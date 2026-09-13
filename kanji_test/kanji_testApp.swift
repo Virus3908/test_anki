@@ -1,14 +1,19 @@
-//
-//  kanji_testApp.swift
-//  kanji_test
-//
-//  Created by Алексей Ломачев on 13.09.2026.
-//
-
 import SwiftUI
+import UIKit
+
+final class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(
+        _ application: UIApplication,
+        supportedInterfaceOrientationsFor window: UIWindow?
+    ) -> UIInterfaceOrientationMask {
+        .portrait
+    }
+}
 
 @main
 struct kanji_testApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+
     var body: some Scene {
         WindowGroup {
             ContentView()
