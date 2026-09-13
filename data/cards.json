@@ -1,0 +1,13 @@
+[
+  {
+    "kanji": "日",
+    "meanings": ["солнце", "день"],
+    "onyomi": ["ニチ", "ジツ"],
+    "kunyomi": ["ひ", "-び", "-か"],
+    "examples": [
+      { "word": "日本", "reading": "にほん", "meaning": "Япония" },
+      { "word": "日曜日", "reading": "にちようび", "meaning": "воскресенье" },
+      { "word": "今日", "reading": "きょう", "meaning": "сегодня" }
+    ]
+  }
+]
