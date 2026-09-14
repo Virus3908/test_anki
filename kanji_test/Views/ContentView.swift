@@ -1,24 +1,5 @@
 import SwiftUI
 
-private let canonicalSize: CGFloat = 109
-
-private enum AppPalette {
-    static let background = Color(red: 0.95, green: 0.94, blue: 0.90)
-    static let surface = Color.white
-    static let text = Color(red: 0.12, green: 0.11, blue: 0.09)
-    static let secondaryText = Color(red: 0.42, green: 0.38, blue: 0.32)
-    static let mutedText = Color(red: 0.68, green: 0.64, blue: 0.56)
-    static let border = Color(red: 0.68, green: 0.64, blue: 0.56)
-    static let ink = Color(red: 0.12, green: 0.16, blue: 0.17)
-    static let accent = Color(red: 0.14, green: 0.36, blue: 0.39)
-    static let correction = Color(red: 0.74, green: 0.12, blue: 0.14)
-    static let warning = Color(red: 0.78, green: 0.58, blue: 0.10)
-    static let expectedCorrection = Color(red: 1.00, green: 0.35, blue: 0.32)
-    static let expectedWarning = Color(red: 0.96, green: 0.74, blue: 0.22)
-    static let expectedCorrect = Color(red: 0.50, green: 0.52, blue: 0.56)
-    static let success = Color(red: 0.18, green: 0.52, blue: 0.24)
-}
-
 private enum FrontFieldKind: String, CaseIterable, Identifiable {
     case readings
     case meanings
@@ -38,17 +19,48 @@ private enum FrontFieldKind: String, CaseIterable, Identifiable {
     }
 }
 
+private struct SessionCardMarker: Identifiable {
+    let id: String
+    let title: String
+    let isMastered: Bool
+}
+
+private enum MeaningLanguage: String, CaseIterable, Identifiable {
+    case russian
+    case english
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .russian:
+            return "Русский"
+        case .english:
+            return "English"
+        }
+    }
+}
+
 struct ContentView: View {
     @State private var practiceMode: PracticeMode = .kanji
     @State private var cards: [KanjiCard] = []
     @State private var wordCards: [WordStudyCard] = []
     @State private var kanaCards: [KanaStudyCard] = []
     @State private var selectedDeck: KanjiDeck = .jlpt5
+    @State private var selectedKanaDeck: KanaDeck = .hiragana
     @State private var previewDeck: KanjiDeck?
+    @State private var previewKanaDeck: KanaDeck?
+    @State private var previewWordDeck: WordFrequencyDeck?
     @State private var previewCards: [KanjiCard] = []
+    @State private var previewKanaCards: [KanaStudyCard] = []
+    @State private var previewWordCards: [WordStudyCard] = []
     @State private var previewExpectedCount: Int?
     @State private var selectedPreviewCard: KanjiCard?
+    @State private var selectedKanaPreviewCard: KanaStudyCard?
+    @State private var selectedWordPreviewCard: WordStudyCard?
+    @State private var selectedLinkedKanjiCard: KanjiCard?
     @State private var isPreviewDetailPresented = false
+    @State private var isLinkedKanjiPresented = false
     @State private var previewSwipeDirection = 0
     @State private var deckPreviewTask: Task<Void, Never>?
     @State private var previewTranslationTask: Task<Void, Never>?
@@ -63,6 +75,9 @@ struct ContentView: View {
     @State private var wordFeedbackByKanji: [[StrokeFeedback]] = []
     @State private var sessionTotalCards = 0
     @State private var sessionCompletedCards = 0
+    @State private var masteredKanjiKeys: Set<String> = []
+    @State private var masteredWordKeys: Set<String> = []
+    @State private var masteredKanaKeys: Set<String> = []
     @State private var drawnStrokes: [[CGPoint]] = []
     @State private var currentStroke: [CGPoint] = []
     @State private var feedback: [StrokeFeedback] = []
@@ -80,6 +95,9 @@ struct ContentView: View {
     @State private var frontFieldDragOffset: CGFloat = 0
     @State private var frontFieldDragStartIndex: Int?
     @State private var isGuidedSingleKanjiPractice = false
+    @State private var isSettingsPresented = false
+    @State private var meaningLanguage: MeaningLanguage = .russian
+    @State private var wordMeaningTranslations: [String: String] = [:]
 
     var body: some View {
         NavigationStack {
@@ -88,15 +106,35 @@ struct ContentView: View {
                     activeTrainingView()
                 } else if let previewDeck {
                     deckPreviewView(for: previewDeck)
+                } else if let previewKanaDeck {
+                    kanaPreviewView(for: previewKanaDeck)
+                } else if let previewWordDeck {
+                    wordPreviewView(for: previewWordDeck)
                 } else {
                     startView()
                 }
             }
-            .navigationTitle(hasStartedTraining ? "Kanji Trainer" : previewDeck == nil ? "Набор карточек" : "Колода")
+            .navigationTitle(hasStartedTraining ? "Kanji Trainer" : previewDeck == nil && previewKanaDeck == nil && previewWordDeck == nil ? "Набор карточек" : "Колода")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(AppPalette.background, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarColorScheme(.light, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        isSettingsPresented = true
+                    } label: {
+                        Image(systemName: "gearshape")
+                    }
+                    .disabled(isLoadingDeck)
+                }
+            }
+            .sheet(isPresented: $isSettingsPresented) {
+                settingsView()
+            }
+            .onChange(of: meaningLanguage) {
+                handleMeaningLanguageChange()
+            }
             .task {
                 await loadReviewMemory()
             }
@@ -135,12 +173,12 @@ struct ContentView: View {
                     .disabled(isLoadingDeck)
                 }
 
-                frontSettingsView()
-
                 ScrollView {
                     VStack(alignment: .leading, spacing: 18) {
-                        if practiceMode == .hiragana || practiceMode == .katakana {
-                            kanaStartButton()
+                        if practiceMode == .kana {
+                            ForEach(KanaDeck.allCases) { deck in
+                                kanaDeckButton(for: deck)
+                            }
                         } else if practiceMode == .words {
                             ForEach(WordFrequencyDeck.groups, id: \.title) { group in
                                 VStack(alignment: .leading, spacing: 10) {
@@ -184,6 +222,58 @@ struct ContentView: View {
             .padding(20)
             .foregroundStyle(AppPalette.text)
         }
+    }
+
+    private func settingsView() -> some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    translationSettingsView()
+                    frontSettingsView()
+                }
+                .padding(20)
+            }
+            .background(AppPalette.background)
+            .foregroundStyle(AppPalette.text)
+            .navigationTitle("Настройки")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Готово") {
+                        isSettingsPresented = false
+                    }
+                }
+            }
+        }
+    }
+
+    private func translationSettingsView() -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Перевод")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(AppPalette.secondaryText)
+                .textCase(.uppercase)
+
+            Picker("Язык значений", selection: $meaningLanguage) {
+                ForEach(MeaningLanguage.allCases) { language in
+                    Text(language.title).tag(language)
+                }
+            }
+            .pickerStyle(.segmented)
+
+            Text(meaningLanguage == .russian ? "Показываем русский перевод через внутренний переводчик." : "Показываем исходные английские значения из источников.")
+                .font(.caption)
+                .foregroundStyle(AppPalette.secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(12)
+        .background(AppPalette.surface)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(AppPalette.border.opacity(0.65), lineWidth: 1)
+        )
+        .disabled(isLoadingDeck)
     }
 
     private func frontSettingsView() -> some View {
@@ -301,14 +391,27 @@ struct ContentView: View {
         }
     }
 
+    private func handleMeaningLanguageChange() {
+        guard meaningLanguage == .russian else {
+            previewTranslationTask?.cancel()
+            pretranslationTask?.cancel()
+            return
+        }
+
+        if let previewDeck {
+            schedulePreviewTranslations(for: previewDeck)
+        }
+        scheduleNextCardTranslation()
+    }
+
     private var trainingTitle: String {
         switch practiceMode {
         case .kanji:
             return selectedDeck.title
         case .words:
             return "Слова: \(selectedWordDeck.title)"
-        case .hiragana, .katakana:
-            return practiceMode.title
+        case .kana:
+            return selectedKanaDeck.title
         }
     }
 
@@ -318,10 +421,8 @@ struct ContentView: View {
             return "Первый запуск скачает весь пакет из kanjiapi.dev и сохранит его в кэш."
         case .words:
             return "Слова берутся локально из полного словаря и группируются диапазонами по частоте."
-        case .hiragana:
-            return "Тренировка базовой хираганы без интернета."
-        case .katakana:
-            return "Тренировка базовой катаканы без интернета."
+        case .kana:
+            return "Хирагана и катакана с просмотром карточек и тренировкой письма."
         }
     }
 
@@ -330,15 +431,15 @@ struct ContentView: View {
         reviewStore = KanjiReviewStore.load()
     }
 
-    private func kanaStartButton() -> some View {
+    private func kanaDeckButton(for deck: KanaDeck) -> some View {
         Button {
-            startKanaTraining()
+            openKanaPreview(deck)
         } label: {
             HStack {
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(practiceMode.title)
+                    Text(deck.title)
                         .font(.headline)
-                    Text("\(practiceMode == .hiragana ? KanaStudyCard.hiragana.count : KanaStudyCard.katakana.count) карточек")
+                    Text("\(deck.cards.count) карточек")
                         .font(.caption)
                         .foregroundStyle(AppPalette.secondaryText)
                 }
@@ -391,10 +492,7 @@ struct ContentView: View {
 
     private func wordDeckButton(for deck: WordFrequencyDeck) -> some View {
         Button {
-            selectedWordDeck = deck
-            Task {
-                await loadSelectedWordDeck()
-            }
+            openWordPreview(deck)
         } label: {
             HStack {
                 VStack(alignment: .leading, spacing: 3) {
@@ -454,8 +552,9 @@ struct ContentView: View {
                             .fontWeight(.semibold)
                         Spacer()
                         Text("\(previewCards.count)")
-                            .foregroundStyle(AppPalette.secondaryText)
+                            .fontWeight(.semibold)
                     }
+                    .foregroundStyle(Color.white)
                     .padding(14)
                     .frame(maxWidth: .infinity)
                 }
@@ -491,8 +590,168 @@ struct ContentView: View {
         }
     }
 
+    private func kanaPreviewView(for deck: KanaDeck) -> some View {
+        ZStack {
+            AppPalette.background
+                .ignoresSafeArea()
+
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(spacing: 12) {
+                    Button("", systemImage: "chevron.left") {
+                        closeKanaPreview()
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(AppPalette.accent)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(deck.title)
+                            .font(.title2.weight(.bold))
+                        Text(kanaPreviewStatus(for: deck))
+                            .font(.caption)
+                            .foregroundStyle(AppPalette.secondaryText)
+                    }
+
+                    Spacer()
+                }
+
+                Button {
+                    startKanaTraining(deck: deck, cards: previewKanaCards.shuffled())
+                } label: {
+                    HStack {
+                        Image(systemName: "shuffle")
+                        Text("Начать тренировку")
+                            .fontWeight(.semibold)
+                        Spacer()
+                        Text("\(previewKanaCards.count)")
+                            .fontWeight(.semibold)
+                    }
+                    .foregroundStyle(Color.white)
+                    .padding(14)
+                    .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(AppPalette.accent)
+                .disabled(previewKanaCards.isEmpty)
+
+                ScrollView(.vertical) {
+                    LazyVGrid(columns: kanaPreviewColumns, spacing: 10) {
+                        ForEach(previewKanaCards) { card in
+                            kanaPreviewTile(for: card)
+                        }
+                    }
+                    .padding(.bottom, 20)
+                }
+
+                if isLoadingDeck {
+                    ProgressView("Загружаю штрихи")
+                        .foregroundStyle(AppPalette.secondaryText)
+                        .tint(AppPalette.accent)
+                }
+            }
+            .padding(20)
+            .foregroundStyle(AppPalette.text)
+        }
+        .sheet(isPresented: $isPreviewDetailPresented) {
+            selectedKanaPreviewCard = nil
+            previewSwipeDirection = 0
+        } content: {
+            if let selectedKanaPreviewCard {
+                kanaPreviewDetail(for: selectedKanaPreviewCard, deck: deck)
+            }
+        }
+    }
+
+    private func wordPreviewView(for deck: WordFrequencyDeck) -> some View {
+        ZStack {
+            AppPalette.background
+                .ignoresSafeArea()
+
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(spacing: 12) {
+                    Button("", systemImage: "chevron.left") {
+                        closeWordPreview()
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(AppPalette.accent)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(deck.title)
+                            .font(.title2.weight(.bold))
+                        Text(wordPreviewStatus)
+                            .font(.caption)
+                            .foregroundStyle(AppPalette.secondaryText)
+                    }
+
+                    Spacer()
+                }
+
+                Button {
+                    startWordTraining(with: previewWordCards.shuffled())
+                } label: {
+                    HStack {
+                        Image(systemName: "shuffle")
+                        Text("Начать тренировку")
+                            .fontWeight(.semibold)
+                        Spacer()
+                        Text("\(previewWordCards.count)")
+                            .fontWeight(.semibold)
+                    }
+                    .foregroundStyle(Color.white)
+                    .padding(14)
+                    .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(AppPalette.accent)
+                .disabled(previewWordCards.isEmpty)
+
+                ScrollView(.vertical) {
+                    LazyVGrid(columns: wordPreviewColumns, spacing: 10) {
+                        ForEach(previewWordCards) { card in
+                            wordPreviewTile(for: card)
+                        }
+                    }
+                    .padding(.bottom, 20)
+                }
+
+                if isLoadingDeck {
+                    ProgressView("Загружаю слова")
+                        .foregroundStyle(AppPalette.secondaryText)
+                        .tint(AppPalette.accent)
+                }
+            }
+            .padding(20)
+            .foregroundStyle(AppPalette.text)
+        }
+        .sheet(isPresented: $isPreviewDetailPresented) {
+            selectedWordPreviewCard = nil
+            selectedLinkedKanjiCard = nil
+            isLinkedKanjiPresented = false
+            previewSwipeDirection = 0
+        } content: {
+            if let selectedWordPreviewCard {
+                wordPreviewDetail(for: selectedWordPreviewCard, deck: deck)
+            }
+        }
+    }
+
     private var kanjiPreviewColumns: [GridItem] {
         Array(repeating: GridItem(.flexible(), spacing: 10), count: 4)
+    }
+
+    private var kanaPreviewColumns: [GridItem] {
+        Array(repeating: GridItem(.flexible(), spacing: 8), count: 5)
+    }
+
+    private var wordPreviewColumns: [GridItem] {
+        [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)]
+    }
+
+    private var wordPreviewStatus: String {
+        isLoadingDeck ? "Загружаю словарь" : "\(previewWordCards.count) слов"
+    }
+
+    private func kanaPreviewStatus(for deck: KanaDeck) -> String {
+        isLoadingDeck ? "Загружаю штрихи из KanjiVG" : "\(previewKanaCards.count) карточек из KanjiVG"
     }
 
     private var deckPreviewStatus: String {
@@ -501,6 +760,235 @@ struct ContentView: View {
         }
 
         return "\(previewCards.count) загружено"
+    }
+
+    private func wordPreviewTile(for card: WordStudyCard) -> some View {
+        Button {
+            selectedWordPreviewCard = card
+            previewSwipeDirection = 0
+            isPreviewDetailPresented = true
+        } label: {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(card.reading)
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(AppPalette.secondaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+
+                Text(card.word)
+                    .font(.system(size: 30, weight: .regular, design: .serif))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.55)
+
+                Text(displayedWordMeaning(for: card))
+                    .font(.caption)
+                    .foregroundStyle(AppPalette.secondaryText)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(10)
+            .frame(maxWidth: .infinity, minHeight: 104, alignment: .topLeading)
+            .background(AppPalette.surface)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(AppPalette.border.opacity(0.55), lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func wordPreviewDetail(for card: WordStudyCard, deck: WordFrequencyDeck) -> some View {
+        NavigationStack {
+            ScrollView(.vertical) {
+                VStack(alignment: .leading, spacing: 16) {
+                    wordFullCard(for: card)
+
+                    Button {
+                        selectedWordPreviewCard = nil
+                        isPreviewDetailPresented = false
+                        startWordTraining(with: [card])
+                    } label: {
+                        HStack {
+                            Image(systemName: "pencil.and.scribble")
+                            Text("Практиковать слово")
+                                .fontWeight(.semibold)
+                        }
+                        .foregroundStyle(Color.white)
+                        .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(AppPalette.accent)
+                }
+                .padding(20)
+            }
+            .background(AppPalette.background)
+            .id(card.id)
+            .transition(previewDetailTransition)
+            .simultaneousGesture(wordPreviewCardSwipeGesture(for: card, in: deck))
+        }
+        .sheet(isPresented: $isLinkedKanjiPresented) {
+            selectedLinkedKanjiCard = nil
+        } content: {
+            if let selectedLinkedKanjiCard {
+                kanjiPreviewDetail(for: selectedLinkedKanjiCard)
+            }
+        }
+    }
+
+    private func wordFullCard(for card: WordStudyCard) -> some View {
+        wordFullCardContent(for: card)
+            .padding(18)
+            .background(AppPalette.surface)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(AppPalette.border.opacity(0.65), lineWidth: 1)
+            )
+    }
+
+    private func wordFullCardContent(for card: WordStudyCard) -> some View {
+        VStack(alignment: .leading, spacing: 16) {
+            VStack(spacing: 6) {
+                Text(card.word)
+                    .font(.system(size: 64, weight: .regular, design: .serif))
+                    .foregroundStyle(AppPalette.text)
+                    .minimumScaleFactor(0.42)
+                    .lineLimit(1)
+                    .frame(maxWidth: .infinity)
+
+                Text(card.reading)
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(AppPalette.secondaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+                    .frame(maxWidth: .infinity)
+            }
+            .frame(maxWidth: .infinity)
+
+            detailBlock("Перевод") {
+                Text(displayedWordMeaning(for: card))
+                    .foregroundStyle(AppPalette.text)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            detailBlock("Состав") {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 92), spacing: 8)], alignment: .leading, spacing: 8) {
+                    ForEach(card.kanjiCards.indices, id: \.self) { index in
+                        wordComponentLink(for: card.kanjiCards[index])
+                    }
+                }
+            }
+        }
+        .task(id: "\(card.id)-\(meaningLanguage.rawValue)") {
+            await translateWordMeaningIfNeeded(for: card)
+        }
+    }
+
+    private func wordComponentLink(for card: KanjiCard) -> some View {
+        Button {
+            selectedLinkedKanjiCard = card
+            isLinkedKanjiPresented = true
+        } label: {
+            VStack(alignment: .leading, spacing: 3) {
+                Text(card.kanji)
+                    .font(.title2.weight(.semibold))
+                    .foregroundStyle(AppPalette.text)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+
+                Text(wordComponentSubtitle(for: card))
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(AppPalette.secondaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(AppPalette.background)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(AppPalette.border.opacity(0.55), lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func wordComponentSubtitle(for card: KanjiCard) -> String {
+        if let meaning = displayedKanjiMeanings(for: card).first, !meaning.isEmpty {
+            return meaning
+        }
+
+        if let reading = card.kunyomi.first ?? card.onyomi.first, !reading.isEmpty {
+            return reading
+        }
+
+        return "знак"
+    }
+
+    private func kanaPreviewTile(for card: KanaStudyCard) -> some View {
+        Button {
+            selectedKanaPreviewCard = card
+            previewSwipeDirection = 0
+            isPreviewDetailPresented = true
+        } label: {
+            VStack(spacing: 4) {
+                Text(card.character)
+                    .font(.system(size: 30, weight: .regular, design: .serif))
+                    .frame(maxWidth: .infinity)
+                    .minimumScaleFactor(0.55)
+
+                Text(card.reading)
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(AppPalette.secondaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+                    .frame(height: 14)
+            }
+            .padding(6)
+            .frame(maxWidth: .infinity, minHeight: 70)
+            .background(AppPalette.surface)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(AppPalette.border.opacity(0.55), lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func kanaPreviewDetail(for card: KanaStudyCard, deck: KanaDeck) -> some View {
+        NavigationStack {
+            ScrollView(.vertical) {
+                VStack(alignment: .leading, spacing: 16) {
+                    kanaPreviewCardContent(for: card)
+
+                    Button {
+                        selectedKanaPreviewCard = nil
+                        isPreviewDetailPresented = false
+                        startKanaTraining(deck: deck, cards: [card], guided: true)
+                    } label: {
+                        HStack {
+                            Image(systemName: "pencil.and.scribble")
+                            Text("Тренировать этот знак")
+                                .fontWeight(.semibold)
+                        }
+                        .foregroundStyle(Color.white)
+                        .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(AppPalette.accent)
+                }
+                .padding(20)
+            }
+            .background(AppPalette.background)
+            .foregroundStyle(AppPalette.text)
+            .id(card.character)
+            .transition(previewDetailTransition)
+            .simultaneousGesture(kanaPreviewCardSwipeGesture(for: card, in: deck))
+        }
     }
 
     private func kanjiPreviewTile(for card: KanjiCard) -> some View {
@@ -514,7 +1002,7 @@ struct ContentView: View {
                     .font(.system(size: 34, weight: .regular, design: .serif))
                     .frame(maxWidth: .infinity)
 
-                Text(card.meanings.prefix(2).joined(separator: ", "))
+                Text(displayedKanjiMeanings(for: card).prefix(2).joined(separator: ", "))
                     .font(.caption2)
                     .lineLimit(2)
                     .multilineTextAlignment(.center)
@@ -537,7 +1025,7 @@ struct ContentView: View {
         NavigationStack {
             ScrollView(.vertical) {
                 VStack(alignment: .leading, spacing: 16) {
-                    cardBack(for: card)
+                    cardBackContent(for: card)
                         .padding(18)
                         .background(AppPalette.surface)
                         .clipShape(RoundedRectangle(cornerRadius: 8))
@@ -556,6 +1044,7 @@ struct ContentView: View {
                             Text("Тренировать этот кандзи")
                                 .fontWeight(.semibold)
                         }
+                        .foregroundStyle(Color.white)
                         .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.borderedProminent)
@@ -564,9 +1053,10 @@ struct ContentView: View {
                 .padding(20)
             }
             .background(AppPalette.background)
+            .foregroundStyle(AppPalette.text)
             .id(card.kanji)
             .transition(previewDetailTransition)
-            .highPriorityGesture(previewCardSwipeGesture(for: card))
+            .simultaneousGesture(previewCardSwipeGesture(for: card))
         }
     }
 
@@ -580,6 +1070,60 @@ struct ContentView: View {
         }
 
         return .opacity
+    }
+
+    private func wordPreviewCardSwipeGesture(for card: WordStudyCard, in deck: WordFrequencyDeck) -> some Gesture {
+        DragGesture(minimumDistance: 35)
+            .onEnded { value in
+                let width = value.translation.width
+                let height = value.translation.height
+                guard abs(width) > abs(height) * 1.25, abs(width) > 55 else {
+                    return
+                }
+
+                guard let index = previewWordCards.firstIndex(where: { $0.id == card.id }) else {
+                    return
+                }
+
+                if width < 0, let nextCard = previewWordCards[safe: index + 1] {
+                    previewSwipeDirection = -1
+                    withAnimation(.easeInOut(duration: 0.22)) {
+                        selectedWordPreviewCard = nextCard
+                    }
+                } else if width > 0, let previousCard = previewWordCards[safe: index - 1] {
+                    previewSwipeDirection = 1
+                    withAnimation(.easeInOut(duration: 0.22)) {
+                        selectedWordPreviewCard = previousCard
+                    }
+                }
+            }
+    }
+
+    private func kanaPreviewCardSwipeGesture(for card: KanaStudyCard, in deck: KanaDeck) -> some Gesture {
+        DragGesture(minimumDistance: 35)
+            .onEnded { value in
+                let width = value.translation.width
+                let height = value.translation.height
+                guard abs(width) > abs(height) * 1.25, abs(width) > 55 else {
+                    return
+                }
+
+                guard let index = previewKanaCards.firstIndex(where: { $0.character == card.character }) else {
+                    return
+                }
+
+                if width < 0, let nextCard = previewKanaCards[safe: index + 1] {
+                    previewSwipeDirection = -1
+                    withAnimation(.easeInOut(duration: 0.22)) {
+                        selectedKanaPreviewCard = nextCard
+                    }
+                } else if width > 0, let previousCard = previewKanaCards[safe: index - 1] {
+                    previewSwipeDirection = 1
+                    withAnimation(.easeInOut(duration: 0.22)) {
+                        selectedKanaPreviewCard = previousCard
+                    }
+                }
+            }
     }
 
     private func previewCardSwipeGesture(for card: KanjiCard) -> some Gesture {
@@ -624,7 +1168,7 @@ struct ContentView: View {
             } else {
                 startView()
             }
-        case .hiragana, .katakana:
+        case .kana:
             if let kanaCard = kanaCards[safe: currentIndex] {
                 kanaTrainingView(for: kanaCard)
             } else {
@@ -729,18 +1273,16 @@ struct ContentView: View {
     }
 
     private func wordStudyCard(for wordCard: WordStudyCard) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Слово")
-                .font(.caption.weight(.bold))
-                .foregroundStyle(AppPalette.secondaryText)
-                .textCase(.uppercase)
+        ZStack {
+            wordCardFront(for: wordCard)
+                .opacity(isAnswerVisible ? 0 : 1)
+                .rotation3DEffect(.degrees(isAnswerVisible ? 180 : 0), axis: (x: 0, y: 1, z: 0))
 
-            wordFrontFields(for: wordCard)
-
-            if !isAnswerVisible && !showsPromptCharacters && !showsPromptReading && !showsPromptMeaning {
-                Text("Нарисуй символы слова по памяти.")
-                    .font(.title2.weight(.semibold))
+            ScrollView {
+                wordFullCardContent(for: wordCard)
             }
+            .opacity(isAnswerVisible ? 1 : 0)
+            .rotation3DEffect(.degrees(isAnswerVisible ? 0 : -180), axis: (x: 0, y: 1, z: 0))
         }
         .padding(18)
         .frame(maxWidth: .infinity, alignment: .topLeading)
@@ -752,7 +1294,33 @@ struct ContentView: View {
                 .stroke(AppPalette.border.opacity(0.65), lineWidth: 1)
         )
         .contentShape(RoundedRectangle(cornerRadius: 8))
-        .highPriorityGesture(cardSwipeGesture())
+        .gesture(cardSwipeGesture())
+        .task(id: "\(wordCard.id)-\(meaningLanguage.rawValue)") {
+            await translateWordMeaningIfNeeded(for: wordCard)
+        }
+    }
+
+    private func wordCardFront(for wordCard: WordStudyCard) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Задание")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(AppPalette.secondaryText)
+                .textCase(.uppercase)
+
+            wordFrontFields(for: wordCard)
+
+            if !showsPromptCharacters && !showsPromptReading && !showsPromptMeaning {
+                Text("Нарисуй символы слова по памяти.")
+                    .font(.title2.weight(.semibold))
+                    .foregroundStyle(AppPalette.text)
+            }
+
+            Spacer(minLength: 16)
+
+            Text("Проверка покажет слово, чтение, перевод и состав.")
+                .foregroundStyle(AppPalette.secondaryText)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
     @ViewBuilder
@@ -792,21 +1360,21 @@ struct ContentView: View {
     private func wordMeaningField(for wordCard: WordStudyCard) -> some View {
         if isAnswerVisible || showsPromptMeaning {
             detailBlock("Значения") {
-                Text(wordCard.meaning)
+                Text(displayedWordMeaning(for: wordCard))
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
     }
 
     private func kanaStudyCard(for kanaCard: KanaStudyCard) -> some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text(kanaCard.reading)
-                .font(.largeTitle.weight(.bold))
+        ZStack {
+            kanaCardFront(for: kanaCard)
+                .opacity(isAnswerVisible ? 0 : 1)
+                .rotation3DEffect(.degrees(isAnswerVisible ? 180 : 0), axis: (x: 0, y: 1, z: 0))
 
-            Text(isAnswerVisible ? kanaCard.character : "Нарисуй знак каны по чтению")
-                .font(.system(size: isAnswerVisible ? 92 : 24, weight: .regular, design: .serif))
-                .foregroundStyle(isAnswerVisible ? AppPalette.text : AppPalette.secondaryText)
-                .frame(maxWidth: .infinity, minHeight: 140)
+            kanaCardBack(for: kanaCard)
+                .opacity(isAnswerVisible ? 1 : 0)
+                .rotation3DEffect(.degrees(isAnswerVisible ? 0 : -180), axis: (x: 0, y: 1, z: 0))
         }
         .padding(18)
         .frame(maxWidth: .infinity, alignment: .topLeading)
@@ -818,7 +1386,84 @@ struct ContentView: View {
                 .stroke(AppPalette.border.opacity(0.65), lineWidth: 1)
         )
         .contentShape(RoundedRectangle(cornerRadius: 8))
-        .highPriorityGesture(cardSwipeGesture())
+        .gesture(cardSwipeGesture())
+    }
+
+    private func kanaCardFront(for kanaCard: KanaStudyCard) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Задание")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(AppPalette.secondaryText)
+                .textCase(.uppercase)
+
+            detailBlock("Чтение") {
+                Text(kanaCard.reading)
+                    .font(.largeTitle.weight(.bold))
+            }
+
+            Spacer(minLength: 16)
+
+            Text("Нарисуй знак каны по памяти.")
+                .font(.title2.weight(.semibold))
+
+            Text("Проверка покажет оригинал и сравнение штрихов.")
+                .foregroundStyle(AppPalette.secondaryText)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+    }
+
+    private func kanaPreviewCardContent(for kanaCard: KanaStudyCard) -> some View {
+        kanaCardBackContent(for: kanaCard)
+            .padding(18)
+            .background(AppPalette.surface)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(AppPalette.border.opacity(0.65), lineWidth: 1)
+            )
+    }
+
+    private func kanaCardBack(for kanaCard: KanaStudyCard) -> some View {
+        ScrollView {
+            kanaCardBackContent(for: kanaCard)
+        }
+    }
+
+    private func kanaCardBackContent(for kanaCard: KanaStudyCard) -> some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(alignment: .top, spacing: 18) {
+                Text(kanaCard.character)
+                    .font(.system(size: 82, weight: .regular, design: .serif))
+                    .foregroundStyle(AppPalette.text)
+                    .frame(width: 112, height: 112)
+                    .background(AppPalette.surface)
+                    .border(AppPalette.border.opacity(0.65))
+
+                VStack(alignment: .leading, spacing: 8) {
+                    detailBlock("Кана") {
+                        Text(kanaCard.character)
+                            .font(.title2.weight(.bold))
+                            .foregroundStyle(AppPalette.text)
+                    }
+
+                    detailBlock("Чтение") {
+                        Text(kanaCard.reading)
+                            .foregroundStyle(AppPalette.text)
+                    }
+
+                    detailBlock("Штрихи") {
+                        Text("\(kanaCard.strokes.count)")
+                            .foregroundStyle(AppPalette.text)
+                    }
+                }
+            }
+
+            if !kanaCard.strokes.isEmpty {
+                detailBlock("Порядок штрихов") {
+                    StrokeStepStrip(strokes: kanaCard.strokes)
+                }
+            }
+        }
     }
 
     private func completedWordStrip(for wordCard: WordStudyCard) -> some View {
@@ -876,23 +1521,100 @@ struct ContentView: View {
     }
 
     private func headerControls() -> some View {
-        HStack(spacing: 12) {
-            Button("", systemImage: "square.grid.2x2") {
-                hasStartedTraining = false
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 12) {
+                Button("", systemImage: "square.grid.2x2") {
+                    hasStartedTraining = false
+                }
+
+                Text(trainingTitle)
+                    .font(.headline)
+
+                Spacer()
+
+                Text("Закреплено \(sessionCompletedCards) / \(sessionTotalCards)")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(AppPalette.secondaryText)
+                    .frame(minWidth: 128, alignment: .trailing)
             }
 
-            Text(trainingTitle)
-                .font(.headline)
-
-            Spacer()
-
-            Text("\(sessionCompletedCards) / \(sessionTotalCards)")
-                .font(.footnote.weight(.semibold))
-                .foregroundStyle(AppPalette.secondaryText)
-                .frame(minWidth: 56)
+            let markers = sessionCardMarkers
+            if !markers.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 6) {
+                        ForEach(markers) { marker in
+                            sessionCardMarker(marker)
+                        }
+                    }
+                    .padding(.vertical, 1)
+                }
+            }
         }
         .buttonStyle(.bordered)
         .tint(AppPalette.accent)
+    }
+
+    private var sessionCardMarkers: [SessionCardMarker] {
+        switch practiceMode {
+        case .kanji:
+            return uniqueMarkers(
+                from: cards,
+                key: \.kanji,
+                title: \.kanji,
+                masteredKeys: masteredKanjiKeys
+            )
+        case .words:
+            return uniqueMarkers(
+                from: wordCards,
+                key: \.id,
+                title: \.word,
+                masteredKeys: masteredWordKeys
+            )
+        case .kana:
+            return uniqueMarkers(
+                from: kanaCards,
+                key: \.character,
+                title: \.character,
+                masteredKeys: masteredKanaKeys
+            )
+        }
+    }
+
+    private func uniqueMarkers<Item>(
+        from items: [Item],
+        key: KeyPath<Item, String>,
+        title: KeyPath<Item, String>,
+        masteredKeys: Set<String>
+    ) -> [SessionCardMarker] {
+        var seen: Set<String> = []
+        return items.compactMap { item in
+            let itemKey = item[keyPath: key]
+            guard seen.insert(itemKey).inserted else {
+                return nil
+            }
+
+            return SessionCardMarker(
+                id: itemKey,
+                title: item[keyPath: title],
+                isMastered: masteredKeys.contains(itemKey)
+            )
+        }
+    }
+
+    private func sessionCardMarker(_ marker: SessionCardMarker) -> some View {
+        Text(marker.title)
+            .font(.caption.weight(.semibold))
+            .lineLimit(1)
+            .minimumScaleFactor(0.7)
+            .foregroundStyle(marker.isMastered ? Color.white : AppPalette.secondaryText)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 5)
+            .background(marker.isMastered ? AppPalette.success : AppPalette.surface)
+            .clipShape(RoundedRectangle(cornerRadius: 7))
+            .overlay(
+                RoundedRectangle(cornerRadius: 7)
+                    .stroke(marker.isMastered ? AppPalette.success : AppPalette.border.opacity(0.55), lineWidth: 1)
+            )
     }
 
     private func studyCard(for card: KanjiCard) -> some View {
@@ -915,7 +1637,7 @@ struct ContentView: View {
                 .stroke(AppPalette.border.opacity(0.65), lineWidth: 1)
         )
         .contentShape(RoundedRectangle(cornerRadius: 8))
-        .highPriorityGesture(cardSwipeGesture())
+        .gesture(cardSwipeGesture())
         .onTapGesture {
             withAnimation(.easeInOut(duration: 0.24)) {
                 isAnswerVisible.toggle()
@@ -986,7 +1708,7 @@ struct ContentView: View {
     private func frontMeanings(for card: KanjiCard) -> some View {
         if showsPromptMeaning {
             detailBlock("Значения") {
-                Text(card.meanings.joined(separator: ", "))
+                Text(displayedKanjiMeanings(for: card).joined(separator: ", "))
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
@@ -994,52 +1716,62 @@ struct ContentView: View {
 
     private func cardBack(for card: KanjiCard) -> some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                HStack(alignment: .top, spacing: 18) {
-                    Text(card.kanji)
-                        .font(.system(size: 82, weight: .regular, design: .serif))
-                        .frame(width: 112, height: 112)
-                        .background(AppPalette.surface)
-                        .border(AppPalette.border.opacity(0.65))
-
-                    VStack(alignment: .leading, spacing: 8) {
-                        detailBlock("Кандзи") {
-                            Text(card.kanji)
-                                .font(.title2.weight(.bold))
-                        }
-
-                        detailBlock("Онъёми") {
-                            Text(readingsText(card.onyomi))
-                        }
-
-                        detailBlock("Кунъёми") {
-                            Text(kunyomiText(for: card.kunyomi))
-                        }
-
-                        detailBlock("Порядок черт") {
-                            StrokeStepStrip(strokes: card.strokes)
-                        }
-
-                        detailBlock("Значения") {
-                            Text(card.meanings.joined(separator: ", "))
-                        }
-                    }
-                    .fixedSize(horizontal: false, vertical: true)
-                }
-
-                if !card.examples.isEmpty {
-                    section("Примеры") {
-                        VStack(alignment: .leading, spacing: 8) {
-                            ForEach(card.examples) { example in
-                                Text("\(example.word) - \(example.reading) — \(example.meaning)")
-                            }
-                        }
-                    }
-                }
-
-            }
+            cardBackContent(for: card)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+    }
+
+    private func cardBackContent(for card: KanjiCard) -> some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(alignment: .top, spacing: 18) {
+                Text(card.kanji)
+                    .font(.system(size: 82, weight: .regular, design: .serif))
+                    .foregroundStyle(AppPalette.text)
+                    .frame(width: 112, height: 112)
+                    .background(AppPalette.surface)
+                    .border(AppPalette.border.opacity(0.65))
+
+                VStack(alignment: .leading, spacing: 8) {
+                    detailBlock("Кандзи") {
+                        Text(card.kanji)
+                            .font(.title2.weight(.bold))
+                            .foregroundStyle(AppPalette.text)
+                    }
+
+                    detailBlock("Онъёми") {
+                        Text(readingsText(card.onyomi))
+                            .foregroundStyle(AppPalette.text)
+                    }
+
+                    detailBlock("Кунъёми") {
+                        Text(kunyomiText(for: card.kunyomi))
+                            .foregroundStyle(AppPalette.text)
+                    }
+
+                    detailBlock("Порядок черт") {
+                        StrokeStepStrip(strokes: card.strokes)
+                    }
+
+                    detailBlock("Значения") {
+                        Text(displayedKanjiMeanings(for: card).joined(separator: ", "))
+                            .foregroundStyle(AppPalette.text)
+                    }
+                }
+                .fixedSize(horizontal: false, vertical: true)
+            }
+
+            let examples = displayedKanjiExamples(for: card)
+            if !examples.isEmpty {
+                section("Примеры") {
+                    VStack(alignment: .leading, spacing: 8) {
+                        ForEach(examples) { example in
+                            Text("\(example.word) - \(example.reading) - \(example.meaning)")
+                                .foregroundStyle(AppPalette.text)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private func detailBlock<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
@@ -1049,6 +1781,48 @@ struct ContentView: View {
                 .foregroundStyle(AppPalette.secondaryText)
             content()
                 .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private func displayedKanjiMeanings(for card: KanjiCard) -> [String] {
+        switch meaningLanguage {
+        case .russian:
+            return card.meanings
+        case .english:
+            return card.sourceMeanings ?? card.meanings
+        }
+    }
+
+    private func displayedKanjiExamples(for card: KanjiCard) -> [KanjiExample] {
+        switch meaningLanguage {
+        case .russian:
+            return card.examples
+        case .english:
+            return card.sourceExamples ?? card.examples
+        }
+    }
+
+    private func displayedWordMeaning(for card: WordStudyCard) -> String {
+        switch meaningLanguage {
+        case .russian:
+            return wordMeaningTranslations[card.id] ?? RussianMeaningTranslator.translateLocally([card.meaning]).first ?? card.meaning
+        case .english:
+            return card.meaning
+        }
+    }
+
+    private func translateWordMeaningIfNeeded(for card: WordStudyCard) async {
+        guard meaningLanguage == .russian, wordMeaningTranslations[card.id] == nil else {
+            return
+        }
+
+        let translatedMeaning = await RussianMeaningTranslator.translate([card.meaning]).first ?? card.meaning
+        await MainActor.run {
+            guard meaningLanguage == .russian, wordMeaningTranslations[card.id] == nil else {
+                return
+            }
+
+            wordMeaningTranslations[card.id] = translatedMeaning
         }
     }
 
@@ -1088,16 +1862,21 @@ struct ContentView: View {
     }
 
     private func reviewButton(_ title: String, rating: ReviewRating, card: KanjiCard, color: Color) -> some View {
-        Button {
+        ratingActionButton(title, color: color) {
             applyReview(rating, to: card)
-        } label: {
+        }
+        .disabled(isPreparingCard)
+    }
+
+    private func ratingActionButton(_ title: String, color: Color, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
             Text(title)
                 .font(.title3.weight(.bold))
+                .foregroundStyle(Color.white)
                 .frame(width: 18, height: 18)
         }
         .buttonStyle(.borderedProminent)
         .tint(color)
-        .disabled(isPreparingCard)
     }
 
     private func feedbackInfoButton(items: [StrokeFeedback]) -> some View {
@@ -1150,10 +1929,10 @@ struct ContentView: View {
                 DrawingBoard(
                     drawnStrokes: $drawnStrokes,
                     currentStroke: $currentStroke,
-                    expectedStrokes: expectedStrokesForCurrentKanji(card),
+                    expectedStrokes: expectedStrokesForCurrentCard(card),
                     feedback: feedback,
                     onStrokeFinished: {
-                        handleKanjiStrokeFinished(card)
+                        handleGuidedStrokeFinished(card)
                     }
                 )
                 .frame(width: boardSide, height: boardSide)
@@ -1179,7 +1958,7 @@ struct ContentView: View {
 
                 HStack {
                     Button {
-                        undoCurrentStroke(expected: card)
+                        undoCurrentStroke()
                     } label: {
                         Image(systemName: "arrow.uturn.backward")
                     }
@@ -1188,7 +1967,7 @@ struct ContentView: View {
                     Spacer()
 
                 Button {
-                    advanceGuidedKanjiStrokeOrFinish(card)
+                    advanceGuidedStrokeOrReveal(card)
                 } label: {
                     Image(systemName: "checkmark.circle.fill")
                 }
@@ -1203,11 +1982,11 @@ struct ContentView: View {
 
             HStack(spacing: 8) {
                 Button {
-                    undoCurrentStroke(expected: card)
+                    moveToPreviousCard()
                 } label: {
-                    Image(systemName: "arrow.uturn.backward")
+                    Image(systemName: "chevron.left")
                 }
-                .disabled(drawnStrokes.isEmpty)
+                .disabled(currentIndex <= 0 || isPreparingCard)
 
                 Spacer(minLength: 12)
 
@@ -1308,18 +2087,24 @@ struct ContentView: View {
 
             HStack(spacing: 8) {
                 Button {
-                    undoCurrentWordStroke(wordCard, currentKanji: currentKanji)
+                    moveToPreviousCard()
                 } label: {
-                    Image(systemName: "arrow.uturn.backward")
+                    Image(systemName: "chevron.left")
                 }
-                .disabled(drawnStrokes.isEmpty)
+                .disabled(currentIndex <= 0 || isPreparingCard)
 
                 Spacer(minLength: 12)
 
                 HStack(spacing: 10) {
-                    Button("-") { applyWordReview(.again) }.buttonStyle(.borderedProminent).tint(feedback.isEmpty ? AppPalette.mutedText : AppPalette.correction)
-                    Button("~") { applyWordReview(.hard) }.buttonStyle(.borderedProminent).tint(feedback.isEmpty ? AppPalette.mutedText : AppPalette.warning)
-                    Button("+") { applyWordReview(.good) }.buttonStyle(.borderedProminent).tint(feedback.isEmpty ? AppPalette.mutedText : AppPalette.success)
+                    ratingActionButton("-", color: feedback.isEmpty ? AppPalette.mutedText : AppPalette.correction) {
+                        applyWordReview(.again)
+                    }
+                    ratingActionButton("~", color: feedback.isEmpty ? AppPalette.mutedText : AppPalette.warning) {
+                        applyWordReview(.hard)
+                    }
+                    ratingActionButton("+", color: feedback.isEmpty ? AppPalette.mutedText : AppPalette.success) {
+                        applyWordReview(.good)
+                    }
                 }
                 .disabled(feedback.isEmpty)
 
@@ -1356,23 +2141,25 @@ struct ContentView: View {
 
     private func kanaDrawingPanel(for kanaCard: KanaStudyCard, panelHeight: CGFloat) -> some View {
         let boardSide = drawingBoardSide(for: panelHeight)
+        let expectedCard = kanjiCard(for: kanaCard)
 
         return VStack(spacing: 8) {
             ZStack {
                 DrawingBoard(
                     drawnStrokes: $drawnStrokes,
                     currentStroke: $currentStroke,
-                    expectedStrokes: [],
-                    feedback: [],
-                    onStrokeFinished: nil
+                    expectedStrokes: expectedStrokesForCurrentCard(expectedCard),
+                    feedback: feedback,
+                    onStrokeFinished: {
+                        handleGuidedStrokeFinished(expectedCard)
+                    }
                 )
                 .frame(width: boardSide, height: boardSide)
 
                 VStack {
                     HStack {
                         Button {
-                            drawnStrokes.removeAll()
-                            currentStroke.removeAll()
+                            clearCurrentDrawing(expected: expectedCard)
                         } label: {
                             Image(systemName: "trash")
                         }
@@ -1380,8 +2167,9 @@ struct ContentView: View {
 
                         Spacer()
 
-                        Image(systemName: "info.circle")
-                            .foregroundStyle(AppPalette.mutedText)
+                        feedbackInfoButton(items: feedback)
+                            .disabled(feedback.isEmpty)
+                            .tint(feedback.isEmpty ? AppPalette.mutedText : AppPalette.accent)
                     }
 
                     Spacer()
@@ -1389,7 +2177,7 @@ struct ContentView: View {
 
                 HStack {
                     Button {
-                        _ = drawnStrokes.popLast()
+                        undoCurrentStroke()
                     } label: {
                         Image(systemName: "arrow.uturn.backward")
                     }
@@ -1398,9 +2186,7 @@ struct ContentView: View {
                     Spacer()
 
                     Button {
-                        withAnimation(.easeInOut(duration: 0.24)) {
-                            isAnswerVisible = true
-                        }
+                        advanceGuidedStrokeOrReveal(expectedCard)
                     } label: {
                         Image(systemName: "checkmark.circle.fill")
                     }
@@ -1414,17 +2200,27 @@ struct ContentView: View {
             .font(.title3.weight(.semibold))
 
             HStack(spacing: 8) {
-                Button { _ = drawnStrokes.popLast() } label: { Image(systemName: "arrow.uturn.backward") }
-                    .disabled(drawnStrokes.isEmpty)
+                Button {
+                    moveToPreviousCard()
+                } label: {
+                    Image(systemName: "chevron.left")
+                }
+                .disabled(currentIndex <= 0 || isPreparingCard)
 
                 Spacer(minLength: 12)
 
                 HStack(spacing: 10) {
-                    Button("-") { applyKanaReview(.again) }.buttonStyle(.borderedProminent).tint(isAnswerVisible ? AppPalette.correction : AppPalette.mutedText)
-                    Button("~") { applyKanaReview(.hard) }.buttonStyle(.borderedProminent).tint(isAnswerVisible ? AppPalette.warning : AppPalette.mutedText)
-                    Button("+") { applyKanaReview(.good) }.buttonStyle(.borderedProminent).tint(isAnswerVisible ? AppPalette.success : AppPalette.mutedText)
+                    ratingActionButton("-", color: feedback.isEmpty ? AppPalette.mutedText : AppPalette.correction) {
+                        applyKanaReview(.again)
+                    }
+                    ratingActionButton("~", color: feedback.isEmpty ? AppPalette.mutedText : AppPalette.warning) {
+                        applyKanaReview(.hard)
+                    }
+                    ratingActionButton("+", color: feedback.isEmpty ? AppPalette.mutedText : AppPalette.success) {
+                        applyKanaReview(.good)
+                    }
                 }
-                .disabled(!isAnswerVisible)
+                .disabled(feedback.isEmpty)
 
                 Spacer(minLength: 12)
 
@@ -1456,6 +2252,14 @@ struct ContentView: View {
         }
     }
 
+    private func resetSessionProgress(total: Int) {
+        sessionTotalCards = total
+        sessionCompletedCards = 0
+        masteredKanjiKeys.removeAll()
+        masteredWordKeys.removeAll()
+        masteredKanaKeys.removeAll()
+    }
+
     private func clearDeckCache() {
         pretranslationTask?.cancel()
         pretranslationTask = nil
@@ -1464,18 +2268,26 @@ struct ContentView: View {
         previewTranslationTask?.cancel()
         previewTranslationTask = nil
         KanjiDataLoader.clearCache()
+        KanaDataLoader.clearCache()
         cards.removeAll()
         wordCards.removeAll()
         kanaCards.removeAll()
         previewCards.removeAll()
+        previewKanaCards.removeAll()
+        previewWordCards.removeAll()
         previewExpectedCount = nil
         previewDeck = nil
+        previewKanaDeck = nil
+        previewWordDeck = nil
+        selectedPreviewCard = nil
+        selectedKanaPreviewCard = nil
+        selectedWordPreviewCard = nil
+        selectedLinkedKanjiCard = nil
         currentIndex = 0
         currentWordKanjiIndex = 0
         completedWordDrawings.removeAll()
         wordFeedbackByKanji.removeAll()
-        sessionTotalCards = 0
-        sessionCompletedCards = 0
+        resetSessionProgress(total: 0)
         resetCurrentAnswer()
     }
 
@@ -1483,9 +2295,16 @@ struct ContentView: View {
         deckPreviewTask?.cancel()
         previewTranslationTask?.cancel()
         previewDeck = deck
+        previewKanaDeck = nil
+        previewWordDeck = nil
+        previewWordCards.removeAll()
+        previewKanaCards.removeAll()
+        selectedKanaPreviewCard = nil
+        selectedWordPreviewCard = nil
+        selectedPreviewCard = nil
+        isPreviewDetailPresented = false
         previewCards.removeAll()
         previewExpectedCount = nil
-        selectedPreviewCard = nil
         isLoadingDeck = true
 
         deckPreviewTask = Task {
@@ -1518,6 +2337,43 @@ struct ContentView: View {
         isLoadingDeck = false
     }
 
+    private func openKanaPreview(_ deck: KanaDeck) {
+        selectedKanaDeck = deck
+        previewKanaDeck = deck
+        previewDeck = nil
+        previewWordDeck = nil
+        previewWordCards.removeAll()
+        previewKanaCards = deck.baseCards
+        selectedPreviewCard = nil
+        selectedWordPreviewCard = nil
+        selectedKanaPreviewCard = nil
+        isPreviewDetailPresented = false
+        isLoadingDeck = true
+        resetCurrentAnswer()
+
+        Task {
+            let loadedCards = await KanaDataLoader.loadCards(deck: deck)
+            await MainActor.run {
+                guard previewKanaDeck == deck else {
+                    return
+                }
+
+                previewKanaCards = loadedCards
+                isLoadingDeck = false
+            }
+        }
+    }
+
+    private func closeKanaPreview() {
+        previewKanaDeck = nil
+        previewKanaCards.removeAll()
+        selectedPreviewCard = nil
+        selectedKanaPreviewCard = nil
+        isPreviewDetailPresented = false
+        isLoadingDeck = false
+        resetCurrentAnswer()
+    }
+
     private func startRandomTrainingFromPreview() {
         startTraining(with: previewCards.shuffled(), guided: false)
     }
@@ -1537,8 +2393,7 @@ struct ContentView: View {
         currentWordKanjiIndex = 0
         completedWordDrawings.removeAll()
         wordFeedbackByKanji.removeAll()
-        sessionTotalCards = cards.count
-        sessionCompletedCards = 0
+        resetSessionProgress(total: Set(cards.map(\.kanji)).count)
         isGuidedSingleKanjiPractice = guided
         hasStartedTraining = true
         resetCurrentAnswer()
@@ -1546,6 +2401,10 @@ struct ContentView: View {
     }
 
     private func schedulePreviewTranslations(for deck: KanjiDeck) {
+        guard meaningLanguage == .russian else {
+            return
+        }
+
         let pendingCards = previewCards.filter { $0.translationState != "ru-system" }
         guard !pendingCards.isEmpty else {
             return
@@ -1581,57 +2440,87 @@ struct ContentView: View {
         }
     }
 
-    private func loadSelectedWordDeck() async {
+    private func openWordPreview(_ deck: WordFrequencyDeck) {
         guard !isLoadingDeck else {
             return
         }
 
-        pretranslationTask?.cancel()
-        pretranslationTask = nil
+        selectedWordDeck = deck
+        previewWordDeck = deck
+        previewDeck = nil
+        previewKanaDeck = nil
+        selectedWordPreviewCard = nil
+        selectedPreviewCard = nil
+        selectedKanaPreviewCard = nil
+        previewWordCards.removeAll()
+        isPreviewDetailPresented = false
         isLoadingDeck = true
-        cards.removeAll()
-        kanaCards.removeAll()
 
-        await Task.yield()
+        Task {
+            let allWords = await WordDataLoader.loadWords()
+            let preparedWords = deck.cards(from: allWords)
 
-        let deck = selectedWordDeck
-        let masterCards = KanjiDataLoader.loadBundledMasterCards()
-        let sourceCards = masterCards.isEmpty ? KanjiDataLoader.loadLocalCards() : masterCards
-        let builtWords = WordStudyCard.build(from: sourceCards)
-        let preparedWords = deck.cards(from: builtWords)
+            await MainActor.run {
+                guard previewWordDeck == deck else {
+                    return
+                }
 
-        guard selectedWordDeck == deck else {
-            isLoadingDeck = false
-            return
+                previewWordCards = preparedWords
+                isLoadingDeck = false
+            }
         }
+    }
 
-        wordCards = preparedWords
-        currentIndex = 0
-        currentWordKanjiIndex = 0
-        completedWordDrawings.removeAll()
-        wordFeedbackByKanji.removeAll()
-        sessionTotalCards = wordCards.count
-        sessionCompletedCards = 0
-        isGuidedSingleKanjiPractice = false
+    private func closeWordPreview() {
+        previewWordDeck = nil
+        previewWordCards.removeAll()
+        selectedWordPreviewCard = nil
+        selectedLinkedKanjiCard = nil
+        isPreviewDetailPresented = false
+        isLinkedKanjiPresented = false
         isLoadingDeck = false
-        hasStartedTraining = !wordCards.isEmpty
         resetCurrentAnswer()
     }
 
-    private func startKanaTraining() {
+    private func startWordTraining(with trainingCards: [WordStudyCard]) {
+        guard !trainingCards.isEmpty else {
+            return
+        }
+
         pretranslationTask?.cancel()
         pretranslationTask = nil
+        practiceMode = .words
+        previewWordDeck = nil
         cards.removeAll()
-        wordCards.removeAll()
-        kanaCards = practiceMode == .hiragana ? KanaStudyCard.hiragana : KanaStudyCard.katakana
+        kanaCards.removeAll()
+        wordCards = trainingCards
         currentIndex = 0
         currentWordKanjiIndex = 0
         completedWordDrawings.removeAll()
         wordFeedbackByKanji.removeAll()
-        sessionTotalCards = kanaCards.count
-        sessionCompletedCards = 0
+        resetSessionProgress(total: Set(wordCards.map(\.id)).count)
         isGuidedSingleKanjiPractice = false
+        isLoadingDeck = false
         hasStartedTraining = true
+        resetCurrentAnswer()
+    }
+
+    private func startKanaTraining(deck: KanaDeck, cards trainingCards: [KanaStudyCard]? = nil, guided: Bool = false) {
+        pretranslationTask?.cancel()
+        pretranslationTask = nil
+        selectedKanaDeck = deck
+        practiceMode = .kana
+        previewKanaDeck = nil
+        cards.removeAll()
+        wordCards.removeAll()
+        kanaCards = trainingCards ?? deck.cards.shuffled()
+        currentIndex = 0
+        currentWordKanjiIndex = 0
+        completedWordDrawings.removeAll()
+        wordFeedbackByKanji.removeAll()
+        resetSessionProgress(total: Set(kanaCards.map(\.character)).count)
+        isGuidedSingleKanjiPractice = guided
+        hasStartedTraining = !kanaCards.isEmpty
         resetCurrentAnswer()
     }
 
@@ -1651,7 +2540,7 @@ struct ContentView: View {
         }
 
         var orderedCards = reviewStore.orderedCards(loadedCards)
-        if let firstCard = orderedCards.first {
+        if meaningLanguage == .russian, let firstCard = orderedCards.first {
             orderedCards[0] = await KanjiDataLoader.translateCardIfNeeded(firstCard, deck: selectedDeck)
         }
 
@@ -1661,8 +2550,7 @@ struct ContentView: View {
         currentWordKanjiIndex = 0
         completedWordDrawings.removeAll()
         wordFeedbackByKanji.removeAll()
-        sessionTotalCards = practiceMode == .words ? wordCards.count : orderedCards.count
-        sessionCompletedCards = 0
+        resetSessionProgress(total: practiceMode == .words ? Set(wordCards.map(\.id)).count : Set(orderedCards.map(\.kanji)).count)
         isGuidedSingleKanjiPractice = false
         isLoadingDeck = false
         hasStartedTraining = true
@@ -1738,6 +2626,19 @@ struct ContentView: View {
         }
     }
 
+    private func kanjiCard(for kanaCard: KanaStudyCard) -> KanjiCard {
+        KanjiCard(
+            kanji: kanaCard.character,
+            meanings: [kanaCard.reading],
+            onyomi: [],
+            kunyomi: [kanaCard.reading],
+            examples: [],
+            source: KanjiSource(name: "KanjiVG", file: "kana", license: "KanjiVG: Creative Commons Attribution-Share Alike 3.0"),
+            strokes: kanaCard.strokes,
+            translationState: "ru-system"
+        )
+    }
+
     private func guidedExpectedStrokes(for card: KanjiCard) -> [KanjiStroke] {
         guard !card.strokes.isEmpty else {
             return []
@@ -1746,7 +2647,7 @@ struct ContentView: View {
         return Array(card.strokes.prefix(min(guidedStrokeLimit, card.strokes.count)))
     }
 
-    private func expectedStrokesForCurrentKanji(_ card: KanjiCard) -> [KanjiStroke] {
+    private func expectedStrokesForCurrentCard(_ card: KanjiCard) -> [KanjiStroke] {
         guard isGuidedSingleKanjiPractice else {
             return isAnswerVisible || !feedback.isEmpty ? card.strokes : []
         }
@@ -1758,10 +2659,8 @@ struct ContentView: View {
         isAnswerVisible || !currentWordFeedback.isEmpty ? card.strokes : []
     }
 
-    private func undoCurrentStroke(expected card: KanjiCard) {
+    private func undoCurrentStroke() {
         _ = drawnStrokes.popLast()
-//        feedback = StrokeEvaluator.evaluateCompletedStrokes(actual: drawnStrokes, expected: card.strokes)
-//        guidedStrokeLimit = nextGuidedStrokeLimit(for: card)
     }
 
     private func clearCurrentDrawing(expected card: KanjiCard) {
@@ -1797,12 +2696,8 @@ struct ContentView: View {
         return min(max(drawnStrokes.count + 1, 1), card.strokes.count)
     }
 
-    private func handleKanjiStrokeFinished(_ card: KanjiCard) {
-        guard isGuidedSingleKanjiPractice else {
-            return
-        }
-
-        guard !card.strokes.isEmpty else {
+    private func handleGuidedStrokeFinished(_ card: KanjiCard) {
+        guard isGuidedSingleKanjiPractice, !card.strokes.isEmpty else {
             return
         }
 
@@ -1810,17 +2705,12 @@ struct ContentView: View {
         let latestSeverity = feedback.last { $0.strokeIndex == drawnStrokes.count - 1 }?.severity
 
         if latestSeverity == .good || latestSeverity == .minor {
-            advanceGuidedKanjiStrokeOrFinish(card)
+            advanceGuidedStrokeOrReveal(card)
         }
     }
 
-    private func advanceGuidedKanjiStrokeOrFinish(_ card: KanjiCard) {
-        guard isGuidedSingleKanjiPractice else {
-            updateFeedback(for: card, reveal: true)
-            return
-        }
-
-        guard !card.strokes.isEmpty else {
+    private func advanceGuidedStrokeOrReveal(_ card: KanjiCard) {
+        guard isGuidedSingleKanjiPractice, !card.strokes.isEmpty else {
             updateFeedback(for: card, reveal: true)
             return
         }
@@ -1833,35 +2723,6 @@ struct ContentView: View {
         guidedStrokeLimit = min(max(guidedStrokeLimit + 1, drawnStrokes.count + 1), card.strokes.count)
     }
 
-    private func handleWordStrokeFinished(_ wordCard: WordStudyCard, currentKanji: KanjiCard) {
-        guard !currentKanji.strokes.isEmpty else {
-            return
-        }
-
-        let currentFeedback = StrokeEvaluator.evaluateCompletedStrokes(actual: drawnStrokes, expected: currentKanji.strokes)
-        storeCurrentWordFeedback(currentFeedback, in: wordCard)
-        feedback = flattenedWordFeedback(for: wordCard)
-
-        let latestSeverity = currentFeedback.last { $0.strokeIndex == drawnStrokes.count - 1 }?.severity
-        if latestSeverity == .good || latestSeverity == .minor {
-            advanceGuidedWordStrokeOrStep(wordCard, currentKanji: currentKanji)
-        }
-    }
-
-    private func advanceGuidedWordStrokeOrStep(_ wordCard: WordStudyCard, currentKanji: KanjiCard) {
-        guard !currentKanji.strokes.isEmpty else {
-            advanceWordKanjiOrCheck(wordCard)
-            return
-        }
-
-        if drawnStrokes.count >= currentKanji.strokes.count {
-            advanceWordKanjiOrCheck(wordCard)
-            guidedStrokeLimit = nextGuidedStrokeLimit(for: currentWordKanjiCard(for: wordCard) ?? currentKanji)
-            return
-        }
-
-        guidedStrokeLimit = min(max(guidedStrokeLimit + 1, drawnStrokes.count + 1), currentKanji.strokes.count)
-    }
 
     private func storeCurrentWordFeedback(_ items: [StrokeFeedback], in wordCard: WordStudyCard) {
         while wordFeedbackByKanji.count < wordCard.kanjiCards.count {
@@ -1876,37 +2737,53 @@ struct ContentView: View {
             return
         }
 
+        let wordCard = wordCards[currentIndex]
         switch rating {
         case .again:
-            moveCurrentWordLater(after: 2)
+            masteredWordKeys.remove(wordCard.id)
+            scheduleWordRepeat(wordCard, after: 2)
         case .hard:
-            moveCurrentWordLater(after: 5)
+            masteredWordKeys.remove(wordCard.id)
+            scheduleWordRepeat(wordCard, after: 5)
         case .good:
-            sessionCompletedCards = min(sessionCompletedCards + 1, sessionTotalCards)
-            wordCards.remove(at: currentIndex)
+            masteredWordKeys.insert(wordCard.id)
+            removeFutureWordRepeats(after: currentIndex, key: wordCard.id)
         }
 
-        prepareCurrentWordOrFinish()
+        sessionCompletedCards = masteredWordKeys.count
+        advanceToNextWordOrFinish()
     }
 
-    private func moveCurrentWordLater(after offset: Int) {
-        let wordCard = wordCards.remove(at: currentIndex)
+    private func scheduleWordRepeat(_ wordCard: WordStudyCard, after offset: Int) {
+        removeFutureWordRepeats(after: currentIndex, key: wordCard.id)
         let insertIndex = min(currentIndex + offset, wordCards.count)
         wordCards.insert(wordCard, at: insertIndex)
     }
 
-    private func prepareCurrentWordOrFinish() {
-        guard !wordCards.isEmpty else {
+    private func removeFutureWordRepeats(after index: Int, key: String) {
+        guard index + 1 < wordCards.count else {
+            return
+        }
+
+        for cardIndex in wordCards.indices.reversed() where cardIndex > index && wordCards[cardIndex].id == key {
+            wordCards.remove(at: cardIndex)
+        }
+    }
+
+    private func advanceToNextWordOrFinish() {
+        guard sessionCompletedCards < sessionTotalCards else {
             finishDeck()
             return
         }
 
-        if currentIndex >= wordCards.count {
-            currentIndex = wordCards.count - 1
+        guard currentIndex < wordCards.count - 1 else {
+            return
         }
 
+        currentIndex += 1
         currentWordKanjiIndex = 0
         completedWordDrawings.removeAll()
+        wordFeedbackByKanji.removeAll()
         resetCurrentAnswer()
         scrollToTopToken += 1
     }
@@ -1916,35 +2793,50 @@ struct ContentView: View {
             return
         }
 
+        let kanaCard = kanaCards[currentIndex]
         switch rating {
         case .again:
-            moveCurrentKanaLater(after: 2)
+            masteredKanaKeys.remove(kanaCard.character)
+            scheduleKanaRepeat(kanaCard, after: 2)
         case .hard:
-            moveCurrentKanaLater(after: 5)
+            masteredKanaKeys.remove(kanaCard.character)
+            scheduleKanaRepeat(kanaCard, after: 5)
         case .good:
-            sessionCompletedCards = min(sessionCompletedCards + 1, sessionTotalCards)
-            kanaCards.remove(at: currentIndex)
+            masteredKanaKeys.insert(kanaCard.character)
+            removeFutureKanaRepeats(after: currentIndex, key: kanaCard.character)
         }
 
-        prepareCurrentKanaOrFinish()
+        sessionCompletedCards = masteredKanaKeys.count
+        advanceToNextKanaOrFinish()
     }
 
-    private func moveCurrentKanaLater(after offset: Int) {
-        let kanaCard = kanaCards.remove(at: currentIndex)
+    private func scheduleKanaRepeat(_ kanaCard: KanaStudyCard, after offset: Int) {
+        removeFutureKanaRepeats(after: currentIndex, key: kanaCard.character)
         let insertIndex = min(currentIndex + offset, kanaCards.count)
         kanaCards.insert(kanaCard, at: insertIndex)
     }
 
-    private func prepareCurrentKanaOrFinish() {
-        guard !kanaCards.isEmpty else {
+    private func removeFutureKanaRepeats(after index: Int, key: String) {
+        guard index + 1 < kanaCards.count else {
+            return
+        }
+
+        for cardIndex in kanaCards.indices.reversed() where cardIndex > index && kanaCards[cardIndex].character == key {
+            kanaCards.remove(at: cardIndex)
+        }
+    }
+
+    private func advanceToNextKanaOrFinish() {
+        guard sessionCompletedCards < sessionTotalCards else {
             finishDeck()
             return
         }
 
-        if currentIndex >= kanaCards.count {
-            currentIndex = kanaCards.count - 1
+        guard currentIndex < kanaCards.count - 1 else {
+            return
         }
 
+        currentIndex += 1
         resetCurrentAnswer()
         scrollToTopToken += 1
     }
@@ -1968,34 +2860,47 @@ struct ContentView: View {
 
         switch rating {
         case .again:
-            moveCurrentCardLater(after: 2)
+            masteredKanjiKeys.remove(card.kanji)
+            scheduleKanjiRepeat(card, after: 2)
         case .hard:
-            moveCurrentCardLater(after: 5)
+            masteredKanjiKeys.remove(card.kanji)
+            scheduleKanjiRepeat(card, after: 5)
         case .good:
-            sessionCompletedCards = min(sessionCompletedCards + 1, sessionTotalCards)
-            cards.remove(at: currentIndex)
+            masteredKanjiKeys.insert(card.kanji)
+            removeFutureKanjiRepeats(after: currentIndex, key: card.kanji)
         }
 
-        await prepareCurrentCardOrFinish()
+        sessionCompletedCards = masteredKanjiKeys.count
+        await advanceToNextKanjiOrFinish()
     }
 
-    private func moveCurrentCardLater(after offset: Int) {
-        let card = cards.remove(at: currentIndex)
+    private func scheduleKanjiRepeat(_ card: KanjiCard, after offset: Int) {
+        removeFutureKanjiRepeats(after: currentIndex, key: card.kanji)
         let insertIndex = min(currentIndex + offset, cards.count)
         cards.insert(card, at: insertIndex)
     }
 
-    private func prepareCurrentCardOrFinish() async {
-        guard !cards.isEmpty else {
+    private func removeFutureKanjiRepeats(after index: Int, key: String) {
+        guard index + 1 < cards.count else {
+            return
+        }
+
+        for cardIndex in cards.indices.reversed() where cardIndex > index && cards[cardIndex].kanji == key {
+            cards.remove(at: cardIndex)
+        }
+    }
+
+    private func advanceToNextKanjiOrFinish() async {
+        guard sessionCompletedCards < sessionTotalCards else {
             finishDeck()
             return
         }
 
-        if currentIndex >= cards.count {
-            currentIndex = cards.count - 1
+        guard currentIndex < cards.count - 1 else {
+            return
         }
 
-        await prepareAndMoveToCard(at: currentIndex)
+        await prepareAndMoveToCard(at: currentIndex + 1)
     }
 
     private func finishDeck() {
@@ -2008,8 +2913,7 @@ struct ContentView: View {
         currentWordKanjiIndex = 0
         completedWordDrawings.removeAll()
         wordFeedbackByKanji.removeAll()
-        sessionTotalCards = 0
-        sessionCompletedCards = 0
+        resetSessionProgress(total: 0)
         isGuidedSingleKanjiPractice = false
         isPreparingCard = false
         hasStartedTraining = false
@@ -2054,7 +2958,7 @@ struct ContentView: View {
             wordFeedbackByKanji.removeAll()
             resetCurrentAnswer()
             scrollToTopToken += 1
-        case .hiragana, .katakana:
+        case .kana:
             guard currentIndex < kanaCards.count - 1 else {
                 return
             }
@@ -2075,9 +2979,9 @@ struct ContentView: View {
 
         let deck = selectedDeck
         let card = cards[targetIndex]
-        let preparedCard = card.translationState == "ru-system"
-            ? card
-            : await KanjiDataLoader.translateCardIfNeeded(card, deck: deck)
+        let preparedCard = meaningLanguage == .russian && card.translationState != "ru-system"
+            ? await KanjiDataLoader.translateCardIfNeeded(card, deck: deck)
+            : card
 
         guard selectedDeck == deck, cards.indices.contains(targetIndex) else {
             isPreparingCard = false
@@ -2094,6 +2998,10 @@ struct ContentView: View {
 
     private func scheduleNextCardTranslation() {
         pretranslationTask?.cancel()
+
+        guard meaningLanguage == .russian else {
+            return
+        }
 
         let nextRange = (currentIndex + 1)..<min(currentIndex + 4, cards.count)
         let pendingCards = nextRange
@@ -2145,440 +3053,5 @@ struct ContentView: View {
                 isAnswerVisible = true
             }
         }
-    }
-}
-
-struct UserStrokePreview: View {
-    let strokes: [[CGPoint]]
-
-    var body: some View {
-        Canvas { context, size in
-            let scale = min(size.width, size.height) / canonicalSize
-            context.scaleBy(x: scale, y: scale)
-
-            for stroke in strokes {
-                context.stroke(
-                    path(for: stroke),
-                    with: .color(AppPalette.ink),
-                    style: StrokeStyle(lineWidth: 2.2, lineCap: .round, lineJoin: .round)
-                )
-            }
-        }
-    }
-
-    private func path(for points: [CGPoint]) -> Path {
-        var path = Path()
-        guard let first = points.first else {
-            return path
-        }
-
-        path.move(to: first)
-        for point in points.dropFirst() {
-            path.addLine(to: point)
-        }
-        return path
-    }
-}
-
-struct DrawingBoard: View {
-    @Binding var drawnStrokes: [[CGPoint]]
-    @Binding var currentStroke: [CGPoint]
-
-    let expectedStrokes: [KanjiStroke]
-    let feedback: [StrokeFeedback]
-    let onStrokeFinished: (() -> Void)?
-
-    var body: some View {
-        GeometryReader { proxy in
-            Canvas { context, size in
-                drawGuides(in: &context, size: size)
-                let scale = size.width / canonicalSize
-                context.scaleBy(x: scale, y: scale)
-
-                for (index, stroke) in expectedStrokes.enumerated() {
-                    let severity = severityForExpectedStroke(at: index)
-                    drawExpectedStroke(stroke, severity: severity, in: &context)
-                }
-
-                for (index, stroke) in drawnStrokes.enumerated() {
-                    context.stroke(
-                        path(for: stroke),
-                        with: .color(colorForActualStroke(at: index)),
-                        style: StrokeStyle(lineWidth: 2.4, lineCap: .round, lineJoin: .round)
-                    )
-                }
-
-                context.stroke(path(for: currentStroke), with: .color(AppPalette.accent), style: StrokeStyle(lineWidth: 2.4, lineCap: .round, lineJoin: .round))
-            }
-            .background(AppPalette.surface)
-            .border(AppPalette.border.opacity(0.65))
-            .gesture(dragGesture(size: proxy.size))
-        }
-        .aspectRatio(1, contentMode: .fit)
-    }
-
-    private func drawExpectedStroke(_ stroke: KanjiStroke, severity: StrokeFeedbackSeverity, in context: inout GraphicsContext) {
-        guard severity.requiresCorrectionOverlay else {
-            context.stroke(
-                SVGPathParser.path(from: stroke.pathData),
-                with: .color(AppPalette.expectedCorrect.opacity(0.16)),
-                style: StrokeStyle(lineWidth: 1.2, lineCap: .round, lineJoin: .round)
-            )
-            return
-        }
-
-        let markerColor = severity.expectedStrokeColor
-        context.stroke(
-            SVGPathParser.path(from: stroke.pathData),
-            with: .color(markerColor.opacity(0.36)),
-            style: StrokeStyle(lineWidth: 1.35, lineCap: .round, lineJoin: .round)
-        )
-
-        let startRect = CGRect(x: stroke.startPoint.x - 2.1, y: stroke.startPoint.y - 2.1, width: 4.2, height: 4.2)
-        context.fill(Path(ellipseIn: startRect), with: .color(markerColor.opacity(0.85)))
-    }
-
-    private func severityForExpectedStroke(at index: Int) -> StrokeFeedbackSeverity {
-        feedback.first { $0.strokeIndex == index }?.severity ?? .good
-    }
-
-    private func colorForActualStroke(at index: Int) -> Color {
-        feedback.first { $0.strokeIndex == index }?.severity.actualStrokeColor ?? AppPalette.ink
-    }
-
-    private func dragGesture(size: CGSize) -> some Gesture {
-        DragGesture(minimumDistance: 0)
-            .onChanged { value in
-                if currentStroke.isEmpty {
-                    currentStroke.append(normalized(value.startLocation, in: size))
-                }
-
-                currentStroke.append(normalized(value.location, in: size))
-            }
-            .onEnded { _ in
-                if currentStroke.count > 2 {
-                    drawnStrokes.append(simplified(currentStroke))
-                    onStrokeFinished?()
-                }
-
-                currentStroke.removeAll()
-            }
-    }
-
-    private func normalized(_ point: CGPoint, in size: CGSize) -> CGPoint {
-        let side = max(size.width, 1)
-        return CGPoint(
-            x: min(max(point.x / side * canonicalSize, 0), canonicalSize),
-            y: min(max(point.y / side * canonicalSize, 0), canonicalSize)
-        )
-    }
-
-    private func simplified(_ points: [CGPoint]) -> [CGPoint] {
-        var result: [CGPoint] = []
-
-        for index in stride(from: 0, to: points.count, by: 3) {
-            result.append(points[index])
-        }
-
-        if result.last != points.last, let last = points.last {
-            result.append(last)
-        }
-
-        return result
-    }
-
-    private func path(for points: [CGPoint]) -> Path {
-        var path = Path()
-
-        guard let first = points.first else {
-            return path
-        }
-
-        path.move(to: first)
-
-        for point in points.dropFirst() {
-            path.addLine(to: point)
-        }
-
-        return path
-    }
-
-    private func drawGuides(in context: inout GraphicsContext, size: CGSize) {
-        var guides = Path()
-        guides.move(to: CGPoint(x: size.width / 2, y: 0))
-        guides.addLine(to: CGPoint(x: size.width / 2, y: size.height))
-        guides.move(to: CGPoint(x: 0, y: size.height / 2))
-        guides.addLine(to: CGPoint(x: size.width, y: size.height / 2))
-        context.stroke(guides, with: .color(AppPalette.border.opacity(0.35)), lineWidth: 1)
-    }
-}
-
-struct StrokeStepStrip: View {
-    let strokes: [KanjiStroke]
-
-    private let columns = [
-        GridItem(.adaptive(minimum: 41, maximum: 41), spacing: 4)
-    ]
-
-    var body: some View {
-        LazyVGrid(columns: columns, alignment: .leading, spacing: 4) {
-            ForEach(strokes.indices, id: \.self) { index in
-                StrokeStepView(strokes: strokes, visibleCount: index + 1)
-                    .frame(width: 41, height: 41)
-            }
-        }
-    }
-}
-
-struct StrokeStepView: View {
-    let strokes: [KanjiStroke]
-    let visibleCount: Int
-
-    var body: some View {
-        Canvas { context, size in
-            drawGuides(in: &context, size: size)
-            let scale = min(size.width, size.height) / canonicalSize
-            context.scaleBy(x: scale, y: scale)
-
-            for stroke in strokes.prefix(visibleCount) {
-                let color = stroke.order == visibleCount ? AppPalette.correction : AppPalette.ink.opacity(0.28)
-                context.stroke(
-                    SVGPathParser.path(from: stroke.pathData),
-                    with: .color(color),
-                    style: StrokeStyle(lineWidth: 2.2, lineCap: .round, lineJoin: .round)
-                )
-            }
-        }
-        .background(AppPalette.surface)
-        .border(AppPalette.border.opacity(0.65))
-        .overlay(alignment: .topLeading) {
-            Text("\(visibleCount)")
-                .font(.system(size: 7, weight: .bold))
-                .foregroundStyle(AppPalette.correction)
-                .padding(2)
-        }
-    }
-
-    private func drawGuides(in context: inout GraphicsContext, size: CGSize) {
-        var guides = Path()
-        guides.move(to: CGPoint(x: size.width / 2, y: 0))
-        guides.addLine(to: CGPoint(x: size.width / 2, y: size.height))
-        guides.move(to: CGPoint(x: 0, y: size.height / 2))
-        guides.addLine(to: CGPoint(x: size.width, y: size.height / 2))
-        context.stroke(guides, with: .color(AppPalette.border.opacity(0.25)), lineWidth: 1)
-    }
-}
-
-enum StrokeFeedbackSeverity {
-    case info
-    case good
-    case minor
-    case major
-    case missing
-    case extra
-
-    var textColor: Color {
-        switch self {
-        case .info:
-            return AppPalette.secondaryText
-        case .good:
-            return AppPalette.success
-        case .minor:
-            return AppPalette.warning
-        case .major, .missing, .extra:
-            return AppPalette.correction
-        }
-    }
-
-    var actualStrokeColor: Color {
-        switch self {
-        case .good, .info:
-            return AppPalette.ink
-        case .minor:
-            return AppPalette.warning
-        case .major, .missing, .extra:
-            return AppPalette.correction
-        }
-    }
-
-    var expectedStrokeColor: Color {
-        switch self {
-        case .good, .info:
-            return AppPalette.expectedCorrect
-        case .minor:
-            return AppPalette.expectedWarning
-        case .major, .missing, .extra:
-            return AppPalette.expectedCorrection
-        }
-    }
-
-    var requiresCorrectionOverlay: Bool {
-        switch self {
-        case .minor, .major, .missing:
-            return true
-        case .info, .good, .extra:
-            return false
-        }
-    }
-}
-
-struct StrokeFeedback: Identifiable {
-    let id = UUID()
-    let strokeIndex: Int?
-    let severity: StrokeFeedbackSeverity
-    let message: String
-}
-
-enum StrokeEvaluator {
-    static func evaluateCompletedStrokes(actual: [[CGPoint]], expected: [KanjiStroke]) -> [StrokeFeedback] {
-        guard !actual.isEmpty else {
-            return []
-        }
-
-        var feedback: [StrokeFeedback] = []
-        for (index, stroke) in actual.enumerated() {
-            guard index < expected.count else {
-                feedback.append(
-                    StrokeFeedback(
-                        strokeIndex: index,
-                        severity: .extra,
-                        message: "Штрих \(index + 1): лишний."
-                    )
-                )
-                continue
-            }
-
-            feedback.append(evaluateStroke(stroke, expected: expected[index], index: index))
-        }
-
-        return feedback
-    }
-
-    static func evaluate(actual: [[CGPoint]], expected: [KanjiStroke]) -> [StrokeFeedback] {
-        guard !actual.isEmpty else {
-            return [
-                StrokeFeedback(
-                    strokeIndex: nil,
-                    severity: .info,
-                    message: "Пока нет штрихов. Нарисуй кандзи, потом нажми «Проверить»."
-                )
-            ]
-        }
-
-        var feedback: [StrokeFeedback] = []
-        let countSeverity: StrokeFeedbackSeverity = actual.count == expected.count ? .good : .major
-        let countMessage = actual.count == expected.count
-            ? "Количество штрихов похоже на правильное."
-            : "Нужно \(expected.count) штриха, сейчас распознано \(actual.count)."
-        feedback.append(StrokeFeedback(strokeIndex: nil, severity: countSeverity, message: countMessage))
-
-        for (index, expectedStroke) in expected.enumerated() {
-            guard index < actual.count else {
-                feedback.append(
-                    StrokeFeedback(
-                        strokeIndex: index,
-                        severity: .missing,
-                        message: "Штрих \(index + 1): не найден."
-                    )
-                )
-                continue
-            }
-
-            feedback.append(evaluateStroke(actual[index], expected: expectedStroke, index: index))
-        }
-
-        if actual.count > expected.count {
-            for index in expected.count..<actual.count {
-                feedback.append(
-                    StrokeFeedback(
-                        strokeIndex: index,
-                        severity: .extra,
-                        message: "Штрих \(index + 1): лишний."
-                    )
-                )
-            }
-        }
-
-        return feedback
-    }
-
-    private static func evaluateStroke(_ points: [CGPoint], expected: KanjiStroke, index: Int) -> StrokeFeedback {
-        guard let start = points.first, let end = points.last else {
-            return StrokeFeedback(strokeIndex: index, severity: .missing, message: "Штрих \(index + 1): не найден.")
-        }
-
-        let forwardDistance = start.distance(to: expected.startPoint) + end.distance(to: expected.endPoint)
-        let reverseDistance = start.distance(to: expected.endPoint) + end.distance(to: expected.startPoint)
-        let directionOK = forwardDistance <= reverseDistance
-        let shapeOK = strokeShapeLooksRight(points, axis: expected.axis)
-        let placementSeverity = placementSeverity(forwardDistance)
-
-        if directionOK && shapeOK && placementSeverity == .good {
-            return StrokeFeedback(strokeIndex: index, severity: .good, message: "Штрих \(index + 1): хорошо.")
-        }
-
-        var problems: [String] = []
-        if !directionOK {
-            problems.append("направление обратное")
-        }
-        if !shapeOK {
-            problems.append("форма отличается")
-        }
-        if placementSeverity != .good {
-            problems.append(placementSeverity == .minor ? "чуть смещён" : "далеко от нужного места")
-        }
-
-        let severity: StrokeFeedbackSeverity = (!directionOK || placementSeverity == .major) ? .major : .minor
-        let prefix = severity == .minor ? "слегка отличается" : "сильно отличается"
-        return StrokeFeedback(
-            strokeIndex: index,
-            severity: severity,
-            message: "Штрих \(index + 1): \(prefix) — \(problems.joined(separator: ", "))."
-        )
-    }
-
-    private static func placementSeverity(_ distance: CGFloat) -> StrokeFeedbackSeverity {
-        if distance < 34 {
-            return .good
-        }
-
-        return distance < 54 ? .minor : .major
-    }
-
-    private static func strokeShapeLooksRight(_ points: [CGPoint], axis: StrokeAxis) -> Bool {
-        let box = boundingBox(for: points)
-        let width = box.width
-        let height = box.height
-
-        switch axis {
-        case .horizontal:
-            return width > height * 1.5
-        case .vertical:
-            return height > width * 1.5
-        case .corner:
-            return width > 18 && height > 24
-        }
-    }
-
-    private static func boundingBox(for points: [CGPoint]) -> CGRect {
-        guard let first = points.first else {
-            return .zero
-        }
-
-        return points.dropFirst().reduce(CGRect(origin: first, size: .zero)) { box, point in
-            box.union(CGRect(origin: point, size: .zero))
-        }
-    }
-}
-
-private extension CGPoint {
-    func distance(to other: CGPoint) -> CGFloat {
-        hypot(x - other.x, y - other.y)
-    }
-}
-
-private extension Collection {
-    subscript(safe index: Index) -> Element? {
-        indices.contains(index) ? self[index] : nil
     }
 }
