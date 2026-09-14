@@ -12,6 +12,8 @@ struct KanjiCard: Codable, Identifiable {
     let examples: [KanjiExample]
     let source: KanjiSource
     let strokes: [KanjiStroke]
+    let grade: Int?
+    let jlpt: Int?
     let translationState: String?
 
     init(
@@ -22,6 +24,8 @@ struct KanjiCard: Codable, Identifiable {
         examples: [KanjiExample],
         source: KanjiSource,
         strokes: [KanjiStroke],
+        grade: Int? = nil,
+        jlpt: Int? = nil,
         translationState: String? = nil
     ) {
         self.kanji = kanji
@@ -31,6 +35,8 @@ struct KanjiCard: Codable, Identifiable {
         self.examples = examples
         self.source = source
         self.strokes = strokes
+        self.grade = grade
+        self.jlpt = jlpt
         self.translationState = translationState
     }
 
@@ -43,6 +49,8 @@ struct KanjiCard: Codable, Identifiable {
             examples: examples,
             source: source,
             strokes: strokes,
+            grade: grade,
+            jlpt: jlpt,
             translationState: "ru-system"
         )
     }
@@ -54,6 +62,267 @@ struct KanjiExample: Codable, Identifiable {
     let word: String
     let reading: String
     let meaning: String
+}
+
+enum PracticeMode: String, CaseIterable, Identifiable {
+    case kanji
+    case words
+    case hiragana
+    case katakana
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .kanji:
+            return "Кандзи"
+        case .words:
+            return "Слова"
+        case .hiragana:
+            return "Хирагана"
+        case .katakana:
+            return "Катакана"
+        }
+    }
+}
+
+struct WordStudyCard: Identifiable {
+    var id: String { "\(word)-\(reading)" }
+
+    let word: String
+    let reading: String
+    let meaning: String
+    let kanjiCards: [KanjiCard]
+
+    var kanjiText: String {
+        kanjiCards.map(\.kanji).joined()
+    }
+
+    static func build(from cards: [KanjiCard]) -> [WordStudyCard] {
+        let cardsByKanji = Dictionary(cards.map { ($0.kanji, $0) }, uniquingKeysWith: { current, _ in current })
+        var seen: Set<String> = []
+        var result: [WordStudyCard] = []
+
+        for card in cards {
+            for example in card.examples {
+                let characters = example.word.map(String.init)
+                let wordStudyCards = characters.compactMap { character -> KanjiCard? in
+                    if let card = cardsByKanji[character] {
+                        return card
+                    }
+
+                    guard isKana(character) else {
+                        return nil
+                    }
+
+                    return kanaCard(for: character)
+                }
+                guard characters.allSatisfy(isJapaneseStudyCharacter),
+                      wordStudyCards.count == characters.count,
+                      seen.insert(example.word).inserted else {
+                    continue
+                }
+
+                result.append(
+                    WordStudyCard(
+                        word: example.word,
+                        reading: example.reading,
+                        meaning: example.meaning,
+                        kanjiCards: wordStudyCards
+                    )
+                )
+            }
+        }
+
+        return result.sorted { left, right in
+            if left.kanjiCards.count != right.kanjiCards.count {
+                return left.kanjiCards.count < right.kanjiCards.count
+            }
+
+            if left.word.count != right.word.count {
+                return left.word.count < right.word.count
+            }
+
+            return left.word < right.word
+        }
+    }
+
+    nonisolated private static func isKanji(_ text: String) -> Bool {
+        guard let scalar = text.unicodeScalars.first else {
+            return false
+        }
+
+        return (0x4E00...0x9FFF).contains(Int(scalar.value))
+    }
+
+    nonisolated private static func isKana(_ text: String) -> Bool {
+        guard let scalar = text.unicodeScalars.first else {
+            return false
+        }
+
+        let value = Int(scalar.value)
+        return (0x3040...0x309F).contains(value)
+            || (0x30A0...0x30FF).contains(value)
+    }
+
+    private static func kanaCard(for character: String) -> KanjiCard {
+        KanjiCard(
+            kanji: character,
+            meanings: [],
+            onyomi: [],
+            kunyomi: [],
+            examples: [],
+            source: KanjiSource(name: "Kana", file: "local-kana", license: "App data"),
+            strokes: [],
+            translationState: "ru-system"
+        )
+    }
+
+    nonisolated private static func isJapaneseStudyCharacter(_ text: String) -> Bool {
+        guard let scalar = text.unicodeScalars.first else {
+            return false
+        }
+
+        let value = Int(scalar.value)
+        return (0x3040...0x309F).contains(value)
+            || (0x30A0...0x30FF).contains(value)
+            || (0x4E00...0x9FFF).contains(value)
+    }
+}
+
+struct KanaStudyCard: Identifiable {
+    var id: String { character }
+
+    let character: String
+    let reading: String
+
+    static let hiragana: [KanaStudyCard] = cards([
+        ("あ", "a"), ("い", "i"), ("う", "u"), ("え", "e"), ("お", "o"),
+        ("か", "ka"), ("き", "ki"), ("く", "ku"), ("け", "ke"), ("こ", "ko"),
+        ("さ", "sa"), ("し", "shi"), ("す", "su"), ("せ", "se"), ("そ", "so"),
+        ("た", "ta"), ("ち", "chi"), ("つ", "tsu"), ("て", "te"), ("と", "to"),
+        ("な", "na"), ("に", "ni"), ("ぬ", "nu"), ("ね", "ne"), ("の", "no"),
+        ("は", "ha"), ("ひ", "hi"), ("ふ", "fu"), ("へ", "he"), ("ほ", "ho"),
+        ("ま", "ma"), ("み", "mi"), ("む", "mu"), ("め", "me"), ("も", "mo"),
+        ("や", "ya"), ("ゆ", "yu"), ("よ", "yo"),
+        ("ら", "ra"), ("り", "ri"), ("る", "ru"), ("れ", "re"), ("ろ", "ro"),
+        ("わ", "wa"), ("を", "wo"), ("ん", "n"),
+        ("が", "ga"), ("ぎ", "gi"), ("ぐ", "gu"), ("げ", "ge"), ("ご", "go"),
+        ("ざ", "za"), ("じ", "ji"), ("ず", "zu"), ("ぜ", "ze"), ("ぞ", "zo"),
+        ("だ", "da"), ("ぢ", "ji"), ("づ", "zu"), ("で", "de"), ("ど", "do"),
+        ("ば", "ba"), ("び", "bi"), ("ぶ", "bu"), ("べ", "be"), ("ぼ", "bo"),
+        ("ぱ", "pa"), ("ぴ", "pi"), ("ぷ", "pu"), ("ぺ", "pe"), ("ぽ", "po"),
+        ("ぁ", "small a"), ("ぃ", "small i"), ("ぅ", "small u"), ("ぇ", "small e"), ("ぉ", "small o"),
+        ("ゃ", "small ya"), ("ゅ", "small yu"), ("ょ", "small yo"), ("っ", "small tsu"), ("ゎ", "small wa"),
+        ("きゃ", "kya"), ("きゅ", "kyu"), ("きょ", "kyo"),
+        ("しゃ", "sha"), ("しゅ", "shu"), ("しょ", "sho"),
+        ("ちゃ", "cha"), ("ちゅ", "chu"), ("ちょ", "cho"),
+        ("にゃ", "nya"), ("にゅ", "nyu"), ("にょ", "nyo"),
+        ("ひゃ", "hya"), ("ひゅ", "hyu"), ("ひょ", "hyo"),
+        ("みゃ", "mya"), ("みゅ", "myu"), ("みょ", "myo"),
+        ("りゃ", "rya"), ("りゅ", "ryu"), ("りょ", "ryo"),
+        ("ぎゃ", "gya"), ("ぎゅ", "gyu"), ("ぎょ", "gyo"),
+        ("じゃ", "ja"), ("じゅ", "ju"), ("じょ", "jo"),
+        ("びゃ", "bya"), ("びゅ", "byu"), ("びょ", "byo"),
+        ("ぴゃ", "pya"), ("ぴゅ", "pyu"), ("ぴょ", "pyo")
+    ])
+
+    static let katakana: [KanaStudyCard] = cards([
+        ("ア", "a"), ("イ", "i"), ("ウ", "u"), ("エ", "e"), ("オ", "o"),
+        ("カ", "ka"), ("キ", "ki"), ("ク", "ku"), ("ケ", "ke"), ("コ", "ko"),
+        ("サ", "sa"), ("シ", "shi"), ("ス", "su"), ("セ", "se"), ("ソ", "so"),
+        ("タ", "ta"), ("チ", "chi"), ("ツ", "tsu"), ("テ", "te"), ("ト", "to"),
+        ("ナ", "na"), ("ニ", "ni"), ("ヌ", "nu"), ("ネ", "ne"), ("ノ", "no"),
+        ("ハ", "ha"), ("ヒ", "hi"), ("フ", "fu"), ("ヘ", "he"), ("ホ", "ho"),
+        ("マ", "ma"), ("ミ", "mi"), ("ム", "mu"), ("メ", "me"), ("モ", "mo"),
+        ("ヤ", "ya"), ("ユ", "yu"), ("ヨ", "yo"),
+        ("ラ", "ra"), ("リ", "ri"), ("ル", "ru"), ("レ", "re"), ("ロ", "ro"),
+        ("ワ", "wa"), ("ヲ", "wo"), ("ン", "n"),
+        ("ガ", "ga"), ("ギ", "gi"), ("グ", "gu"), ("ゲ", "ge"), ("ゴ", "go"),
+        ("ザ", "za"), ("ジ", "ji"), ("ズ", "zu"), ("ゼ", "ze"), ("ゾ", "zo"),
+        ("ダ", "da"), ("ヂ", "ji"), ("ヅ", "zu"), ("デ", "de"), ("ド", "do"),
+        ("バ", "ba"), ("ビ", "bi"), ("ブ", "bu"), ("ベ", "be"), ("ボ", "bo"),
+        ("パ", "pa"), ("ピ", "pi"), ("プ", "pu"), ("ペ", "pe"), ("ポ", "po"),
+        ("ァ", "small a"), ("ィ", "small i"), ("ゥ", "small u"), ("ェ", "small e"), ("ォ", "small o"),
+        ("ャ", "small ya"), ("ュ", "small yu"), ("ョ", "small yo"), ("ッ", "small tsu"), ("ヮ", "small wa"),
+        ("ヴ", "vu"),
+        ("キャ", "kya"), ("キュ", "kyu"), ("キョ", "kyo"),
+        ("シャ", "sha"), ("シュ", "shu"), ("ショ", "sho"),
+        ("チャ", "cha"), ("チュ", "chu"), ("チョ", "cho"),
+        ("ニャ", "nya"), ("ニュ", "nyu"), ("ニョ", "nyo"),
+        ("ヒャ", "hya"), ("ヒュ", "hyu"), ("ヒョ", "hyo"),
+        ("ミャ", "mya"), ("ミュ", "myu"), ("ミョ", "myo"),
+        ("リャ", "rya"), ("リュ", "ryu"), ("リョ", "ryo"),
+        ("ギャ", "gya"), ("ギュ", "gyu"), ("ギョ", "gyo"),
+        ("ジャ", "ja"), ("ジュ", "ju"), ("ジョ", "jo"),
+        ("ビャ", "bya"), ("ビュ", "byu"), ("ビョ", "byo"),
+        ("ピャ", "pya"), ("ピュ", "pyu"), ("ピョ", "pyo")
+    ])
+
+    private static func cards(_ pairs: [(String, String)]) -> [KanaStudyCard] {
+        pairs.map { KanaStudyCard(character: $0.0, reading: $0.1) }
+    }
+}
+
+enum WordFrequencyDeck: String, CaseIterable, Identifiable {
+    case top1000
+    case top2000
+    case top5000
+    case top10000
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .top1000:
+            return "0-1000"
+        case .top2000:
+            return "1001-2000"
+        case .top5000:
+            return "2001-5000"
+        case .top10000:
+            return "5001-10000"
+        }
+    }
+
+    var subtitle: String {
+        "Диапазон частоты слов"
+    }
+
+    var bounds: Range<Int> {
+        switch self {
+        case .top1000:
+            return 0..<1000
+        case .top2000:
+            return 1000..<2000
+        case .top5000:
+            return 2000..<5000
+        case .top10000:
+            return 5000..<10000
+        }
+    }
+
+    static var groups: [(title: String, decks: [WordFrequencyDeck])] {
+        [
+            ("Frequency", [.top1000, .top2000, .top5000, .top10000])
+        ]
+    }
+
+    func cards(from words: [WordStudyCard]) -> [WordStudyCard] {
+        let ordered = words.sorted { left, right in
+            if left.word.count != right.word.count {
+                return left.word.count < right.word.count
+            }
+
+            if left.kanjiCards.count != right.kanjiCards.count {
+                return left.kanjiCards.count < right.kanjiCards.count
+            }
+
+            return left.word < right.word
+        }
+
+        return Array(ordered[bounds.clamped(to: ordered.indices)])
+    }
 }
 
 struct KanjiSource: Codable {
@@ -328,6 +597,39 @@ enum KanjiDeck: String, CaseIterable, Identifiable {
         }
     }
 
+    var masterFilter: (KanjiCard) -> Bool {
+        switch self {
+        case .jlpt5:
+            return { $0.jlpt == 5 }
+        case .jlpt4:
+            return { $0.jlpt == 4 }
+        case .jlpt3:
+            return { $0.jlpt == 3 }
+        case .jlpt2:
+            return { $0.jlpt == 2 }
+        case .jlpt1:
+            return { $0.jlpt == 1 }
+        case .grade1:
+            return { $0.grade == 1 }
+        case .grade2:
+            return { $0.grade == 2 }
+        case .grade3:
+            return { $0.grade == 3 }
+        case .grade4:
+            return { $0.grade == 4 }
+        case .grade5:
+            return { $0.grade == 5 }
+        case .grade6:
+            return { $0.grade == 6 }
+        case .grade8:
+            return { $0.grade == 8 }
+        case .joyo, .jinmeiyo:
+            return { _ in false }
+        case .all:
+            return { _ in true }
+        }
+    }
+
     static var groups: [(title: String, decks: [KanjiDeck])] {
         [
             ("JLPT", [.jlpt5, .jlpt4, .jlpt3, .jlpt2, .jlpt1]),
@@ -338,6 +640,20 @@ enum KanjiDeck: String, CaseIterable, Identifiable {
 }
 
 enum KanjiDataLoader {
+    static func loadBundledMasterCards() -> [KanjiCard] {
+        guard let url = Bundle.main.url(forResource: "kanji-all", withExtension: "json") else {
+            return []
+        }
+
+        do {
+            let data = try Data(contentsOf: url)
+            return try JSONDecoder().decode([KanjiCard].self, from: data)
+        } catch {
+            assertionFailure("Failed to decode kanji-all.json: \(error)")
+            return []
+        }
+    }
+
     static func loadLocalCards() -> [KanjiCard] {
         guard let url = Bundle.main.url(forResource: "kanji-data", withExtension: "json") else {
             assertionFailure("kanji-data.json is missing from the app bundle.")
@@ -354,17 +670,44 @@ enum KanjiDataLoader {
     }
 
     static func loadCards(deck: KanjiDeck = .jlpt5) async -> [KanjiCard] {
+        let masterCards = loadBundledMasterCards()
+        let masterDeckCards = masterCards.filter(deck.masterFilter)
+        if !masterDeckCards.isEmpty {
+            return masterDeckCards
+        }
+
         do {
-            if let cachedCards = try loadCachedCards(for: deck), !cachedCards.isEmpty {
-                return cachedCards
+            let cachedCards = try loadCachedCards(for: deck) ?? []
+            let remoteKanjiList = try await RemoteKanjiProvider.loadKanjiList(deck: deck)
+
+            if !cachedCards.isEmpty {
+                let cachedByKanji = Dictionary(cachedCards.map { ($0.kanji, $0) }, uniquingKeysWith: { current, _ in current })
+                let missingKanji = remoteKanjiList.filter { cachedByKanji[$0] == nil }
+
+                if missingKanji.isEmpty {
+                    return remoteKanjiList.compactMap { cachedByKanji[$0] }
+                }
+
+                let missingCards = try await RemoteKanjiProvider.loadCards(for: missingKanji)
+                let mergedByKanji = Dictionary((cachedCards + missingCards).map { ($0.kanji, $0) }, uniquingKeysWith: { _, new in new })
+                let mergedCards = remoteKanjiList.compactMap { mergedByKanji[$0] }
+
+                if !mergedCards.isEmpty {
+                    try saveCachedCards(mergedCards, for: deck)
+                    return mergedCards
+                }
             }
 
-            let remoteCards = try await RemoteKanjiProvider.loadCards(deck: deck)
+            let remoteCards = try await RemoteKanjiProvider.loadCards(for: remoteKanjiList)
             if !remoteCards.isEmpty {
                 try saveCachedCards(remoteCards, for: deck)
                 return remoteCards
             }
         } catch {
+            if let cachedCards = try? loadCachedCards(for: deck), !cachedCards.isEmpty {
+                return cachedCards
+            }
+
             assertionFailure("Failed to load remote kanji data: \(error)")
         }
 
@@ -453,18 +796,26 @@ enum KanjiDataLoader {
 private enum RemoteKanjiProvider {
     private static let session: URLSession = {
         let configuration = URLSessionConfiguration.ephemeral
-        configuration.timeoutIntervalForRequest = 8
-        configuration.timeoutIntervalForResource = 12
+        configuration.timeoutIntervalForRequest = 5
+        configuration.timeoutIntervalForResource = 8
         return URLSession(configuration: configuration)
     }()
 
-    static func loadCards(deck: KanjiDeck) async throws -> [KanjiCard] {
+    static func loadKanjiList(deck: KanjiDeck) async throws -> [String] {
         let listURL = URL(string: "https://kanjiapi.dev/v1/kanji/\(deck.endpointPath)")!
         let (listData, _) = try await session.data(from: listURL)
-        let kanjiList = try JSONDecoder().decode([String].self, from: listData)
+        return try JSONDecoder().decode([String].self, from: listData)
+    }
+
+    static func loadCards(deck: KanjiDeck) async throws -> [KanjiCard] {
+        let kanjiList = try await loadKanjiList(deck: deck)
+        return try await loadCards(for: kanjiList)
+    }
+
+    static func loadCards(for kanjiList: [String]) async throws -> [KanjiCard] {
         var cards: [KanjiCard] = []
         var nextIndex = 0
-        let maxConcurrentRequests = 8
+        let maxConcurrentRequests = 16
 
         await withTaskGroup(of: KanjiCard?.self) { group in
             func enqueueNextCard() {
@@ -501,7 +852,6 @@ private enum RemoteKanjiProvider {
 
         async let detailData = session.data(from: detailURL).0
         async let svgData = session.data(from: svgURL).0
-        async let examples = loadExamples(for: kanji)
 
         let detail = try JSONDecoder().decode(RemoteKanjiDetail.self, from: try await detailData)
         let svgText = String(decoding: try await svgData, as: UTF8.self)
@@ -512,7 +862,7 @@ private enum RemoteKanjiProvider {
         }
 
         let translatedMeanings = RussianMeaningTranslator.translateLocally(detail.meanings)
-        let loadedExamples = await examples
+        let loadedExamples = await loadExamples(for: kanji)
 
         return KanjiCard(
             kanji: detail.kanji,
@@ -525,14 +875,18 @@ private enum RemoteKanjiProvider {
                 file: svgFileName(for: kanji),
                 license: "KanjiVG: Creative Commons Attribution-Share Alike 3.0"
             ),
-            strokes: strokes
+            strokes: strokes,
+            grade: detail.grade,
+            jlpt: detail.jlpt
         )
     }
 
     private static func loadExamples(for kanji: String) async -> [KanjiExample] {
         do {
             let wordsURL = URL(string: "https://kanjiapi.dev/v1/words/\(kanji)")!
-            let (data, _) = try await session.data(from: wordsURL)
+            let (data, _) = try await withTimeout(seconds: 3) {
+                try await session.data(from: wordsURL)
+            }
             let entries = try JSONDecoder().decode([RemoteWordEntry].self, from: data)
             var examples: [KanjiExample] = []
 
@@ -555,6 +909,25 @@ private enum RemoteKanjiProvider {
         }
     }
 
+    private static func withTimeout<Value>(seconds: UInt64, operation: @escaping () async throws -> Value) async throws -> Value {
+        try await withThrowingTaskGroup(of: Value.self) { group in
+            group.addTask {
+                try await operation()
+            }
+            group.addTask {
+                try await Task.sleep(nanoseconds: seconds * 1_000_000_000)
+                throw URLError(.timedOut)
+            }
+
+            guard let value = try await group.next() else {
+                throw URLError(.timedOut)
+            }
+
+            group.cancelAll()
+            return value
+        }
+    }
+
     private static func svgFileName(for kanji: String) -> String {
         guard let scalar = kanji.unicodeScalars.first else {
             return "00000.svg"
@@ -569,12 +942,16 @@ private struct RemoteKanjiDetail: Decodable {
     let meanings: [String]
     let onReadings: [String]
     let kunReadings: [String]
+    let grade: Int?
+    let jlpt: Int?
 
     enum CodingKeys: String, CodingKey {
         case kanji
         case meanings
         case onReadings = "on_readings"
         case kunReadings = "kun_readings"
+        case grade
+        case jlpt
     }
 }
 
@@ -694,11 +1071,32 @@ private enum RussianMeaningTranslator {
     }
 
     static func translate(_ meanings: [String]) async -> [String] {
-        if let systemTranslation = try? await translateWithSystem(meanings), !systemTranslation.isEmpty {
+        if let systemTranslation = try? await withTimeout(seconds: 4, operation: {
+            try await translateWithSystem(meanings)
+        }), !systemTranslation.isEmpty {
             return unique(systemTranslation)
         }
 
         return translateLocally(meanings)
+    }
+
+    private static func withTimeout<Value>(seconds: UInt64, operation: @escaping () async throws -> Value) async throws -> Value {
+        try await withThrowingTaskGroup(of: Value.self) { group in
+            group.addTask {
+                try await operation()
+            }
+            group.addTask {
+                try await Task.sleep(nanoseconds: seconds * 1_000_000_000)
+                throw URLError(.timedOut)
+            }
+
+            guard let value = try await group.next() else {
+                throw URLError(.timedOut)
+            }
+
+            group.cancelAll()
+            return value
+        }
     }
 
     private static func translateWithSystem(_ meanings: [String]) async throws -> [String] {

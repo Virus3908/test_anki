@@ -1,7 +1,29 @@
+import Foundation
 import SwiftUI
 
+private final class CachedSVGPath {
+    let path: Path
+
+    init(_ path: Path) {
+        self.path = path
+    }
+}
+
 enum SVGPathParser {
+    private static let pathCache = NSCache<NSString, CachedSVGPath>()
+
     static func path(from pathData: String) -> Path {
+        let cacheKey = pathData as NSString
+        if let cachedPath = pathCache.object(forKey: cacheKey) {
+            return cachedPath.path
+        }
+
+        let path = parsePath(from: pathData)
+        pathCache.setObject(CachedSVGPath(path), forKey: cacheKey)
+        return path
+    }
+
+    private static func parsePath(from pathData: String) -> Path {
         var path = Path()
         var current = CGPoint.zero
 
