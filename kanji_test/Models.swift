@@ -2,7 +2,7 @@ import Foundation
 import CoreGraphics
 import Translation
 
-struct KanjiCard: Codable, Identifiable {
+struct KanjiCard: Codable, Identifiable, Sendable {
     var id: String { kanji }
 
     let kanji: String
@@ -56,7 +56,7 @@ struct KanjiCard: Codable, Identifiable {
     }
 }
 
-struct KanjiExample: Codable, Identifiable {
+struct KanjiExample: Codable, Identifiable, Sendable {
     var id: String { "\(word)-\(reading)" }
 
     let word: String
@@ -86,7 +86,7 @@ enum PracticeMode: String, CaseIterable, Identifiable {
     }
 }
 
-struct WordStudyCard: Identifiable {
+struct WordStudyCard: Identifiable, Sendable {
     var id: String { "\(word)-\(reading)" }
 
     let word: String
@@ -190,7 +190,7 @@ struct WordStudyCard: Identifiable {
     }
 }
 
-struct KanaStudyCard: Identifiable {
+struct KanaStudyCard: Identifiable, Sendable {
     var id: String { character }
 
     let character: String
@@ -264,7 +264,7 @@ struct KanaStudyCard: Identifiable {
     }
 }
 
-enum WordFrequencyDeck: String, CaseIterable, Identifiable {
+enum WordFrequencyDeck: String, CaseIterable, Identifiable, Sendable {
     case top1000
     case top2000
     case top5000
@@ -325,13 +325,13 @@ enum WordFrequencyDeck: String, CaseIterable, Identifiable {
     }
 }
 
-struct KanjiSource: Codable {
+struct KanjiSource: Codable, Sendable {
     let name: String
     let file: String
     let license: String
 }
 
-struct KanjiStroke: Codable, Identifiable {
+struct KanjiStroke: Codable, Identifiable, Sendable {
     var id: Int { order }
 
     let order: Int
@@ -357,7 +357,7 @@ struct KanjiStroke: Codable, Identifiable {
     }
 }
 
-enum StrokeAxis: String, Codable {
+enum StrokeAxis: String, Codable, Sendable {
     case horizontal
     case vertical
     case corner
@@ -654,6 +654,27 @@ enum KanjiDataLoader {
         }
     }
 
+    static func loadAvailableCards(deck: KanjiDeck) -> [KanjiCard] {
+        let masterCards = loadBundledMasterCards()
+        let masterDeckCards = masterCards.filter(deck.masterFilter)
+        if !masterDeckCards.isEmpty {
+            return masterDeckCards
+        }
+
+        if deck != .all, let allCachedCards = try? loadCachedCards(for: .all), !allCachedCards.isEmpty {
+            let filteredCards = allCachedCards.filter(deck.masterFilter)
+            if !filteredCards.isEmpty {
+                return filteredCards
+            }
+        }
+
+        if let cachedCards = try? loadCachedCards(for: deck), !cachedCards.isEmpty {
+            return cachedCards
+        }
+
+        return []
+    }
+
     static func loadLocalCards() -> [KanjiCard] {
         guard let url = Bundle.main.url(forResource: "kanji-data", withExtension: "json") else {
             assertionFailure("kanji-data.json is missing from the app bundle.")
@@ -670,10 +691,9 @@ enum KanjiDataLoader {
     }
 
     static func loadCards(deck: KanjiDeck = .jlpt5) async -> [KanjiCard] {
-        let masterCards = loadBundledMasterCards()
-        let masterDeckCards = masterCards.filter(deck.masterFilter)
-        if !masterDeckCards.isEmpty {
-            return masterDeckCards
+        let availableCards = loadAvailableCards(deck: deck)
+        if !availableCards.isEmpty {
+            return availableCards
         }
 
         do {
@@ -693,14 +713,14 @@ enum KanjiDataLoader {
                 let mergedCards = remoteKanjiList.compactMap { mergedByKanji[$0] }
 
                 if !mergedCards.isEmpty {
-                    try saveCachedCards(mergedCards, for: deck)
+                    try mergeCardsIntoAllCache(mergedCards)
                     return mergedCards
                 }
             }
 
             let remoteCards = try await RemoteKanjiProvider.loadCards(for: remoteKanjiList)
             if !remoteCards.isEmpty {
-                try saveCachedCards(remoteCards, for: deck)
+                try mergeCardsIntoAllCache(remoteCards)
                 return remoteCards
             }
         } catch {
@@ -712,6 +732,47 @@ enum KanjiDataLoader {
         }
 
         return loadLocalCards()
+    }
+
+    static func loadCardsProgressively(
+        deck: KanjiDeck,
+        onUpdate: @MainActor @escaping ([KanjiCard], Int?) -> Void
+    ) async {
+        let bundledOrCachedCards = loadAvailableCards(deck: deck)
+        if !bundledOrCachedCards.isEmpty {
+            onUpdate(bundledOrCachedCards, bundledOrCachedCards.count)
+        }
+
+        do {
+            let remoteKanjiList = try await RemoteKanjiProvider.loadKanjiList(deck: deck)
+            var cardsByKanji = Dictionary(bundledOrCachedCards.map { ($0.kanji, $0) }, uniquingKeysWith: { current, _ in current })
+            let missingKanji = remoteKanjiList.filter { cardsByKanji[$0] == nil }
+
+            if missingKanji.isEmpty {
+                let orderedCards = remoteKanjiList.compactMap { cardsByKanji[$0] }
+                onUpdate(orderedCards, remoteKanjiList.count)
+                return
+            }
+
+            for await batch in RemoteKanjiProvider.loadCardsStream(for: missingKanji) {
+                for card in batch {
+                    cardsByKanji[card.kanji] = card
+                }
+
+                let orderedCards = remoteKanjiList.compactMap { cardsByKanji[$0] }
+                onUpdate(orderedCards, remoteKanjiList.count)
+            }
+
+            let finalCards = remoteKanjiList.compactMap { cardsByKanji[$0] }
+            if !finalCards.isEmpty {
+                try mergeCardsIntoAllCache(finalCards)
+                onUpdate(finalCards, remoteKanjiList.count)
+            }
+        } catch {
+            if bundledOrCachedCards.isEmpty {
+                onUpdate(loadLocalCards(), nil)
+            }
+        }
     }
 
     static func clearCache() {
@@ -773,13 +834,34 @@ enum KanjiDataLoader {
     }
 
     private static func updateCachedCard(_ card: KanjiCard, for deck: KanjiDeck) throws {
-        guard var cachedCards = try loadCachedCards(for: deck),
-              let index = cachedCards.firstIndex(where: { $0.kanji == card.kanji }) else {
+        let cacheDeck = deck == .all ? deck : .all
+        guard var cachedCards = try loadCachedCards(for: cacheDeck) else {
+            try saveCachedCards([card], for: cacheDeck)
             return
         }
 
-        cachedCards[index] = card
-        try saveCachedCards(cachedCards, for: deck)
+        if let index = cachedCards.firstIndex(where: { $0.kanji == card.kanji }) {
+            cachedCards[index] = card
+        } else {
+            cachedCards.append(card)
+        }
+
+        try saveCachedCards(cachedCards, for: cacheDeck)
+    }
+
+    private static func mergeCardsIntoAllCache(_ cards: [KanjiCard]) throws {
+        guard !cards.isEmpty else {
+            return
+        }
+
+        let existingCards = (try? loadCachedCards(for: .all)) ?? []
+        var cardsByKanji = Dictionary(existingCards.map { ($0.kanji, $0) }, uniquingKeysWith: { _, new in new })
+
+        for card in cards {
+            cardsByKanji[card.kanji] = card
+        }
+
+        try saveCachedCards(cardsByKanji.values.sorted { $0.kanji < $1.kanji }, for: .all)
     }
 
     private static func cacheURL(for deck: KanjiDeck) -> URL {
@@ -844,6 +926,67 @@ private enum RemoteKanjiProvider {
         }
 
         return cards.sorted { $0.kanji < $1.kanji }
+    }
+
+    static func loadCardsStream(for kanjiList: [String]) -> AsyncStream<[KanjiCard]> {
+        AsyncStream { continuation in
+            let task = Task {
+                var batch: [KanjiCard] = []
+                var didYieldFirstCard = false
+                var nextIndex = 0
+                let maxConcurrentRequests = 8
+
+                await withTaskGroup(of: KanjiCard?.self) { group in
+                    func enqueueNextCard() {
+                        guard nextIndex < kanjiList.count else {
+                            return
+                        }
+
+                        let kanji = kanjiList[nextIndex]
+                        nextIndex += 1
+                        group.addTask {
+                            try? await loadCard(for: kanji)
+                        }
+                    }
+
+                    for _ in 0..<min(maxConcurrentRequests, kanjiList.count) {
+                        enqueueNextCard()
+                    }
+
+                    for await card in group {
+                        guard !Task.isCancelled else {
+                            return
+                        }
+
+                        if let card {
+                            if didYieldFirstCard {
+                                batch.append(card)
+                            } else {
+                                continuation.yield([card])
+                                didYieldFirstCard = true
+                            }
+                        }
+
+                        if batch.count >= 8 {
+                            continuation.yield(batch)
+                            batch.removeAll(keepingCapacity: true)
+                        }
+
+                        enqueueNextCard()
+                    }
+                }
+
+                if !batch.isEmpty {
+                    continuation.yield(batch)
+                }
+
+                continuation.finish()
+            }
+
+            continuation.onTermination = { _ in
+                task.cancel()
+            }
+        }
     }
 
     private static func loadCard(for kanji: String) async throws -> KanjiCard {
