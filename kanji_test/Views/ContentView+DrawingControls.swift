@@ -4,12 +4,12 @@ extension ContentView {
     func reviewButton(_ title: String, rating: ReviewRating, card: KanjiCard) -> some View {
         ratingActionButton(
             title,
-            color: ratingButtonColor(for: rating, hasFeedback: !feedback.isEmpty, isAnswered: currentSessionRating() != nil),
-            isSelected: sessionRating(at: currentIndex) == rating
+            color: ratingButtonColor(for: rating, hasFeedback: !trainingSession.feedback.isEmpty, isAnswered: currentSessionRating() != nil),
+            isSelected: sessionRating(at: trainingSession.currentIndex) == rating
         ) {
             applyReview(rating, to: card)
         }
-        .disabled(isPreparingCard)
+        .disabled(trainingSession.isPreparingCard)
     }
 
     func ratingActionButton(
@@ -33,11 +33,11 @@ extension ContentView {
     }
 
     func currentSessionRating() -> ReviewRating? {
-        sessionRating(at: currentIndex)
+        sessionRating(at: trainingSession.currentIndex)
     }
 
     func sessionRating(at index: Int) -> ReviewRating? {
-        sessionAnswerStates[sessionAnswerID(for: index)]?.rating
+        trainingSession.sessionAnswerStates[sessionAnswerID(for: index)]?.rating
     }
 
     func ratingButtonColor(for rating: ReviewRating, hasFeedback: Bool, isAnswered: Bool) -> Color {
@@ -66,11 +66,11 @@ extension ContentView {
 
     func feedbackInfoButton(items: [StrokeFeedback]) -> some View {
         Button {
-            showsFeedbackInfo = true
+            trainingSession.showsFeedbackInfo = true
         } label: {
             Image(systemName: "info.circle")
         }
-        .popover(isPresented: $showsFeedbackInfo, arrowEdge: .bottom) {
+        .popover(isPresented: $trainingSession.showsFeedbackInfo, arrowEdge: .bottom) {
             feedbackInfoPopover(items: items)
                 .presentationCompactAdaptation(.popover)
         }

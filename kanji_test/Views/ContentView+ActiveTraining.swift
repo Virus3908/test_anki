@@ -6,27 +6,27 @@ extension ContentView {
         Group {
             switch practiceMode {
             case .kanji:
-                if let card = cards[safe: currentIndex] {
+                if let card = cards[safe: trainingSession.currentIndex] {
                     trainingView(for: card)
                 } else {
                     startView()
                 }
             case .words:
-                if let wordCard = wordCards[safe: currentIndex] {
+                if let wordCard = wordCards[safe: trainingSession.currentIndex] {
                     wordTrainingView(for: wordCard)
                 } else {
                     startView()
                 }
             case .kana:
-                if let kanaCard = kanaCards[safe: currentIndex] {
+                if let kanaCard = kanaCards[safe: trainingSession.currentIndex] {
                     kanaTrainingView(for: kanaCard)
                 } else {
                     startView()
                 }
             }
         }
-        .sheet(item: $selectedLinkedKanjiCard, onDismiss: {
-            selectedLinkedKanjiCard = nil
+        .sheet(item: $coordinator.selectedLinkedKanjiCard, onDismiss: {
+            coordinator.selectedLinkedKanjiCard = nil
         }) { card in
             kanjiPreviewDetail(for: card)
         }
@@ -57,7 +57,7 @@ extension ContentView {
                 }
                 .background(AppPalette.background)
                 .simultaneousGesture(cardSwipeGesture())
-                .onChange(of: scrollToTopToken) {
+                .onChange(of: trainingSession.scrollToTopToken) {
                     withAnimation(.easeInOut(duration: 0.2)) {
                             scrollProxy.scrollTo("trainingTop", anchor: .top)
                     }

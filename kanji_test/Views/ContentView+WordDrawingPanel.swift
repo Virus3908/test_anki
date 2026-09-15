@@ -9,8 +9,8 @@ extension ContentView {
 
             ZStack {
                 DrawingBoard(
-                    drawnStrokes: $drawnStrokes,
-                    currentStroke: $currentStroke,
+                    drawnStrokes: $trainingSession.drawnStrokes,
+                    currentStroke: $trainingSession.currentStroke,
                     expectedStrokes: expectedStrokesForCurrentWordKanji(currentKanji),
                     feedback: currentWordFeedback,
                     onStrokeFinished: nil
@@ -24,13 +24,13 @@ extension ContentView {
                         } label: {
                             Image(systemName: "trash")
                         }
-                        .disabled(drawnStrokes.isEmpty && currentStroke.isEmpty)
+                        .disabled(trainingSession.drawnStrokes.isEmpty && trainingSession.currentStroke.isEmpty)
 
                         Spacer()
 
-                        feedbackInfoButton(items: feedback)
-                            .disabled(feedback.isEmpty)
-                            .tint(feedback.isEmpty ? AppPalette.mutedText : AppPalette.accent)
+                        feedbackInfoButton(items: trainingSession.feedback)
+                            .disabled(trainingSession.feedback.isEmpty)
+                            .tint(trainingSession.feedback.isEmpty ? AppPalette.mutedText : AppPalette.accent)
                     }
 
                     Spacer()
@@ -42,14 +42,14 @@ extension ContentView {
                     } label: {
                         Image(systemName: "arrow.uturn.backward")
                     }
-                    .disabled(drawnStrokes.isEmpty)
+                    .disabled(trainingSession.drawnStrokes.isEmpty)
 
                     Spacer()
 
                     Button {
                         advanceWordKanjiOrCheck(wordCard)
                     } label: {
-                    Image(systemName: currentWordKanjiIndex < wordCard.kanjiCards.count - 1 ? "arrow.right.circle.fill" : "checkmark.circle.fill")
+                    Image(systemName: trainingSession.currentWordKanjiIndex < wordCard.kanjiCards.count - 1 ? "arrow.right.circle.fill" : "checkmark.circle.fill")
                 }
                     .buttonStyle(.borderedProminent)
                     .tint(AppPalette.accent)
@@ -66,7 +66,7 @@ extension ContentView {
                 } label: {
                     Image(systemName: "chevron.left")
                 }
-                .disabled(currentIndex <= 0 || isPreparingCard)
+                .disabled(trainingSession.currentIndex <= 0 || trainingSession.isPreparingCard)
 
                 Spacer(minLength: 12)
 
@@ -76,42 +76,42 @@ extension ContentView {
                     HStack(spacing: 10) {
                         ratingActionButton(
                             "-",
-                            color: ratingButtonColor(for: .again, hasFeedback: !feedback.isEmpty, isAnswered: isCurrentCardAnswered),
+                            color: ratingButtonColor(for: .again, hasFeedback: !trainingSession.feedback.isEmpty, isAnswered: isCurrentCardAnswered),
                             isSelected: currentSessionRating() == .again
                         ) {
                             applyWordReview(.again)
                         }
                         ratingActionButton(
                             "~",
-                            color: ratingButtonColor(for: .hard, hasFeedback: !feedback.isEmpty, isAnswered: isCurrentCardAnswered),
+                            color: ratingButtonColor(for: .hard, hasFeedback: !trainingSession.feedback.isEmpty, isAnswered: isCurrentCardAnswered),
                             isSelected: currentSessionRating() == .hard
                         ) {
                             applyWordReview(.hard)
                         }
                         ratingActionButton(
                             "+",
-                            color: ratingButtonColor(for: .good, hasFeedback: !feedback.isEmpty, isAnswered: isCurrentCardAnswered),
+                            color: ratingButtonColor(for: .good, hasFeedback: !trainingSession.feedback.isEmpty, isAnswered: isCurrentCardAnswered),
                             isSelected: currentSessionRating() == .good
                         ) {
                             applyWordReview(.good)
                         }
                     }
                 }
-                .disabled(feedback.isEmpty && !isCurrentCardAnswered)
+                .disabled(trainingSession.feedback.isEmpty && !isCurrentCardAnswered)
 
                 Spacer(minLength: 12)
 
                 Button {
                     moveToNextCard()
                 } label: {
-                    if isPreparingCard {
+                    if trainingSession.isPreparingCard {
                         ProgressView()
                             .controlSize(.small)
                     } else {
                         Image(systemName: "chevron.right")
                     }
                 }
-                .disabled(currentIndex >= wordCards.count - 1 || isPreparingCard)
+                .disabled(trainingSession.currentIndex >= wordCards.count - 1 || trainingSession.isPreparingCard)
             }
             .buttonStyle(.bordered)
             .tint(AppPalette.accent)

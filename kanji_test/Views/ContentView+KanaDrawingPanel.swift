@@ -10,10 +10,10 @@ extension ContentView {
 
             ZStack {
                 DrawingBoard(
-                    drawnStrokes: $drawnStrokes,
-                    currentStroke: $currentStroke,
+                    drawnStrokes: $trainingSession.drawnStrokes,
+                    currentStroke: $trainingSession.currentStroke,
                     expectedStrokes: expectedStrokesForCurrentCard(expectedCard),
-                    feedback: feedback,
+                    feedback: trainingSession.feedback,
                     onStrokeFinished: {
                         handleGuidedStrokeFinished(expectedCard)
                     }
@@ -27,13 +27,13 @@ extension ContentView {
                         } label: {
                             Image(systemName: "trash")
                         }
-                        .disabled(drawnStrokes.isEmpty && currentStroke.isEmpty)
+                        .disabled(trainingSession.drawnStrokes.isEmpty && trainingSession.currentStroke.isEmpty)
 
                         Spacer()
 
-                        feedbackInfoButton(items: feedback)
-                            .disabled(feedback.isEmpty)
-                            .tint(feedback.isEmpty ? AppPalette.mutedText : AppPalette.accent)
+                        feedbackInfoButton(items: trainingSession.feedback)
+                            .disabled(trainingSession.feedback.isEmpty)
+                            .tint(trainingSession.feedback.isEmpty ? AppPalette.mutedText : AppPalette.accent)
                     }
 
                     Spacer()
@@ -45,7 +45,7 @@ extension ContentView {
                     } label: {
                         Image(systemName: "arrow.uturn.backward")
                     }
-                    .disabled(drawnStrokes.isEmpty)
+                    .disabled(trainingSession.drawnStrokes.isEmpty)
 
                     Spacer()
 
@@ -69,7 +69,7 @@ extension ContentView {
                 } label: {
                     Image(systemName: "chevron.left")
                 }
-                .disabled(currentIndex <= 0 || isPreparingCard)
+                .disabled(trainingSession.currentIndex <= 0 || trainingSession.isPreparingCard)
 
                 Spacer(minLength: 12)
 
@@ -79,33 +79,33 @@ extension ContentView {
                     HStack(spacing: 10) {
                         ratingActionButton(
                             "-",
-                            color: ratingButtonColor(for: .again, hasFeedback: !feedback.isEmpty, isAnswered: isCurrentCardAnswered),
+                            color: ratingButtonColor(for: .again, hasFeedback: !trainingSession.feedback.isEmpty, isAnswered: isCurrentCardAnswered),
                             isSelected: currentSessionRating() == .again
                         ) {
                             applyKanaReview(.again)
                         }
                         ratingActionButton(
                             "~",
-                            color: ratingButtonColor(for: .hard, hasFeedback: !feedback.isEmpty, isAnswered: isCurrentCardAnswered),
+                            color: ratingButtonColor(for: .hard, hasFeedback: !trainingSession.feedback.isEmpty, isAnswered: isCurrentCardAnswered),
                             isSelected: currentSessionRating() == .hard
                         ) {
                             applyKanaReview(.hard)
                         }
                         ratingActionButton(
                             "+",
-                            color: ratingButtonColor(for: .good, hasFeedback: !feedback.isEmpty, isAnswered: isCurrentCardAnswered),
+                            color: ratingButtonColor(for: .good, hasFeedback: !trainingSession.feedback.isEmpty, isAnswered: isCurrentCardAnswered),
                             isSelected: currentSessionRating() == .good
                         ) {
                             applyKanaReview(.good)
                         }
                     }
                 }
-                .disabled(feedback.isEmpty && !isCurrentCardAnswered)
+                .disabled(trainingSession.feedback.isEmpty && !isCurrentCardAnswered)
 
                 Spacer(minLength: 12)
 
                 Button { moveToNextCard() } label: { Image(systemName: "chevron.right") }
-                    .disabled(currentIndex >= kanaCards.count - 1 || isPreparingCard)
+                    .disabled(trainingSession.currentIndex >= kanaCards.count - 1 || trainingSession.isPreparingCard)
             }
             .buttonStyle(.bordered)
             .tint(AppPalette.accent)

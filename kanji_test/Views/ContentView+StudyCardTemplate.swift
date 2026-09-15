@@ -7,14 +7,14 @@ extension ContentView {
     ) -> some View {
         ZStack {
             front()
-                .opacity(isAnswerVisible ? 0 : 1)
-                .rotation3DEffect(.degrees(isAnswerVisible ? 180 : 0), axis: (x: 0, y: 1, z: 0))
+                .opacity(trainingSession.isAnswerVisible ? 0 : 1)
+                .rotation3DEffect(.degrees(trainingSession.isAnswerVisible ? 180 : 0), axis: (x: 0, y: 1, z: 0))
 
             ScrollView {
                 back()
             }
-            .opacity(isAnswerVisible ? 1 : 0)
-            .rotation3DEffect(.degrees(isAnswerVisible ? 0 : -180), axis: (x: 0, y: 1, z: 0))
+            .opacity(trainingSession.isAnswerVisible ? 1 : 0)
+            .rotation3DEffect(.degrees(trainingSession.isAnswerVisible ? 0 : -180), axis: (x: 0, y: 1, z: 0))
         }
         .padding(18)
         .frame(maxWidth: .infinity, alignment: .topLeading)
@@ -24,7 +24,7 @@ extension ContentView {
         .gesture(cardSwipeGesture())
         .onTapGesture {
             withAnimation(.easeInOut(duration: 0.24)) {
-                isAnswerVisible.toggle()
+                trainingSession.isAnswerVisible.toggle()
             }
         }
     }

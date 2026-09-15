@@ -9,7 +9,7 @@ extension ContentView {
             VStack(alignment: .leading, spacing: 14) {
                 previewHeader(title: deck.title, subtitle: deckPreviewStatus, onBack: closeDeckPreview) {
                     Button {
-                        isDeckSchedulePresented = true
+                        coordinator.isDeckSchedulePresented = true
                     } label: {
                         Image(systemName: "info.circle")
                     }
@@ -17,20 +17,20 @@ extension ContentView {
                     .tint(AppPalette.accent)
                 }
 
-                previewStartButton(count: previewCards.count, isDisabled: previewCards.isEmpty) {
+                previewStartButton(count: deckState.previewCards.count, isDisabled: deckState.previewCards.isEmpty) {
                     startRandomTrainingFromPreview()
                 }
 
                 ScrollView(.vertical) {
                     LazyVGrid(columns: kanjiPreviewColumns, spacing: 10) {
-                        ForEach(previewCards) { card in
+                        ForEach(deckState.previewCards) { card in
                             kanjiPreviewTile(for: card)
                         }
                     }
                     .padding(.bottom, 20)
                 }
 
-                if isLoadingDeck {
+                if deckState.isLoadingDeck {
                     ProgressView("Загружаю карточки")
                         .foregroundStyle(AppPalette.secondaryText)
                         .tint(AppPalette.accent)
@@ -39,13 +39,13 @@ extension ContentView {
             .padding(20)
             .foregroundStyle(AppPalette.text)
         }
-        .sheet(item: $presentedKanjiPreview, onDismiss: {
-            selectedPreviewCard = nil
-            previewSwipeDirection = 0
+        .sheet(item: $coordinator.presentedKanjiPreview, onDismiss: {
+            coordinator.selectedPreviewCard = nil
+            coordinator.previewSwipeDirection = 0
         }) { presentedPreview in
-            kanjiPreviewDetail(for: selectedPreviewCard ?? presentedPreview.card)
+            kanjiPreviewDetail(for: coordinator.selectedPreviewCard ?? presentedPreview.card)
         }
-        .sheet(isPresented: $isDeckSchedulePresented) {
+        .sheet(isPresented: $coordinator.isDeckSchedulePresented) {
             deckScheduleInfoView(for: deck)
         }
     }
@@ -58,24 +58,24 @@ extension ContentView {
             VStack(alignment: .leading, spacing: 14) {
                 previewHeader(title: deck.title, subtitle: kanaPreviewStatus(for: deck), onBack: closeKanaPreview)
 
-                previewStartButton(count: previewKanaCards.count, isDisabled: previewKanaCards.isEmpty) {
+                previewStartButton(count: deckState.previewKanaCards.count, isDisabled: deckState.previewKanaCards.isEmpty) {
                     startKanaTraining(
                         deck: deck,
-                        cards: nextKanaSessionCards(from: previewKanaCards),
-                        sourceCards: previewKanaCards
+                        cards: nextKanaSessionCards(from: deckState.previewKanaCards),
+                        sourceCards: deckState.previewKanaCards
                     )
                 }
 
                 ScrollView(.vertical) {
                     LazyVGrid(columns: kanaPreviewColumns, spacing: 10) {
-                        ForEach(previewKanaCards) { card in
+                        ForEach(deckState.previewKanaCards) { card in
                             kanaPreviewTile(for: card)
                         }
                     }
                     .padding(.bottom, 20)
                 }
 
-                if isLoadingDeck {
+                if deckState.isLoadingDeck {
                     ProgressView("Загружаю штрихи")
                         .foregroundStyle(AppPalette.secondaryText)
                         .tint(AppPalette.accent)
@@ -84,11 +84,11 @@ extension ContentView {
             .padding(20)
             .foregroundStyle(AppPalette.text)
         }
-        .sheet(item: $presentedKanaPreview, onDismiss: {
-            selectedKanaPreviewCard = nil
-            previewSwipeDirection = 0
+        .sheet(item: $coordinator.presentedKanaPreview, onDismiss: {
+            coordinator.selectedKanaPreviewCard = nil
+            coordinator.previewSwipeDirection = 0
         }) { presentedPreview in
-            kanaPreviewDetail(for: selectedKanaPreviewCard ?? presentedPreview.card, deck: deck)
+            kanaPreviewDetail(for: coordinator.selectedKanaPreviewCard ?? presentedPreview.card, deck: deck)
         }
     }
 
@@ -100,23 +100,23 @@ extension ContentView {
             VStack(alignment: .leading, spacing: 14) {
                 previewHeader(title: deck.title, subtitle: wordPreviewStatus, onBack: closeWordPreview)
 
-                previewStartButton(count: previewWordCards.count, isDisabled: previewWordCards.isEmpty) {
+                previewStartButton(count: deckState.previewWordCards.count, isDisabled: deckState.previewWordCards.isEmpty) {
                     startWordTraining(
-                        with: nextWordSessionCards(from: previewWordCards),
-                        sourceCards: previewWordCards
+                        with: nextWordSessionCards(from: deckState.previewWordCards),
+                        sourceCards: deckState.previewWordCards
                     )
                 }
 
                 ScrollView(.vertical) {
                     LazyVGrid(columns: wordPreviewColumns, spacing: 10) {
-                        ForEach(previewWordCards) { card in
+                        ForEach(deckState.previewWordCards) { card in
                             wordPreviewTile(for: card)
                         }
                     }
                     .padding(.bottom, 20)
                 }
 
-                if isLoadingDeck {
+                if deckState.isLoadingDeck {
                     ProgressView("Загружаю слова")
                         .foregroundStyle(AppPalette.secondaryText)
                         .tint(AppPalette.accent)
@@ -125,12 +125,12 @@ extension ContentView {
             .padding(20)
             .foregroundStyle(AppPalette.text)
         }
-        .sheet(item: $presentedWordPreview, onDismiss: {
-            selectedWordPreviewCard = nil
-            selectedLinkedKanjiCard = nil
-            previewSwipeDirection = 0
+        .sheet(item: $coordinator.presentedWordPreview, onDismiss: {
+            coordinator.selectedWordPreviewCard = nil
+            coordinator.selectedLinkedKanjiCard = nil
+            coordinator.previewSwipeDirection = 0
         }) { presentedPreview in
-            wordPreviewDetail(for: selectedWordPreviewCard ?? presentedPreview.card, deck: deck)
+            wordPreviewDetail(for: coordinator.selectedWordPreviewCard ?? presentedPreview.card, deck: deck)
         }
     }
 
@@ -147,19 +147,19 @@ extension ContentView {
     }
 
     var wordPreviewStatus: String {
-        isLoadingDeck ? "Загружаю словарь" : "\(previewWordCards.count) слов"
+        deckState.isLoadingDeck ? "Загружаю словарь" : "\(deckState.previewWordCards.count) слов"
     }
 
     func kanaPreviewStatus(for deck: KanaDeck) -> String {
-        isLoadingDeck ? "Загружаю штрихи из KanjiVG" : "\(previewKanaCards.count) карточек из KanjiVG"
+        deckState.isLoadingDeck ? "Загружаю штрихи из KanjiVG" : "\(deckState.previewKanaCards.count) карточек из KanjiVG"
     }
 
     var deckPreviewStatus: String {
-        if let previewExpectedCount {
-            return "\(previewCards.count) / \(previewExpectedCount) загружено"
+        if let previewExpectedCount = deckState.previewExpectedCount {
+            return "\(deckState.previewCards.count) / \(previewExpectedCount) загружено"
         }
 
-        return "\(previewCards.count) загружено"
+        return "\(deckState.previewCards.count) загружено"
     }
 
     func deckScheduleInfoView(for deck: KanjiDeck) -> some View {
@@ -170,7 +170,7 @@ extension ContentView {
                         .font(.title2.weight(.bold))
 
                     VStack(spacing: 8) {
-                        ForEach(reviewStore.scheduleBuckets(for: previewCards)) { bucket in
+                        ForEach(reviewStore.scheduleBuckets(for: deckState.previewCards)) { bucket in
                             HStack {
                                 Text(bucket.title)
                                     .foregroundStyle(AppPalette.text)
@@ -201,7 +201,7 @@ extension ContentView {
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Готово") {
-                        isDeckSchedulePresented = false
+                        coordinator.isDeckSchedulePresented = false
                     }
                 }
             }

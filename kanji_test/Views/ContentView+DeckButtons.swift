@@ -49,7 +49,7 @@ extension ContentView {
             .appSurfaceCard()
         }
         .buttonStyle(.plain)
-        .disabled(isLoadingDeck)
+        .disabled(deckState.isLoadingDeck)
     }
 
 }

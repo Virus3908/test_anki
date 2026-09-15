@@ -41,8 +41,8 @@ extension ContentView {
                         wordFullCard(for: card)
 
                         primaryActionButton(title: "Практиковать слово", systemImage: "pencil.and.scribble") {
-                            presentedWordPreview = nil
-                            selectedWordPreviewCard = nil
+                            coordinator.presentedWordPreview = nil
+                            coordinator.selectedWordPreviewCard = nil
                             startWordTraining(with: [card], guided: true)
                         }
                     }
@@ -55,8 +55,8 @@ extension ContentView {
             .simultaneousGesture(wordPreviewCardSwipeGesture(for: card, in: deck))
         }
         .background(AppPalette.background.ignoresSafeArea())
-        .sheet(item: $selectedLinkedKanjiCard, onDismiss: {
-            selectedLinkedKanjiCard = nil
+        .sheet(item: $coordinator.selectedLinkedKanjiCard, onDismiss: {
+            coordinator.selectedLinkedKanjiCard = nil
         }) { card in
             kanjiPreviewDetail(for: card)
         }
@@ -152,7 +152,7 @@ extension ContentView {
                     await translateWordExamplesIfNeeded(for: card, examples: sourceExamples)
                 }
             }
-        } else if loadingWordExampleKeys.contains(card.id) {
+        } else if translationState.loadingWordExampleKeys.contains(card.id) {
             ProgressView("Ищу примеры")
                 .font(.caption)
                 .foregroundStyle(AppPalette.secondaryText)
@@ -165,39 +165,39 @@ extension ContentView {
     }
 
     func loadWordUsageExamplesIfNeeded(for card: WordStudyCard) async {
-        guard wordUsageExamples[card.id] == nil, !loadingWordExampleKeys.contains(card.id) else {
+        guard translationState.wordUsageExamples[card.id] == nil, !translationState.loadingWordExampleKeys.contains(card.id) else {
             return
         }
 
-        loadingWordExampleKeys.insert(card.id)
+        translationState.loadingWordExampleKeys.insert(card.id)
         let examples = await WordUsageExampleProvider.loadExamples(for: card)
         await MainActor.run {
-            wordUsageExamples[card.id] = examples
-            loadingWordExampleKeys.remove(card.id)
+            translationState.wordUsageExamples[card.id] = examples
+            translationState.loadingWordExampleKeys.remove(card.id)
         }
     }
 
     func reloadWordUsageExamples(for card: WordStudyCard) {
-        guard !loadingWordExampleKeys.contains(card.id) else {
+        guard !translationState.loadingWordExampleKeys.contains(card.id) else {
             return
         }
 
-        loadingWordExampleKeys.insert(card.id)
+        translationState.loadingWordExampleKeys.insert(card.id)
 
         Task { @MainActor in
             let examples = await WordUsageExampleProvider.reloadRemoteExamples(for: card)
             if !examples.isEmpty {
-                wordUsageExamples[card.id] = examples
-                wordExampleTranslations[card.id] = nil
+                translationState.wordUsageExamples[card.id] = examples
+                translationState.wordExampleTranslations[card.id] = nil
 
                 if meaningLanguage == .russian {
                     let translatedExamples = await translateWordUsageExamples(examples)
-                    wordExampleTranslations[card.id] = translatedExamples
+                    translationState.wordExampleTranslations[card.id] = translatedExamples
                     KanjiTranslationStore.saveWordExampleTranslation(translatedExamples, for: card.id)
                 }
             }
 
-            loadingWordExampleKeys.remove(card.id)
+            translationState.loadingWordExampleKeys.remove(card.id)
         }
     }
 
@@ -206,14 +206,14 @@ extension ContentView {
             reloadWordUsageExamples(for: card)
         } label: {
             Label(
-                loadingWordExampleKeys.contains(card.id) ? "Запрашиваю примеры" : "Перезапросить примеры",
+                translationState.loadingWordExampleKeys.contains(card.id) ? "Запрашиваю примеры" : "Перезапросить примеры",
                 systemImage: "arrow.clockwise"
             )
             .font(.caption.weight(.semibold))
         }
         .buttonStyle(.bordered)
         .tint(AppPalette.accent)
-        .disabled(loadingWordExampleKeys.contains(card.id))
+        .disabled(translationState.loadingWordExampleKeys.contains(card.id))
     }
 
     func wordExampleReading(for example: WordUsageExample, card: WordStudyCard) -> String? {
@@ -230,7 +230,7 @@ extension ContentView {
 
     func wordComponentLink(for card: KanjiCard) -> some View {
         Button {
-            selectedLinkedKanjiCard = card
+            coordinator.selectedLinkedKanjiCard = card
         } label: {
             HStack(spacing: 6) {
                 Text(card.kanji)

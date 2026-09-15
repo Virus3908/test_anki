@@ -256,7 +256,7 @@ extension ContentView {
         }
         .padding(12)
         .appSurfaceCard()
-        .disabled(isLoadingDeck)
+        .disabled(deckState.isLoadingDeck)
     }
 
     func frontSettingRow(for field: FrontFieldKind) -> some View {
@@ -357,8 +357,7 @@ extension ContentView {
     func loadReviewMemory() async {
         await Task.yield()
         reviewStore = KanjiReviewStore.load()
-        wordMeaningTranslations = KanjiTranslationStore.loadWordTranslations()
-        wordExampleTranslations = KanjiTranslationStore.loadWordExampleTranslations()
+        translationState.loadSavedWordTranslations()
     }
 
 }

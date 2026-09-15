@@ -35,124 +35,74 @@ enum MeaningLanguage: String, CaseIterable, Identifiable {
     }
 }
 
-enum KanjiLearningSessionPhase {
-    case review
-    case learning
-    case fallbackReview
-}
-
-struct PresentedKanjiPreview: Identifiable {
-    let card: KanjiCard
-    var id: String { "kanji-preview" }
-}
-
-struct PresentedKanaPreview: Identifiable {
-    let card: KanaStudyCard
-    var id: String { "kana-preview" }
-}
-
-struct PresentedWordPreview: Identifiable {
-    let card: WordStudyCard
-    var id: String { "word-preview" }
-}
-
-struct SessionAnswerState {
-    let reviewKey: String
-    var rating: ReviewRating
-    let recordBefore: KanjiReviewRecord?
-    let againCountBefore: Int?
-    let recoveryGoodCountBefore: Int?
-    let wasMastered: Bool
-}
-
 struct ContentView: View {
     @State var practiceMode: PracticeMode = .kanji
-    @State var cards: [KanjiCard] = []
-    @State var wordCards: [WordStudyCard] = []
-    @State var kanaCards: [KanaStudyCard] = []
-    @State var wordSourceCards: [WordStudyCard] = []
-    @State var kanaSourceCards: [KanaStudyCard] = []
-    @State var selectedDeck: KanjiDeck = .jlpt5
-    @State var selectedKanaDeck: KanaDeck = .hiragana
-    @State var previewDeck: KanjiDeck?
-    @State var previewKanaDeck: KanaDeck?
-    @State var previewWordDeck: WordFrequencyDeck?
-    @State var previewCards: [KanjiCard] = []
-    @State var kanjiSourceCards: [KanjiCard] = []
-    @State var previewKanaCards: [KanaStudyCard] = []
-    @State var previewWordCards: [WordStudyCard] = []
-    @State var previewExpectedCount: Int?
-    @State var selectedPreviewCard: KanjiCard?
-    @State var selectedKanaPreviewCard: KanaStudyCard?
-    @State var selectedWordPreviewCard: WordStudyCard?
-    @State var selectedLinkedKanjiCard: KanjiCard?
-    @State var presentedKanjiPreview: PresentedKanjiPreview?
-    @State var presentedKanaPreview: PresentedKanaPreview?
-    @State var presentedWordPreview: PresentedWordPreview?
-    @State var previewSwipeDirection = 0
-    @State var deckPreviewTask: Task<Void, Never>?
-    @State var isLoadingDeck = false
-    @State var isPreparingCard = false
-    @State var hasStartedTraining = false
-    @State var isDeckSchedulePresented = false
-    @State var reviewStore = KanjiReviewStore(records: [:])
+    @State var deckState = DeckPreviewViewModel()
+    @State var coordinator = StudyCoordinator()
 
-    @State var currentIndex = 0
-    @State var currentWordKanjiIndex = 0
-    @State var completedWordDrawings: [[[CGPoint]]] = []
-    @State var wordFeedbackByKanji: [[StrokeFeedback]] = []
-    @State var sessionTotalCards = 0
-    @State var sessionCompletedCards = 0
-    @State var masteredKanjiKeys: Set<String> = []
-    @State var masteredWordKeys: Set<String> = []
-    @State var masteredKanaKeys: Set<String> = []
-    @State var drawnStrokes: [[CGPoint]] = []
-    @State var currentStroke: [CGPoint] = []
-    @State var feedback: [StrokeFeedback] = []
-    @State var guidedStrokeLimit = 1
-    @State var showsFeedbackInfo = false
-    @State var isAnswerVisible = false
-    @State var scrollToTopToken = 0
-    @State var selectedWordDeck: WordFrequencyDeck = .top1000
+    @State var trainingSession = TrainingSessionViewModel()
     @State var showsPromptCharacters = false
     @State var showsPromptReading = true
     @State var showsPromptMeaning = false
     @State var frontFieldOrder: [FrontFieldKind] = [.readings, .meanings, .character]
-    @State var isGuidedSingleKanjiPractice = false
     @State var isSettingsPresented = false
     @State var isAboutPresented = false
-    @State var kanjiAgainCounts: [String: Int] = [:]
-    @State var kanjiRecoveryGoodCounts: [String: Int] = [:]
-    @State var sessionAnswerStates: [String: SessionAnswerState] = [:]
-    @State var retranslationKanjiMeaningKeys: Set<String> = []
-    @State var retranslationKanjiExampleKeys: Set<String> = []
-    @State var retranslationWordKeys: Set<String> = []
-    @State var retranslationWordExampleKeys: Set<String> = []
-    @State var kanjiSessionPhase: KanjiLearningSessionPhase = .learning
+    @State var translationState = TranslationViewModel()
     @AppStorage("kanjiDailyNewCardLimit") var kanjiDailyNewCardLimit = 10
     @AppStorage("kanjiLearningSuccessTarget") var kanjiLearningSuccessTarget = KanjiReviewStore.defaultLearningSuccessTarget
     @State var meaningLanguage: MeaningLanguage = .russian
-    @State var wordMeaningTranslations: [String: String] = [:]
-    @State var wordExampleTranslations: [String: [WordUsageExample]] = [:]
-    @State var wordUsageExamples: [String: [WordUsageExample]] = [:]
-    @State var loadingWordExampleKeys: Set<String> = []
+
+    var cards: [KanjiCard] {
+        get { coordinator.cards }
+        nonmutating set { coordinator.cards = newValue }
+    }
+
+    var wordCards: [WordStudyCard] {
+        get { coordinator.wordCards }
+        nonmutating set { coordinator.wordCards = newValue }
+    }
+
+    var kanaCards: [KanaStudyCard] {
+        get { coordinator.kanaCards }
+        nonmutating set { coordinator.kanaCards = newValue }
+    }
+
+    var selectedDeck: KanjiDeck {
+        get { coordinator.selectedDeck }
+        nonmutating set { coordinator.selectedDeck = newValue }
+    }
+
+    var selectedKanaDeck: KanaDeck {
+        get { coordinator.selectedKanaDeck }
+        nonmutating set { coordinator.selectedKanaDeck = newValue }
+    }
+
+    var selectedWordDeck: WordFrequencyDeck {
+        get { coordinator.selectedWordDeck }
+        nonmutating set { coordinator.selectedWordDeck = newValue }
+    }
+
+    var reviewStore: KanjiReviewStore {
+        get { coordinator.reviewStore }
+        nonmutating set { coordinator.reviewStore = newValue }
+    }
 
     var body: some View {
         NavigationStack {
             Group {
-                if hasStartedTraining {
+                if coordinator.hasStartedTraining {
                     activeTrainingView()
-                } else if let previewDeck {
+                } else if let previewDeck = deckState.previewDeck {
                     deckPreviewView(for: previewDeck)
-                } else if let previewKanaDeck {
+                } else if let previewKanaDeck = deckState.previewKanaDeck {
                     kanaPreviewView(for: previewKanaDeck)
-                } else if let previewWordDeck {
+                } else if let previewWordDeck = deckState.previewWordDeck {
                     wordPreviewView(for: previewWordDeck)
                 } else {
                     startView()
                 }
             }
-            .navigationTitle(hasStartedTraining ? "Kanji Trainer" : previewDeck == nil && previewKanaDeck == nil && previewWordDeck == nil ? "Набор карточек" : "Колода")
+            .navigationTitle(coordinator.hasStartedTraining ? "Kanji Trainer" : deckState.previewDeck == nil && deckState.previewKanaDeck == nil && deckState.previewWordDeck == nil ? "Набор карточек" : "Колода")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(AppPalette.background, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
@@ -164,7 +114,7 @@ struct ContentView: View {
                     } label: {
                         Image(systemName: "gearshape")
                     }
-                    .disabled(isLoadingDeck)
+                    .disabled(deckState.isLoadingDeck)
                 }
             }
             .sheet(isPresented: $isSettingsPresented) {

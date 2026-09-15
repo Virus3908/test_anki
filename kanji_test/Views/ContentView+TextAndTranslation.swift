@@ -22,7 +22,7 @@ extension ContentView {
     func displayedWordMeaning(for card: WordStudyCard) -> String {
         switch meaningLanguage {
         case .russian:
-            return wordMeaningTranslations[card.id] ?? RussianMeaningTranslator.translateLocally([card.meaning]).first ?? card.meaning
+            return translationState.wordMeaningTranslations[card.id] ?? RussianMeaningTranslator.translateLocally([card.meaning]).first ?? card.meaning
         case .english:
             return card.meaning
         }
@@ -32,7 +32,7 @@ extension ContentView {
         let examples = originalWordUsageExamples(for: card)
         switch meaningLanguage {
         case .russian:
-            guard let translatedExamples = wordExampleTranslations[card.id], !translatedExamples.isEmpty else {
+            guard let translatedExamples = translationState.wordExampleTranslations[card.id], !translatedExamples.isEmpty else {
                 return examples
             }
 
@@ -43,60 +43,60 @@ extension ContentView {
     }
 
     func originalWordUsageExamples(for card: WordStudyCard) -> [WordUsageExample] {
-        wordUsageExamples[card.id] ?? card.examples
+        translationState.wordUsageExamples[card.id] ?? card.examples
     }
 
     func translateWordMeaningIfNeeded(for card: WordStudyCard) async {
-        guard meaningLanguage == .russian, wordMeaningTranslations[card.id] == nil else {
+        guard meaningLanguage == .russian, translationState.wordMeaningTranslations[card.id] == nil else {
             return
         }
 
         let translatedMeaning = await RussianMeaningTranslator.translate([card.meaning]).first ?? card.meaning
         await MainActor.run {
-            guard meaningLanguage == .russian, wordMeaningTranslations[card.id] == nil else {
+            guard meaningLanguage == .russian, translationState.wordMeaningTranslations[card.id] == nil else {
                 return
             }
 
-            wordMeaningTranslations[card.id] = translatedMeaning
+            translationState.wordMeaningTranslations[card.id] = translatedMeaning
             KanjiTranslationStore.saveWordTranslation(translatedMeaning, for: card.id)
         }
     }
 
     func retranslateWordMeaning(_ card: WordStudyCard) {
-        guard meaningLanguage == .russian, !retranslationWordKeys.contains(card.id) else {
+        guard meaningLanguage == .russian, !translationState.retranslationWordKeys.contains(card.id) else {
             return
         }
 
-        retranslationWordKeys.insert(card.id)
+        translationState.retranslationWordKeys.insert(card.id)
 
         Task { @MainActor in
             let translatedMeaning = await RussianMeaningTranslator.translate([card.meaning]).first ?? card.meaning
-            wordMeaningTranslations[card.id] = translatedMeaning
+            translationState.wordMeaningTranslations[card.id] = translatedMeaning
             KanjiTranslationStore.saveWordTranslation(translatedMeaning, for: card.id)
-            retranslationWordKeys.remove(card.id)
+            translationState.retranslationWordKeys.remove(card.id)
         }
     }
 
     func translateWordExamplesIfNeeded(for card: WordStudyCard, examples: [WordUsageExample]) async {
         guard meaningLanguage == .russian,
-              wordExampleTranslations[card.id] == nil,
+              translationState.wordExampleTranslations[card.id] == nil,
               !examples.isEmpty else {
             return
         }
 
         let translatedExamples = await translateWordUsageExamples(examples)
         await MainActor.run {
-            guard meaningLanguage == .russian, wordExampleTranslations[card.id] == nil else {
+            guard meaningLanguage == .russian, translationState.wordExampleTranslations[card.id] == nil else {
                 return
             }
 
-            wordExampleTranslations[card.id] = translatedExamples
+            translationState.wordExampleTranslations[card.id] = translatedExamples
             KanjiTranslationStore.saveWordExampleTranslation(translatedExamples, for: card.id)
         }
     }
 
     func retranslateWordExamples(_ card: WordStudyCard) {
-        guard meaningLanguage == .russian, !retranslationWordExampleKeys.contains(card.id) else {
+        guard meaningLanguage == .russian, !translationState.retranslationWordExampleKeys.contains(card.id) else {
             return
         }
 
@@ -105,13 +105,13 @@ extension ContentView {
             return
         }
 
-        retranslationWordExampleKeys.insert(card.id)
+        translationState.retranslationWordExampleKeys.insert(card.id)
 
         Task { @MainActor in
             let translatedExamples = await translateWordUsageExamples(examples)
-            wordExampleTranslations[card.id] = translatedExamples
+            translationState.wordExampleTranslations[card.id] = translatedExamples
             KanjiTranslationStore.saveWordExampleTranslation(translatedExamples, for: card.id)
-            retranslationWordExampleKeys.remove(card.id)
+            translationState.retranslationWordExampleKeys.remove(card.id)
         }
     }
 
@@ -176,11 +176,11 @@ extension ContentView {
     }
 
     func retranslateKanjiMeanings(_ card: KanjiCard, deck: KanjiDeck) {
-        guard meaningLanguage == .russian, !retranslationKanjiMeaningKeys.contains(card.kanji) else {
+        guard meaningLanguage == .russian, !translationState.retranslationKanjiMeaningKeys.contains(card.kanji) else {
             return
         }
 
-        retranslationKanjiMeaningKeys.insert(card.kanji)
+        translationState.retranslationKanjiMeaningKeys.insert(card.kanji)
 
         Task { @MainActor in
             let currentCard = latestKanjiCard(for: card)
@@ -190,16 +190,16 @@ extension ContentView {
                 force: true
             )
             replaceCard(translatedMeaningsCard)
-            retranslationKanjiMeaningKeys.remove(card.kanji)
+            translationState.retranslationKanjiMeaningKeys.remove(card.kanji)
         }
     }
 
     func retranslateKanjiExamples(_ card: KanjiCard, deck: KanjiDeck) {
-        guard meaningLanguage == .russian, !retranslationKanjiExampleKeys.contains(card.kanji) else {
+        guard meaningLanguage == .russian, !translationState.retranslationKanjiExampleKeys.contains(card.kanji) else {
             return
         }
 
-        retranslationKanjiExampleKeys.insert(card.kanji)
+        translationState.retranslationKanjiExampleKeys.insert(card.kanji)
 
         Task { @MainActor in
             let currentCard = latestKanjiCard(for: card)
@@ -209,7 +209,7 @@ extension ContentView {
                 force: true
             )
             replaceCard(translatedExamplesCard)
-            retranslationKanjiExampleKeys.remove(card.kanji)
+            translationState.retranslationKanjiExampleKeys.remove(card.kanji)
         }
     }
 
@@ -218,7 +218,7 @@ extension ContentView {
         if meaningLanguage == .russian {
             translationRetryControls(
                 originalText: originalKanjiMeaningsText(for: card),
-                isLoading: retranslationKanjiMeaningKeys.contains(card.kanji)
+                isLoading: translationState.retranslationKanjiMeaningKeys.contains(card.kanji)
             ) {
                 retranslateKanjiMeanings(card, deck: selectedDeck)
             }
@@ -230,7 +230,7 @@ extension ContentView {
         if meaningLanguage == .russian {
             translationRetryControls(
                 originalText: originalKanjiExamplesText(for: card),
-                isLoading: retranslationKanjiExampleKeys.contains(card.kanji)
+                isLoading: translationState.retranslationKanjiExampleKeys.contains(card.kanji)
             ) {
                 retranslateKanjiExamples(card, deck: selectedDeck)
             }
@@ -242,7 +242,7 @@ extension ContentView {
         if meaningLanguage == .russian {
             translationRetryControls(
                 originalText: card.meaning,
-                isLoading: retranslationWordKeys.contains(card.id)
+                isLoading: translationState.retranslationWordKeys.contains(card.id)
             ) {
                 retranslateWordMeaning(card)
             }
@@ -254,7 +254,7 @@ extension ContentView {
         if meaningLanguage == .russian {
             translationRetryControls(
                 originalText: originalWordExamplesText(for: card),
-                isLoading: retranslationWordExampleKeys.contains(card.id)
+                isLoading: translationState.retranslationWordExampleKeys.contains(card.id)
             ) {
                 retranslateWordExamples(card)
             }
@@ -304,7 +304,7 @@ extension ContentView {
     func latestKanjiCard(for card: KanjiCard) -> KanjiCard {
         var latestCard = card
 
-        if let previewCard = previewCards.first(where: { $0.kanji == card.kanji }) {
+        if let previewCard = deckState.previewCards.first(where: { $0.kanji == card.kanji }) {
             latestCard = latestCard.mergedForDisplay(with: previewCard)
         }
 
@@ -312,11 +312,11 @@ extension ContentView {
             latestCard = latestCard.mergedForDisplay(with: trainingCard)
         }
 
-        if let selectedPreviewCard, selectedPreviewCard.kanji == card.kanji {
+        if let selectedPreviewCard = coordinator.selectedPreviewCard, selectedPreviewCard.kanji == card.kanji {
             latestCard = latestCard.mergedForDisplay(with: selectedPreviewCard)
         }
 
-        if let selectedLinkedKanjiCard, selectedLinkedKanjiCard.kanji == card.kanji {
+        if let selectedLinkedKanjiCard = coordinator.selectedLinkedKanjiCard, selectedLinkedKanjiCard.kanji == card.kanji {
             latestCard = latestCard.mergedForDisplay(with: selectedLinkedKanjiCard)
         }
 

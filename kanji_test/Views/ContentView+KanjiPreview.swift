@@ -40,8 +40,8 @@ extension ContentView {
                             .appSurfaceCard()
 
                         primaryActionButton(title: "Тренировать этот кандзи", systemImage: "pencil.and.scribble") {
-                            presentedKanjiPreview = nil
-                            selectedPreviewCard = nil
+                            coordinator.presentedKanjiPreview = nil
+                            coordinator.selectedPreviewCard = nil
                             startTraining(with: [card], guided: true)
                         }
                     }

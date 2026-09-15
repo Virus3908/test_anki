@@ -2,11 +2,11 @@ import SwiftUI
 
 extension ContentView {
     var previewDetailTransition: AnyTransition {
-        if previewSwipeDirection < 0 {
+        if coordinator.previewSwipeDirection < 0 {
             return .asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading))
         }
 
-        if previewSwipeDirection > 0 {
+        if coordinator.previewSwipeDirection > 0 {
             return .asymmetric(insertion: .move(edge: .leading), removal: .move(edge: .trailing))
         }
 
@@ -22,21 +22,21 @@ extension ContentView {
                     return
                 }
 
-                guard let index = previewWordCards.firstIndex(where: { $0.id == card.id }) else {
+                guard let index = deckState.previewWordCards.firstIndex(where: { $0.id == card.id }) else {
                     return
                 }
 
-                if width < 0, let nextCard = previewWordCards[safe: index + 1] {
-                    previewSwipeDirection = -1
+                if width < 0, let nextCard = deckState.previewWordCards[safe: index + 1] {
+                    coordinator.previewSwipeDirection = -1
                     withAnimation(.easeInOut(duration: 0.22)) {
-                        selectedWordPreviewCard = nextCard
-                        presentedWordPreview = PresentedWordPreview(card: nextCard)
+                        coordinator.selectedWordPreviewCard = nextCard
+                        coordinator.presentedWordPreview = PresentedWordPreview(card: nextCard)
                     }
-                } else if width > 0, let previousCard = previewWordCards[safe: index - 1] {
-                    previewSwipeDirection = 1
+                } else if width > 0, let previousCard = deckState.previewWordCards[safe: index - 1] {
+                    coordinator.previewSwipeDirection = 1
                     withAnimation(.easeInOut(duration: 0.22)) {
-                        selectedWordPreviewCard = previousCard
-                        presentedWordPreview = PresentedWordPreview(card: previousCard)
+                        coordinator.selectedWordPreviewCard = previousCard
+                        coordinator.presentedWordPreview = PresentedWordPreview(card: previousCard)
                     }
                 }
             }
@@ -51,21 +51,21 @@ extension ContentView {
                     return
                 }
 
-                guard let index = previewKanaCards.firstIndex(where: { $0.character == card.character }) else {
+                guard let index = deckState.previewKanaCards.firstIndex(where: { $0.character == card.character }) else {
                     return
                 }
 
-                if width < 0, let nextCard = previewKanaCards[safe: index + 1] {
-                    previewSwipeDirection = -1
+                if width < 0, let nextCard = deckState.previewKanaCards[safe: index + 1] {
+                    coordinator.previewSwipeDirection = -1
                     withAnimation(.easeInOut(duration: 0.22)) {
-                        selectedKanaPreviewCard = nextCard
-                        presentedKanaPreview = PresentedKanaPreview(card: nextCard)
+                        coordinator.selectedKanaPreviewCard = nextCard
+                        coordinator.presentedKanaPreview = PresentedKanaPreview(card: nextCard)
                     }
-                } else if width > 0, let previousCard = previewKanaCards[safe: index - 1] {
-                    previewSwipeDirection = 1
+                } else if width > 0, let previousCard = deckState.previewKanaCards[safe: index - 1] {
+                    coordinator.previewSwipeDirection = 1
                     withAnimation(.easeInOut(duration: 0.22)) {
-                        selectedKanaPreviewCard = previousCard
-                        presentedKanaPreview = PresentedKanaPreview(card: previousCard)
+                        coordinator.selectedKanaPreviewCard = previousCard
+                        coordinator.presentedKanaPreview = PresentedKanaPreview(card: previousCard)
                     }
                 }
             }
@@ -80,21 +80,21 @@ extension ContentView {
                     return
                 }
 
-                guard let index = previewCards.firstIndex(where: { $0.kanji == card.kanji }) else {
+                guard let index = deckState.previewCards.firstIndex(where: { $0.kanji == card.kanji }) else {
                     return
                 }
 
-                if width < 0, let nextCard = previewCards[safe: index + 1] {
-                    previewSwipeDirection = -1
+                if width < 0, let nextCard = deckState.previewCards[safe: index + 1] {
+                    coordinator.previewSwipeDirection = -1
                     withAnimation(.easeInOut(duration: 0.22)) {
-                        selectedPreviewCard = nextCard
-                        presentedKanjiPreview = PresentedKanjiPreview(card: nextCard)
+                        coordinator.selectedPreviewCard = nextCard
+                        coordinator.presentedKanjiPreview = PresentedKanjiPreview(card: nextCard)
                     }
-                } else if width > 0, let previousCard = previewCards[safe: index - 1] {
-                    previewSwipeDirection = 1
+                } else if width > 0, let previousCard = deckState.previewCards[safe: index - 1] {
+                    coordinator.previewSwipeDirection = 1
                     withAnimation(.easeInOut(duration: 0.22)) {
-                        selectedPreviewCard = previousCard
-                        presentedKanjiPreview = PresentedKanjiPreview(card: previousCard)
+                        coordinator.selectedPreviewCard = previousCard
+                        coordinator.presentedKanjiPreview = PresentedKanjiPreview(card: previousCard)
                     }
                 }
             }

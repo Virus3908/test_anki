@@ -21,7 +21,7 @@ extension ContentView {
     func headerControls() -> some View {
         HStack(spacing: 12) {
             Button {
-                hasStartedTraining = false
+                coordinator.hasStartedTraining = false
             } label: {
                 Image(systemName: "square.grid.2x2")
                     .frame(width: 34, height: 30)
@@ -32,7 +32,7 @@ extension ContentView {
 
             Spacer()
 
-            Text("Закреплено \(sessionCompletedCards) / \(sessionTotalCards)")
+            Text("Закреплено \(trainingSession.sessionCompletedCards) / \(trainingSession.sessionTotalCards)")
                 .font(.footnote.weight(.semibold))
                 .foregroundStyle(AppPalette.secondaryText)
                 .frame(minWidth: 128, alignment: .trailing)

@@ -58,7 +58,7 @@ extension ContentView {
                     }
                 }
 
-                if isLoadingDeck {
+                if deckState.isLoadingDeck {
                     ProgressView("Скачиваю и кэширую \(selectedDeck.title)")
                         .foregroundStyle(AppPalette.secondaryText)
                         .tint(AppPalette.accent)

@@ -9,10 +9,10 @@ extension ContentView {
 
             ZStack {
                 DrawingBoard(
-                    drawnStrokes: $drawnStrokes,
-                    currentStroke: $currentStroke,
+                    drawnStrokes: $trainingSession.drawnStrokes,
+                    currentStroke: $trainingSession.currentStroke,
                     expectedStrokes: expectedStrokesForCurrentCard(card),
-                    feedback: feedback,
+                    feedback: trainingSession.feedback,
                     onStrokeFinished: {
                         handleGuidedStrokeFinished(card)
                     }
@@ -26,13 +26,13 @@ extension ContentView {
                         } label: {
                             Image(systemName: "trash")
                         }
-                        .disabled(drawnStrokes.isEmpty && currentStroke.isEmpty)
+                        .disabled(trainingSession.drawnStrokes.isEmpty && trainingSession.currentStroke.isEmpty)
 
                         Spacer()
 
-                        feedbackInfoButton(items: feedback)
-                            .disabled(feedback.isEmpty)
-                            .tint(feedback.isEmpty ? AppPalette.mutedText : AppPalette.accent)
+                        feedbackInfoButton(items: trainingSession.feedback)
+                            .disabled(trainingSession.feedback.isEmpty)
+                            .tint(trainingSession.feedback.isEmpty ? AppPalette.mutedText : AppPalette.accent)
                     }
 
                     Spacer()
@@ -44,7 +44,7 @@ extension ContentView {
                     } label: {
                         Image(systemName: "arrow.uturn.backward")
                     }
-                    .disabled(drawnStrokes.isEmpty)
+                    .disabled(trainingSession.drawnStrokes.isEmpty)
 
                     Spacer()
 
@@ -68,7 +68,7 @@ extension ContentView {
                 } label: {
                     Image(systemName: "chevron.left")
                 }
-                .disabled(currentIndex <= 0 || isPreparingCard)
+                .disabled(trainingSession.currentIndex <= 0 || trainingSession.isPreparingCard)
 
                 Spacer(minLength: 12)
 
@@ -81,21 +81,21 @@ extension ContentView {
                         reviewButton("+", rating: .good, card: card)
                     }
                 }
-                .disabled(feedback.isEmpty && !isCurrentCardAnswered)
+                .disabled(trainingSession.feedback.isEmpty && !isCurrentCardAnswered)
 
                 Spacer(minLength: 12)
 
                 Button {
                     moveToNextCard()
                 } label: {
-                    if isPreparingCard {
+                    if trainingSession.isPreparingCard {
                         ProgressView()
                             .controlSize(.small)
                     } else {
                         Image(systemName: "chevron.right")
                     }
                 }
-                .disabled(currentIndex >= cards.count - 1 || isPreparingCard)
+                .disabled(trainingSession.currentIndex >= cards.count - 1 || trainingSession.isPreparingCard)
             }
             .buttonStyle(.bordered)
             .tint(AppPalette.accent)
