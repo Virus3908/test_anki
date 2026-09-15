@@ -70,7 +70,9 @@ enum KanjiDataLoader {
                 }
 
                 let missingCards = try await RemoteKanjiProvider.loadCards(for: missingKanji)
-                let mergedByKanji = Dictionary((cachedCards + missingCards).map { ($0.kanji, $0) }, uniquingKeysWith: { _, new in new })
+                let mergedByKanji = Dictionary((cachedCards + missingCards).map { ($0.kanji, $0) }, uniquingKeysWith: { current, new in
+                    mergeCachedCard(current, with: new)
+                })
                 let mergedCards = remoteKanjiList.compactMap { mergedByKanji[$0] }
 
                 if !mergedCards.isEmpty {
@@ -117,7 +119,11 @@ enum KanjiDataLoader {
 
             for await batch in RemoteKanjiProvider.loadCardsStream(for: missingKanji) {
                 for card in batch {
-                    cardsByKanji[card.kanji] = card
+                    if let existingCard = cardsByKanji[card.kanji] {
+                        cardsByKanji[card.kanji] = mergeCachedCard(existingCard, with: card)
+                    } else {
+                        cardsByKanji[card.kanji] = card
+                    }
                 }
 
                 let orderedCards = remoteKanjiList.compactMap { cardsByKanji[$0] }
@@ -157,32 +163,42 @@ enum KanjiDataLoader {
         }
     }
 
-    static func translateCardIfNeeded(_ card: KanjiCard, deck: KanjiDeck) async -> KanjiCard {
-        guard card.translationState != "ru-system" else {
+    static func translateMeaningsIfNeeded(_ card: KanjiCard, deck: KanjiDeck) async -> KanjiCard {
+        guard !card.hasRussianMeanings else {
             return card
         }
 
-        async let translatedMeanings = RussianMeaningTranslator.translate(card.meanings)
-        async let translatedExampleMeanings = RussianMeaningTranslator.translate(card.examples.map(\.meaning))
+        let meanings = await RussianMeaningTranslator.translate(card.englishMeanings)
+        let translatedCard = card.withRussianMeanings(meanings)
+        cacheTranslatedCard(translatedCard, deck: deck)
+        return translatedCard
+    }
 
-        let meanings = await translatedMeanings
-        let exampleMeanings = await translatedExampleMeanings
-        let examples = card.examples.enumerated().map { index, example in
+    static func translateExamplesIfNeeded(_ card: KanjiCard, deck: KanjiDeck) async -> KanjiCard {
+        guard !card.hasRussianExamples else {
+            return card
+        }
+
+        let sourceExamples = card.englishExamples
+        let translatedExampleMeanings = await RussianMeaningTranslator.translate(sourceExamples.map(\.meaning))
+        let examples = sourceExamples.enumerated().map { index, example in
             KanjiExample(
                 word: example.word,
                 reading: example.reading,
-                meaning: index < exampleMeanings.count ? exampleMeanings[index] : example.meaning
+                meaning: index < translatedExampleMeanings.count ? translatedExampleMeanings[index] : example.meaning
             )
         }
-        let translatedCard = card.translated(meanings: meanings, examples: examples)
+        let translatedCard = card.withRussianExamples(examples)
+        cacheTranslatedCard(translatedCard, deck: deck)
+        return translatedCard
+    }
 
+    private static func cacheTranslatedCard(_ card: KanjiCard, deck: KanjiDeck) {
         do {
-            try updateCachedCard(translatedCard, for: deck)
+            try updateCachedCard(card, for: deck)
         } catch {
             assertionFailure("Failed to update translated kanji cache: \(error)")
         }
-
-        return translatedCard
     }
 
     private static func loadCachedCards(for deck: KanjiDeck) throws -> [KanjiCard]? {
@@ -210,7 +226,7 @@ enum KanjiDataLoader {
         }
 
         if let index = cachedCards.firstIndex(where: { $0.kanji == card.kanji }) {
-            cachedCards[index] = card
+            cachedCards[index] = mergeCachedCard(cachedCards[index], with: card)
         } else {
             cachedCards.append(card)
         }
@@ -224,13 +240,36 @@ enum KanjiDataLoader {
         }
 
         let existingCards = (try? loadCachedCards(for: .all)) ?? []
-        var cardsByKanji = Dictionary(existingCards.map { ($0.kanji, $0) }, uniquingKeysWith: { _, new in new })
+        var cardsByKanji = Dictionary(existingCards.map { ($0.kanji, $0) }, uniquingKeysWith: { current, _ in current })
 
         for card in cards {
-            cardsByKanji[card.kanji] = card
+            if let existingCard = cardsByKanji[card.kanji] {
+                cardsByKanji[card.kanji] = mergeCachedCard(existingCard, with: card)
+            } else {
+                cardsByKanji[card.kanji] = card
+            }
         }
 
         try saveCachedCards(cardsByKanji.values.sorted { $0.kanji < $1.kanji }, for: .all)
+    }
+
+    private static func mergeCachedCard(_ cached: KanjiCard, with fresh: KanjiCard) -> KanjiCard {
+        KanjiCard(
+            kanji: fresh.kanji,
+            meanings: fresh.englishMeanings,
+            onyomi: fresh.onyomi,
+            kunyomi: fresh.kunyomi,
+            examples: fresh.englishExamples,
+            sourceMeanings: nil,
+            sourceExamples: nil,
+            russianMeanings: fresh.cachedRussianMeanings ?? cached.cachedRussianMeanings,
+            russianExamples: fresh.cachedRussianExamples ?? cached.cachedRussianExamples,
+            source: fresh.source,
+            strokes: fresh.strokes,
+            grade: fresh.grade,
+            jlpt: fresh.jlpt,
+            translationState: nil
+        )
     }
 
     private static func cacheURL(for deck: KanjiDeck) -> URL {

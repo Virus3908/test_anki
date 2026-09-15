@@ -2,6 +2,15 @@ import Foundation
 import Translation
 
 enum RussianMeaningTranslator {
+    private actor SystemTranslationQueue {
+        func translate(_ meanings: [String]) async throws -> [String] {
+            try await RussianMeaningTranslator.withTimeout(seconds: 8) {
+                try await RussianMeaningTranslator.translateWithSystem(meanings)
+            }
+        }
+    }
+
+    private static let systemTranslationQueue = SystemTranslationQueue()
     private static let translations: [String: String] = [
         "above": "верх",
         "after": "после",
@@ -99,9 +108,7 @@ enum RussianMeaningTranslator {
     }
 
     static func translate(_ meanings: [String]) async -> [String] {
-        if let systemTranslation = try? await withTimeout(seconds: 4, operation: {
-            try await translateWithSystem(meanings)
-        }), !systemTranslation.isEmpty {
+        if let systemTranslation = try? await systemTranslationQueue.translate(meanings), !systemTranslation.isEmpty {
             return unique(systemTranslation)
         }
 
