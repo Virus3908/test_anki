@@ -3,25 +3,32 @@ import SwiftUI
 extension ContentView {
     @ViewBuilder
     func activeTrainingView() -> some View {
-        switch practiceMode {
-        case .kanji:
-            if let card = cards[safe: currentIndex] {
-                trainingView(for: card)
-            } else {
-                startView()
+        Group {
+            switch practiceMode {
+            case .kanji:
+                if let card = cards[safe: currentIndex] {
+                    trainingView(for: card)
+                } else {
+                    startView()
+                }
+            case .words:
+                if let wordCard = wordCards[safe: currentIndex] {
+                    wordTrainingView(for: wordCard)
+                } else {
+                    startView()
+                }
+            case .kana:
+                if let kanaCard = kanaCards[safe: currentIndex] {
+                    kanaTrainingView(for: kanaCard)
+                } else {
+                    startView()
+                }
             }
-        case .words:
-            if let wordCard = wordCards[safe: currentIndex] {
-                wordTrainingView(for: wordCard)
-            } else {
-                startView()
-            }
-        case .kana:
-            if let kanaCard = kanaCards[safe: currentIndex] {
-                kanaTrainingView(for: kanaCard)
-            } else {
-                startView()
-            }
+        }
+        .sheet(item: $selectedLinkedKanjiCard, onDismiss: {
+            selectedLinkedKanjiCard = nil
+        }) { card in
+            kanjiPreviewDetail(for: card)
         }
     }
 

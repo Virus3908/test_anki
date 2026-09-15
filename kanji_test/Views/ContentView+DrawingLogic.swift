@@ -92,18 +92,28 @@ extension ContentView {
 
     func expectedStrokesForCurrentCard(_ card: KanjiCard) -> [KanjiStroke] {
         guard isGuidedSingleKanjiPractice else {
-            return isAnswerVisible || !feedback.isEmpty ? card.strokes : []
+            return isAnswerVisible ? card.strokes : []
         }
 
         return guidedExpectedStrokes(for: card)
     }
 
     func expectedStrokesForCurrentWordKanji(_ card: KanjiCard) -> [KanjiStroke] {
-        isAnswerVisible || !currentWordFeedback.isEmpty ? card.strokes : []
+        isAnswerVisible ? card.strokes : []
     }
 
-    func undoCurrentStroke() {
+    func undoCurrentStroke(expected card: KanjiCard? = nil) {
         _ = drawnStrokes.popLast()
+        feedback.removeAll()
+        showsFeedbackInfo = false
+        if let card {
+            guidedStrokeLimit = nextGuidedStrokeLimit(for: card)
+        }
+        if isAnswerVisible {
+            withAnimation(.easeInOut(duration: 0.18)) {
+                isAnswerVisible = false
+            }
+        }
     }
 
     func clearCurrentDrawing(expected card: KanjiCard) {
@@ -112,14 +122,20 @@ extension ContentView {
         feedback.removeAll()
         guidedStrokeLimit = nextGuidedStrokeLimit(for: card)
         showsFeedbackInfo = false
+        isAnswerVisible = false
     }
 
     func undoCurrentWordStroke(_ wordCard: WordStudyCard, currentKanji: KanjiCard) {
         _ = drawnStrokes.popLast()
-        let currentFeedback = StrokeEvaluator.evaluateCompletedStrokes(actual: drawnStrokes, expected: currentKanji.strokes)
-        storeCurrentWordFeedback(currentFeedback, in: wordCard)
+        storeCurrentWordFeedback([], in: wordCard)
         feedback = flattenedWordFeedback(for: wordCard)
         guidedStrokeLimit = nextGuidedStrokeLimit(for: currentKanji)
+        showsFeedbackInfo = false
+        if isAnswerVisible {
+            withAnimation(.easeInOut(duration: 0.18)) {
+                isAnswerVisible = false
+            }
+        }
     }
 
     func clearCurrentWordDrawing(_ wordCard: WordStudyCard, currentKanji: KanjiCard) {
@@ -129,6 +145,7 @@ extension ContentView {
         feedback = flattenedWordFeedback(for: wordCard)
         guidedStrokeLimit = nextGuidedStrokeLimit(for: currentKanji)
         showsFeedbackInfo = false
+        isAnswerVisible = false
     }
 
     func nextGuidedStrokeLimit(for card: KanjiCard) -> Int {

@@ -5,6 +5,7 @@ extension ContentView {
         Button {
             selectedPreviewCard = card
             previewSwipeDirection = 0
+            isKanjiPreviewPresented = true
         } label: {
             VStack(spacing: 6) {
                 Text(card.kanji)
@@ -30,29 +31,36 @@ extension ContentView {
 
     func kanjiPreviewDetail(for card: KanjiCard) -> some View {
         NavigationStack {
-            ScrollView(.vertical) {
-                VStack(alignment: .leading, spacing: 16) {
-                    cardBackContent(for: card)
-                        .padding(18)
-                        .appSurfaceCard()
+            ZStack {
+                AppPalette.background
+                    .ignoresSafeArea()
 
-                    primaryActionButton(title: "Тренировать этот кандзи", systemImage: "pencil.and.scribble") {
-                        selectedPreviewCard = nil
-                        startTraining(with: [card], guided: true)
+                ScrollView(.vertical) {
+                    VStack(alignment: .leading, spacing: 16) {
+                        cardBackContent(for: card)
+                            .padding(18)
+                            .appSurfaceCard()
+
+                        primaryActionButton(title: "Тренировать этот кандзи", systemImage: "pencil.and.scribble") {
+                            isKanjiPreviewPresented = false
+                            selectedPreviewCard = nil
+                            startTraining(with: [card], guided: true)
+                        }
                     }
+                    .padding(20)
+                    .id(card.kanji)
+                    .transition(previewDetailTransition)
                 }
-                .padding(20)
             }
             .background(AppPalette.background)
             .foregroundStyle(AppPalette.text)
-            .id(card.kanji)
-            .transition(previewDetailTransition)
             .simultaneousGesture(previewCardSwipeGesture(for: card))
             .task(id: "preview-detail-\(card.id)-\(meaningLanguage.rawValue)") {
                 await translateKanjiMeaningsIfNeeded(for: card, deck: selectedDeck)
                 await translateKanjiExamplesIfNeeded(for: card, deck: selectedDeck)
             }
         }
+        .background(AppPalette.background.ignoresSafeArea())
     }
 
 }

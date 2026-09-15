@@ -7,26 +7,91 @@ extension ContentView {
         }
 
         let wordCard = wordCards[currentIndex]
+        let key = reviewKey(for: wordCard)
+        let answerID = currentSessionAnswerID()
+        let existingAnswer = sessionAnswerStates[answerID]
+        if let existingAnswer {
+            restoreSessionAnswer(existingAnswer)
+            removeFutureWordRepeats(after: currentIndex, key: key)
+            rollbackFutureSessionAnswers(after: currentIndex)
+        }
+
+        var answerState = existingAnswer ?? SessionAnswerState(
+            reviewKey: key,
+            rating: rating,
+            recordBefore: reviewStore.record(for: key),
+            againCountBefore: kanjiAgainCounts[key],
+            recoveryGoodCountBefore: kanjiRecoveryGoodCounts[key],
+            wasMastered: masteredWordKeys.contains(key)
+        )
+        let wasReviewCard = reviewStore.record(for: key)?.state == .review
+        let needsMoreRecovery = rating == .good && needsMoreRecoverySuccesses(for: key)
+        let shouldUpdateSchedule = kanjiSessionPhase != .fallbackReview && !needsMoreRecovery
+        let shouldResetIntervalOnGood = rating == .good && wasReviewCard && kanjiAgainCounts[key, default: 0] >= 2
+
+        if shouldUpdateSchedule {
+            reviewStore.apply(
+                rating,
+                to: key,
+                learningSuccessTarget: kanjiLearningSuccessTarget,
+                resetIntervalOnGood: shouldResetIntervalOnGood
+            )
+        }
+
+        let isLearned = reviewStore.record(for: key)?.state == .review
+
         switch rating {
         case .again:
-            masteredWordKeys.remove(wordCard.id)
+            masteredWordKeys.remove(key)
+            kanjiAgainCounts[key, default: 0] += 1
+            kanjiRecoveryGoodCounts[key] = 0
             scheduleWordRepeat(wordCard, after: 2)
+            if kanjiAgainCounts[key, default: 0] >= 3 {
+                scheduleAdditionalWordRepeat(wordCard, after: 5)
+            }
         case .hard:
-            masteredWordKeys.remove(wordCard.id)
+            masteredWordKeys.remove(key)
             scheduleWordRepeat(wordCard, after: 5)
         case .good:
-            masteredWordKeys.insert(wordCard.id)
-            removeFutureWordRepeats(after: currentIndex, key: wordCard.id)
+            if isLearned {
+                if needsMoreRecovery {
+                    masteredWordKeys.remove(key)
+                    scheduleWordRepeatAtEnd(wordCard)
+                } else {
+                    masteredWordKeys.insert(key)
+                    kanjiAgainCounts[key] = nil
+                    kanjiRecoveryGoodCounts[key] = nil
+                    removeFutureWordRepeats(after: currentIndex, key: key)
+                }
+            } else {
+                masteredWordKeys.remove(key)
+                scheduleWordRepeatAtEnd(wordCard)
+            }
         }
 
         sessionCompletedCards = masteredWordKeys.count
+        answerState.rating = rating
+        sessionAnswerStates[answerID] = answerState
+        if existingAnswer != nil {
+            return
+        }
+
         advanceToNextWordOrFinish()
     }
 
     func scheduleWordRepeat(_ wordCard: WordStudyCard, after offset: Int) {
-        removeFutureWordRepeats(after: currentIndex, key: wordCard.id)
+        removeFutureWordRepeats(after: currentIndex, key: reviewKey(for: wordCard))
+        scheduleAdditionalWordRepeat(wordCard, after: offset)
+    }
+
+    func scheduleAdditionalWordRepeat(_ wordCard: WordStudyCard, after offset: Int) {
         let insertIndex = min(currentIndex + offset, wordCards.count)
         wordCards.insert(wordCard, at: insertIndex)
+    }
+
+    func scheduleWordRepeatAtEnd(_ wordCard: WordStudyCard) {
+        removeFutureWordRepeats(after: currentIndex, key: reviewKey(for: wordCard))
+        wordCards.append(wordCard)
     }
 
     func removeFutureWordRepeats(after index: Int, key: String) {
@@ -34,13 +99,17 @@ extension ContentView {
             return
         }
 
-        for cardIndex in wordCards.indices.reversed() where cardIndex > index && wordCards[cardIndex].id == key {
+        for cardIndex in wordCards.indices.reversed() where cardIndex > index && reviewKey(for: wordCards[cardIndex]) == key {
             wordCards.remove(at: cardIndex)
         }
     }
 
     func advanceToNextWordOrFinish() {
         guard sessionCompletedCards < sessionTotalCards else {
+            if startNextWordPack() {
+                return
+            }
+
             finishDeck()
             return
         }
@@ -61,26 +130,91 @@ extension ContentView {
         }
 
         let kanaCard = kanaCards[currentIndex]
+        let key = reviewKey(for: kanaCard)
+        let answerID = currentSessionAnswerID()
+        let existingAnswer = sessionAnswerStates[answerID]
+        if let existingAnswer {
+            restoreSessionAnswer(existingAnswer)
+            removeFutureKanaRepeats(after: currentIndex, key: key)
+            rollbackFutureSessionAnswers(after: currentIndex)
+        }
+
+        var answerState = existingAnswer ?? SessionAnswerState(
+            reviewKey: key,
+            rating: rating,
+            recordBefore: reviewStore.record(for: key),
+            againCountBefore: kanjiAgainCounts[key],
+            recoveryGoodCountBefore: kanjiRecoveryGoodCounts[key],
+            wasMastered: masteredKanaKeys.contains(key)
+        )
+        let wasReviewCard = reviewStore.record(for: key)?.state == .review
+        let needsMoreRecovery = rating == .good && needsMoreRecoverySuccesses(for: key)
+        let shouldUpdateSchedule = kanjiSessionPhase != .fallbackReview && !needsMoreRecovery
+        let shouldResetIntervalOnGood = rating == .good && wasReviewCard && kanjiAgainCounts[key, default: 0] >= 2
+
+        if shouldUpdateSchedule {
+            reviewStore.apply(
+                rating,
+                to: key,
+                learningSuccessTarget: kanjiLearningSuccessTarget,
+                resetIntervalOnGood: shouldResetIntervalOnGood
+            )
+        }
+
+        let isLearned = reviewStore.record(for: key)?.state == .review
+
         switch rating {
         case .again:
-            masteredKanaKeys.remove(kanaCard.character)
+            masteredKanaKeys.remove(key)
+            kanjiAgainCounts[key, default: 0] += 1
+            kanjiRecoveryGoodCounts[key] = 0
             scheduleKanaRepeat(kanaCard, after: 2)
+            if kanjiAgainCounts[key, default: 0] >= 3 {
+                scheduleAdditionalKanaRepeat(kanaCard, after: 5)
+            }
         case .hard:
-            masteredKanaKeys.remove(kanaCard.character)
+            masteredKanaKeys.remove(key)
             scheduleKanaRepeat(kanaCard, after: 5)
         case .good:
-            masteredKanaKeys.insert(kanaCard.character)
-            removeFutureKanaRepeats(after: currentIndex, key: kanaCard.character)
+            if isLearned {
+                if needsMoreRecovery {
+                    masteredKanaKeys.remove(key)
+                    scheduleKanaRepeatAtEnd(kanaCard)
+                } else {
+                    masteredKanaKeys.insert(key)
+                    kanjiAgainCounts[key] = nil
+                    kanjiRecoveryGoodCounts[key] = nil
+                    removeFutureKanaRepeats(after: currentIndex, key: key)
+                }
+            } else {
+                masteredKanaKeys.remove(key)
+                scheduleKanaRepeatAtEnd(kanaCard)
+            }
         }
 
         sessionCompletedCards = masteredKanaKeys.count
+        answerState.rating = rating
+        sessionAnswerStates[answerID] = answerState
+        if existingAnswer != nil {
+            return
+        }
+
         advanceToNextKanaOrFinish()
     }
 
     func scheduleKanaRepeat(_ kanaCard: KanaStudyCard, after offset: Int) {
-        removeFutureKanaRepeats(after: currentIndex, key: kanaCard.character)
+        removeFutureKanaRepeats(after: currentIndex, key: reviewKey(for: kanaCard))
+        scheduleAdditionalKanaRepeat(kanaCard, after: offset)
+    }
+
+    func scheduleAdditionalKanaRepeat(_ kanaCard: KanaStudyCard, after offset: Int) {
         let insertIndex = min(currentIndex + offset, kanaCards.count)
         kanaCards.insert(kanaCard, at: insertIndex)
+    }
+
+    func scheduleKanaRepeatAtEnd(_ kanaCard: KanaStudyCard) {
+        removeFutureKanaRepeats(after: currentIndex, key: reviewKey(for: kanaCard))
+        kanaCards.append(kanaCard)
     }
 
     func removeFutureKanaRepeats(after index: Int, key: String) {
@@ -88,13 +222,17 @@ extension ContentView {
             return
         }
 
-        for cardIndex in kanaCards.indices.reversed() where cardIndex > index && kanaCards[cardIndex].character == key {
+        for cardIndex in kanaCards.indices.reversed() where cardIndex > index && reviewKey(for: kanaCards[cardIndex]) == key {
             kanaCards.remove(at: cardIndex)
         }
     }
 
     func advanceToNextKanaOrFinish() {
         guard sessionCompletedCards < sessionTotalCards else {
+            if startNextKanaPack() {
+                return
+            }
+
             finishDeck()
             return
         }
@@ -123,25 +261,47 @@ extension ContentView {
             return
         }
 
-        let successTarget = max(1, kanjiLearningSuccessTarget)
-        let wasLearnedBefore = (reviewStore.record(for: card.kanji)?.successes ?? 0) >= successTarget
-        let shouldResetIntervalOnGood = rating == .good && wasLearnedBefore && kanjiAgainCounts[card.kanji, default: 0] >= 2
-        reviewStore.apply(
-            rating,
-            to: card.kanji,
-            learningSuccessTarget: kanjiLearningSuccessTarget,
-            resetIntervalOnGood: shouldResetIntervalOnGood
+        let key = reviewKey(for: card)
+        let answerID = currentSessionAnswerID()
+        let existingAnswer = sessionAnswerStates[answerID]
+        if let existingAnswer {
+            restoreSessionAnswer(existingAnswer)
+            removeFutureKanjiRepeats(after: currentIndex, key: key)
+            rollbackFutureSessionAnswers(after: currentIndex)
+        }
+
+        var answerState = existingAnswer ?? SessionAnswerState(
+            reviewKey: key,
+            rating: rating,
+            recordBefore: reviewStore.record(for: key),
+            againCountBefore: kanjiAgainCounts[key],
+            recoveryGoodCountBefore: kanjiRecoveryGoodCounts[key],
+            wasMastered: masteredKanjiKeys.contains(card.kanji)
         )
-        let reviewRecord = reviewStore.record(for: card.kanji)
-        let isLearned = (reviewRecord?.successes ?? 0) >= successTarget
+        let wasReviewCard = reviewStore.record(for: key)?.state == .review
+        let needsMoreRecovery = rating == .good && needsMoreRecoverySuccesses(for: key)
+        let shouldUpdateSchedule = kanjiSessionPhase != .fallbackReview && !needsMoreRecovery
+        let shouldResetIntervalOnGood = rating == .good && wasReviewCard && kanjiAgainCounts[key, default: 0] >= 2
+
+        if shouldUpdateSchedule {
+            reviewStore.apply(
+                rating,
+                to: key,
+                learningSuccessTarget: kanjiLearningSuccessTarget,
+                resetIntervalOnGood: shouldResetIntervalOnGood
+            )
+        }
+
+        let reviewRecord = reviewStore.record(for: key)
+        let isLearned = reviewRecord?.state == .review
 
         switch rating {
         case .again:
             masteredKanjiKeys.remove(card.kanji)
-            kanjiAgainCounts[card.kanji, default: 0] += 1
-            kanjiRecoveryGoodCounts[card.kanji] = 0
+            kanjiAgainCounts[key, default: 0] += 1
+            kanjiRecoveryGoodCounts[key] = 0
             scheduleKanjiRepeat(card, after: 2)
-            if kanjiAgainCounts[card.kanji, default: 0] >= 3 {
+            if kanjiAgainCounts[key, default: 0] >= 3 {
                 scheduleAdditionalKanjiRepeat(card, after: 5)
             }
         case .hard:
@@ -149,13 +309,13 @@ extension ContentView {
             scheduleKanjiRepeat(card, after: 5)
         case .good:
             if isLearned {
-                if needsMoreRecoverySuccesses(for: card.kanji) {
+                if needsMoreRecovery {
                     masteredKanjiKeys.remove(card.kanji)
                     scheduleKanjiRepeatAtEnd(card)
                 } else {
                     masteredKanjiKeys.insert(card.kanji)
-                    kanjiAgainCounts[card.kanji] = nil
-                    kanjiRecoveryGoodCounts[card.kanji] = nil
+                    kanjiAgainCounts[key] = nil
+                    kanjiRecoveryGoodCounts[key] = nil
                     removeFutureKanjiRepeats(after: currentIndex, key: card.kanji)
                 }
             } else {
@@ -165,7 +325,104 @@ extension ContentView {
         }
 
         sessionCompletedCards = masteredKanjiKeys.count
+        answerState.rating = rating
+        sessionAnswerStates[answerID] = answerState
+        if existingAnswer != nil {
+            return
+        }
+
         await advanceToNextKanjiOrFinish()
+    }
+
+    func restoreSessionAnswer(_ answer: SessionAnswerState) {
+        reviewStore.restore(answer.recordBefore, for: answer.reviewKey)
+        restoreCounter(answer.againCountBefore, for: answer.reviewKey, in: &kanjiAgainCounts)
+        restoreCounter(answer.recoveryGoodCountBefore, for: answer.reviewKey, in: &kanjiRecoveryGoodCounts)
+
+        switch practiceMode {
+        case .kanji:
+            if answer.wasMastered {
+                masteredKanjiKeys.insert(answer.reviewKey)
+            } else {
+                masteredKanjiKeys.remove(answer.reviewKey)
+            }
+            sessionCompletedCards = masteredKanjiKeys.count
+        case .words:
+            if answer.wasMastered {
+                masteredWordKeys.insert(answer.reviewKey)
+            } else {
+                masteredWordKeys.remove(answer.reviewKey)
+            }
+            sessionCompletedCards = masteredWordKeys.count
+        case .kana:
+            if answer.wasMastered {
+                masteredKanaKeys.insert(answer.reviewKey)
+            } else {
+                masteredKanaKeys.remove(answer.reviewKey)
+            }
+            sessionCompletedCards = masteredKanaKeys.count
+        }
+    }
+
+    func restoreCounter(_ value: Int?, for key: String, in dictionary: inout [String: Int]) {
+        if let value {
+            dictionary[key] = value
+        } else {
+            dictionary[key] = nil
+        }
+    }
+
+    func rollbackFutureSessionAnswers(after index: Int) {
+        let prefix = "\(practiceMode.rawValue):"
+
+        let futureAnswers = sessionAnswerStates.compactMap { answerID, answer -> (String, Int, SessionAnswerState)? in
+            guard answerID.hasPrefix(prefix) else {
+                return nil
+            }
+
+            let indexText = answerID.dropFirst(prefix.count)
+            guard let answerIndex = Int(indexText), answerIndex > index else {
+                return nil
+            }
+
+            return (answerID, answerIndex, answer)
+        }
+        .sorted { left, right in
+            left.1 > right.1
+        }
+
+        for (answerID, _, answer) in futureAnswers {
+            restoreSessionAnswer(answer)
+            removeFutureRepeatsForCurrentMode(after: index, key: answer.reviewKey)
+            sessionAnswerStates[answerID] = nil
+        }
+    }
+
+    func removeFutureRepeatsForCurrentMode(after index: Int, key: String) {
+        switch practiceMode {
+        case .kanji:
+            removeFutureKanjiRepeats(after: index, key: key)
+        case .words:
+            removeFutureWordRepeats(after: index, key: key)
+        case .kana:
+            removeFutureKanaRepeats(after: index, key: key)
+        }
+    }
+
+    func clearFutureSessionAnswers(after index: Int) {
+        let prefix = "\(practiceMode.rawValue):"
+        let answerIDs = sessionAnswerStates.keys.filter { answerID in
+            guard answerID.hasPrefix(prefix) else {
+                return false
+            }
+
+            let indexText = answerID.dropFirst(prefix.count)
+            return Int(indexText).map { $0 > index } ?? false
+        }
+
+        for answerID in answerIDs {
+            sessionAnswerStates[answerID] = nil
+        }
     }
 
     func needsMoreRecoverySuccesses(for kanji: String) -> Bool {
@@ -221,6 +478,56 @@ extension ContentView {
         await prepareAndMoveToCard(at: currentIndex + 1)
     }
 
+    func startNextWordPack() -> Bool {
+        let sourceCards = !wordSourceCards.isEmpty ? wordSourceCards : previewWordCards
+        guard !sourceCards.isEmpty, !isGuidedSingleKanjiPractice else {
+            return false
+        }
+
+        let nextCards = nextWordSessionCards(from: sourceCards)
+        guard !nextCards.isEmpty else {
+            return false
+        }
+
+        wordCards = nextCards
+        cards.removeAll()
+        kanaCards.removeAll()
+        currentIndex = 0
+        kanjiAgainCounts.removeAll()
+        kanjiRecoveryGoodCounts.removeAll()
+        resetWordDrawingState()
+        resetSessionProgress(total: Set(nextCards.map(\.id)).count)
+        isPreparingCard = false
+        resetCurrentAnswer()
+        scrollToTopToken += 1
+        return true
+    }
+
+    func startNextKanaPack() -> Bool {
+        let sourceCards = !kanaSourceCards.isEmpty ? kanaSourceCards : previewKanaCards
+        guard !sourceCards.isEmpty, !isGuidedSingleKanjiPractice else {
+            return false
+        }
+
+        let nextCards = nextKanaSessionCards(from: sourceCards)
+        guard !nextCards.isEmpty else {
+            return false
+        }
+
+        kanaCards = nextCards
+        cards.removeAll()
+        wordCards.removeAll()
+        currentIndex = 0
+        kanjiAgainCounts.removeAll()
+        kanjiRecoveryGoodCounts.removeAll()
+        resetWordDrawingState()
+        resetSessionProgress(total: Set(nextCards.map(\.character)).count)
+        isPreparingCard = false
+        resetCurrentAnswer()
+        scrollToTopToken += 1
+        return true
+    }
+
     func startNextKanjiPack() -> Bool {
         let sourceCards = !kanjiSourceCards.isEmpty ? kanjiSourceCards : previewCards
         let nextCards = nextKanjiSessionCards(from: sourceCards)
@@ -247,6 +554,8 @@ extension ContentView {
         wordCards.removeAll()
         kanaCards.removeAll()
         kanjiSourceCards.removeAll()
+        wordSourceCards.removeAll()
+        kanaSourceCards.removeAll()
         currentIndex = 0
         kanjiAgainCounts.removeAll()
         kanjiRecoveryGoodCounts.removeAll()
@@ -256,6 +565,13 @@ extension ContentView {
         isGuidedSingleKanjiPractice = false
         isPreparingCard = false
         hasStartedTraining = false
+        selectedPreviewCard = nil
+        selectedKanaPreviewCard = nil
+        selectedWordPreviewCard = nil
+        selectedLinkedKanjiCard = nil
+        isKanjiPreviewPresented = false
+        isKanaPreviewPresented = false
+        isWordPreviewPresented = false
         resetCurrentAnswer()
     }
 

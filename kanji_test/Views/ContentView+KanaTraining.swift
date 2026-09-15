@@ -2,21 +2,11 @@ import SwiftUI
 
 extension ContentView {
     func kanaStudyCard(for kanaCard: KanaStudyCard) -> some View {
-        ZStack {
+        trainingCardShell {
             kanaCardFront(for: kanaCard)
-                .opacity(isAnswerVisible ? 0 : 1)
-                .rotation3DEffect(.degrees(isAnswerVisible ? 180 : 0), axis: (x: 0, y: 1, z: 0))
-
-            kanaCardBack(for: kanaCard)
-                .opacity(isAnswerVisible ? 1 : 0)
-                .rotation3DEffect(.degrees(isAnswerVisible ? 0 : -180), axis: (x: 0, y: 1, z: 0))
+        } back: {
+            kanaCardBackContent(for: kanaCard)
         }
-        .padding(18)
-        .frame(maxWidth: .infinity, alignment: .topLeading)
-        .aspectRatio(1, contentMode: .fit)
-        .appSurfaceCard()
-        .contentShape(RoundedRectangle(cornerRadius: 8))
-        .gesture(cardSwipeGesture())
     }
 
     func kanaCardFront(for kanaCard: KanaStudyCard) -> some View {
@@ -38,6 +28,8 @@ extension ContentView {
 
             Text("Проверка покажет оригинал и сравнение штрихов.")
                 .foregroundStyle(AppPalette.secondaryText)
+
+            learningStatusLabel(forReviewKey: reviewKey(for: kanaCard))
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
@@ -46,12 +38,6 @@ extension ContentView {
         kanaCardBackContent(for: kanaCard)
             .padding(18)
             .appSurfaceCard()
-    }
-
-    func kanaCardBack(for kanaCard: KanaStudyCard) -> some View {
-        ScrollView {
-            kanaCardBackContent(for: kanaCard)
-        }
     }
 
     func kanaCardBackContent(for kanaCard: KanaStudyCard) -> some View {
@@ -88,6 +74,8 @@ extension ContentView {
                     StrokeStepStrip(strokes: kanaCard.strokes)
                 }
             }
+
+            learningStatusLabel(forReviewKey: reviewKey(for: kanaCard))
         }
     }
 

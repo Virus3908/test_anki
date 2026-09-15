@@ -45,10 +45,11 @@ extension ContentView {
             }
             .padding(14)
             .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
+            .appSurfaceCard()
         }
         .buttonStyle(.plain)
         .disabled(isLoadingDeck)
-        .appSurfaceCard()
     }
 
 }

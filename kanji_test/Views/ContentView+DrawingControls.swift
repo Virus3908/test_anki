@@ -1,14 +1,23 @@
 import SwiftUI
 
 extension ContentView {
-    func reviewButton(_ title: String, rating: ReviewRating, card: KanjiCard, color: Color) -> some View {
-        ratingActionButton(title, color: color) {
+    func reviewButton(_ title: String, rating: ReviewRating, card: KanjiCard) -> some View {
+        ratingActionButton(
+            title,
+            color: ratingButtonColor(for: rating, hasFeedback: !feedback.isEmpty, isAnswered: currentSessionRating() != nil),
+            isSelected: sessionRating(at: currentIndex) == rating
+        ) {
             applyReview(rating, to: card)
         }
         .disabled(isPreparingCard)
     }
 
-    func ratingActionButton(_ title: String, color: Color, action: @escaping () -> Void) -> some View {
+    func ratingActionButton(
+        _ title: String,
+        color: Color,
+        isSelected: Bool = false,
+        action: @escaping () -> Void
+    ) -> some View {
         Button(action: action) {
             Text(title)
                 .font(.title3.weight(.bold))
@@ -17,6 +26,42 @@ extension ContentView {
         }
         .buttonStyle(.borderedProminent)
         .tint(color)
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(isSelected ? AppPalette.text.opacity(0.75) : Color.clear, lineWidth: 2)
+        )
+    }
+
+    func currentSessionRating() -> ReviewRating? {
+        sessionRating(at: currentIndex)
+    }
+
+    func sessionRating(at index: Int) -> ReviewRating? {
+        sessionAnswerStates[sessionAnswerID(for: index)]?.rating
+    }
+
+    func ratingButtonColor(for rating: ReviewRating, hasFeedback: Bool, isAnswered: Bool) -> Color {
+        guard hasFeedback || isAnswered else {
+            return AppPalette.mutedText
+        }
+
+        switch rating {
+        case .again:
+            return AppPalette.correction
+        case .hard:
+            return AppPalette.warning
+        case .good:
+            return AppPalette.success
+        }
+    }
+
+    @ViewBuilder
+    func sessionAnswerLabel() -> some View {
+        if let rating = currentSessionRating() {
+            Label("Ответ: \(rating.title)", systemImage: rating.iconName)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(ratingButtonColor(for: rating, hasFeedback: true, isAnswered: true))
+        }
     }
 
     func feedbackInfoButton(items: [StrokeFeedback]) -> some View {

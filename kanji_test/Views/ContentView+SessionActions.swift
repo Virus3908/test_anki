@@ -7,6 +7,7 @@ extension ContentView {
         masteredKanjiKeys.removeAll()
         masteredWordKeys.removeAll()
         masteredKanaKeys.removeAll()
+        sessionAnswerStates.removeAll()
     }
 
     func resetWordDrawingState(resetKanjiIndex: Bool = true) {
@@ -26,6 +27,8 @@ extension ContentView {
         wordCards.removeAll()
         kanaCards.removeAll()
         kanjiSourceCards.removeAll()
+        wordSourceCards.removeAll()
+        kanaSourceCards.removeAll()
         previewCards.removeAll()
         previewKanaCards.removeAll()
         previewWordCards.removeAll()
@@ -33,6 +36,9 @@ extension ContentView {
         previewDeck = nil
         previewKanaDeck = nil
         previewWordDeck = nil
+        isKanjiPreviewPresented = false
+        isKanaPreviewPresented = false
+        isWordPreviewPresented = false
         isDeckSchedulePresented = false
         selectedPreviewCard = nil
         selectedKanaPreviewCard = nil
@@ -86,6 +92,7 @@ extension ContentView {
         previewCards.removeAll()
         previewExpectedCount = nil
         selectedPreviewCard = nil
+        isKanjiPreviewPresented = false
         isLoadingDeck = false
         isDeckSchedulePresented = false
     }
@@ -121,6 +128,7 @@ extension ContentView {
         previewKanaCards.removeAll()
         selectedPreviewCard = nil
         selectedKanaPreviewCard = nil
+        isKanaPreviewPresented = false
         isLoadingDeck = false
         resetCurrentAnswer()
     }
@@ -139,6 +147,8 @@ extension ContentView {
         cards = trainingCards
         wordCards.removeAll()
         kanaCards.removeAll()
+        wordSourceCards.removeAll()
+        kanaSourceCards.removeAll()
         currentIndex = 0
         kanjiAgainCounts.removeAll()
         kanjiRecoveryGoodCounts.removeAll()
@@ -147,6 +157,26 @@ extension ContentView {
         isGuidedSingleKanjiPractice = guided
         hasStartedTraining = true
         resetCurrentAnswer()
+    }
+
+    func reviewKey(for card: KanjiCard) -> String {
+        card.kanji
+    }
+
+    func reviewKey(for card: WordStudyCard) -> String {
+        "word:\(card.id)"
+    }
+
+    func reviewKey(for card: KanaStudyCard) -> String {
+        "kana:\(card.character)"
+    }
+
+    func currentSessionAnswerID() -> String {
+        sessionAnswerID(for: currentIndex)
+    }
+
+    func sessionAnswerID(for index: Int) -> String {
+        "\(practiceMode.rawValue):\(index)"
     }
 
     func learningSessionCards(from sourceCards: [KanjiCard]) -> [KanjiCard] {
@@ -176,6 +206,56 @@ extension ContentView {
             from: sourceCards,
             newCardLimit: kanjiDailyNewCardLimit,
             learningSuccessTarget: kanjiLearningSuccessTarget
+        )
+        if !learningCards.isEmpty {
+            kanjiSessionPhase = .learning
+            return learningCards
+        }
+
+        kanjiSessionPhase = .fallbackReview
+        return Array(sourceCards.shuffled().prefix(max(1, kanjiDailyNewCardLimit)))
+    }
+
+    func nextWordSessionCards(from sourceCards: [WordStudyCard]) -> [WordStudyCard] {
+        let dueReviewCards = reviewStore.dueReviewItems(
+            from: sourceCards,
+            key: reviewKey(for:),
+            learningSuccessTarget: kanjiLearningSuccessTarget
+        )
+        if !dueReviewCards.isEmpty {
+            kanjiSessionPhase = .review
+            return dueReviewCards
+        }
+
+        let learningCards = reviewStore.newLearningItems(
+            from: sourceCards,
+            key: reviewKey(for:),
+            newCardLimit: kanjiDailyNewCardLimit
+        )
+        if !learningCards.isEmpty {
+            kanjiSessionPhase = .learning
+            return learningCards
+        }
+
+        kanjiSessionPhase = .fallbackReview
+        return Array(sourceCards.shuffled().prefix(max(1, kanjiDailyNewCardLimit)))
+    }
+
+    func nextKanaSessionCards(from sourceCards: [KanaStudyCard]) -> [KanaStudyCard] {
+        let dueReviewCards = reviewStore.dueReviewItems(
+            from: sourceCards,
+            key: reviewKey(for:),
+            learningSuccessTarget: kanjiLearningSuccessTarget
+        )
+        if !dueReviewCards.isEmpty {
+            kanjiSessionPhase = .review
+            return dueReviewCards
+        }
+
+        let learningCards = reviewStore.newLearningItems(
+            from: sourceCards,
+            key: reviewKey(for:),
+            newCardLimit: kanjiDailyNewCardLimit
         )
         if !learningCards.isEmpty {
             kanjiSessionPhase = .learning
@@ -265,12 +345,12 @@ extension ContentView {
         previewWordCards.removeAll()
         selectedWordPreviewCard = nil
         selectedLinkedKanjiCard = nil
-        isLinkedKanjiPresented = false
+        isWordPreviewPresented = false
         isLoadingDeck = false
         resetCurrentAnswer()
     }
 
-    func startWordTraining(with trainingCards: [WordStudyCard]) {
+    func startWordTraining(with trainingCards: [WordStudyCard], sourceCards: [WordStudyCard]? = nil, guided: Bool = false) {
         guard !trainingCards.isEmpty else {
             return
         }
@@ -279,30 +359,40 @@ extension ContentView {
         previewWordDeck = nil
         cards.removeAll()
         kanaCards.removeAll()
+        kanjiSourceCards.removeAll()
+        kanaSourceCards.removeAll()
         wordCards = trainingCards
+        wordSourceCards = sourceCards ?? trainingCards
         currentIndex = 0
         kanjiAgainCounts.removeAll()
         kanjiRecoveryGoodCounts.removeAll()
-        kanjiSessionPhase = .learning
         resetWordDrawingState()
         resetSessionProgress(total: Set(wordCards.map(\.id)).count)
-        isGuidedSingleKanjiPractice = false
+        isGuidedSingleKanjiPractice = guided
         isLoadingDeck = false
         hasStartedTraining = true
         resetCurrentAnswer()
     }
 
-    func startKanaTraining(deck: KanaDeck, cards trainingCards: [KanaStudyCard]? = nil, guided: Bool = false) {
+    func startKanaTraining(
+        deck: KanaDeck,
+        cards trainingCards: [KanaStudyCard]? = nil,
+        sourceCards providedSourceCards: [KanaStudyCard]? = nil,
+        guided: Bool = false
+    ) {
         selectedKanaDeck = deck
         practiceMode = .kana
         previewKanaDeck = nil
         cards.removeAll()
         wordCards.removeAll()
-        kanaCards = trainingCards ?? deck.cards.shuffled()
+        kanjiSourceCards.removeAll()
+        wordSourceCards.removeAll()
+        let sourceCards = providedSourceCards ?? trainingCards ?? deck.cards
+        kanaSourceCards = sourceCards
+        kanaCards = trainingCards ?? nextKanaSessionCards(from: sourceCards)
         currentIndex = 0
         kanjiAgainCounts.removeAll()
         kanjiRecoveryGoodCounts.removeAll()
-        kanjiSessionPhase = .learning
         resetWordDrawingState()
         resetSessionProgress(total: Set(kanaCards.map(\.character)).count)
         isGuidedSingleKanjiPractice = guided

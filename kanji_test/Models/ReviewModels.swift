@@ -30,6 +30,12 @@ enum ReviewRating: String, CaseIterable, Identifiable, Codable {
     }
 }
 
+enum KanjiReviewState: String, Codable {
+    case learning
+    case review
+    case relearning
+}
+
 struct KanjiReviewRecord: Codable {
     var attempts: Int
     var successes: Int
@@ -38,6 +44,70 @@ struct KanjiReviewRecord: Codable {
     var dueDate: Date
     var lastRating: ReviewRating
     var lastReviewedAt: Date
+    var state: KanjiReviewState
+    var learningStep: Int
+    var easeFactor: Double
+    var lapses: Int
+
+    init(
+        attempts: Int,
+        successes: Int,
+        streak: Int,
+        intervalDays: Double,
+        dueDate: Date,
+        lastRating: ReviewRating,
+        lastReviewedAt: Date,
+        state: KanjiReviewState = .learning,
+        learningStep: Int = 0,
+        easeFactor: Double = 2.5,
+        lapses: Int = 0
+    ) {
+        self.attempts = attempts
+        self.successes = successes
+        self.streak = streak
+        self.intervalDays = intervalDays
+        self.dueDate = dueDate
+        self.lastRating = lastRating
+        self.lastReviewedAt = lastReviewedAt
+        self.state = state
+        self.learningStep = learningStep
+        self.easeFactor = easeFactor
+        self.lapses = lapses
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case attempts
+        case successes
+        case streak
+        case intervalDays
+        case dueDate
+        case lastRating
+        case lastReviewedAt
+        case state
+        case learningStep
+        case easeFactor
+        case lapses
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        attempts = try container.decodeIfPresent(Int.self, forKey: .attempts) ?? 0
+        successes = try container.decodeIfPresent(Int.self, forKey: .successes) ?? 0
+        streak = try container.decodeIfPresent(Int.self, forKey: .streak) ?? 0
+        intervalDays = try container.decodeIfPresent(Double.self, forKey: .intervalDays) ?? 0
+        dueDate = try container.decodeIfPresent(Date.self, forKey: .dueDate) ?? Date()
+        lastRating = try container.decodeIfPresent(ReviewRating.self, forKey: .lastRating) ?? .again
+        lastReviewedAt = try container.decodeIfPresent(Date.self, forKey: .lastReviewedAt) ?? Date()
+        learningStep = try container.decodeIfPresent(Int.self, forKey: .learningStep) ?? min(successes, KanjiReviewStore.defaultLearningSuccessTarget)
+        easeFactor = max(1.3, try container.decodeIfPresent(Double.self, forKey: .easeFactor) ?? 2.5)
+        lapses = try container.decodeIfPresent(Int.self, forKey: .lapses) ?? 0
+
+        if let decodedState = try container.decodeIfPresent(KanjiReviewState.self, forKey: .state) {
+            state = decodedState
+        } else {
+            state = successes >= KanjiReviewStore.defaultLearningSuccessTarget ? .review : .learning
+        }
+    }
 }
 
 struct KanjiReviewScheduleBucket: Identifiable {
@@ -87,40 +157,71 @@ struct KanjiReviewStore: Codable {
         record.attempts += 1
         record.lastRating = rating
         record.lastReviewedAt = now
-        let wasLearned = record.successes >= successTarget
+        if record.successes < successTarget, record.state == .review {
+            record.state = .learning
+        }
 
         switch rating {
         case .again:
             record.streak = 0
-            if wasLearned {
-                record.intervalDays = 1
-                record.dueDate = Self.nextDay(after: now)
+            if record.state == .review {
+                record.state = .relearning
+                record.lapses += 1
+                record.learningStep = 0
+                record.easeFactor = max(1.3, record.easeFactor - 0.2)
+                record.intervalDays = max(1, min(record.intervalDays, 1))
+                record.dueDate = now
             } else {
+                record.state = .learning
+                record.learningStep = 0
                 record.intervalDays = 0
                 record.dueDate = now
             }
         case .hard:
-            record.streak = max(0, record.streak)
-            if wasLearned {
-                record.intervalDays = 1
-                record.dueDate = Self.nextDay(after: now)
+            record.streak = 0
+            record.easeFactor = max(1.3, record.easeFactor - 0.15)
+            if record.state == .review {
+                let nextInterval = max(1, min(record.intervalDays * 1.2, 180))
+                record.intervalDays = nextInterval
+                record.dueDate = Self.date(now, addingDays: Int(ceil(nextInterval)))
             } else {
-                record.intervalDays = max(0.02, record.intervalDays * 0.5)
-                record.dueDate = now.addingTimeInterval(30 * 60)
+                record.learningStep = max(0, record.learningStep - 1)
+                record.intervalDays = 0
+                record.dueDate = now
             }
         case .good:
             record.successes += 1
             record.streak += 1
 
-            if !wasLearned && record.successes < successTarget {
-                record.intervalDays = 0
-                record.dueDate = now
-            } else if resetIntervalOnGood || record.intervalDays == 0 {
-                record.intervalDays = 1
-                record.dueDate = Self.nextDay(after: now)
-            } else {
-                record.intervalDays = min(record.intervalDays * 2.5, 180)
-                record.dueDate = now.addingTimeInterval(record.intervalDays * 24 * 60 * 60)
+            switch record.state {
+            case .learning:
+                record.learningStep += 1
+                if record.learningStep >= successTarget {
+                    record.state = .review
+                    record.intervalDays = 1
+                    record.dueDate = Self.nextDay(after: now)
+                } else {
+                    record.intervalDays = 0
+                    record.dueDate = now
+                }
+            case .relearning:
+                record.learningStep += 1
+                let relearningTarget = 1
+                if record.learningStep >= relearningTarget {
+                    record.state = .review
+                    record.intervalDays = 1
+                    record.dueDate = Self.nextDay(after: now)
+                } else {
+                    record.intervalDays = 0
+                    record.dueDate = now
+                }
+            case .review:
+                if resetIntervalOnGood || record.intervalDays == 0 {
+                    record.intervalDays = 1
+                } else {
+                    record.intervalDays = min(max(1, record.intervalDays * record.easeFactor), 180)
+                }
+                record.dueDate = Self.date(now, addingDays: Int(ceil(record.intervalDays)))
             }
         }
 
@@ -130,6 +231,11 @@ struct KanjiReviewStore: Codable {
 
     func record(for kanji: String) -> KanjiReviewRecord? {
         records[kanji]
+    }
+
+    mutating func restore(_ record: KanjiReviewRecord?, for key: String) {
+        records[key] = record
+        save()
     }
 
     func orderedCards(_ cards: [KanjiCard], now: Date = Date()) -> [KanjiCard] {
@@ -169,30 +275,76 @@ struct KanjiReviewStore: Codable {
         )
     }
 
-    func dueReviewCards(
-        from cards: [KanjiCard],
+    func dueReviewItems<Item>(
+        from items: [Item],
+        key: (Item) -> String,
         learningSuccessTarget: Int = Self.defaultLearningSuccessTarget,
         now: Date = Date()
-    ) -> [KanjiCard] {
+    ) -> [Item] {
         let successTarget = max(1, learningSuccessTarget)
-        return cards
-            .filter { card in
-                guard let record = records[card.kanji] else {
+        return items
+            .filter { item in
+                guard let record = records[key(item)] else {
                     return false
                 }
 
-                return record.successes >= successTarget && record.dueDate <= now
+                return record.state == .review && record.successes >= successTarget && record.dueDate <= now
             }
             .sorted { left, right in
-                let leftDate = records[left.kanji]?.dueDate ?? .distantPast
-                let rightDate = records[right.kanji]?.dueDate ?? .distantPast
+                let leftDate = records[key(left)]?.dueDate ?? .distantPast
+                let rightDate = records[key(right)]?.dueDate ?? .distantPast
 
                 if leftDate != rightDate {
                     return leftDate < rightDate
                 }
 
-                return left.kanji < right.kanji
+                return key(left) < key(right)
             }
+    }
+
+    func newLearningItems<Item>(
+        from items: [Item],
+        key: (Item) -> String,
+        newCardLimit: Int,
+        now: Date = Date()
+    ) -> [Item] {
+        let inProgressItems = items
+            .filter { item in
+                guard let record = records[key(item)] else {
+                    return false
+                }
+
+                return record.state != .review && record.dueDate <= now
+            }
+            .sorted { left, right in
+                let leftDate = records[key(left)]?.dueDate ?? .distantPast
+                let rightDate = records[key(right)]?.dueDate ?? .distantPast
+
+                if leftDate != rightDate {
+                    return leftDate < rightDate
+                }
+
+                return key(left) < key(right)
+            }
+
+        let newItems = items
+            .filter { records[key($0)] == nil }
+            .prefix(max(0, newCardLimit))
+
+        return inProgressItems + Array(newItems)
+    }
+
+    func dueReviewCards(
+        from cards: [KanjiCard],
+        learningSuccessTarget: Int = Self.defaultLearningSuccessTarget,
+        now: Date = Date()
+    ) -> [KanjiCard] {
+        dueReviewItems(
+            from: cards,
+            key: \.kanji,
+            learningSuccessTarget: learningSuccessTarget,
+            now: now
+        )
     }
 
     func newLearningCards(
@@ -201,31 +353,12 @@ struct KanjiReviewStore: Codable {
         learningSuccessTarget: Int = Self.defaultLearningSuccessTarget,
         now: Date = Date()
     ) -> [KanjiCard] {
-        let successTarget = max(1, learningSuccessTarget)
-        let inProgressCards = cards
-            .filter { card in
-                guard let record = records[card.kanji] else {
-                    return false
-                }
-
-                return record.successes < successTarget && record.dueDate <= now
-            }
-            .sorted { left, right in
-                let leftDate = records[left.kanji]?.dueDate ?? .distantPast
-                let rightDate = records[right.kanji]?.dueDate ?? .distantPast
-
-                if leftDate != rightDate {
-                    return leftDate < rightDate
-                }
-
-                return left.kanji < right.kanji
-            }
-
-        let newCards = cards
-            .filter { records[$0.kanji] == nil }
-            .prefix(max(0, newCardLimit))
-
-        return inProgressCards + Array(newCards)
+        newLearningItems(
+            from: cards,
+            key: \.kanji,
+            newCardLimit: newCardLimit,
+            now: now
+        )
     }
 
     func scheduleBuckets(for cards: [KanjiCard], now: Date = Date()) -> [KanjiReviewScheduleBucket] {

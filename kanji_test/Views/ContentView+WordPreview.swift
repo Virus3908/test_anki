@@ -5,6 +5,7 @@ extension ContentView {
         Button {
             selectedWordPreviewCard = card
             previewSwipeDirection = 0
+            isWordPreviewPresented = true
         } label: {
             VStack(alignment: .leading, spacing: 6) {
                 Text(card.reading)
@@ -33,28 +34,33 @@ extension ContentView {
 
     func wordPreviewDetail(for card: WordStudyCard, deck: WordFrequencyDeck) -> some View {
         NavigationStack {
-            ScrollView(.vertical) {
-                VStack(alignment: .leading, spacing: 16) {
-                    wordFullCard(for: card)
+            ZStack {
+                AppPalette.background
+                    .ignoresSafeArea()
 
-                    primaryActionButton(title: "Практиковать слово", systemImage: "pencil.and.scribble") {
-                        selectedWordPreviewCard = nil
-                        startWordTraining(with: [card])
+                ScrollView(.vertical) {
+                    VStack(alignment: .leading, spacing: 16) {
+                        wordFullCard(for: card)
+
+                        primaryActionButton(title: "Практиковать слово", systemImage: "pencil.and.scribble") {
+                            isWordPreviewPresented = false
+                            selectedWordPreviewCard = nil
+                            startWordTraining(with: [card], guided: true)
+                        }
                     }
+                    .padding(20)
+                    .id(card.id)
+                    .transition(previewDetailTransition)
                 }
-                .padding(20)
             }
             .background(AppPalette.background)
-            .id(card.id)
-            .transition(previewDetailTransition)
             .simultaneousGesture(wordPreviewCardSwipeGesture(for: card, in: deck))
         }
-        .sheet(isPresented: $isLinkedKanjiPresented) {
+        .background(AppPalette.background.ignoresSafeArea())
+        .sheet(item: $selectedLinkedKanjiCard, onDismiss: {
             selectedLinkedKanjiCard = nil
-        } content: {
-            if let selectedLinkedKanjiCard {
-                kanjiPreviewDetail(for: selectedLinkedKanjiCard)
-            }
+        }) { card in
+            kanjiPreviewDetail(for: card)
         }
     }
 
@@ -94,7 +100,7 @@ extension ContentView {
             }
 
             detailBlock("Состав") {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 92), spacing: 8)], alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 6) {
                     ForEach(card.kanjiCards.indices, id: \.self) { index in
                         wordComponentLink(for: card.kanjiCards[index])
                     }
@@ -183,29 +189,42 @@ extension ContentView {
     func wordComponentLink(for card: KanjiCard) -> some View {
         Button {
             selectedLinkedKanjiCard = card
-            isLinkedKanjiPresented = true
         } label: {
-            VStack(alignment: .leading, spacing: 3) {
+            HStack(spacing: 6) {
                 Text(card.kanji)
-                    .font(.title2.weight(.semibold))
+                    .font(.body.weight(.semibold))
                     .foregroundStyle(AppPalette.text)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.7)
+
+                Text("-")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(AppPalette.mutedText)
 
                 Text(wordComponentSubtitle(for: card))
-                    .font(.caption2.weight(.semibold))
+                    .font(.caption.weight(.semibold))
                     .foregroundStyle(AppPalette.secondaryText)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.7)
+                    .truncationMode(.tail)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
             .padding(.horizontal, 10)
-            .padding(.vertical, 8)
+            .padding(.vertical, 6)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(AppPalette.background)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .clipShape(RoundedRectangle(cornerRadius: 6))
+            .overlay(alignment: .trailing) {
+                LinearGradient(
+                    colors: [AppPalette.background.opacity(0), AppPalette.background],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+                .frame(width: 22)
+                .padding(.vertical, 1)
+                .allowsHitTesting(false)
+            }
             .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(AppPalette.border.opacity(0.55), lineWidth: 1)
+                RoundedRectangle(cornerRadius: 6)
+                    .strokeBorder(AppPalette.border.opacity(0.55), lineWidth: 1)
             )
         }
         .buttonStyle(.plain)

@@ -6,6 +6,8 @@ extension ContentView {
         let expectedCard = kanjiCard(for: kanaCard)
 
         return VStack(spacing: 8) {
+            let isCurrentCardAnswered = currentSessionRating() != nil
+
             ZStack {
                 DrawingBoard(
                     drawnStrokes: $drawnStrokes,
@@ -39,7 +41,7 @@ extension ContentView {
 
                 HStack {
                     Button {
-                        undoCurrentStroke()
+                        undoCurrentStroke(expected: expectedCard)
                     } label: {
                         Image(systemName: "arrow.uturn.backward")
                     }
@@ -71,18 +73,34 @@ extension ContentView {
 
                 Spacer(minLength: 12)
 
-                HStack(spacing: 10) {
-                    ratingActionButton("-", color: feedback.isEmpty ? AppPalette.mutedText : AppPalette.correction) {
-                        applyKanaReview(.again)
-                    }
-                    ratingActionButton("~", color: feedback.isEmpty ? AppPalette.mutedText : AppPalette.warning) {
-                        applyKanaReview(.hard)
-                    }
-                    ratingActionButton("+", color: feedback.isEmpty ? AppPalette.mutedText : AppPalette.success) {
-                        applyKanaReview(.good)
+                VStack(spacing: 4) {
+                    sessionAnswerLabel()
+
+                    HStack(spacing: 10) {
+                        ratingActionButton(
+                            "-",
+                            color: ratingButtonColor(for: .again, hasFeedback: !feedback.isEmpty, isAnswered: isCurrentCardAnswered),
+                            isSelected: currentSessionRating() == .again
+                        ) {
+                            applyKanaReview(.again)
+                        }
+                        ratingActionButton(
+                            "~",
+                            color: ratingButtonColor(for: .hard, hasFeedback: !feedback.isEmpty, isAnswered: isCurrentCardAnswered),
+                            isSelected: currentSessionRating() == .hard
+                        ) {
+                            applyKanaReview(.hard)
+                        }
+                        ratingActionButton(
+                            "+",
+                            color: ratingButtonColor(for: .good, hasFeedback: !feedback.isEmpty, isAnswered: isCurrentCardAnswered),
+                            isSelected: currentSessionRating() == .good
+                        ) {
+                            applyKanaReview(.good)
+                        }
                     }
                 }
-                .disabled(feedback.isEmpty)
+                .disabled(feedback.isEmpty && !isCurrentCardAnswered)
 
                 Spacer(minLength: 12)
 

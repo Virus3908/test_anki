@@ -20,8 +20,11 @@ extension ContentView {
 
     func headerControls() -> some View {
         HStack(spacing: 12) {
-            Button("", systemImage: "square.grid.2x2") {
+            Button {
                 hasStartedTraining = false
+            } label: {
+                Image(systemName: "square.grid.2x2")
+                    .frame(width: 34, height: 30)
             }
 
             Text(trainingTitle)

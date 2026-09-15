@@ -5,6 +5,8 @@ extension ContentView {
         let boardSide = drawingBoardSide(for: panelHeight)
 
         return VStack(spacing: 8) {
+            let isCurrentCardAnswered = currentSessionRating() != nil
+
             ZStack {
                 DrawingBoard(
                     drawnStrokes: $drawnStrokes,
@@ -38,7 +40,7 @@ extension ContentView {
 
                 HStack {
                     Button {
-                        undoCurrentStroke()
+                        undoCurrentStroke(expected: card)
                     } label: {
                         Image(systemName: "arrow.uturn.backward")
                     }
@@ -70,12 +72,16 @@ extension ContentView {
 
                 Spacer(minLength: 12)
 
-                HStack(spacing: 10) {
-                    reviewButton("-", rating: .again, card: card, color: feedback.isEmpty ? AppPalette.mutedText : AppPalette.correction)
-                    reviewButton("~", rating: .hard, card: card, color: feedback.isEmpty ? AppPalette.mutedText : AppPalette.warning)
-                    reviewButton("+", rating: .good, card: card, color: feedback.isEmpty ? AppPalette.mutedText : AppPalette.success)
+                VStack(spacing: 4) {
+                    sessionAnswerLabel()
+
+                    HStack(spacing: 10) {
+                        reviewButton("-", rating: .again, card: card)
+                        reviewButton("~", rating: .hard, card: card)
+                        reviewButton("+", rating: .good, card: card)
+                    }
                 }
-                .disabled(feedback.isEmpty)
+                .disabled(feedback.isEmpty && !isCurrentCardAnswered)
 
                 Spacer(minLength: 12)
 

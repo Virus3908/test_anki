@@ -41,11 +41,22 @@ enum KanjiLearningSessionPhase {
     case fallbackReview
 }
 
+struct SessionAnswerState {
+    let reviewKey: String
+    var rating: ReviewRating
+    let recordBefore: KanjiReviewRecord?
+    let againCountBefore: Int?
+    let recoveryGoodCountBefore: Int?
+    let wasMastered: Bool
+}
+
 struct ContentView: View {
     @State var practiceMode: PracticeMode = .kanji
     @State var cards: [KanjiCard] = []
     @State var wordCards: [WordStudyCard] = []
     @State var kanaCards: [KanaStudyCard] = []
+    @State var wordSourceCards: [WordStudyCard] = []
+    @State var kanaSourceCards: [KanaStudyCard] = []
     @State var selectedDeck: KanjiDeck = .jlpt5
     @State var selectedKanaDeck: KanaDeck = .hiragana
     @State var previewDeck: KanjiDeck?
@@ -60,7 +71,9 @@ struct ContentView: View {
     @State var selectedKanaPreviewCard: KanaStudyCard?
     @State var selectedWordPreviewCard: WordStudyCard?
     @State var selectedLinkedKanjiCard: KanjiCard?
-    @State var isLinkedKanjiPresented = false
+    @State var isKanjiPreviewPresented = false
+    @State var isKanaPreviewPresented = false
+    @State var isWordPreviewPresented = false
     @State var previewSwipeDirection = 0
     @State var deckPreviewTask: Task<Void, Never>?
     @State var isLoadingDeck = false
@@ -95,6 +108,7 @@ struct ContentView: View {
     @State var isAboutPresented = false
     @State var kanjiAgainCounts: [String: Int] = [:]
     @State var kanjiRecoveryGoodCounts: [String: Int] = [:]
+    @State var sessionAnswerStates: [String: SessionAnswerState] = [:]
     @State var retranslationKanjiMeaningKeys: Set<String> = []
     @State var retranslationKanjiExampleKeys: Set<String> = []
     @State var retranslationWordKeys: Set<String> = []

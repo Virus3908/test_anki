@@ -5,6 +5,7 @@ extension ContentView {
         Button {
             selectedKanaPreviewCard = card
             previewSwipeDirection = 0
+            isKanaPreviewPresented = true
         } label: {
             VStack(spacing: 4) {
                 Text(card.character)
@@ -28,23 +29,30 @@ extension ContentView {
 
     func kanaPreviewDetail(for card: KanaStudyCard, deck: KanaDeck) -> some View {
         NavigationStack {
-            ScrollView(.vertical) {
-                VStack(alignment: .leading, spacing: 16) {
-                    kanaPreviewCardContent(for: card)
+            ZStack {
+                AppPalette.background
+                    .ignoresSafeArea()
 
-                    primaryActionButton(title: "Тренировать этот знак", systemImage: "pencil.and.scribble") {
-                        selectedKanaPreviewCard = nil
-                        startKanaTraining(deck: deck, cards: [card], guided: true)
+                ScrollView(.vertical) {
+                    VStack(alignment: .leading, spacing: 16) {
+                        kanaPreviewCardContent(for: card)
+
+                        primaryActionButton(title: "Тренировать этот знак", systemImage: "pencil.and.scribble") {
+                            isKanaPreviewPresented = false
+                            selectedKanaPreviewCard = nil
+                            startKanaTraining(deck: deck, cards: [card], guided: true)
+                        }
                     }
+                    .padding(20)
+                    .id(card.character)
+                    .transition(previewDetailTransition)
                 }
-                .padding(20)
             }
             .background(AppPalette.background)
             .foregroundStyle(AppPalette.text)
-            .id(card.character)
-            .transition(previewDetailTransition)
             .simultaneousGesture(kanaPreviewCardSwipeGesture(for: card, in: deck))
         }
+        .background(AppPalette.background.ignoresSafeArea())
     }
 
 }

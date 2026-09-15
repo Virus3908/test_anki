@@ -2,23 +2,14 @@ import SwiftUI
 
 extension ContentView {
     func wordStudyCard(for wordCard: WordStudyCard) -> some View {
-        ZStack {
+        trainingCardShell {
             wordCardFront(for: wordCard)
-                .opacity(isAnswerVisible ? 0 : 1)
-                .rotation3DEffect(.degrees(isAnswerVisible ? 180 : 0), axis: (x: 0, y: 1, z: 0))
-
-            ScrollView {
+        } back: {
+            VStack(alignment: .leading, spacing: 16) {
                 wordFullCardContent(for: wordCard)
+                learningStatusLabel(forReviewKey: reviewKey(for: wordCard))
             }
-            .opacity(isAnswerVisible ? 1 : 0)
-            .rotation3DEffect(.degrees(isAnswerVisible ? 0 : -180), axis: (x: 0, y: 1, z: 0))
         }
-        .padding(18)
-        .frame(maxWidth: .infinity, alignment: .topLeading)
-        .aspectRatio(1, contentMode: .fit)
-        .appSurfaceCard()
-        .contentShape(RoundedRectangle(cornerRadius: 8))
-        .gesture(cardSwipeGesture())
         .task(id: "\(wordCard.id)-\(meaningLanguage.rawValue)") {
             await translateWordMeaningIfNeeded(for: wordCard)
         }
@@ -43,6 +34,8 @@ extension ContentView {
 
             Text("Проверка покажет слово, чтение, перевод и состав.")
                 .foregroundStyle(AppPalette.secondaryText)
+
+            learningStatusLabel(forReviewKey: reviewKey(for: wordCard))
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .textSelection(.enabled)

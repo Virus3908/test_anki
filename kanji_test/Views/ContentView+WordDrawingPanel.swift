@@ -5,6 +5,8 @@ extension ContentView {
         let boardSide = drawingBoardSide(for: panelHeight)
 
         return VStack(spacing: 8) {
+            let isCurrentCardAnswered = currentSessionRating() != nil
+
             ZStack {
                 DrawingBoard(
                     drawnStrokes: $drawnStrokes,
@@ -68,18 +70,34 @@ extension ContentView {
 
                 Spacer(minLength: 12)
 
-                HStack(spacing: 10) {
-                    ratingActionButton("-", color: feedback.isEmpty ? AppPalette.mutedText : AppPalette.correction) {
-                        applyWordReview(.again)
-                    }
-                    ratingActionButton("~", color: feedback.isEmpty ? AppPalette.mutedText : AppPalette.warning) {
-                        applyWordReview(.hard)
-                    }
-                    ratingActionButton("+", color: feedback.isEmpty ? AppPalette.mutedText : AppPalette.success) {
-                        applyWordReview(.good)
+                VStack(spacing: 4) {
+                    sessionAnswerLabel()
+
+                    HStack(spacing: 10) {
+                        ratingActionButton(
+                            "-",
+                            color: ratingButtonColor(for: .again, hasFeedback: !feedback.isEmpty, isAnswered: isCurrentCardAnswered),
+                            isSelected: currentSessionRating() == .again
+                        ) {
+                            applyWordReview(.again)
+                        }
+                        ratingActionButton(
+                            "~",
+                            color: ratingButtonColor(for: .hard, hasFeedback: !feedback.isEmpty, isAnswered: isCurrentCardAnswered),
+                            isSelected: currentSessionRating() == .hard
+                        ) {
+                            applyWordReview(.hard)
+                        }
+                        ratingActionButton(
+                            "+",
+                            color: ratingButtonColor(for: .good, hasFeedback: !feedback.isEmpty, isAnswered: isCurrentCardAnswered),
+                            isSelected: currentSessionRating() == .good
+                        ) {
+                            applyWordReview(.good)
+                        }
                     }
                 }
-                .disabled(feedback.isEmpty)
+                .disabled(feedback.isEmpty && !isCurrentCardAnswered)
 
                 Spacer(minLength: 12)
 

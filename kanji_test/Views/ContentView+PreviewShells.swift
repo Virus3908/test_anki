@@ -39,11 +39,13 @@ extension ContentView {
             .padding(20)
             .foregroundStyle(AppPalette.text)
         }
-        .sheet(item: $selectedPreviewCard, onDismiss: {
+        .sheet(isPresented: $isKanjiPreviewPresented, onDismiss: {
             selectedPreviewCard = nil
             previewSwipeDirection = 0
-        }) { card in
-            kanjiPreviewDetail(for: card)
+        }) {
+            if let selectedPreviewCard {
+                kanjiPreviewDetail(for: selectedPreviewCard)
+            }
         }
         .sheet(isPresented: $isDeckSchedulePresented) {
             deckScheduleInfoView(for: deck)
@@ -59,7 +61,11 @@ extension ContentView {
                 previewHeader(title: deck.title, subtitle: kanaPreviewStatus(for: deck), onBack: closeKanaPreview)
 
                 previewStartButton(count: previewKanaCards.count, isDisabled: previewKanaCards.isEmpty) {
-                    startKanaTraining(deck: deck, cards: previewKanaCards.shuffled())
+                    startKanaTraining(
+                        deck: deck,
+                        cards: nextKanaSessionCards(from: previewKanaCards),
+                        sourceCards: previewKanaCards
+                    )
                 }
 
                 ScrollView(.vertical) {
@@ -80,11 +86,13 @@ extension ContentView {
             .padding(20)
             .foregroundStyle(AppPalette.text)
         }
-        .sheet(item: $selectedKanaPreviewCard, onDismiss: {
+        .sheet(isPresented: $isKanaPreviewPresented, onDismiss: {
             selectedKanaPreviewCard = nil
             previewSwipeDirection = 0
-        }) { card in
-            kanaPreviewDetail(for: card, deck: deck)
+        }) {
+            if let selectedKanaPreviewCard {
+                kanaPreviewDetail(for: selectedKanaPreviewCard, deck: deck)
+            }
         }
     }
 
@@ -97,7 +105,10 @@ extension ContentView {
                 previewHeader(title: deck.title, subtitle: wordPreviewStatus, onBack: closeWordPreview)
 
                 previewStartButton(count: previewWordCards.count, isDisabled: previewWordCards.isEmpty) {
-                    startWordTraining(with: previewWordCards.shuffled())
+                    startWordTraining(
+                        with: nextWordSessionCards(from: previewWordCards),
+                        sourceCards: previewWordCards
+                    )
                 }
 
                 ScrollView(.vertical) {
@@ -118,13 +129,14 @@ extension ContentView {
             .padding(20)
             .foregroundStyle(AppPalette.text)
         }
-        .sheet(item: $selectedWordPreviewCard, onDismiss: {
+        .sheet(isPresented: $isWordPreviewPresented, onDismiss: {
             selectedWordPreviewCard = nil
             selectedLinkedKanjiCard = nil
-            isLinkedKanjiPresented = false
             previewSwipeDirection = 0
-        }) { card in
-            wordPreviewDetail(for: card, deck: deck)
+        }) {
+            if let selectedWordPreviewCard {
+                wordPreviewDetail(for: selectedWordPreviewCard, deck: deck)
+            }
         }
     }
 
