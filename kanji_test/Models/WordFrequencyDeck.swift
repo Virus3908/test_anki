@@ -11,18 +11,18 @@ enum WordFrequencyDeck: String, CaseIterable, Identifiable, Sendable {
     var title: String {
         switch self {
         case .top1000:
-            return "0-1000"
+            return "Common 1"
         case .top2000:
-            return "1001-2000"
+            return "Common 2"
         case .top5000:
-            return "2001-5000"
+            return "Common 3"
         case .top10000:
-            return "5001-10000"
+            return "Common 4"
         }
     }
 
     var subtitle: String {
-        "Диапазон частоты слов"
+        "Локальный JMdict common-набор"
     }
 
     var bounds: Range<Int> {
@@ -40,7 +40,7 @@ enum WordFrequencyDeck: String, CaseIterable, Identifiable, Sendable {
 
     static var groups: [(title: String, decks: [WordFrequencyDeck])] {
         [
-            ("Frequency", [.top1000, .top2000, .top5000, .top10000])
+            ("JMdict common", [.top1000, .top2000, .top5000, .top10000])
         ]
     }
 

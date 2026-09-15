@@ -45,6 +45,7 @@ extension ContentView {
                 .foregroundStyle(AppPalette.secondaryText)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .textSelection(.enabled)
     }
 
     @ViewBuilder

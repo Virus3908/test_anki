@@ -1,15 +1,6 @@
 import Foundation
 
 enum WordDataLoader {
-    private static let remotePageCount = 10
-    private static let remoteBaseURL = URL(string: "https://www.manythings.org/japanese/words/goo/")!
-    private static let session: URLSession = {
-        let configuration = URLSessionConfiguration.ephemeral
-        configuration.timeoutIntervalForRequest = 8
-        configuration.timeoutIntervalForResource = 20
-        return URLSession(configuration: configuration)
-    }()
-
     static func loadWords() async -> [WordStudyCard] {
         await Task.yield()
 
@@ -26,110 +17,7 @@ enum WordDataLoader {
     }
 
     private static func loadDictionaryEntries() async -> [WordDictionaryEntry] {
-        if let cachedEntries = loadCachedEntries(), !cachedEntries.isEmpty {
-            return cachedEntries
-        }
-
-        if let remoteEntries = await loadRemoteEntries(), !remoteEntries.isEmpty {
-            saveCachedEntries(remoteEntries)
-            return remoteEntries
-        }
-
-        return loadBundledEntries()
-    }
-
-    private static func loadRemoteEntries() async -> [WordDictionaryEntry]? {
-        do {
-            var entries: [WordDictionaryEntry] = []
-            var seen: Set<String> = []
-
-            for page in 1...remotePageCount {
-                let pageURL = remoteBaseURL.appendingPathComponent("\(page).html")
-                let (data, response) = try await session.data(from: pageURL)
-                if let httpResponse = response as? HTTPURLResponse, !(200..<300).contains(httpResponse.statusCode) {
-                    throw URLError(.badServerResponse)
-                }
-
-                let html = String(decoding: data, as: UTF8.self)
-                for entry in parseRemotePage(html) where seen.insert(entry.id).inserted {
-                    entries.append(entry)
-                }
-            }
-
-            return entries
-        } catch {
-            return nil
-        }
-    }
-
-    private static func parseRemotePage(_ html: String) -> [WordDictionaryEntry] {
-        let pattern = #"<dt>(.*?)<tt>\(\d+\)</tt></dt><dd>(.*?)<dd>"#
-        guard let regex = try? NSRegularExpression(pattern: pattern, options: [.dotMatchesLineSeparators]) else {
-            return []
-        }
-
-        let nsRange = NSRange(html.startIndex..<html.endIndex, in: html)
-        return regex.matches(in: html, range: nsRange).compactMap { match in
-            guard let headerRange = Range(match.range(at: 1), in: html),
-                  let definitionRange = Range(match.range(at: 2), in: html) else {
-                return nil
-            }
-
-            let header = String(html[headerRange])
-            let definition = String(html[definitionRange])
-            let reading = parseRemoteReading(from: header)
-            let word = stripHTMLTags(from: header)
-                .replacingOccurrences(of: #"\[[^\]]+\]"#, with: "", options: .regularExpression)
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-            let meaning = cleanedDefinition(from: stripHTMLTags(from: definition))
-
-            guard isUsableJapaneseWord(word), !meaning.isEmpty else {
-                return nil
-            }
-
-            return WordDictionaryEntry(
-                word: word,
-                reading: reading ?? word,
-                meaning: meaning
-            )
-        }
-    }
-
-    private static func parseRemoteReading(from header: String) -> String? {
-        guard let range = header.range(of: #"<i>\[[^\]]+\]</i>"#, options: .regularExpression) else {
-            return nil
-        }
-
-        return stripHTMLTags(from: String(header[range]))
-            .trimmingCharacters(in: CharacterSet(charactersIn: "[]"))
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
-    private static func stripHTMLTags(from html: String) -> String {
-        html
-            .replacingOccurrences(of: #"<[^>]+>"#, with: "", options: .regularExpression)
-            .replacingOccurrences(of: "&nbsp;", with: " ")
-            .replacingOccurrences(of: "&amp;", with: "&")
-            .replacingOccurrences(of: "&quot;", with: "\"")
-            .replacingOccurrences(of: "&#39;", with: "'")
-            .replacingOccurrences(of: "&lt;", with: "<")
-            .replacingOccurrences(of: "&gt;", with: ">")
-    }
-
-    private static func cleanedDefinition(from line: String) -> String {
-        var result = line
-            .replacingOccurrences(of: #"\(P\)"#, with: "", options: .regularExpression)
-            .replacingOccurrences(of: #"^\([^)]*\)\s*"#, with: "", options: .regularExpression)
-            .replacingOccurrences(of: #";\s*\([^)]*\)"#, with: "; ", options: .regularExpression)
-            .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-
-        if result.count > 180 {
-            let endIndex = result.index(result.startIndex, offsetBy: 180)
-            result = String(result[..<endIndex]).trimmingCharacters(in: .whitespacesAndNewlines)
-        }
-
-        return result
+        loadBundledEntries()
     }
 
     private static func loadKanjiCards(for entries: [WordDictionaryEntry]) async -> [KanjiCard] {
@@ -216,41 +104,10 @@ enum WordDataLoader {
                 word: entry.word,
                 reading: entry.reading,
                 meaning: entry.meaning,
+                examples: entry.examples,
                 kanjiCards: characterCards
             )
         }
-    }
-
-    private static func loadCachedEntries() -> [WordDictionaryEntry]? {
-        let url = cacheURL()
-        guard FileManager.default.fileExists(atPath: url.path) else {
-            return nil
-        }
-
-        do {
-            let data = try Data(contentsOf: url)
-            return try JSONDecoder().decode([WordDictionaryEntry].self, from: data)
-        } catch {
-            return nil
-        }
-    }
-
-    private static func saveCachedEntries(_ entries: [WordDictionaryEntry]) {
-        do {
-            let url = cacheURL()
-            try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-            let data = try JSONEncoder().encode(entries)
-            try data.write(to: url, options: .atomic)
-        } catch {
-            assertionFailure("Failed to cache remote word frequency entries: \(error)")
-        }
-    }
-
-    private static func cacheURL() -> URL {
-        let caches = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
-        return caches
-            .appendingPathComponent("WordFrequencyCache", isDirectory: true)
-            .appendingPathComponent("goo-blog-frequency.json")
     }
 
     private static func kanaCard(for character: String) -> KanjiCard {

@@ -228,6 +228,7 @@ extension ContentView {
             word: wordCard.word,
             reading: wordCard.reading,
             meaning: wordCard.meaning,
+            examples: wordCard.examples,
             kanjiCards: kanjiCards
         )
     }

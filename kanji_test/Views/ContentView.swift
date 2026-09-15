@@ -96,6 +96,7 @@ struct ContentView: View {
     @State var frontFieldDragStartIndex: Int?
     @State var isGuidedSingleKanjiPractice = false
     @State var isSettingsPresented = false
+    @State var isAboutPresented = false
     @State var kanjiAgainCounts: [String: Int] = [:]
     @State var kanjiRecoveryGoodCounts: [String: Int] = [:]
     @State var retranslationKanjiMeaningKeys: Set<String> = []
@@ -106,6 +107,8 @@ struct ContentView: View {
     @AppStorage("kanjiLearningSuccessTarget") var kanjiLearningSuccessTarget = KanjiReviewStore.defaultLearningSuccessTarget
     @State var meaningLanguage: MeaningLanguage = .russian
     @State var wordMeaningTranslations: [String: String] = [:]
+    @State var wordUsageExamples: [String: [WordUsageExample]] = [:]
+    @State var loadingWordExampleKeys: Set<String> = []
 
     var body: some View {
         NavigationStack {

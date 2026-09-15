@@ -102,9 +102,69 @@ extension ContentView {
                     }
                 }
             }
+
+            wordExamplesBlock(for: card)
         }
+        .textSelection(.enabled)
         .task(id: "\(card.id)-\(meaningLanguage.rawValue)") {
             await translateWordMeaningIfNeeded(for: card)
+        }
+        .task(id: "word-examples-\(card.id)") {
+            await loadWordUsageExamplesIfNeeded(for: card)
+        }
+    }
+
+    @ViewBuilder
+    func wordExamplesBlock(for card: WordStudyCard) -> some View {
+        let examples = displayedWordUsageExamples(for: card)
+        if !examples.isEmpty {
+            section("Примеры") {
+                VStack(alignment: .leading, spacing: 10) {
+                    ForEach(examples) { example in
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(example.sentence)
+                                .foregroundStyle(AppPalette.text)
+                                .fixedSize(horizontal: false, vertical: true)
+
+                            if let reading = example.reading, !reading.isEmpty {
+                                Text(reading)
+                                    .font(.caption)
+                                    .foregroundStyle(AppPalette.secondaryText)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+
+                            if let meaning = example.meaning, !meaning.isEmpty {
+                                Text(meaning)
+                                    .font(.caption)
+                                    .foregroundStyle(AppPalette.secondaryText)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
+                    }
+                }
+            }
+        } else if loadingWordExampleKeys.contains(card.id) {
+            ProgressView("Ищу примеры")
+                .font(.caption)
+                .foregroundStyle(AppPalette.secondaryText)
+                .tint(AppPalette.accent)
+        }
+    }
+
+    func displayedWordUsageExamples(for card: WordStudyCard) -> [WordUsageExample] {
+        wordUsageExamples[card.id] ?? card.examples
+    }
+
+    func loadWordUsageExamplesIfNeeded(for card: WordStudyCard) async {
+        guard wordUsageExamples[card.id] == nil, !loadingWordExampleKeys.contains(card.id) else {
+            return
+        }
+
+        loadingWordExampleKeys.insert(card.id)
+        let examples = await WordUsageExampleProvider.loadExamples(for: card)
+        await MainActor.run {
+            wordUsageExamples[card.id] = examples
+            loadingWordExampleKeys.remove(card.id)
         }
     }
 

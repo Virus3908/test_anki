@@ -6,6 +6,7 @@ struct WordStudyCard: Identifiable, Sendable {
     let word: String
     let reading: String
     let meaning: String
+    let examples: [WordUsageExample]
     let kanjiCards: [KanjiCard]
 
     var kanjiText: String {
@@ -42,6 +43,7 @@ struct WordStudyCard: Identifiable, Sendable {
                         word: example.word,
                         reading: example.reading,
                         meaning: example.meaning,
+                        examples: [],
                         kanjiCards: wordStudyCards
                     )
                 )
