@@ -3,9 +3,7 @@ import SwiftUI
 extension ContentView {
     func kanaPreviewTile(for card: KanaStudyCard) -> some View {
         Button {
-            selectedKanaPreviewCard = card
-            previewSwipeDirection = 0
-            isKanaPreviewPresented = true
+            openKanaPreviewCard(card)
         } label: {
             VStack(spacing: 4) {
                 Text(card.character)
@@ -38,7 +36,7 @@ extension ContentView {
                         kanaPreviewCardContent(for: card)
 
                         primaryActionButton(title: "Тренировать этот знак", systemImage: "pencil.and.scribble") {
-                            isKanaPreviewPresented = false
+                            presentedKanaPreview = nil
                             selectedKanaPreviewCard = nil
                             startKanaTraining(deck: deck, cards: [card], guided: true)
                         }

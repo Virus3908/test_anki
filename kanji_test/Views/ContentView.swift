@@ -41,6 +41,21 @@ enum KanjiLearningSessionPhase {
     case fallbackReview
 }
 
+struct PresentedKanjiPreview: Identifiable {
+    let card: KanjiCard
+    var id: String { "kanji-preview" }
+}
+
+struct PresentedKanaPreview: Identifiable {
+    let card: KanaStudyCard
+    var id: String { "kana-preview" }
+}
+
+struct PresentedWordPreview: Identifiable {
+    let card: WordStudyCard
+    var id: String { "word-preview" }
+}
+
 struct SessionAnswerState {
     let reviewKey: String
     var rating: ReviewRating
@@ -71,9 +86,9 @@ struct ContentView: View {
     @State var selectedKanaPreviewCard: KanaStudyCard?
     @State var selectedWordPreviewCard: WordStudyCard?
     @State var selectedLinkedKanjiCard: KanjiCard?
-    @State var isKanjiPreviewPresented = false
-    @State var isKanaPreviewPresented = false
-    @State var isWordPreviewPresented = false
+    @State var presentedKanjiPreview: PresentedKanjiPreview?
+    @State var presentedKanaPreview: PresentedKanaPreview?
+    @State var presentedWordPreview: PresentedWordPreview?
     @State var previewSwipeDirection = 0
     @State var deckPreviewTask: Task<Void, Never>?
     @State var isLoadingDeck = false

@@ -39,13 +39,11 @@ extension ContentView {
             .padding(20)
             .foregroundStyle(AppPalette.text)
         }
-        .sheet(isPresented: $isKanjiPreviewPresented, onDismiss: {
+        .sheet(item: $presentedKanjiPreview, onDismiss: {
             selectedPreviewCard = nil
             previewSwipeDirection = 0
-        }) {
-            if let selectedPreviewCard {
-                kanjiPreviewDetail(for: selectedPreviewCard)
-            }
+        }) { presentedPreview in
+            kanjiPreviewDetail(for: selectedPreviewCard ?? presentedPreview.card)
         }
         .sheet(isPresented: $isDeckSchedulePresented) {
             deckScheduleInfoView(for: deck)
@@ -86,13 +84,11 @@ extension ContentView {
             .padding(20)
             .foregroundStyle(AppPalette.text)
         }
-        .sheet(isPresented: $isKanaPreviewPresented, onDismiss: {
+        .sheet(item: $presentedKanaPreview, onDismiss: {
             selectedKanaPreviewCard = nil
             previewSwipeDirection = 0
-        }) {
-            if let selectedKanaPreviewCard {
-                kanaPreviewDetail(for: selectedKanaPreviewCard, deck: deck)
-            }
+        }) { presentedPreview in
+            kanaPreviewDetail(for: selectedKanaPreviewCard ?? presentedPreview.card, deck: deck)
         }
     }
 
@@ -129,14 +125,12 @@ extension ContentView {
             .padding(20)
             .foregroundStyle(AppPalette.text)
         }
-        .sheet(isPresented: $isWordPreviewPresented, onDismiss: {
+        .sheet(item: $presentedWordPreview, onDismiss: {
             selectedWordPreviewCard = nil
             selectedLinkedKanjiCard = nil
             previewSwipeDirection = 0
-        }) {
-            if let selectedWordPreviewCard {
-                wordPreviewDetail(for: selectedWordPreviewCard, deck: deck)
-            }
+        }) { presentedPreview in
+            wordPreviewDetail(for: selectedWordPreviewCard ?? presentedPreview.card, deck: deck)
         }
     }
 

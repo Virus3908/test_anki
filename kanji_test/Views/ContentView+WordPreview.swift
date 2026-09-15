@@ -3,9 +3,7 @@ import SwiftUI
 extension ContentView {
     func wordPreviewTile(for card: WordStudyCard) -> some View {
         Button {
-            selectedWordPreviewCard = card
-            previewSwipeDirection = 0
-            isWordPreviewPresented = true
+            openWordPreviewCard(card)
         } label: {
             VStack(alignment: .leading, spacing: 6) {
                 Text(card.reading)
@@ -43,7 +41,7 @@ extension ContentView {
                         wordFullCard(for: card)
 
                         primaryActionButton(title: "Практиковать слово", systemImage: "pencil.and.scribble") {
-                            isWordPreviewPresented = false
+                            presentedWordPreview = nil
                             selectedWordPreviewCard = nil
                             startWordTraining(with: [card], guided: true)
                         }
@@ -148,6 +146,7 @@ extension ContentView {
                     }
 
                     retranslateWordExamplesButton(for: card)
+                    reloadWordExamplesButton(for: card)
                 }
                 .task(id: "word-example-translation-\(card.id)-\(meaningLanguage.rawValue)-\(sourceExamples.map(\.id).joined(separator: "|"))") {
                     await translateWordExamplesIfNeeded(for: card, examples: sourceExamples)
@@ -158,6 +157,10 @@ extension ContentView {
                 .font(.caption)
                 .foregroundStyle(AppPalette.secondaryText)
                 .tint(AppPalette.accent)
+        } else {
+            detailBlock("Примеры") {
+                reloadWordExamplesButton(for: card)
+            }
         }
     }
 
@@ -172,6 +175,45 @@ extension ContentView {
             wordUsageExamples[card.id] = examples
             loadingWordExampleKeys.remove(card.id)
         }
+    }
+
+    func reloadWordUsageExamples(for card: WordStudyCard) {
+        guard !loadingWordExampleKeys.contains(card.id) else {
+            return
+        }
+
+        loadingWordExampleKeys.insert(card.id)
+
+        Task { @MainActor in
+            let examples = await WordUsageExampleProvider.reloadRemoteExamples(for: card)
+            if !examples.isEmpty {
+                wordUsageExamples[card.id] = examples
+                wordExampleTranslations[card.id] = nil
+
+                if meaningLanguage == .russian {
+                    let translatedExamples = await translateWordUsageExamples(examples)
+                    wordExampleTranslations[card.id] = translatedExamples
+                    KanjiTranslationStore.saveWordExampleTranslation(translatedExamples, for: card.id)
+                }
+            }
+
+            loadingWordExampleKeys.remove(card.id)
+        }
+    }
+
+    func reloadWordExamplesButton(for card: WordStudyCard) -> some View {
+        Button {
+            reloadWordUsageExamples(for: card)
+        } label: {
+            Label(
+                loadingWordExampleKeys.contains(card.id) ? "Запрашиваю примеры" : "Перезапросить примеры",
+                systemImage: "arrow.clockwise"
+            )
+            .font(.caption.weight(.semibold))
+        }
+        .buttonStyle(.bordered)
+        .tint(AppPalette.accent)
+        .disabled(loadingWordExampleKeys.contains(card.id))
     }
 
     func wordExampleReading(for example: WordUsageExample, card: WordStudyCard) -> String? {

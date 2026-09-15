@@ -30,11 +30,13 @@ extension ContentView {
                     previewSwipeDirection = -1
                     withAnimation(.easeInOut(duration: 0.22)) {
                         selectedWordPreviewCard = nextCard
+                        presentedWordPreview = PresentedWordPreview(card: nextCard)
                     }
                 } else if width > 0, let previousCard = previewWordCards[safe: index - 1] {
                     previewSwipeDirection = 1
                     withAnimation(.easeInOut(duration: 0.22)) {
                         selectedWordPreviewCard = previousCard
+                        presentedWordPreview = PresentedWordPreview(card: previousCard)
                     }
                 }
             }
@@ -57,11 +59,13 @@ extension ContentView {
                     previewSwipeDirection = -1
                     withAnimation(.easeInOut(duration: 0.22)) {
                         selectedKanaPreviewCard = nextCard
+                        presentedKanaPreview = PresentedKanaPreview(card: nextCard)
                     }
                 } else if width > 0, let previousCard = previewKanaCards[safe: index - 1] {
                     previewSwipeDirection = 1
                     withAnimation(.easeInOut(duration: 0.22)) {
                         selectedKanaPreviewCard = previousCard
+                        presentedKanaPreview = PresentedKanaPreview(card: previousCard)
                     }
                 }
             }
@@ -84,11 +88,13 @@ extension ContentView {
                     previewSwipeDirection = -1
                     withAnimation(.easeInOut(duration: 0.22)) {
                         selectedPreviewCard = nextCard
+                        presentedKanjiPreview = PresentedKanjiPreview(card: nextCard)
                     }
                 } else if width > 0, let previousCard = previewCards[safe: index - 1] {
                     previewSwipeDirection = 1
                     withAnimation(.easeInOut(duration: 0.22)) {
                         selectedPreviewCard = previousCard
+                        presentedKanjiPreview = PresentedKanjiPreview(card: previousCard)
                     }
                 }
             }

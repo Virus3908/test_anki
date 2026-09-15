@@ -3,9 +3,7 @@ import SwiftUI
 extension ContentView {
     func kanjiPreviewTile(for card: KanjiCard) -> some View {
         Button {
-            selectedPreviewCard = card
-            previewSwipeDirection = 0
-            isKanjiPreviewPresented = true
+            openKanjiPreviewCard(card)
         } label: {
             VStack(spacing: 6) {
                 Text(card.kanji)
@@ -42,7 +40,7 @@ extension ContentView {
                             .appSurfaceCard()
 
                         primaryActionButton(title: "Тренировать этот кандзи", systemImage: "pencil.and.scribble") {
-                            isKanjiPreviewPresented = false
+                            presentedKanjiPreview = nil
                             selectedPreviewCard = nil
                             startTraining(with: [card], guided: true)
                         }

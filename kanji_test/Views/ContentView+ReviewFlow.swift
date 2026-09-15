@@ -569,9 +569,9 @@ extension ContentView {
         selectedKanaPreviewCard = nil
         selectedWordPreviewCard = nil
         selectedLinkedKanjiCard = nil
-        isKanjiPreviewPresented = false
-        isKanaPreviewPresented = false
-        isWordPreviewPresented = false
+        presentedKanjiPreview = nil
+        presentedKanaPreview = nil
+        presentedWordPreview = nil
         resetCurrentAnswer()
     }
 

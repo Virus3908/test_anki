@@ -18,6 +18,24 @@ extension ContentView {
         wordFeedbackByKanji.removeAll()
     }
 
+    func openKanjiPreviewCard(_ card: KanjiCard) {
+        selectedPreviewCard = card
+        previewSwipeDirection = 0
+        presentedKanjiPreview = PresentedKanjiPreview(card: card)
+    }
+
+    func openKanaPreviewCard(_ card: KanaStudyCard) {
+        selectedKanaPreviewCard = card
+        previewSwipeDirection = 0
+        presentedKanaPreview = PresentedKanaPreview(card: card)
+    }
+
+    func openWordPreviewCard(_ card: WordStudyCard) {
+        selectedWordPreviewCard = card
+        previewSwipeDirection = 0
+        presentedWordPreview = PresentedWordPreview(card: card)
+    }
+
     func clearDeckCache() {
         deckPreviewTask?.cancel()
         deckPreviewTask = nil
@@ -36,9 +54,9 @@ extension ContentView {
         previewDeck = nil
         previewKanaDeck = nil
         previewWordDeck = nil
-        isKanjiPreviewPresented = false
-        isKanaPreviewPresented = false
-        isWordPreviewPresented = false
+        presentedKanjiPreview = nil
+        presentedKanaPreview = nil
+        presentedWordPreview = nil
         isDeckSchedulePresented = false
         selectedPreviewCard = nil
         selectedKanaPreviewCard = nil
@@ -92,7 +110,7 @@ extension ContentView {
         previewCards.removeAll()
         previewExpectedCount = nil
         selectedPreviewCard = nil
-        isKanjiPreviewPresented = false
+        presentedKanjiPreview = nil
         isLoadingDeck = false
         isDeckSchedulePresented = false
     }
@@ -128,7 +146,7 @@ extension ContentView {
         previewKanaCards.removeAll()
         selectedPreviewCard = nil
         selectedKanaPreviewCard = nil
-        isKanaPreviewPresented = false
+        presentedKanaPreview = nil
         isLoadingDeck = false
         resetCurrentAnswer()
     }
@@ -345,7 +363,7 @@ extension ContentView {
         previewWordCards.removeAll()
         selectedWordPreviewCard = nil
         selectedLinkedKanjiCard = nil
-        isWordPreviewPresented = false
+        presentedWordPreview = nil
         isLoadingDeck = false
         resetCurrentAnswer()
     }

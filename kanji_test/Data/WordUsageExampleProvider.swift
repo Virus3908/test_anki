@@ -22,6 +22,14 @@ enum WordUsageExampleProvider {
         return remoteExamples
     }
 
+    static func reloadRemoteExamples(for card: WordStudyCard, limit: Int = 3) async -> [WordUsageExample] {
+        let remoteExamples = await loadRemoteExamples(for: card, limit: limit)
+        if !remoteExamples.isEmpty {
+            saveCachedExamples(remoteExamples, for: card.id)
+        }
+        return remoteExamples
+    }
+
     private static func loadRemoteExamples(for card: WordStudyCard, limit: Int) async -> [WordUsageExample] {
         guard var components = URLComponents(string: "https://api.tatoeba.org/unstable/sentences") else {
             return []
