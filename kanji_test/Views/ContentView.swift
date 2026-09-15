@@ -19,12 +19,6 @@ enum FrontFieldKind: String, CaseIterable, Identifiable {
     }
 }
 
-struct SessionCardMarker: Identifiable {
-    let id: String
-    let title: String
-    let isMastered: Bool
-}
-
 enum MeaningLanguage: String, CaseIterable, Identifiable {
     case russian
     case english
@@ -41,6 +35,12 @@ enum MeaningLanguage: String, CaseIterable, Identifiable {
     }
 }
 
+enum KanjiLearningSessionPhase {
+    case review
+    case learning
+    case fallbackReview
+}
+
 struct ContentView: View {
     @State var practiceMode: PracticeMode = .kanji
     @State var cards: [KanjiCard] = []
@@ -52,6 +52,7 @@ struct ContentView: View {
     @State var previewKanaDeck: KanaDeck?
     @State var previewWordDeck: WordFrequencyDeck?
     @State var previewCards: [KanjiCard] = []
+    @State var kanjiSourceCards: [KanjiCard] = []
     @State var previewKanaCards: [KanaStudyCard] = []
     @State var previewWordCards: [WordStudyCard] = []
     @State var previewExpectedCount: Int?
@@ -66,6 +67,7 @@ struct ContentView: View {
     @State var isLoadingDeck = false
     @State var isPreparingCard = false
     @State var hasStartedTraining = false
+    @State var isDeckSchedulePresented = false
     @State var reviewStore = KanjiReviewStore(records: [:])
 
     @State var currentIndex = 0
@@ -94,6 +96,14 @@ struct ContentView: View {
     @State var frontFieldDragStartIndex: Int?
     @State var isGuidedSingleKanjiPractice = false
     @State var isSettingsPresented = false
+    @State var kanjiAgainCounts: [String: Int] = [:]
+    @State var kanjiRecoveryGoodCounts: [String: Int] = [:]
+    @State var retranslationKanjiMeaningKeys: Set<String> = []
+    @State var retranslationKanjiExampleKeys: Set<String> = []
+    @State var retranslationWordKeys: Set<String> = []
+    @State var kanjiSessionPhase: KanjiLearningSessionPhase = .learning
+    @AppStorage("kanjiDailyNewCardLimit") var kanjiDailyNewCardLimit = 10
+    @AppStorage("kanjiLearningSuccessTarget") var kanjiLearningSuccessTarget = KanjiReviewStore.defaultLearningSuccessTarget
     @State var meaningLanguage: MeaningLanguage = .russian
     @State var wordMeaningTranslations: [String: String] = [:]
 

@@ -67,7 +67,11 @@ struct KanjiCard: Codable, Identifiable, Sendable {
     }
 
     var hasRussianMeanings: Bool {
-        cachedRussianMeanings?.isEmpty == false
+        guard let cachedRussianMeanings, !cachedRussianMeanings.isEmpty else {
+            return false
+        }
+
+        return !hasSameMeanings(cachedRussianMeanings, englishMeanings)
     }
 
     var hasRussianExamples: Bool {
@@ -139,6 +143,25 @@ struct KanjiCard: Codable, Identifiable, Sendable {
         )
     }
 
+    var withoutTranslations: KanjiCard {
+        KanjiCard(
+            kanji: kanji,
+            meanings: englishMeanings,
+            onyomi: onyomi,
+            kunyomi: kunyomi,
+            examples: englishExamples,
+            sourceMeanings: nil,
+            sourceExamples: nil,
+            russianMeanings: nil,
+            russianExamples: nil,
+            source: source,
+            strokes: strokes,
+            grade: grade,
+            jlpt: jlpt,
+            translationState: nil
+        )
+    }
+
     private func hasSameExampleMeanings(_ left: [KanjiExample], _ right: [KanjiExample]) -> Bool {
         guard left.count == right.count else {
             return false
@@ -147,6 +170,17 @@ struct KanjiCard: Codable, Identifiable, Sendable {
         return zip(left, right).allSatisfy { leftExample, rightExample in
             leftExample.meaning.trimmingCharacters(in: .whitespacesAndNewlines)
                 .caseInsensitiveCompare(rightExample.meaning.trimmingCharacters(in: .whitespacesAndNewlines)) == .orderedSame
+        }
+    }
+
+    private func hasSameMeanings(_ left: [String], _ right: [String]) -> Bool {
+        guard left.count == right.count else {
+            return false
+        }
+
+        return zip(left, right).allSatisfy { leftMeaning, rightMeaning in
+            leftMeaning.trimmingCharacters(in: .whitespacesAndNewlines)
+                .caseInsensitiveCompare(rightMeaning.trimmingCharacters(in: .whitespacesAndNewlines)) == .orderedSame
         }
     }
 }

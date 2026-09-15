@@ -27,12 +27,7 @@ extension ContentView {
             }
             .padding(10)
             .frame(maxWidth: .infinity, minHeight: 104, alignment: .topLeading)
-            .background(AppPalette.surface)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(AppPalette.border.opacity(0.55), lineWidth: 1)
-            )
+            .appSurfaceCard(borderOpacity: 0.55)
         }
         .buttonStyle(.plain)
     }
@@ -43,21 +38,11 @@ extension ContentView {
                 VStack(alignment: .leading, spacing: 16) {
                     wordFullCard(for: card)
 
-                    Button {
+                    primaryActionButton(title: "Практиковать слово", systemImage: "pencil.and.scribble") {
                         selectedWordPreviewCard = nil
                         isPreviewDetailPresented = false
                         startWordTraining(with: [card])
-                    } label: {
-                        HStack {
-                            Image(systemName: "pencil.and.scribble")
-                            Text("Практиковать слово")
-                                .fontWeight(.semibold)
-                        }
-                        .foregroundStyle(Color.white)
-                        .frame(maxWidth: .infinity)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(AppPalette.accent)
                 }
                 .padding(20)
             }
@@ -78,12 +63,7 @@ extension ContentView {
     func wordFullCard(for card: WordStudyCard) -> some View {
         wordFullCardContent(for: card)
             .padding(18)
-            .background(AppPalette.surface)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(AppPalette.border.opacity(0.65), lineWidth: 1)
-            )
+            .appSurfaceCard()
     }
 
     func wordFullCardContent(for card: WordStudyCard) -> some View {
@@ -106,9 +86,13 @@ extension ContentView {
             .frame(maxWidth: .infinity)
 
             detailBlock("Перевод") {
-                Text(displayedWordMeaning(for: card))
-                    .foregroundStyle(AppPalette.text)
-                    .fixedSize(horizontal: false, vertical: true)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(displayedWordMeaning(for: card))
+                        .foregroundStyle(AppPalette.text)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    retranslateWordButton(for: card)
+                }
             }
 
             detailBlock("Состав") {
@@ -153,9 +137,6 @@ extension ContentView {
             )
         }
         .buttonStyle(.plain)
-        .task(id: "word-component-\(card.id)-\(meaningLanguage.rawValue)") {
-            await translateKanjiMeaningsIfNeeded(for: card, deck: selectedDeck)
-        }
     }
 
     func wordComponentSubtitle(for card: KanjiCard) -> String {

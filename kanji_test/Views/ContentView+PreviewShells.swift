@@ -7,42 +7,19 @@ extension ContentView {
                 .ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 14) {
-                HStack(spacing: 12) {
-                    Button("", systemImage: "chevron.left") {
-                        closeDeckPreview()
+                previewHeader(title: deck.title, subtitle: deckPreviewStatus, onBack: closeDeckPreview) {
+                    Button {
+                        isDeckSchedulePresented = true
+                    } label: {
+                        Image(systemName: "info.circle")
                     }
                     .buttonStyle(.bordered)
                     .tint(AppPalette.accent)
-
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(deck.title)
-                            .font(.title2.weight(.bold))
-                        Text(deckPreviewStatus)
-                            .font(.caption)
-                            .foregroundStyle(AppPalette.secondaryText)
-                    }
-
-                    Spacer()
                 }
 
-                Button {
+                previewStartButton(count: previewCards.count, isDisabled: previewCards.isEmpty) {
                     startRandomTrainingFromPreview()
-                } label: {
-                    HStack {
-                        Image(systemName: "shuffle")
-                        Text("Начать тренировку")
-                            .fontWeight(.semibold)
-                        Spacer()
-                        Text("\(previewCards.count)")
-                            .fontWeight(.semibold)
-                    }
-                    .foregroundStyle(Color.white)
-                    .padding(14)
-                    .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(AppPalette.accent)
-                .disabled(previewCards.isEmpty)
 
                 ScrollView(.vertical) {
                     LazyVGrid(columns: kanjiPreviewColumns, spacing: 10) {
@@ -70,6 +47,9 @@ extension ContentView {
                 kanjiPreviewDetail(for: selectedPreviewCard)
             }
         }
+        .sheet(isPresented: $isDeckSchedulePresented) {
+            deckScheduleInfoView(for: deck)
+        }
     }
 
     func kanaPreviewView(for deck: KanaDeck) -> some View {
@@ -78,42 +58,11 @@ extension ContentView {
                 .ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 14) {
-                HStack(spacing: 12) {
-                    Button("", systemImage: "chevron.left") {
-                        closeKanaPreview()
-                    }
-                    .buttonStyle(.bordered)
-                    .tint(AppPalette.accent)
+                previewHeader(title: deck.title, subtitle: kanaPreviewStatus(for: deck), onBack: closeKanaPreview)
 
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(deck.title)
-                            .font(.title2.weight(.bold))
-                        Text(kanaPreviewStatus(for: deck))
-                            .font(.caption)
-                            .foregroundStyle(AppPalette.secondaryText)
-                    }
-
-                    Spacer()
-                }
-
-                Button {
+                previewStartButton(count: previewKanaCards.count, isDisabled: previewKanaCards.isEmpty) {
                     startKanaTraining(deck: deck, cards: previewKanaCards.shuffled())
-                } label: {
-                    HStack {
-                        Image(systemName: "shuffle")
-                        Text("Начать тренировку")
-                            .fontWeight(.semibold)
-                        Spacer()
-                        Text("\(previewKanaCards.count)")
-                            .fontWeight(.semibold)
-                    }
-                    .foregroundStyle(Color.white)
-                    .padding(14)
-                    .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(AppPalette.accent)
-                .disabled(previewKanaCards.isEmpty)
 
                 ScrollView(.vertical) {
                     LazyVGrid(columns: kanaPreviewColumns, spacing: 10) {
@@ -149,42 +98,11 @@ extension ContentView {
                 .ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 14) {
-                HStack(spacing: 12) {
-                    Button("", systemImage: "chevron.left") {
-                        closeWordPreview()
-                    }
-                    .buttonStyle(.bordered)
-                    .tint(AppPalette.accent)
+                previewHeader(title: deck.title, subtitle: wordPreviewStatus, onBack: closeWordPreview)
 
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(deck.title)
-                            .font(.title2.weight(.bold))
-                        Text(wordPreviewStatus)
-                            .font(.caption)
-                            .foregroundStyle(AppPalette.secondaryText)
-                    }
-
-                    Spacer()
-                }
-
-                Button {
+                previewStartButton(count: previewWordCards.count, isDisabled: previewWordCards.isEmpty) {
                     startWordTraining(with: previewWordCards.shuffled())
-                } label: {
-                    HStack {
-                        Image(systemName: "shuffle")
-                        Text("Начать тренировку")
-                            .fontWeight(.semibold)
-                        Spacer()
-                        Text("\(previewWordCards.count)")
-                            .fontWeight(.semibold)
-                    }
-                    .foregroundStyle(Color.white)
-                    .padding(14)
-                    .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(AppPalette.accent)
-                .disabled(previewWordCards.isEmpty)
 
                 ScrollView(.vertical) {
                     LazyVGrid(columns: wordPreviewColumns, spacing: 10) {
@@ -242,6 +160,52 @@ extension ContentView {
         }
 
         return "\(previewCards.count) загружено"
+    }
+
+    func deckScheduleInfoView(for deck: KanjiDeck) -> some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 14) {
+                    Text(deck.title)
+                        .font(.title2.weight(.bold))
+
+                    VStack(spacing: 8) {
+                        ForEach(reviewStore.scheduleBuckets(for: previewCards)) { bucket in
+                            HStack {
+                                Text(bucket.title)
+                                    .foregroundStyle(AppPalette.text)
+
+                                Spacer()
+
+                                Text("\(bucket.count)")
+                                    .fontWeight(.semibold)
+                                    .foregroundStyle(AppPalette.text)
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 10)
+                            .background(AppPalette.surface)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(AppPalette.border.opacity(0.55), lineWidth: 1)
+                            )
+                        }
+                    }
+                }
+                .padding(20)
+            }
+            .background(AppPalette.background)
+            .foregroundStyle(AppPalette.text)
+            .navigationTitle("Повторения")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Готово") {
+                        isDeckSchedulePresented = false
+                    }
+                }
+            }
+        }
     }
 
 }

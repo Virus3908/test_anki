@@ -108,11 +108,35 @@ enum RussianMeaningTranslator {
     }
 
     static func translate(_ meanings: [String]) async -> [String] {
-        if let systemTranslation = try? await systemTranslationQueue.translate(meanings), !systemTranslation.isEmpty {
-            return unique(systemTranslation)
+        unique(await translatePreservingOrder(meanings))
+    }
+
+    static func translatePreservingOrder(_ meanings: [String]) async -> [String] {
+        var bestTranslation: [String]?
+
+        for _ in 0..<3 {
+            guard let systemTranslation = try? await systemTranslationQueue.translate(meanings),
+                  !systemTranslation.isEmpty else {
+                continue
+            }
+
+            bestTranslation = systemTranslation
+            if !hasUntranslatedItems(systemTranslation, comparedTo: meanings) {
+                return systemTranslation
+            }
         }
 
-        return translateLocally(meanings)
+        guard let bestTranslation, bestTranslation.count == meanings.count else {
+            return dictionaryTranslation(for: meanings)
+        }
+
+        let localTranslation = dictionaryTranslation(for: meanings)
+        return bestTranslation.enumerated().map { index, translatedItem in
+            translatedItem.trimmingCharacters(in: .whitespacesAndNewlines)
+                .caseInsensitiveCompare(meanings[index].trimmingCharacters(in: .whitespacesAndNewlines)) == .orderedSame
+                ? localTranslation[index]
+                : translatedItem
+        }
     }
 
     private static func withTimeout<Value>(seconds: UInt64, operation: @escaping () async throws -> Value) async throws -> Value {
@@ -166,5 +190,16 @@ enum RussianMeaningTranslator {
 
     private static func unique(_ meanings: [String]) -> [String] {
         Array(NSOrderedSet(array: meanings)).compactMap { $0 as? String }
+    }
+
+    private static func hasUntranslatedItems(_ translated: [String], comparedTo source: [String]) -> Bool {
+        guard translated.count == source.count else {
+            return true
+        }
+
+        return zip(translated, source).contains { translatedItem, sourceItem in
+            translatedItem.trimmingCharacters(in: .whitespacesAndNewlines)
+                .caseInsensitiveCompare(sourceItem.trimmingCharacters(in: .whitespacesAndNewlines)) == .orderedSame
+        }
     }
 }

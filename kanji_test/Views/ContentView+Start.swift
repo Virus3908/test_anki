@@ -17,21 +17,8 @@ extension ContentView {
                 }
                 .pickerStyle(.segmented)
 
-                HStack(alignment: .top, spacing: 12) {
-                    Text(startSubtitle)
-                        .foregroundStyle(AppPalette.secondaryText)
-
-                    Spacer()
-
-                    Button {
-                        clearDeckCache()
-                    } label: {
-                        Image(systemName: "trash")
-                    }
-                    .buttonStyle(.bordered)
-                    .tint(AppPalette.correction)
-                    .disabled(isLoadingDeck)
-                }
+                Text(startSubtitle)
+                    .foregroundStyle(AppPalette.secondaryText)
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 18) {

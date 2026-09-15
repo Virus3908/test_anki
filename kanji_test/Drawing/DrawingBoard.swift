@@ -167,13 +167,16 @@ struct DrawingBoard: View {
 
 struct StrokeStepStrip: View {
     let strokes: [KanjiStroke]
+    var spacing: CGFloat = 4
 
-    private let columns = [
-        GridItem(.adaptive(minimum: 41, maximum: 41), spacing: 4)
-    ]
+    private var columns: [GridItem] {
+        [
+            GridItem(.adaptive(minimum: 41, maximum: 41), spacing: spacing)
+        ]
+    }
 
     var body: some View {
-        LazyVGrid(columns: columns, alignment: .leading, spacing: 4) {
+        LazyVGrid(columns: columns, alignment: .leading, spacing: spacing) {
             ForEach(strokes.indices, id: \.self) { index in
                 StrokeStepView(strokes: strokes, visibleCount: index + 1)
                     .frame(width: 41, height: 41)

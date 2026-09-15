@@ -19,18 +19,18 @@ enum KanjiDataLoader {
         let masterCards = loadBundledMasterCards()
         let masterDeckCards = masterCards.filter(deck.masterFilter)
         if !masterDeckCards.isEmpty {
-            return masterDeckCards
+            return KanjiTranslationStore.apply(to: masterDeckCards)
         }
 
         if deck != .all, let allCachedCards = try? loadCachedCards(for: .all), !allCachedCards.isEmpty {
             let filteredCards = allCachedCards.filter(deck.masterFilter)
             if !filteredCards.isEmpty {
-                return filteredCards
+                return prepareLoadedCards(filteredCards)
             }
         }
 
         if let cachedCards = try? loadCachedCards(for: deck), !cachedCards.isEmpty {
-            return cachedCards
+            return prepareLoadedCards(cachedCards)
         }
 
         return []
@@ -44,7 +44,7 @@ enum KanjiDataLoader {
 
         do {
             let data = try Data(contentsOf: url)
-            return try JSONDecoder().decode([KanjiCard].self, from: data)
+            return KanjiTranslationStore.apply(to: try JSONDecoder().decode([KanjiCard].self, from: data))
         } catch {
             assertionFailure("Failed to decode kanji-data.json: \(error)")
             return []
@@ -66,7 +66,7 @@ enum KanjiDataLoader {
                 let missingKanji = remoteKanjiList.filter { cachedByKanji[$0] == nil }
 
                 if missingKanji.isEmpty {
-                    return remoteKanjiList.compactMap { cachedByKanji[$0] }
+                    return prepareLoadedCards(remoteKanjiList.compactMap { cachedByKanji[$0] })
                 }
 
                 let missingCards = try await RemoteKanjiProvider.loadCards(for: missingKanji)
@@ -77,18 +77,18 @@ enum KanjiDataLoader {
 
                 if !mergedCards.isEmpty {
                     try mergeCardsIntoAllCache(mergedCards)
-                    return mergedCards
+                    return KanjiTranslationStore.apply(to: mergedCards)
                 }
             }
 
             let remoteCards = try await RemoteKanjiProvider.loadCards(for: remoteKanjiList)
             if !remoteCards.isEmpty {
                 try mergeCardsIntoAllCache(remoteCards)
-                return remoteCards
+                return KanjiTranslationStore.apply(to: remoteCards)
             }
         } catch {
             if let cachedCards = try? loadCachedCards(for: deck), !cachedCards.isEmpty {
-                return cachedCards
+                return prepareLoadedCards(cachedCards)
             }
 
             assertionFailure("Failed to load remote kanji data: \(error)")
@@ -113,7 +113,7 @@ enum KanjiDataLoader {
 
             if missingKanji.isEmpty {
                 let orderedCards = remoteKanjiList.compactMap { cardsByKanji[$0] }
-                onUpdate(orderedCards, remoteKanjiList.count)
+                onUpdate(KanjiTranslationStore.apply(to: orderedCards), remoteKanjiList.count)
                 return
             }
 
@@ -127,13 +127,13 @@ enum KanjiDataLoader {
                 }
 
                 let orderedCards = remoteKanjiList.compactMap { cardsByKanji[$0] }
-                onUpdate(orderedCards, remoteKanjiList.count)
+                onUpdate(KanjiTranslationStore.apply(to: orderedCards), remoteKanjiList.count)
             }
 
             let finalCards = remoteKanjiList.compactMap { cardsByKanji[$0] }
             if !finalCards.isEmpty {
                 try mergeCardsIntoAllCache(finalCards)
-                onUpdate(finalCards, remoteKanjiList.count)
+                onUpdate(KanjiTranslationStore.apply(to: finalCards), remoteKanjiList.count)
             }
         } catch {
             if bundledOrCachedCards.isEmpty {
@@ -163,8 +163,8 @@ enum KanjiDataLoader {
         }
     }
 
-    static func translateMeaningsIfNeeded(_ card: KanjiCard, deck: KanjiDeck) async -> KanjiCard {
-        guard !card.hasRussianMeanings else {
+    static func translateMeaningsIfNeeded(_ card: KanjiCard, deck: KanjiDeck, force: Bool = false) async -> KanjiCard {
+        guard force || !card.hasRussianMeanings else {
             return card
         }
 
@@ -174,13 +174,13 @@ enum KanjiDataLoader {
         return translatedCard
     }
 
-    static func translateExamplesIfNeeded(_ card: KanjiCard, deck: KanjiDeck) async -> KanjiCard {
-        guard !card.hasRussianExamples else {
+    static func translateExamplesIfNeeded(_ card: KanjiCard, deck: KanjiDeck, force: Bool = false) async -> KanjiCard {
+        guard force || !card.hasRussianExamples else {
             return card
         }
 
         let sourceExamples = card.englishExamples
-        let translatedExampleMeanings = await RussianMeaningTranslator.translate(sourceExamples.map(\.meaning))
+        let translatedExampleMeanings = await RussianMeaningTranslator.translatePreservingOrder(sourceExamples.map(\.meaning))
         let examples = sourceExamples.enumerated().map { index, example in
             KanjiExample(
                 word: example.word,
@@ -194,11 +194,12 @@ enum KanjiDataLoader {
     }
 
     private static func cacheTranslatedCard(_ card: KanjiCard, deck: KanjiDeck) {
-        do {
-            try updateCachedCard(card, for: deck)
-        } catch {
-            assertionFailure("Failed to update translated kanji cache: \(error)")
-        }
+        KanjiTranslationStore.saveKanjiTranslation(from: card)
+    }
+
+    private static func prepareLoadedCards(_ cards: [KanjiCard]) -> [KanjiCard] {
+        KanjiTranslationStore.migrateKanjiTranslations(from: cards)
+        return KanjiTranslationStore.apply(to: cards)
     }
 
     private static func loadCachedCards(for deck: KanjiDeck) throws -> [KanjiCard]? {
@@ -214,7 +215,7 @@ enum KanjiDataLoader {
     private static func saveCachedCards(_ cards: [KanjiCard], for deck: KanjiDeck) throws {
         let url = cacheURL(for: deck)
         try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-        let data = try JSONEncoder().encode(cards)
+        let data = try JSONEncoder().encode(cards.map(\.withoutTranslations))
         try data.write(to: url, options: .atomic)
     }
 
@@ -262,8 +263,8 @@ enum KanjiDataLoader {
             examples: fresh.englishExamples,
             sourceMeanings: nil,
             sourceExamples: nil,
-            russianMeanings: fresh.cachedRussianMeanings ?? cached.cachedRussianMeanings,
-            russianExamples: fresh.cachedRussianExamples ?? cached.cachedRussianExamples,
+            russianMeanings: nil,
+            russianExamples: nil,
             source: fresh.source,
             strokes: fresh.strokes,
             grade: fresh.grade,

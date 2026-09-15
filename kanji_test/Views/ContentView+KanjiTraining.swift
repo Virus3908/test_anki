@@ -14,12 +14,7 @@ extension ContentView {
         .padding(18)
         .frame(maxWidth: .infinity, alignment: .topLeading)
         .aspectRatio(1, contentMode: .fit)
-        .background(AppPalette.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 8))
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(AppPalette.border.opacity(0.65), lineWidth: 1)
-        )
+        .appSurfaceCard()
         .contentShape(RoundedRectangle(cornerRadius: 8))
         .gesture(cardSwipeGesture())
         .onTapGesture {
@@ -47,8 +42,11 @@ extension ContentView {
 
             Text("Проверка покажет оригинал и сравнение штрихов.")
                 .foregroundStyle(AppPalette.secondaryText)
+
+            kanjiLearningStatusLabel(for: card)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .textSelection(.enabled)
     }
 
     @ViewBuilder
@@ -92,8 +90,12 @@ extension ContentView {
     func frontMeanings(for card: KanjiCard) -> some View {
         if showsPromptMeaning {
             detailBlock("Значения") {
-                Text(displayedKanjiMeanings(for: card).joined(separator: ", "))
-                    .fixedSize(horizontal: false, vertical: true)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(displayedKanjiMeanings(for: card).joined(separator: ", "))
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    retranslateKanjiMeaningsButton(for: card)
+                }
             }
             .task(id: "front-meaning-\(card.id)-\(meaningLanguage.rawValue)") {
                 await translateKanjiMeaningsIfNeeded(for: card, deck: selectedDeck)
@@ -114,7 +116,7 @@ extension ContentView {
 
     func cardBackContent(for card: KanjiCard) -> some View {
         VStack(alignment: .leading, spacing: 16) {
-            HStack(alignment: .top, spacing: 18) {
+            HStack(alignment: .top, spacing: 10) {
                 Text(card.kanji)
                     .font(.system(size: 82, weight: .regular, design: .serif))
                     .foregroundStyle(AppPalette.text)
@@ -122,6 +124,12 @@ extension ContentView {
                     .background(AppPalette.surface)
                     .border(AppPalette.border.opacity(0.65))
 
+                detailBlock("Порядок черт") {
+                    StrokeStepStrip(strokes: card.strokes, spacing: 0)
+                }
+            }
+
+            HStack(alignment: .top, spacing: 18) {
                 VStack(alignment: .leading, spacing: 8) {
                     detailBlock("Кандзи") {
                         Text(card.kanji)
@@ -139,13 +147,13 @@ extension ContentView {
                             .foregroundStyle(AppPalette.text)
                     }
 
-                    detailBlock("Порядок черт") {
-                        StrokeStepStrip(strokes: card.strokes)
-                    }
-
                     detailBlock("Значения") {
-                        Text(displayedKanjiMeanings(for: card).joined(separator: ", "))
-                            .foregroundStyle(AppPalette.text)
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(displayedKanjiMeanings(for: card).joined(separator: ", "))
+                                .foregroundStyle(AppPalette.text)
+
+                            retranslateKanjiMeaningsButton(for: card)
+                        }
                     }
                 }
                 .fixedSize(horizontal: false, vertical: true)
@@ -159,10 +167,44 @@ extension ContentView {
                             Text("\(example.word) - \(example.reading) - \(example.meaning)")
                                 .foregroundStyle(AppPalette.text)
                         }
+
+                        retranslateKanjiExamplesButton(for: card)
                     }
                 }
             }
+
+            kanjiLearningStatusLabel(for: card)
         }
+        .textSelection(.enabled)
+    }
+
+    func kanjiLearningStatusLabel(for card: KanjiCard) -> some View {
+        Text(kanjiLearningStatusText(for: card))
+            .font(.caption)
+            .foregroundStyle(AppPalette.mutedText)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    func kanjiLearningStatusText(for card: KanjiCard) -> String {
+        guard let record = reviewStore.record(for: card.kanji),
+              record.successes >= max(1, kanjiLearningSuccessTarget) else {
+            return "Не изучена"
+        }
+
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let dueDay = calendar.startOfDay(for: record.dueDate)
+        let daysUntilReview = calendar.dateComponents([.day], from: today, to: dueDay).day ?? 0
+
+        if daysUntilReview > 7 {
+            return "Хорошо изучена"
+        }
+
+        if daysUntilReview >= 2 {
+            return "Изучается"
+        }
+
+        return "На повторении"
     }
 
 }

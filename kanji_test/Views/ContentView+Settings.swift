@@ -6,7 +6,9 @@ extension ContentView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     translationSettingsView()
+                    learningSettingsView()
                     frontSettingsView()
+                    storageSettingsView()
                 }
                 .padding(20)
             }
@@ -25,12 +27,7 @@ extension ContentView {
     }
 
     func translationSettingsView() -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("Перевод")
-                .font(.caption.weight(.bold))
-                .foregroundStyle(AppPalette.secondaryText)
-                .textCase(.uppercase)
-
+        settingsSection("Перевод") {
             Picker("Язык значений", selection: $meaningLanguage) {
                 ForEach(MeaningLanguage.allCases) { language in
                     Text(language.title).tag(language)
@@ -43,23 +40,10 @@ extension ContentView {
                 .foregroundStyle(AppPalette.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
         }
-        .padding(12)
-        .background(AppPalette.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 8))
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(AppPalette.border.opacity(0.65), lineWidth: 1)
-        )
-        .disabled(isLoadingDeck)
     }
 
     func frontSettingsView() -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("Лицевая сторона")
-                .font(.caption.weight(.bold))
-                .foregroundStyle(AppPalette.secondaryText)
-                .textCase(.uppercase)
-
+        settingsSection("Лицевая сторона") {
             VStack(spacing: 8) {
                 ForEach(frontFieldOrder) { field in
                     frontSettingRow(for: field)
@@ -69,13 +53,75 @@ extension ContentView {
                 }
             }
         }
+    }
+
+    func learningSettingsView() -> some View {
+        settingsSection("Обучение") {
+            Stepper(value: $kanjiDailyNewCardLimit, in: 1...50, step: 1) {
+                HStack {
+                    Text("Новых кандзи в день")
+                    Spacer()
+                    Text("\(kanjiDailyNewCardLimit)")
+                        .fontWeight(.semibold)
+                        .foregroundStyle(AppPalette.text)
+                }
+            }
+
+            Stepper(value: $kanjiLearningSuccessTarget, in: 1...6, step: 1) {
+                HStack {
+                    Text("Успехов для изучения")
+                    Spacer()
+                    Text("\(kanjiLearningSuccessTarget)")
+                        .fontWeight(.semibold)
+                        .foregroundStyle(AppPalette.text)
+                }
+            }
+
+            Text("Сессия начнется с карточек на повторение, затем добавит новые до этого лимита.")
+                .font(.caption)
+                .foregroundStyle(AppPalette.secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Button {
+                reviewStore.advanceReviewDates(byDays: 1)
+            } label: {
+                Label("Перейти на следующий день", systemImage: "calendar.badge.clock")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .tint(AppPalette.accent)
+        }
+    }
+
+    func storageSettingsView() -> some View {
+        settingsSection("Данные") {
+            Button(role: .destructive) {
+                clearDeckCache()
+            } label: {
+                Label("Очистить кэш", systemImage: "trash")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .tint(AppPalette.correction)
+
+            Text("Удаляет загруженные карточки. Прогресс и сохраненные переводы остаются.")
+                .font(.caption)
+                .foregroundStyle(AppPalette.secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    func settingsSection<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(title)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(AppPalette.secondaryText)
+                .textCase(.uppercase)
+
+            content()
+        }
         .padding(12)
-        .background(AppPalette.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 8))
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(AppPalette.border.opacity(0.65), lineWidth: 1)
-        )
+        .appSurfaceCard()
         .disabled(isLoadingDeck)
     }
 
@@ -193,6 +239,7 @@ extension ContentView {
     func loadReviewMemory() async {
         await Task.yield()
         reviewStore = KanjiReviewStore.load()
+        wordMeaningTranslations = KanjiTranslationStore.loadWordTranslations()
     }
 
 }

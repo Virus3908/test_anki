@@ -14,12 +14,7 @@ extension ContentView {
         .padding(18)
         .frame(maxWidth: .infinity, alignment: .topLeading)
         .aspectRatio(1, contentMode: .fit)
-        .background(AppPalette.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 8))
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(AppPalette.border.opacity(0.65), lineWidth: 1)
-        )
+        .appSurfaceCard()
         .contentShape(RoundedRectangle(cornerRadius: 8))
         .gesture(cardSwipeGesture())
     }
@@ -50,12 +45,7 @@ extension ContentView {
     func kanaPreviewCardContent(for kanaCard: KanaStudyCard) -> some View {
         kanaCardBackContent(for: kanaCard)
             .padding(18)
-            .background(AppPalette.surface)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(AppPalette.border.opacity(0.65), lineWidth: 1)
-            )
+            .appSurfaceCard()
     }
 
     func kanaCardBack(for kanaCard: KanaStudyCard) -> some View {

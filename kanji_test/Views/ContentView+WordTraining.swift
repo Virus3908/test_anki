@@ -16,12 +16,7 @@ extension ContentView {
         .padding(18)
         .frame(maxWidth: .infinity, alignment: .topLeading)
         .aspectRatio(1, contentMode: .fit)
-        .background(AppPalette.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 8))
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(AppPalette.border.opacity(0.65), lineWidth: 1)
-        )
+        .appSurfaceCard()
         .contentShape(RoundedRectangle(cornerRadius: 8))
         .gesture(cardSwipeGesture())
         .task(id: "\(wordCard.id)-\(meaningLanguage.rawValue)") {
@@ -89,8 +84,12 @@ extension ContentView {
     func wordMeaningField(for wordCard: WordStudyCard) -> some View {
         if isAnswerVisible || showsPromptMeaning {
             detailBlock("Значения") {
-                Text(displayedWordMeaning(for: wordCard))
-                    .fixedSize(horizontal: false, vertical: true)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(displayedWordMeaning(for: wordCard))
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    retranslateWordButton(for: wordCard)
+                }
             }
         }
     }

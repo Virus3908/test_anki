@@ -21,12 +21,7 @@ extension ContentView {
             }
             .padding(8)
             .frame(maxWidth: .infinity, minHeight: 86)
-            .background(AppPalette.surface)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(AppPalette.border.opacity(0.55), lineWidth: 1)
-            )
+            .appSurfaceCard(borderOpacity: 0.55)
         }
         .buttonStyle(.plain)
         .task(id: "preview-meaning-\(card.id)-\(meaningLanguage.rawValue)") {
@@ -40,28 +35,13 @@ extension ContentView {
                 VStack(alignment: .leading, spacing: 16) {
                     cardBackContent(for: card)
                         .padding(18)
-                        .background(AppPalette.surface)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(AppPalette.border.opacity(0.65), lineWidth: 1)
-                        )
+                        .appSurfaceCard()
 
-                    Button {
+                    primaryActionButton(title: "Тренировать этот кандзи", systemImage: "pencil.and.scribble") {
                         selectedPreviewCard = nil
                         isPreviewDetailPresented = false
                         startTraining(with: [card], guided: true)
-                    } label: {
-                        HStack {
-                            Image(systemName: "pencil.and.scribble")
-                            Text("Тренировать этот кандзи")
-                                .fontWeight(.semibold)
-                        }
-                        .foregroundStyle(Color.white)
-                        .frame(maxWidth: .infinity)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(AppPalette.accent)
                 }
                 .padding(20)
             }
