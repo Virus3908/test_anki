@@ -5,7 +5,6 @@ extension ContentView {
         Button {
             selectedKanaPreviewCard = card
             previewSwipeDirection = 0
-            isPreviewDetailPresented = true
         } label: {
             VStack(spacing: 4) {
                 Text(card.character)
@@ -35,7 +34,6 @@ extension ContentView {
 
                     primaryActionButton(title: "Тренировать этот знак", systemImage: "pencil.and.scribble") {
                         selectedKanaPreviewCard = nil
-                        isPreviewDetailPresented = false
                         startKanaTraining(deck: deck, cards: [card], guided: true)
                     }
                 }

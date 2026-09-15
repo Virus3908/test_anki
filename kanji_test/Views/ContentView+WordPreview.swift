@@ -5,7 +5,6 @@ extension ContentView {
         Button {
             selectedWordPreviewCard = card
             previewSwipeDirection = 0
-            isPreviewDetailPresented = true
         } label: {
             VStack(alignment: .leading, spacing: 6) {
                 Text(card.reading)
@@ -40,7 +39,6 @@ extension ContentView {
 
                     primaryActionButton(title: "Практиковать слово", systemImage: "pencil.and.scribble") {
                         selectedWordPreviewCard = nil
-                        isPreviewDetailPresented = false
                         startWordTraining(with: [card])
                     }
                 }
@@ -116,9 +114,10 @@ extension ContentView {
 
     @ViewBuilder
     func wordExamplesBlock(for card: WordStudyCard) -> some View {
+        let sourceExamples = originalWordUsageExamples(for: card)
         let examples = displayedWordUsageExamples(for: card)
         if !examples.isEmpty {
-            section("Примеры") {
+            detailBlock("Примеры") {
                 VStack(alignment: .leading, spacing: 10) {
                     ForEach(examples) { example in
                         VStack(alignment: .leading, spacing: 3) {
@@ -126,7 +125,7 @@ extension ContentView {
                                 .foregroundStyle(AppPalette.text)
                                 .fixedSize(horizontal: false, vertical: true)
 
-                            if let reading = example.reading, !reading.isEmpty {
+                            if let reading = wordExampleReading(for: example, card: card) {
                                 Text(reading)
                                     .font(.caption)
                                     .foregroundStyle(AppPalette.secondaryText)
@@ -141,6 +140,11 @@ extension ContentView {
                             }
                         }
                     }
+
+                    retranslateWordExamplesButton(for: card)
+                }
+                .task(id: "word-example-translation-\(card.id)-\(meaningLanguage.rawValue)-\(sourceExamples.map(\.id).joined(separator: "|"))") {
+                    await translateWordExamplesIfNeeded(for: card, examples: sourceExamples)
                 }
             }
         } else if loadingWordExampleKeys.contains(card.id) {
@@ -149,10 +153,6 @@ extension ContentView {
                 .foregroundStyle(AppPalette.secondaryText)
                 .tint(AppPalette.accent)
         }
-    }
-
-    func displayedWordUsageExamples(for card: WordStudyCard) -> [WordUsageExample] {
-        wordUsageExamples[card.id] ?? card.examples
     }
 
     func loadWordUsageExamplesIfNeeded(for card: WordStudyCard) async {
@@ -166,6 +166,18 @@ extension ContentView {
             wordUsageExamples[card.id] = examples
             loadingWordExampleKeys.remove(card.id)
         }
+    }
+
+    func wordExampleReading(for example: WordUsageExample, card: WordStudyCard) -> String? {
+        if let reading = example.reading?.trimmingCharacters(in: .whitespacesAndNewlines), !reading.isEmpty {
+            return reading
+        }
+
+        guard card.word != card.reading, example.sentence.contains(card.word) else {
+            return nil
+        }
+
+        return "\(card.word): \(card.reading)"
     }
 
     func wordComponentLink(for card: KanjiCard) -> some View {

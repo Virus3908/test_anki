@@ -12,6 +12,7 @@ extension ContentView {
                     aboutSettingsView()
                 }
                 .padding(20)
+                .padding(.bottom, 24)
             }
             .background(AppPalette.background)
             .foregroundStyle(AppPalette.text)
@@ -51,9 +52,6 @@ extension ContentView {
             VStack(spacing: 8) {
                 ForEach(frontFieldOrder) { field in
                     frontSettingRow(for: field)
-                        .offset(y: draggedFrontField == field ? frontFieldDragOffset : 0)
-                        .zIndex(draggedFrontField == field ? 1 : 0)
-                        .simultaneousGesture(frontFieldDragGesture(for: field))
                 }
             }
         }
@@ -189,6 +187,7 @@ extension ContentView {
                     )
                 }
                 .padding(20)
+                .padding(.bottom, 24)
             }
             .background(AppPalette.background)
             .foregroundStyle(AppPalette.text)
@@ -262,71 +261,55 @@ extension ContentView {
 
     func frontSettingRow(for field: FrontFieldKind) -> some View {
         HStack(spacing: 10) {
-            Image(systemName: "line.3.horizontal")
-                .foregroundStyle(AppPalette.mutedText)
-                .frame(width: 18)
-
             Toggle(field.title, isOn: binding(for: field))
+
+            Spacer(minLength: 8)
+
+            HStack(spacing: 4) {
+                Button {
+                    moveFrontField(field, direction: -1)
+                } label: {
+                    Image(systemName: "chevron.up")
+                        .frame(width: 28, height: 28)
+                }
+                .disabled(!canMoveFrontField(field, direction: -1))
+                .accessibilityLabel("Переместить выше")
+
+                Button {
+                    moveFrontField(field, direction: 1)
+                } label: {
+                    Image(systemName: "chevron.down")
+                        .frame(width: 28, height: 28)
+                }
+                .disabled(!canMoveFrontField(field, direction: 1))
+                .accessibilityLabel("Переместить ниже")
+            }
+            .buttonStyle(.borderless)
+            .foregroundStyle(AppPalette.accent)
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 8)
         .background(AppPalette.background.opacity(0.7))
         .clipShape(RoundedRectangle(cornerRadius: 7))
-        .overlay(
-            RoundedRectangle(cornerRadius: 7)
-                .stroke(draggedFrontField == field ? AppPalette.accent.opacity(0.55) : Color.clear, lineWidth: 1)
-        )
         .frame(maxWidth: .infinity)
-        .scaleEffect(draggedFrontField == field ? 1.006 : 1)
         .animation(.spring(response: 0.28, dampingFraction: 0.95), value: frontFieldOrder)
-        .animation(.easeInOut(duration: 0.12), value: draggedFrontField)
     }
 
-    func frontFieldDragGesture(for field: FrontFieldKind) -> some Gesture {
-        DragGesture(minimumDistance: 8)
-            .onChanged { value in
-                if draggedFrontField == nil {
-                    draggedFrontField = field
-                    frontFieldDragStartIndex = frontFieldOrder.firstIndex(of: field)
-                }
-
-                guard draggedFrontField == field else {
-                    return
-                }
-
-                frontFieldDragOffset = clampedFrontFieldDragOffset(for: field, translation: value.translation.height)
-            }
-            .onEnded { value in
-                moveFrontField(field, translation: value.translation.height)
-                withAnimation(.easeOut(duration: 0.14)) {
-                    frontFieldDragOffset = 0
-                    frontFieldDragStartIndex = nil
-                    draggedFrontField = nil
-                }
-            }
-    }
-
-    func clampedFrontFieldDragOffset(for field: FrontFieldKind, translation: CGFloat) -> CGFloat {
-        let rowStride: CGFloat = 54
-        guard let startIndex = frontFieldDragStartIndex else {
-            return translation
+    func canMoveFrontField(_ field: FrontFieldKind, direction: Int) -> Bool {
+        guard let currentIndex = frontFieldOrder.firstIndex(of: field) else {
+            return false
         }
 
-        let minOffset = CGFloat(-startIndex) * rowStride
-        let maxOffset = CGFloat(frontFieldOrder.count - 1 - startIndex) * rowStride
-        return min(max(translation, minOffset), maxOffset)
+        return frontFieldOrder.indices.contains(currentIndex + direction)
     }
 
-    func moveFrontField(_ field: FrontFieldKind, translation: CGFloat) {
-        let rowStride: CGFloat = 54
-        guard let startIndex = frontFieldDragStartIndex,
-              let currentIndex = frontFieldOrder.firstIndex(of: field) else {
+    func moveFrontField(_ field: FrontFieldKind, direction: Int) {
+        guard let currentIndex = frontFieldOrder.firstIndex(of: field) else {
             return
         }
 
-        let steps = Int((translation / rowStride).rounded())
-        let targetIndex = min(max(startIndex + steps, 0), frontFieldOrder.count - 1)
-        guard targetIndex != currentIndex else {
+        let targetIndex = currentIndex + direction
+        guard frontFieldOrder.indices.contains(targetIndex) else {
             return
         }
 
@@ -375,6 +358,7 @@ extension ContentView {
         await Task.yield()
         reviewStore = KanjiReviewStore.load()
         wordMeaningTranslations = KanjiTranslationStore.loadWordTranslations()
+        wordExampleTranslations = KanjiTranslationStore.loadWordExampleTranslations()
     }
 
 }

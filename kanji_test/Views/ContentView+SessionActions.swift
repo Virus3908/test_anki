@@ -57,7 +57,6 @@ extension ContentView {
         selectedKanaPreviewCard = nil
         selectedWordPreviewCard = nil
         selectedPreviewCard = nil
-        isPreviewDetailPresented = false
         isDeckSchedulePresented = false
         previewCards.removeAll()
         previewExpectedCount = nil
@@ -101,7 +100,6 @@ extension ContentView {
         selectedPreviewCard = nil
         selectedWordPreviewCard = nil
         selectedKanaPreviewCard = nil
-        isPreviewDetailPresented = false
         isLoadingDeck = true
         resetCurrentAnswer()
 
@@ -123,7 +121,6 @@ extension ContentView {
         previewKanaCards.removeAll()
         selectedPreviewCard = nil
         selectedKanaPreviewCard = nil
-        isPreviewDetailPresented = false
         isLoadingDeck = false
         resetCurrentAnswer()
     }
@@ -246,7 +243,6 @@ extension ContentView {
         selectedPreviewCard = nil
         selectedKanaPreviewCard = nil
         previewWordCards.removeAll()
-        isPreviewDetailPresented = false
         isLoadingDeck = true
 
         Task {
@@ -269,7 +265,6 @@ extension ContentView {
         previewWordCards.removeAll()
         selectedWordPreviewCard = nil
         selectedLinkedKanjiCard = nil
-        isPreviewDetailPresented = false
         isLinkedKanjiPresented = false
         isLoadingDeck = false
         resetCurrentAnswer()

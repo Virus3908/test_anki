@@ -17,18 +17,18 @@ enum WordUsageExampleProvider {
             return Array(cachedExamples.prefix(limit))
         }
 
-        let remoteExamples = await loadRemoteExamples(for: card.word, limit: limit)
+        let remoteExamples = await loadRemoteExamples(for: card, limit: limit)
         saveCachedExamples(remoteExamples, for: card.id)
         return remoteExamples
     }
 
-    private static func loadRemoteExamples(for word: String, limit: Int) async -> [WordUsageExample] {
+    private static func loadRemoteExamples(for card: WordStudyCard, limit: Int) async -> [WordUsageExample] {
         guard var components = URLComponents(string: "https://api.tatoeba.org/unstable/sentences") else {
             return []
         }
 
         components.queryItems = [
-            URLQueryItem(name: "q", value: word),
+            URLQueryItem(name: "q", value: card.word),
             URLQueryItem(name: "lang", value: "jpn"),
             URLQueryItem(name: "sort", value: "relevance"),
             URLQueryItem(name: "trans:lang", value: "eng")
@@ -46,17 +46,26 @@ enum WordUsageExampleProvider {
 
             let payload = try JSONDecoder().decode(TatoebaSentenceResponse.self, from: data)
             return payload.data
-                .filter { !$0.isUnapproved && $0.text.contains(word) }
+                .filter { !$0.isUnapproved && $0.text.contains(card.word) }
                 .prefix(limit)
                 .map { sentence in
                     WordUsageExample(
                         sentence: sentence.text,
+                        reading: fallbackReading(for: card, in: sentence.text),
                         meaning: sentence.preferredEnglishTranslation
                     )
                 }
         } catch {
             return []
         }
+    }
+
+    private static func fallbackReading(for card: WordStudyCard, in sentence: String) -> String? {
+        guard card.word != card.reading, sentence.contains(card.word) else {
+            return nil
+        }
+
+        return "\(card.word): \(card.reading)"
     }
 
     private static func loadCachedExamples(for wordID: String) -> [WordUsageExample]? {

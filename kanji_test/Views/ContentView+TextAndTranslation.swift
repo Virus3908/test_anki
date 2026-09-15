@@ -28,6 +28,24 @@ extension ContentView {
         }
     }
 
+    func displayedWordUsageExamples(for card: WordStudyCard) -> [WordUsageExample] {
+        let examples = originalWordUsageExamples(for: card)
+        switch meaningLanguage {
+        case .russian:
+            guard let translatedExamples = wordExampleTranslations[card.id], !translatedExamples.isEmpty else {
+                return examples
+            }
+
+            return translatedExamples
+        case .english:
+            return examples
+        }
+    }
+
+    func originalWordUsageExamples(for card: WordStudyCard) -> [WordUsageExample] {
+        wordUsageExamples[card.id] ?? card.examples
+    }
+
     func translateWordMeaningIfNeeded(for card: WordStudyCard) async {
         guard meaningLanguage == .russian, wordMeaningTranslations[card.id] == nil else {
             return
@@ -56,6 +74,72 @@ extension ContentView {
             wordMeaningTranslations[card.id] = translatedMeaning
             KanjiTranslationStore.saveWordTranslation(translatedMeaning, for: card.id)
             retranslationWordKeys.remove(card.id)
+        }
+    }
+
+    func translateWordExamplesIfNeeded(for card: WordStudyCard, examples: [WordUsageExample]) async {
+        guard meaningLanguage == .russian,
+              wordExampleTranslations[card.id] == nil,
+              !examples.isEmpty else {
+            return
+        }
+
+        let translatedExamples = await translateWordUsageExamples(examples)
+        await MainActor.run {
+            guard meaningLanguage == .russian, wordExampleTranslations[card.id] == nil else {
+                return
+            }
+
+            wordExampleTranslations[card.id] = translatedExamples
+            KanjiTranslationStore.saveWordExampleTranslation(translatedExamples, for: card.id)
+        }
+    }
+
+    func retranslateWordExamples(_ card: WordStudyCard) {
+        guard meaningLanguage == .russian, !retranslationWordExampleKeys.contains(card.id) else {
+            return
+        }
+
+        let examples = originalWordUsageExamples(for: card)
+        guard !examples.isEmpty else {
+            return
+        }
+
+        retranslationWordExampleKeys.insert(card.id)
+
+        Task { @MainActor in
+            let translatedExamples = await translateWordUsageExamples(examples)
+            wordExampleTranslations[card.id] = translatedExamples
+            KanjiTranslationStore.saveWordExampleTranslation(translatedExamples, for: card.id)
+            retranslationWordExampleKeys.remove(card.id)
+        }
+    }
+
+    func translateWordUsageExamples(_ examples: [WordUsageExample]) async -> [WordUsageExample] {
+        let indexesAndMeanings = examples.enumerated().compactMap { index, example -> (Int, String)? in
+            guard let meaning = example.meaning?.trimmingCharacters(in: .whitespacesAndNewlines), !meaning.isEmpty else {
+                return nil
+            }
+
+            return (index, meaning)
+        }
+
+        guard !indexesAndMeanings.isEmpty else {
+            return examples
+        }
+
+        let translatedMeanings = await RussianMeaningTranslator.translate(indexesAndMeanings.map(\.1))
+        var translatedByIndex: [Int: String] = [:]
+        for (translationIndex, source) in indexesAndMeanings.enumerated() {
+            translatedByIndex[source.0] = translatedMeanings[safe: translationIndex] ?? source.1
+        }
+
+        return examples.enumerated().map { index, example in
+            WordUsageExample(
+                sentence: example.sentence,
+                reading: example.reading,
+                meaning: translatedByIndex[index] ?? example.meaning
+            )
         }
     }
 
@@ -165,6 +249,18 @@ extension ContentView {
         }
     }
 
+    @ViewBuilder
+    func retranslateWordExamplesButton(for card: WordStudyCard) -> some View {
+        if meaningLanguage == .russian {
+            translationRetryControls(
+                originalText: originalWordExamplesText(for: card),
+                isLoading: retranslationWordExampleKeys.contains(card.id)
+            ) {
+                retranslateWordExamples(card)
+            }
+        }
+    }
+
     func translationRetryControls(
         originalText: String,
         isLoading: Bool,
@@ -184,6 +280,24 @@ extension ContentView {
     func originalKanjiExamplesText(for card: KanjiCard) -> String {
         card.englishExamples.map { example in
             "\(example.word) - \(example.reading) - \(example.meaning)"
+        }.joined(separator: "\n")
+    }
+
+    func originalWordExamplesText(for card: WordStudyCard) -> String {
+        originalWordUsageExamples(for: card).map { example in
+            [
+                example.sentence,
+                wordExampleReading(for: example, card: card),
+                example.meaning
+            ]
+            .compactMap { text in
+                guard let text, !text.isEmpty else {
+                    return nil
+                }
+
+                return text
+            }
+            .joined(separator: " - ")
         }.joined(separator: "\n")
     }
 

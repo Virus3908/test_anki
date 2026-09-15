@@ -5,7 +5,6 @@ extension ContentView {
         Button {
             selectedPreviewCard = card
             previewSwipeDirection = 0
-            isPreviewDetailPresented = true
         } label: {
             VStack(spacing: 6) {
                 Text(card.kanji)
@@ -39,7 +38,6 @@ extension ContentView {
 
                     primaryActionButton(title: "Тренировать этот кандзи", systemImage: "pencil.and.scribble") {
                         selectedPreviewCard = nil
-                        isPreviewDetailPresented = false
                         startTraining(with: [card], guided: true)
                     }
                 }

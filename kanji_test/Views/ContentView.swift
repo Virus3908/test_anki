@@ -60,7 +60,6 @@ struct ContentView: View {
     @State var selectedKanaPreviewCard: KanaStudyCard?
     @State var selectedWordPreviewCard: WordStudyCard?
     @State var selectedLinkedKanjiCard: KanjiCard?
-    @State var isPreviewDetailPresented = false
     @State var isLinkedKanjiPresented = false
     @State var previewSwipeDirection = 0
     @State var deckPreviewTask: Task<Void, Never>?
@@ -91,9 +90,6 @@ struct ContentView: View {
     @State var showsPromptReading = true
     @State var showsPromptMeaning = false
     @State var frontFieldOrder: [FrontFieldKind] = [.readings, .meanings, .character]
-    @State var draggedFrontField: FrontFieldKind?
-    @State var frontFieldDragOffset: CGFloat = 0
-    @State var frontFieldDragStartIndex: Int?
     @State var isGuidedSingleKanjiPractice = false
     @State var isSettingsPresented = false
     @State var isAboutPresented = false
@@ -102,11 +98,13 @@ struct ContentView: View {
     @State var retranslationKanjiMeaningKeys: Set<String> = []
     @State var retranslationKanjiExampleKeys: Set<String> = []
     @State var retranslationWordKeys: Set<String> = []
+    @State var retranslationWordExampleKeys: Set<String> = []
     @State var kanjiSessionPhase: KanjiLearningSessionPhase = .learning
     @AppStorage("kanjiDailyNewCardLimit") var kanjiDailyNewCardLimit = 10
     @AppStorage("kanjiLearningSuccessTarget") var kanjiLearningSuccessTarget = KanjiReviewStore.defaultLearningSuccessTarget
     @State var meaningLanguage: MeaningLanguage = .russian
     @State var wordMeaningTranslations: [String: String] = [:]
+    @State var wordExampleTranslations: [String: [WordUsageExample]] = [:]
     @State var wordUsageExamples: [String: [WordUsageExample]] = [:]
     @State var loadingWordExampleKeys: Set<String> = []
 
