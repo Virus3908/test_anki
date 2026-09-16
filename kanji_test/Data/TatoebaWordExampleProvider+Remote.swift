@@ -35,4 +35,31 @@ extension TatoebaWordExampleProvider {
 
         return "\(card.word): \(card.reading)"
     }
+
+    func loadRemoteKanjiExamples(for kanji: String, limit: Int) async -> [KanjiExample] {
+        guard let url = TatoebaEndpoint.sentences(for: kanji) else {
+            return []
+        }
+
+        do {
+            let (data, response) = try await session.data(from: url)
+            if let httpResponse = response as? HTTPURLResponse, !(200..<300).contains(httpResponse.statusCode) {
+                return []
+            }
+
+            let payload = try JSONDecoder().decode(TatoebaSentenceResponse.self, from: data)
+            return payload.data
+                .filter { !$0.isUnapproved && $0.text.contains(kanji) }
+                .prefix(limit)
+                .map { sentence in
+                    KanjiExample(
+                        word: sentence.text,
+                        reading: "",
+                        meaning: sentence.preferredEnglishTranslation ?? ""
+                    )
+                }
+        } catch {
+            return []
+        }
+    }
 }

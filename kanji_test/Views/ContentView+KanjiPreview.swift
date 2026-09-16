@@ -52,10 +52,6 @@ extension ContentView {
             .background(AppPalette.background)
             .foregroundStyle(AppPalette.text)
             .simultaneousGesture(previewCardSwipeGesture(for: card))
-            .task(id: "preview-detail-\(card.id)-\(meaningLanguage.rawValue)") {
-                await translateKanjiMeaningsIfNeeded(for: card, deck: selectedDeck)
-                await translateKanjiExamplesIfNeeded(for: card, deck: selectedDeck)
-            }
         }
         .background(AppPalette.background.ignoresSafeArea())
     }

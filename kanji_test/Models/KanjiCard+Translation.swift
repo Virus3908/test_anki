@@ -75,6 +75,25 @@ extension KanjiCard {
         )
     }
 
+    func withEnglishExamples(_ examples: [KanjiExample]) -> KanjiCard {
+        KanjiCard(
+            kanji: kanji,
+            meanings: englishMeanings,
+            onyomi: onyomi,
+            kunyomi: kunyomi,
+            examples: examples,
+            sourceMeanings: nil,
+            sourceExamples: nil,
+            russianMeanings: cachedRussianMeanings,
+            russianExamples: nil,
+            source: source,
+            strokes: strokes,
+            grade: grade,
+            jlpt: jlpt,
+            translationState: nil
+        )
+    }
+
     func mergedForDisplay(with updatedCard: KanjiCard) -> KanjiCard {
         KanjiCard(
             kanji: updatedCard.kanji,

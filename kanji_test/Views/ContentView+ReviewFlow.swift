@@ -78,34 +78,10 @@ extension ContentView {
         masteredKeys: inout Set<String>,
         items: inout [Item]
     ) -> Bool {
-        guard items.indices.contains(trainingSession.currentIndex), !trainingSession.isPreparingCard else {
-            return false
-        }
-
-        let item = items[trainingSession.currentIndex]
-        if let expectedKey, item.reviewKey != expectedKey {
-            return false
-        }
-
-        return applyStudyItemReview(
-            item,
-            rating: rating,
-            masteredKeys: &masteredKeys,
-            items: &items
-        )
-    }
-
-    func applyStudyItemReview<Item: StudyItem>(
-        _ item: Item,
-        rating: ReviewRating,
-        masteredKeys: inout Set<String>,
-        items: inout [Item]
-    ) -> Bool {
-        TrainingReviewService.applyReview(
-            item: item,
+        trainingSession.applyCurrentItemReview(
             rating: rating,
             mode: practiceMode,
-            session: trainingSession,
+            expectedKey: expectedKey,
             reviewStore: &reviewStore,
             masteredKeys: &masteredKeys,
             items: &items,
@@ -114,7 +90,7 @@ extension ContentView {
     }
 
     func updateFeedback(for card: KanjiCard, reveal: Bool) {
-        let shouldReveal = drawingSession.evaluateFeedback(for: card, reveal: reveal)
+        let shouldReveal = trainingSession.evaluateFeedback(for: card, reveal: reveal)
         if shouldReveal {
             revealDrawingAnswer()
         }

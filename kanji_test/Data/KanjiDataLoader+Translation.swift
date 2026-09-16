@@ -23,11 +23,12 @@ extension KanjiDataLoader {
         force: Bool = false,
         translator: MeaningTranslating = SystemRussianMeaningTranslator()
     ) async -> KanjiCard {
-        guard force || !card.hasRussianExamples else {
-            return card
+        let cardWithExamples = await loadExamplesIfNeeded(card)
+        guard force || !cardWithExamples.hasRussianExamples else {
+            return cardWithExamples
         }
 
-        let sourceExamples = card.englishExamples
+        let sourceExamples = cardWithExamples.englishExamples
         let translatedExampleMeanings = await translator.translatePreservingOrder(sourceExamples.map(\.meaning))
         let examples = sourceExamples.enumerated().map { index, example in
             KanjiExample(
@@ -36,9 +37,39 @@ extension KanjiDataLoader {
                 meaning: index < translatedExampleMeanings.count ? translatedExampleMeanings[index] : example.meaning
             )
         }
-        let translatedCard = card.withRussianExamples(examples)
+        let translatedCard = cardWithExamples.withRussianExamples(examples)
         cacheTranslatedCard(translatedCard, deck: deck)
         return translatedCard
+    }
+
+    static func loadExamplesIfNeeded(
+        _ card: KanjiCard,
+        provider: KanjiProviding = KanjiAPIProvider()
+    ) async -> KanjiCard {
+        guard card.englishExamples.isEmpty else {
+            return card
+        }
+
+        if let cachedExamples = KanjiExampleCacheRepository.loadExamples(for: card.kanji) {
+            return card.withEnglishExamples(cachedExamples)
+        }
+
+        let remoteExamples = await provider.loadExamples(for: card.kanji)
+        if !remoteExamples.isEmpty {
+            KanjiExampleCacheRepository.saveExamples(remoteExamples, for: card.kanji)
+        }
+        return card.withEnglishExamples(remoteExamples)
+    }
+
+    static func reloadExamples(
+        for card: KanjiCard,
+        provider: KanjiProviding = KanjiAPIProvider()
+    ) async -> KanjiCard {
+        let remoteExamples = await provider.loadExamples(for: card.kanji)
+        if !remoteExamples.isEmpty {
+            KanjiExampleCacheRepository.saveExamples(remoteExamples, for: card.kanji)
+        }
+        return card.withEnglishExamples(remoteExamples)
     }
 
     static func cacheTranslatedCard(_ card: KanjiCard, deck: KanjiDeck) {

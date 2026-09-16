@@ -6,8 +6,10 @@ extension ContentView {
     }
 
     func originalKanjiExamplesText(for card: KanjiCard) -> String {
-        card.englishExamples.map { example in
-            "\(example.word) - \(example.reading) - \(example.meaning)"
+        originalKanjiExamples(for: card).map { example in
+            [example.word, example.reading, example.meaning]
+                .filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+                .joined(separator: " - ")
         }.joined(separator: "\n")
     }
 

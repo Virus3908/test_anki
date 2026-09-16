@@ -9,7 +9,7 @@ extension KanjiDataLoader {
 
         do {
             let cachedCards = try KanjiDeckCacheRepository.loadCards(for: deck) ?? []
-            let remoteKanjiList = try await provider.loadKanjiList(deck: deck)
+            let remoteKanjiList = uniqueKanjiList(try await provider.loadKanjiList(deck: deck))
 
             if !cachedCards.isEmpty {
                 let cachedByKanji = Dictionary(cachedCards.map { ($0.kanji, $0) }, uniquingKeysWith: { current, _ in current })
@@ -58,7 +58,7 @@ extension KanjiDataLoader {
         }
 
         do {
-            let remoteKanjiList = try await provider.loadKanjiList(deck: deck)
+            let remoteKanjiList = uniqueKanjiList(try await provider.loadKanjiList(deck: deck))
             var cardsByKanji = Dictionary(bundledOrCachedCards.map { ($0.kanji, $0) }, uniquingKeysWith: { current, _ in current })
             let missingKanji = remoteKanjiList.filter { cardsByKanji[$0] == nil }
 
@@ -91,6 +91,11 @@ extension KanjiDataLoader {
                 onUpdate(loadLocalCards(), nil)
             }
         }
+    }
+
+    static func uniqueKanjiList(_ kanjiList: [String]) -> [String] {
+        var seen: Set<String> = []
+        return kanjiList.filter { seen.insert($0).inserted }
     }
 
     static func cacheCards(_ cards: [KanjiCard]) {

@@ -14,8 +14,7 @@ extension DeckPreviewViewModel {
         isLoadingDeck = true
 
         deckPreviewTask = Task { [weak self] in
-            let allWords = await WordDataLoader.loadWords()
-            let preparedWords = deck.cards(from: allWords)
+            let preparedWords = await WordDataLoader.loadWords(for: deck)
             self?.finishWordPreviewLoad(preparedWords, for: deck)
         }
     }

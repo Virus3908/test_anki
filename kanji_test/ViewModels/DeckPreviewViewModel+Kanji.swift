@@ -50,9 +50,22 @@ extension DeckPreviewViewModel {
             return
         }
 
-        previewCards = reviewStore.orderedCards(loadedCards)
+        previewCards = reviewStore.orderedCards(uniqueCards(loadedCards))
         previewExpectedCount = expectedCount
         isLoadingDeck = previewExpectedCount.map { previewCards.count < $0 } ?? false
+    }
+
+    private func uniqueCards(_ cards: [KanjiCard]) -> [KanjiCard] {
+        var cardsByKanji: [String: KanjiCard] = [:]
+        for card in cards {
+            if let existingCard = cardsByKanji[card.kanji] {
+                cardsByKanji[card.kanji] = existingCard.mergedForDisplay(with: card)
+            } else {
+                cardsByKanji[card.kanji] = card
+            }
+        }
+
+        return cardsByKanji.values.sorted { $0.kanji < $1.kanji }
     }
 
     private func finishKanjiPreviewLoad(for deck: KanjiDeck) {

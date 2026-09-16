@@ -5,6 +5,7 @@ protocol KanjiProviding {
     func loadCards(deck: KanjiDeck) async throws -> [KanjiCard]
     func loadCards(for kanjiList: [String]) async throws -> [KanjiCard]
     func loadCardsStream(for kanjiList: [String]) -> AsyncStream<[KanjiCard]>
+    func loadExamples(for kanji: String) async -> [KanjiExample]
 }
 
 struct KanjiAPIProvider: KanjiProviding {
@@ -63,5 +64,9 @@ enum RemoteKanjiProvider {
 
     static func loadCardsStream(for kanjiList: [String]) -> AsyncStream<[KanjiCard]> {
         provider.loadCardsStream(for: kanjiList)
+    }
+
+    static func loadExamples(for kanji: String) async -> [KanjiExample] {
+        await provider.loadExamples(for: kanji)
     }
 }

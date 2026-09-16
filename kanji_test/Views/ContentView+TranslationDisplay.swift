@@ -9,6 +9,10 @@ extension ContentView {
         translationState.displayedKanjiExamples(for: card, language: meaningLanguage)
     }
 
+    func originalKanjiExamples(for card: KanjiCard) -> [KanjiExample] {
+        translationState.originalKanjiExamples(for: card)
+    }
+
     func displayedWordMeaning(for card: WordStudyCard) -> String {
         translationState.displayedWordMeaning(for: card, language: meaningLanguage)
     }

@@ -42,4 +42,58 @@ extension TrainingSessionViewModel {
         prepareStudyPack(nextCards, scrollToTop: true)
         return true
     }
+
+    func applyCurrentItemReview<Item: StudyItem>(
+        rating: ReviewRating,
+        mode: PracticeMode,
+        expectedKey: String? = nil,
+        reviewStore: inout KanjiReviewStore,
+        masteredKeys: inout Set<String>,
+        items: inout [Item],
+        learningSuccessTarget: Int
+    ) -> Bool {
+        guard items.indices.contains(currentIndex), !isPreparingCard else {
+            return false
+        }
+
+        let item = items[currentIndex]
+        if let expectedKey, item.reviewKey != expectedKey {
+            return false
+        }
+
+        return applyStudyItemReview(
+            item,
+            rating: rating,
+            mode: mode,
+            reviewStore: &reviewStore,
+            masteredKeys: &masteredKeys,
+            items: &items,
+            learningSuccessTarget: learningSuccessTarget
+        )
+    }
+
+    func applyStudyItemReview<Item: StudyItem>(
+        _ item: Item,
+        rating: ReviewRating,
+        mode: PracticeMode,
+        reviewStore: inout KanjiReviewStore,
+        masteredKeys: inout Set<String>,
+        items: inout [Item],
+        learningSuccessTarget: Int
+    ) -> Bool {
+        TrainingReviewService.applyReview(
+            item: item,
+            rating: rating,
+            mode: mode,
+            session: self,
+            reviewStore: &reviewStore,
+            masteredKeys: &masteredKeys,
+            items: &items,
+            learningSuccessTarget: learningSuccessTarget
+        )
+    }
+
+    func evaluateFeedback(for card: KanjiCard, reveal: Bool) -> Bool {
+        drawingSession.evaluateFeedback(for: card, reveal: reveal)
+    }
 }

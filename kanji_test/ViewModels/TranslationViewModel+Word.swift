@@ -11,12 +11,20 @@ extension TranslationViewModel {
     }
 
     func translateWordMeaningIfNeeded(for card: WordStudyCard, language: MeaningLanguage) async {
-        guard language == .russian, wordMeaningTranslations[card.id] == nil else {
+        guard language == .russian,
+              wordMeaningTranslations[card.id] == nil,
+              !translationWordKeys.contains(card.id),
+              !retranslationWordKeys.contains(card.id) else {
             return
         }
 
-        let translatedMeaning = await RussianMeaningTranslator.translate([card.meaning]).first ?? card.meaning
-        guard wordMeaningTranslations[card.id] == nil else {
+        translationWordKeys.insert(card.id)
+        defer { translationWordKeys.remove(card.id) }
+        let translatedMeaning = await RussianMeaningTranslator.translateAutomatically([card.meaning]).first ?? card.meaning
+        guard wordMeaningTranslations[card.id] == nil,
+              !retranslationWordKeys.contains(card.id),
+              translatedMeaning.trimmingCharacters(in: .whitespacesAndNewlines)
+                .caseInsensitiveCompare(card.meaning.trimmingCharacters(in: .whitespacesAndNewlines)) != .orderedSame else {
             return
         }
 
@@ -25,17 +33,18 @@ extension TranslationViewModel {
     }
 
     func retranslateWordMeaning(_ card: WordStudyCard, language: MeaningLanguage) {
-        guard language == .russian, !retranslationWordKeys.contains(card.id) else {
+        guard language == .russian,
+              !retranslationWordKeys.contains(card.id) else {
             return
         }
 
         retranslationWordKeys.insert(card.id)
 
         Task { @MainActor in
-            let translatedMeaning = await RussianMeaningTranslator.translate([card.meaning]).first ?? card.meaning
+            defer { retranslationWordKeys.remove(card.id) }
+            let translatedMeaning = await RussianMeaningTranslator.translateManual([card.meaning]).first ?? card.meaning
             wordMeaningTranslations[card.id] = translatedMeaning
             TranslationRepository.saveWordTranslation(translatedMeaning, for: card.id)
-            retranslationWordKeys.remove(card.id)
         }
     }
 

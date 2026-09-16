@@ -37,11 +37,17 @@ extension ContentView {
                     await translateWordExamplesIfNeeded(for: card, examples: sourceExamples)
                 }
             }
-        } else if translationState.loadingWordExampleKeys.contains(card.id) {
-            ProgressView("Ищу примеры")
-                .font(.caption)
-                .foregroundStyle(AppPalette.secondaryText)
-                .tint(AppPalette.accent)
+        } else if translationState.loadingWordExampleKeys.contains(card.id) || translationState.reloadingWordExampleKeys.contains(card.id) {
+            detailBlock("Примеры") {
+                VStack(alignment: .leading, spacing: 10) {
+                    ProgressView(translationState.reloadingWordExampleKeys.contains(card.id) ? "Запрашиваю примеры" : "Ищу примеры")
+                        .font(.caption)
+                        .foregroundStyle(AppPalette.secondaryText)
+                        .tint(AppPalette.accent)
+
+                    reloadWordExamplesButton(for: card)
+                }
+            }
         } else {
             detailBlock("Примеры") {
                 reloadWordExamplesButton(for: card)
@@ -62,14 +68,17 @@ extension ContentView {
             reloadWordUsageExamples(for: card)
         } label: {
             Label(
-                translationState.loadingWordExampleKeys.contains(card.id) ? "Запрашиваю примеры" : "Перезапросить примеры",
+                translationState.reloadingWordExampleKeys.contains(card.id) ? "Запрашиваю примеры" : "Перезапросить примеры",
                 systemImage: "arrow.clockwise"
             )
             .font(.caption.weight(.semibold))
         }
         .buttonStyle(.bordered)
         .tint(AppPalette.accent)
-        .disabled(translationState.loadingWordExampleKeys.contains(card.id))
+        .disabled(
+            translationState.reloadingWordExampleKeys.contains(card.id)
+                || translationState.retranslationWordExampleKeys.contains(card.id)
+        )
     }
 
     func wordExampleReading(for example: WordUsageExample, card: WordStudyCard) -> String? {

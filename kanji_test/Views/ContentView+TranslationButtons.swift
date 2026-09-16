@@ -25,6 +25,24 @@ extension ContentView {
         }
     }
 
+    func reloadKanjiExamplesButton(for card: KanjiCard) -> some View {
+        Button {
+            reloadKanjiExamples(card)
+        } label: {
+            Label(
+                translationState.reloadingKanjiExampleKeys.contains(card.kanji) ? "Запрашиваю примеры" : "Перезапросить примеры",
+                systemImage: "arrow.clockwise"
+            )
+            .font(.caption.weight(.semibold))
+        }
+        .buttonStyle(.bordered)
+        .tint(AppPalette.accent)
+        .disabled(
+            translationState.reloadingKanjiExampleKeys.contains(card.kanji)
+                || translationState.retranslationKanjiExampleKeys.contains(card.kanji)
+        )
+    }
+
     @ViewBuilder
     func retranslateWordButton(for card: WordStudyCard) -> some View {
         if meaningLanguage == .russian {

@@ -9,7 +9,7 @@ protocol MeaningTranslating {
 struct SystemRussianMeaningTranslator: MeaningTranslating {
     nonisolated init() {}
 
-    private static let systemTranslationQueue = SystemTranslationQueue()
+    private static let systemTranslationQueue = PriorityTranslationQueue()
 
     func translateLocally(_ meanings: [String]) -> [String] {
         Self.unique(RussianMeaningDictionary.translate(meanings))
@@ -20,10 +20,22 @@ struct SystemRussianMeaningTranslator: MeaningTranslating {
     }
 
     func translatePreservingOrder(_ meanings: [String]) async -> [String] {
+        await translatePreservingOrder(meanings, priority: .automatic)
+    }
+
+    func translateManual(_ meanings: [String]) async -> [String] {
+        Self.unique(await translatePreservingOrderManual(meanings))
+    }
+
+    func translatePreservingOrderManual(_ meanings: [String]) async -> [String] {
+        await translatePreservingOrder(meanings, priority: .manual)
+    }
+
+    private func translatePreservingOrder(_ meanings: [String], priority: TranslationPriority) async -> [String] {
         var bestTranslation: [String]?
 
-        for _ in 0..<3 {
-            guard let systemTranslation = try? await Self.systemTranslationQueue.translate(meanings),
+        for _ in 0..<2 {
+            guard let systemTranslation = try? await Self.systemTranslationQueue.translate(meanings, priority: priority),
                   !systemTranslation.isEmpty else {
                 continue
             }
@@ -61,32 +73,74 @@ struct SystemRussianMeaningTranslator: MeaningTranslating {
                 .caseInsensitiveCompare(sourceItem.trimmingCharacters(in: .whitespacesAndNewlines)) == .orderedSame
         }
     }
+
 }
 
-private actor SystemTranslationQueue {
-    func translate(_ meanings: [String]) async throws -> [String] {
-        try await withTimeout(seconds: 8) {
-            try await SystemTranslationClient.translate(meanings)
+private enum TranslationPriority {
+    case automatic
+    case manual
+}
+
+private struct QueuedTranslationJob {
+    let meanings: [String]
+    let continuation: CheckedContinuation<[String], any Error>
+}
+
+private actor PriorityTranslationQueue {
+    private var manualJobs: [QueuedTranslationJob] = []
+    private var automaticJobs: [QueuedTranslationJob] = []
+    private var isProcessing = false
+
+    func translate(_ meanings: [String], priority: TranslationPriority) async throws -> [String] {
+        try await withCheckedThrowingContinuation { continuation in
+            enqueue(
+                QueuedTranslationJob(meanings: meanings, continuation: continuation),
+                priority: priority
+            )
         }
     }
 
-    private func withTimeout<Value>(seconds: UInt64, operation: @escaping () async throws -> Value) async throws -> Value {
-        try await withThrowingTaskGroup(of: Value.self) { group in
-            group.addTask {
-                try await operation()
-            }
-            group.addTask {
-                try await Task.sleep(nanoseconds: seconds * 1_000_000_000)
-                throw URLError(.timedOut)
-            }
-
-            guard let value = try await group.next() else {
-                throw URLError(.timedOut)
-            }
-
-            group.cancelAll()
-            return value
+    private func enqueue(_ job: QueuedTranslationJob, priority: TranslationPriority) {
+        switch priority {
+        case .manual:
+            manualJobs.append(job)
+        case .automatic:
+            automaticJobs.append(job)
         }
+
+        guard !isProcessing else {
+            return
+        }
+
+        isProcessing = true
+        Task {
+            await processJobs()
+        }
+    }
+
+    private func processJobs() async {
+        while let job = nextJob() {
+            do {
+                let translated = try await SystemTranslationClient.translate(job.meanings)
+                job.continuation.resume(returning: translated)
+            } catch {
+                job.continuation.resume(throwing: error)
+            }
+        }
+
+        isProcessing = false
+    }
+
+    private func nextJob() -> QueuedTranslationJob? {
+        if !manualJobs.isEmpty {
+            return manualJobs.removeFirst()
+        }
+
+        if !automaticJobs.isEmpty {
+            return automaticJobs.removeFirst()
+        }
+
+        return nil
     }
 }
 
@@ -97,11 +151,23 @@ enum RussianMeaningTranslator {
         translator.translateLocally(meanings)
     }
 
+    static func translateAutomatically(_ meanings: [String]) async -> [String] {
+        await translator.translate(meanings)
+    }
+
     static func translate(_ meanings: [String]) async -> [String] {
         await translator.translate(meanings)
     }
 
     static func translatePreservingOrder(_ meanings: [String]) async -> [String] {
         await translator.translatePreservingOrder(meanings)
+    }
+
+    static func translateManual(_ meanings: [String]) async -> [String] {
+        await translator.translateManual(meanings)
+    }
+
+    static func translatePreservingOrderManual(_ meanings: [String]) async -> [String] {
+        await translator.translatePreservingOrderManual(meanings)
     }
 }

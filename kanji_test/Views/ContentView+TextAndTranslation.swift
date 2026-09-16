@@ -39,6 +39,11 @@ extension ContentView {
         }
     }
 
+    func loadKanjiExamplesIfNeeded(for card: KanjiCard) async {
+        let currentCard = coordinator.latestKanjiCard(for: card, previewCards: deckState.previewCards)
+        await translationState.loadKanjiExamplesIfNeeded(for: currentCard, language: meaningLanguage)
+    }
+
     func retranslateKanjiMeanings(_ card: KanjiCard, deck: KanjiDeck) {
         let currentCard = coordinator.latestKanjiCard(for: card, previewCards: deckState.previewCards)
         translationState.retranslateKanjiMeanings(currentCard, deck: deck, language: meaningLanguage) { translatedCard in
@@ -48,8 +53,11 @@ extension ContentView {
 
     func retranslateKanjiExamples(_ card: KanjiCard, deck: KanjiDeck) {
         let currentCard = coordinator.latestKanjiCard(for: card, previewCards: deckState.previewCards)
-        translationState.retranslateKanjiExamples(currentCard, deck: deck, language: meaningLanguage) { translatedCard in
-            replaceCard(translatedCard)
-        }
+        translationState.retranslateKanjiExamples(currentCard, language: meaningLanguage)
+    }
+
+    func reloadKanjiExamples(_ card: KanjiCard) {
+        let currentCard = coordinator.latestKanjiCard(for: card, previewCards: deckState.previewCards)
+        translationState.reloadKanjiExamples(currentCard, language: meaningLanguage)
     }
 }

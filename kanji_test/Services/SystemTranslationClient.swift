@@ -2,6 +2,7 @@ import Foundation
 import Translation
 
 enum SystemTranslationClient {
+    @MainActor
     static func translate(_ meanings: [String]) async throws -> [String] {
         guard !meanings.isEmpty else {
             return []
@@ -11,6 +12,10 @@ enum SystemTranslationClient {
             installedSource: Locale.Language(identifier: "en"),
             target: Locale.Language(identifier: "ru")
         )
+        guard await session.isReady else {
+            throw URLError(.resourceUnavailable)
+        }
+
         let requests = meanings.map { TranslationSession.Request(sourceText: $0) }
         let responses = try await session.translations(from: requests)
         let translated = responses.map { $0.targetText.trimmingCharacters(in: .whitespacesAndNewlines) }

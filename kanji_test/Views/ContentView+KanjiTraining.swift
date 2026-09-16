@@ -107,17 +107,45 @@ extension ContentView {
                 .fixedSize(horizontal: false, vertical: true)
             }
 
-            let examples = displayedKanjiExamples(for: card)
-            if !examples.isEmpty {
-                section("Примеры") {
-                    VStack(alignment: .leading, spacing: 8) {
-                        ForEach(examples) { example in
-                            Text("\(example.word) - \(example.reading) - \(example.meaning)")
-                                .foregroundStyle(AppPalette.text)
+            section("Примеры") {
+                VStack(alignment: .leading, spacing: 8) {
+                    let examples = displayedKanjiExamples(for: card)
+                    if examples.isEmpty {
+                        if translationState.translationKanjiExampleKeys.contains(card.kanji)
+                            || translationState.retranslationKanjiExampleKeys.contains(card.kanji)
+                            || translationState.reloadingKanjiExampleKeys.contains(card.kanji) {
+                            ProgressView(translationState.reloadingKanjiExampleKeys.contains(card.kanji) ? "Запрашиваю примеры" : "Загружаю примеры")
+                                .font(.caption)
+                                .foregroundStyle(AppPalette.secondaryText)
+                                .tint(AppPalette.accent)
+                        } else {
+                            Text("Примеры пока не загружены")
+                                .font(.caption)
+                                .foregroundStyle(AppPalette.secondaryText)
                         }
+                    } else {
+                        ForEach(examples) { example in
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(example.word)
+                                    .foregroundStyle(AppPalette.text)
 
-                        retranslateKanjiExamplesButton(for: card)
+                                let details = [example.reading, example.meaning]
+                                    .filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+                                    .joined(separator: " - ")
+                                if !details.isEmpty {
+                                    Text(details)
+                                        .font(.caption)
+                                        .foregroundStyle(AppPalette.secondaryText)
+                                }
+                            }
+                        }
                     }
+
+                    retranslateKanjiExamplesButton(for: card)
+                    reloadKanjiExamplesButton(for: card)
+                }
+                .task(id: "kanji-examples-\(card.id)-\(meaningLanguage.rawValue)") {
+                    await loadKanjiExamplesIfNeeded(for: card)
                 }
             }
         }
