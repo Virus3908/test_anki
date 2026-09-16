@@ -54,6 +54,16 @@ enum TranslationRepository {
         loadStore().wordTranslations
     }
 
+    static func loadKanjiMeaningTranslations() -> [String: [String]] {
+        loadStore().kanjiTranslations.compactMapValues { translation in
+            guard let meanings = translation.russianMeanings, !meanings.isEmpty else {
+                return nil
+            }
+
+            return meanings
+        }
+    }
+
     static func loadWordExampleTranslations() -> [String: [WordUsageExample]] {
         loadStore().wordExampleTranslations
     }
@@ -61,6 +71,14 @@ enum TranslationRepository {
     static func saveWordTranslation(_ translation: String, for wordID: String) {
         var store = loadStore()
         store.wordTranslations[wordID] = translation
+        saveStore(store)
+    }
+
+    static func saveKanjiMeaningTranslation(_ meanings: [String], for kanji: String) {
+        var store = loadStore()
+        var translation = store.kanjiTranslations[kanji] ?? StoredKanjiTranslation()
+        translation.russianMeanings = meanings
+        store.kanjiTranslations[kanji] = translation
         saveStore(store)
     }
 

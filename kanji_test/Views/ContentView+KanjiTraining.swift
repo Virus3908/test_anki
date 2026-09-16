@@ -107,40 +107,18 @@ extension ContentView {
                 .fixedSize(horizontal: false, vertical: true)
             }
 
-            section("Примеры") {
-                VStack(alignment: .leading, spacing: 8) {
-                    let examples = displayedKanjiExamples(for: card)
-                    if examples.isEmpty {
-                        if translationState.translationKanjiExampleKeys.contains(card.kanji)
-                            || translationState.retranslationKanjiExampleKeys.contains(card.kanji)
-                            || translationState.reloadingKanjiExampleKeys.contains(card.kanji) {
-                            ProgressView(translationState.reloadingKanjiExampleKeys.contains(card.kanji) ? "Запрашиваю примеры" : "Загружаю примеры")
-                                .font(.caption)
-                                .foregroundStyle(AppPalette.secondaryText)
-                                .tint(AppPalette.accent)
-                        } else {
-                            Text("Примеры пока не загружены")
-                                .font(.caption)
-                                .foregroundStyle(AppPalette.secondaryText)
-                        }
-                    } else {
-                        ForEach(examples) { example in
-                            VStack(alignment: .leading, spacing: 3) {
-                                Text(example.word)
-                                    .foregroundStyle(AppPalette.text)
-
-                                let details = [example.reading, example.meaning]
-                                    .filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
-                                    .joined(separator: " - ")
-                                if !details.isEmpty {
-                                    Text(details)
-                                        .font(.caption)
-                                        .foregroundStyle(AppPalette.secondaryText)
-                                }
-                            }
-                        }
-                    }
-
+            detailBlock("Примеры") {
+                let key = TranslationBlockKey.kanjiExamples(card.kanji)
+                StudyExamplesContent(
+                    examples: displayedKanjiExamples(for: card).map { StudyExample(kanjiExample: $0) },
+                    isLoading: translationState.isAutomaticallyTranslating(key)
+                        || translationState.isManuallyTranslating(key)
+                        || translationState.isManuallyReloadingExamples(key),
+                    loadingText: translationState.isManuallyReloadingExamples(key)
+                        ? "Запрашиваю примеры"
+                        : "Загружаю примеры",
+                    emptyText: "Примеры пока не загружены"
+                ) {
                     retranslateKanjiExamplesButton(for: card)
                     reloadKanjiExamplesButton(for: card)
                 }

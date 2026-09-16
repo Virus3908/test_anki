@@ -4,9 +4,10 @@ extension ContentView {
     @ViewBuilder
     func retranslateKanjiMeaningsButton(for card: KanjiCard) -> some View {
         if meaningLanguage == .russian {
+            let key = TranslationBlockKey.kanjiMeaning(card.kanji)
             translationRetryControls(
                 originalText: originalKanjiMeaningsText(for: card),
-                isLoading: translationState.retranslationKanjiMeaningKeys.contains(card.kanji)
+                isLoading: translationState.isManuallyTranslating(key)
             ) {
                 retranslateKanjiMeanings(card, deck: selectedDeck)
             }
@@ -16,9 +17,10 @@ extension ContentView {
     @ViewBuilder
     func retranslateKanjiExamplesButton(for card: KanjiCard) -> some View {
         if meaningLanguage == .russian {
+            let key = TranslationBlockKey.kanjiExamples(card.kanji)
             translationRetryControls(
                 originalText: originalKanjiExamplesText(for: card),
-                isLoading: translationState.retranslationKanjiExampleKeys.contains(card.kanji)
+                isLoading: translationState.isManuallyTranslating(key)
             ) {
                 retranslateKanjiExamples(card, deck: selectedDeck)
             }
@@ -26,11 +28,12 @@ extension ContentView {
     }
 
     func reloadKanjiExamplesButton(for card: KanjiCard) -> some View {
-        Button {
+        let key = TranslationBlockKey.kanjiExamples(card.kanji)
+        return Button {
             reloadKanjiExamples(card)
         } label: {
             Label(
-                translationState.reloadingKanjiExampleKeys.contains(card.kanji) ? "Запрашиваю примеры" : "Перезапросить примеры",
+                translationState.isManuallyReloadingExamples(key) ? "Запрашиваю примеры" : "Перезапросить примеры",
                 systemImage: "arrow.clockwise"
             )
             .font(.caption.weight(.semibold))
@@ -38,17 +41,18 @@ extension ContentView {
         .buttonStyle(.bordered)
         .tint(AppPalette.accent)
         .disabled(
-            translationState.reloadingKanjiExampleKeys.contains(card.kanji)
-                || translationState.retranslationKanjiExampleKeys.contains(card.kanji)
+            translationState.isManuallyReloadingExamples(key)
+                || translationState.isManuallyTranslating(key)
         )
     }
 
     @ViewBuilder
     func retranslateWordButton(for card: WordStudyCard) -> some View {
         if meaningLanguage == .russian {
+            let key = TranslationBlockKey.wordMeaning(card.id)
             translationRetryControls(
                 originalText: card.meaning,
-                isLoading: translationState.retranslationWordKeys.contains(card.id)
+                isLoading: translationState.isManuallyTranslating(key)
             ) {
                 retranslateWordMeaning(card)
             }
@@ -58,9 +62,10 @@ extension ContentView {
     @ViewBuilder
     func retranslateWordExamplesButton(for card: WordStudyCard) -> some View {
         if meaningLanguage == .russian {
+            let key = TranslationBlockKey.wordExamples(card.id)
             translationRetryControls(
                 originalText: originalWordExamplesText(for: card),
-                isLoading: translationState.retranslationWordExampleKeys.contains(card.id)
+                isLoading: translationState.isManuallyTranslating(key)
             ) {
                 retranslateWordExamples(card)
             }

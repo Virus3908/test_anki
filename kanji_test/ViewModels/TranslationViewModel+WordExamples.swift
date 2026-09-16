@@ -24,19 +24,20 @@ extension TranslationViewModel {
         examples: [WordUsageExample],
         language: MeaningLanguage
     ) async {
+        let key = TranslationBlockKey.wordExamples(card.id)
         guard language == .russian,
               wordExampleTranslations[card.id] == nil,
               !examples.isEmpty,
-              !translationWordExampleKeys.contains(card.id),
-              !retranslationWordExampleKeys.contains(card.id) else {
+              !automaticTranslationBlocks.contains(key),
+              !manualTranslationBlocks.contains(key) else {
             return
         }
 
-        translationWordExampleKeys.insert(card.id)
-        defer { translationWordExampleKeys.remove(card.id) }
+        automaticTranslationBlocks.insert(key)
+        defer { automaticTranslationBlocks.remove(key) }
         let translatedExamples = await translateWordUsageExamples(examples)
         guard wordExampleTranslations[card.id] == nil,
-              !retranslationWordExampleKeys.contains(card.id),
+              !manualTranslationBlocks.contains(key),
               hasDifferentWordExamples(translatedExamples, comparedTo: examples) else {
             return
         }
@@ -46,8 +47,9 @@ extension TranslationViewModel {
     }
 
     func retranslateWordExamples(_ card: WordStudyCard, language: MeaningLanguage) {
+        let key = TranslationBlockKey.wordExamples(card.id)
         guard language == .russian,
-              !retranslationWordExampleKeys.contains(card.id) else {
+              !manualTranslationBlocks.contains(key) else {
             return
         }
 
@@ -56,10 +58,10 @@ extension TranslationViewModel {
             return
         }
 
-        retranslationWordExampleKeys.insert(card.id)
+        manualTranslationBlocks.insert(key)
 
         Task { @MainActor in
-            defer { retranslationWordExampleKeys.remove(card.id) }
+            defer { manualTranslationBlocks.remove(key) }
             let translatedExamples = await translateWordUsageExamples(examples, manual: true)
             wordExampleTranslations[card.id] = translatedExamples
             TranslationRepository.saveWordExampleTranslation(translatedExamples, for: card.id)
@@ -67,35 +69,37 @@ extension TranslationViewModel {
     }
 
     func loadWordUsageExamplesIfNeeded(for card: WordStudyCard) async {
+        let key = TranslationBlockKey.wordExamples(card.id)
         guard wordUsageExamples[card.id] == nil,
-              !loadingWordExampleKeys.contains(card.id),
-              !reloadingWordExampleKeys.contains(card.id) else {
+              !automaticExampleLoadingBlocks.contains(key),
+              !manualExampleReloadingBlocks.contains(key) else {
             return
         }
 
-        loadingWordExampleKeys.insert(card.id)
+        automaticExampleLoadingBlocks.insert(key)
         let examples = await WordUsageExampleProvider.loadExamples(for: card)
-        guard !reloadingWordExampleKeys.contains(card.id) else {
-            loadingWordExampleKeys.remove(card.id)
+        guard !manualExampleReloadingBlocks.contains(key) else {
+            automaticExampleLoadingBlocks.remove(key)
             return
         }
 
         wordUsageExamples[card.id] = examples
-        loadingWordExampleKeys.remove(card.id)
+        automaticExampleLoadingBlocks.remove(key)
     }
 
     func reloadWordUsageExamples(for card: WordStudyCard, language: MeaningLanguage) {
-        guard !reloadingWordExampleKeys.contains(card.id),
-              !retranslationWordExampleKeys.contains(card.id) else {
+        let key = TranslationBlockKey.wordExamples(card.id)
+        guard !manualExampleReloadingBlocks.contains(key),
+              !manualTranslationBlocks.contains(key) else {
             return
         }
 
-        reloadingWordExampleKeys.insert(card.id)
+        manualExampleReloadingBlocks.insert(key)
 
         Task { @MainActor in
-            defer { reloadingWordExampleKeys.remove(card.id) }
+            defer { manualExampleReloadingBlocks.remove(key) }
             let examples = await WordUsageExampleProvider.reloadRemoteExamples(for: card)
-            guard !retranslationWordExampleKeys.contains(card.id) else {
+            guard !manualTranslationBlocks.contains(key) else {
                 return
             }
 
@@ -105,7 +109,7 @@ extension TranslationViewModel {
 
                 if language == .russian {
                     let translatedExamples = await translateWordUsageExamples(examples, manual: true)
-                    guard !retranslationWordExampleKeys.contains(card.id) else {
+                    guard !manualTranslationBlocks.contains(key) else {
                         return
                     }
 

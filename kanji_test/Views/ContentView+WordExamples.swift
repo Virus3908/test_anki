@@ -4,53 +4,25 @@ extension ContentView {
     @ViewBuilder
     func wordExamplesBlock(for card: WordStudyCard) -> some View {
         let sourceExamples = originalWordUsageExamples(for: card)
-        let examples = displayedWordUsageExamples(for: card)
-        if !examples.isEmpty {
-            detailBlock("Примеры") {
-                VStack(alignment: .leading, spacing: 10) {
-                    ForEach(examples) { example in
-                        VStack(alignment: .leading, spacing: 3) {
-                            Text(example.sentence)
-                                .foregroundStyle(AppPalette.text)
-                                .fixedSize(horizontal: false, vertical: true)
-
-                            if let reading = wordExampleReading(for: example, card: card) {
-                                Text(reading)
-                                    .font(.caption)
-                                    .foregroundStyle(AppPalette.secondaryText)
-                                    .fixedSize(horizontal: false, vertical: true)
-                            }
-
-                            if let meaning = example.meaning, !meaning.isEmpty {
-                                Text(meaning)
-                                    .font(.caption)
-                                    .foregroundStyle(AppPalette.secondaryText)
-                                    .fixedSize(horizontal: false, vertical: true)
-                            }
-                        }
-                    }
-
-                    retranslateWordExamplesButton(for: card)
-                    reloadWordExamplesButton(for: card)
-                }
-                .task(id: "\(card.id)-\(meaningLanguage.rawValue)-\(sourceExamples.map(\.id).joined(separator: "|"))") {
-                    await translateWordExamplesIfNeeded(for: card, examples: sourceExamples)
-                }
-            }
-        } else if translationState.loadingWordExampleKeys.contains(card.id) || translationState.reloadingWordExampleKeys.contains(card.id) {
-            detailBlock("Примеры") {
-                VStack(alignment: .leading, spacing: 10) {
-                    ProgressView(translationState.reloadingWordExampleKeys.contains(card.id) ? "Запрашиваю примеры" : "Ищу примеры")
-                        .font(.caption)
-                        .foregroundStyle(AppPalette.secondaryText)
-                        .tint(AppPalette.accent)
-
-                    reloadWordExamplesButton(for: card)
-                }
-            }
-        } else {
-            detailBlock("Примеры") {
+        let key = TranslationBlockKey.wordExamples(card.id)
+        let examples = displayedWordUsageExamples(for: card).map { example in
+            StudyExample(wordExample: example, reading: wordExampleReading(for: example, card: card))
+        }
+        detailBlock("Примеры") {
+            StudyExamplesContent(
+                examples: examples,
+                isLoading: translationState.isAutomaticallyLoadingExamples(key)
+                    || translationState.isManuallyReloadingExamples(key),
+                loadingText: translationState.isManuallyReloadingExamples(key)
+                    ? "Запрашиваю примеры"
+                    : "Ищу примеры",
+                emptyText: "Примеры пока не загружены"
+            ) {
+                retranslateWordExamplesButton(for: card)
                 reloadWordExamplesButton(for: card)
+            }
+            .task(id: "\(card.id)-\(meaningLanguage.rawValue)-\(sourceExamples.map(\.id).joined(separator: "|"))") {
+                await translateWordExamplesIfNeeded(for: card, examples: sourceExamples)
             }
         }
     }
@@ -64,11 +36,12 @@ extension ContentView {
     }
 
     func reloadWordExamplesButton(for card: WordStudyCard) -> some View {
-        Button {
+        let key = TranslationBlockKey.wordExamples(card.id)
+        return Button {
             reloadWordUsageExamples(for: card)
         } label: {
             Label(
-                translationState.reloadingWordExampleKeys.contains(card.id) ? "Запрашиваю примеры" : "Перезапросить примеры",
+                translationState.isManuallyReloadingExamples(key) ? "Запрашиваю примеры" : "Перезапросить примеры",
                 systemImage: "arrow.clockwise"
             )
             .font(.caption.weight(.semibold))
@@ -76,8 +49,8 @@ extension ContentView {
         .buttonStyle(.bordered)
         .tint(AppPalette.accent)
         .disabled(
-            translationState.reloadingWordExampleKeys.contains(card.id)
-                || translationState.retranslationWordExampleKeys.contains(card.id)
+            translationState.isManuallyReloadingExamples(key)
+                || translationState.isManuallyTranslating(key)
         )
     }
 
@@ -91,5 +64,76 @@ extension ContentView {
         }
 
         return "\(card.word): \(card.reading)"
+    }
+}
+
+struct StudyExamplesContent<Controls: View>: View {
+    let examples: [StudyExample]
+    let isLoading: Bool
+    let loadingText: String
+    let emptyText: String
+    let controls: Controls
+
+    init(
+        examples: [StudyExample],
+        isLoading: Bool,
+        loadingText: String,
+        emptyText: String,
+        @ViewBuilder controls: () -> Controls
+    ) {
+        self.examples = examples
+        self.isLoading = isLoading
+        self.loadingText = loadingText
+        self.emptyText = emptyText
+        self.controls = controls()
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            if examples.isEmpty {
+                if isLoading {
+                    ProgressView(loadingText)
+                        .font(.caption)
+                        .foregroundStyle(AppPalette.secondaryText)
+                        .tint(AppPalette.accent)
+                } else {
+                    Text(emptyText)
+                        .font(.caption)
+                        .foregroundStyle(AppPalette.secondaryText)
+                }
+            } else {
+                ForEach(Array(examples.enumerated()), id: \.offset) { _, example in
+                    StudyExampleRow(example: example)
+                }
+            }
+
+            controls
+        }
+    }
+}
+
+private struct StudyExampleRow: View {
+    let example: StudyExample
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(example.text)
+                .foregroundStyle(AppPalette.text)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if let reading = example.reading {
+                Text(reading)
+                    .font(.caption)
+                    .foregroundStyle(AppPalette.secondaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            if let meaning = example.meaning {
+                Text(meaning)
+                    .font(.caption)
+                    .foregroundStyle(AppPalette.secondaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
     }
 }

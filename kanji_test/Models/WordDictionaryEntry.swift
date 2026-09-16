@@ -69,3 +69,42 @@ struct WordUsageExample: Codable, Identifiable, Sendable {
         try container.encodeIfPresent(meaning, forKey: .meaning)
     }
 }
+
+struct StudyExample: Identifiable, Sendable, Hashable {
+    let id: String
+    let text: String
+    let reading: String?
+    let meaning: String?
+
+    init(id: String, text: String, reading: String? = nil, meaning: String? = nil) {
+        self.id = id
+        self.text = text
+        self.reading = reading?.nilIfBlank
+        self.meaning = meaning?.nilIfBlank
+    }
+
+    init(wordExample example: WordUsageExample, reading: String? = nil) {
+        self.init(
+            id: "word-\(example.id)",
+            text: example.sentence,
+            reading: reading ?? example.reading,
+            meaning: example.meaning
+        )
+    }
+
+    init(kanjiExample example: KanjiExample) {
+        self.init(
+            id: "kanji-\(example.id)",
+            text: example.word,
+            reading: example.reading,
+            meaning: example.meaning
+        )
+    }
+}
+
+private extension String {
+    var nilIfBlank: String? {
+        let trimmed = trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : trimmed
+    }
+}

@@ -4,7 +4,7 @@ extension TranslationViewModel {
     func displayedKanjiMeanings(for card: KanjiCard, language: MeaningLanguage) -> [String] {
         switch language {
         case .russian:
-            return card.cachedRussianMeanings ?? card.englishMeanings
+            return translatedTexts[.kanjiMeaning(card.kanji)] ?? card.cachedRussianMeanings ?? card.englishMeanings
         case .english:
             return card.englishMeanings
         }
@@ -28,25 +28,29 @@ extension TranslationViewModel {
         for card: KanjiCard,
         deck: KanjiDeck,
         language: MeaningLanguage
-    ) async -> KanjiCard? {
+    ) async {
+        let key = TranslationBlockKey.kanjiMeaning(card.kanji)
         guard language == .russian,
+              translatedTexts[key] == nil,
               !card.hasRussianMeanings,
-              !translationKanjiMeaningKeys.contains(card.kanji),
-              !retranslationKanjiMeaningKeys.contains(card.kanji) else {
-            return nil
+              !automaticTranslationBlocks.contains(key),
+              !manualTranslationBlocks.contains(key) else {
+            if translatedTexts[key] == nil, let cachedMeanings = card.cachedRussianMeanings, !cachedMeanings.isEmpty {
+                translatedTexts[key] = cachedMeanings
+            }
+            return
         }
 
-        translationKanjiMeaningKeys.insert(card.kanji)
-        defer { translationKanjiMeaningKeys.remove(card.kanji) }
+        automaticTranslationBlocks.insert(key)
+        defer { automaticTranslationBlocks.remove(key) }
         let meanings = await RussianMeaningTranslator.translateAutomatically(card.englishMeanings)
-        guard !retranslationKanjiMeaningKeys.contains(card.kanji),
+        guard !manualTranslationBlocks.contains(key),
               hasDifferentStrings(meanings, comparedTo: card.englishMeanings) else {
-            return nil
+            return
         }
 
-        let translatedCard = card.withRussianMeanings(meanings)
-        TranslationRepository.saveKanjiTranslation(from: translatedCard)
-        return translatedCard
+        translatedTexts[key] = meanings
+        TranslationRepository.saveKanjiMeaningTranslation(meanings, for: card.kanji)
     }
 
     func translateKanjiExamplesIfNeeded(
@@ -54,17 +58,18 @@ extension TranslationViewModel {
         deck: KanjiDeck,
         language: MeaningLanguage
     ) async -> KanjiCard? {
+        let key = TranslationBlockKey.kanjiExamples(card.kanji)
         guard language == .russian,
               needsKanjiExampleTranslation(for: card),
-              !translationKanjiExampleKeys.contains(card.kanji),
-              !retranslationKanjiExampleKeys.contains(card.kanji) else {
+              !automaticTranslationBlocks.contains(key),
+              !manualTranslationBlocks.contains(key) else {
             return nil
         }
 
-        translationKanjiExampleKeys.insert(card.kanji)
-        defer { translationKanjiExampleKeys.remove(card.kanji) }
+        automaticTranslationBlocks.insert(key)
+        defer { automaticTranslationBlocks.remove(key) }
         let loadedCard = await KanjiDataLoader.loadExamplesIfNeeded(card)
-        guard !retranslationKanjiExampleKeys.contains(card.kanji) else {
+        guard !manualTranslationBlocks.contains(key) else {
             return nil
         }
 
@@ -82,20 +87,21 @@ extension TranslationViewModel {
         for card: KanjiCard,
         language: MeaningLanguage
     ) async {
+        let key = TranslationBlockKey.kanjiExamples(card.kanji)
         guard kanjiUsageExamples[card.kanji] == nil,
-              !translationKanjiExampleKeys.contains(card.kanji),
-              !retranslationKanjiExampleKeys.contains(card.kanji),
-              !reloadingKanjiExampleKeys.contains(card.kanji) else {
+              !automaticTranslationBlocks.contains(key),
+              !manualTranslationBlocks.contains(key),
+              !manualExampleReloadingBlocks.contains(key) else {
             return
         }
 
-        translationKanjiExampleKeys.insert(card.kanji)
-        defer { translationKanjiExampleKeys.remove(card.kanji) }
+        automaticTranslationBlocks.insert(key)
+        defer { automaticTranslationBlocks.remove(key) }
 
         let loadedCard = await KanjiDataLoader.loadExamplesIfNeeded(card)
         let examples = loadedCard.englishExamples
-        guard !retranslationKanjiExampleKeys.contains(card.kanji),
-              !reloadingKanjiExampleKeys.contains(card.kanji) else {
+        guard !manualTranslationBlocks.contains(key),
+              !manualExampleReloadingBlocks.contains(key) else {
             return
         }
 
@@ -106,8 +112,8 @@ extension TranslationViewModel {
         }
 
         let translatedExamples = await translateKanjiExamples(examples)
-        guard !retranslationKanjiExampleKeys.contains(card.kanji),
-              !reloadingKanjiExampleKeys.contains(card.kanji),
+        guard !manualTranslationBlocks.contains(key),
+              !manualExampleReloadingBlocks.contains(key),
               hasDifferentKanjiExamples(translatedExamples, comparedTo: examples) else {
             return
         }
@@ -123,22 +129,21 @@ extension TranslationViewModel {
     func retranslateKanjiMeanings(
         _ card: KanjiCard,
         deck: KanjiDeck,
-        language: MeaningLanguage,
-        onTranslated: @MainActor @escaping (KanjiCard) -> Void
+        language: MeaningLanguage
     ) {
+        let key = TranslationBlockKey.kanjiMeaning(card.kanji)
         guard language == .russian,
-              !retranslationKanjiMeaningKeys.contains(card.kanji) else {
+              !manualTranslationBlocks.contains(key) else {
             return
         }
 
-        retranslationKanjiMeaningKeys.insert(card.kanji)
+        manualTranslationBlocks.insert(key)
 
         Task { @MainActor in
-            defer { retranslationKanjiMeaningKeys.remove(card.kanji) }
+            defer { manualTranslationBlocks.remove(key) }
             let meanings = await RussianMeaningTranslator.translateManual(card.englishMeanings)
-            let translatedCard = card.withRussianMeanings(meanings)
-            TranslationRepository.saveKanjiTranslation(from: translatedCard)
-            onTranslated(translatedCard)
+            translatedTexts[key] = meanings
+            TranslationRepository.saveKanjiMeaningTranslation(meanings, for: card.kanji)
         }
     }
 
@@ -146,15 +151,16 @@ extension TranslationViewModel {
         _ card: KanjiCard,
         language: MeaningLanguage
     ) {
+        let key = TranslationBlockKey.kanjiExamples(card.kanji)
         guard language == .russian,
-              !retranslationKanjiExampleKeys.contains(card.kanji) else {
+              !manualTranslationBlocks.contains(key) else {
             return
         }
 
-        retranslationKanjiExampleKeys.insert(card.kanji)
+        manualTranslationBlocks.insert(key)
 
         Task { @MainActor in
-            defer { retranslationKanjiExampleKeys.remove(card.kanji) }
+            defer { manualTranslationBlocks.remove(key) }
             let loadedCard = await KanjiDataLoader.loadExamplesIfNeeded(card)
             let examples = loadedCard.englishExamples
             kanjiUsageExamples[card.kanji] = examples
@@ -170,18 +176,19 @@ extension TranslationViewModel {
     }
 
     func reloadKanjiExamples(_ card: KanjiCard, language: MeaningLanguage) {
-        guard !reloadingKanjiExampleKeys.contains(card.kanji),
-              !retranslationKanjiExampleKeys.contains(card.kanji) else {
+        let key = TranslationBlockKey.kanjiExamples(card.kanji)
+        guard !manualExampleReloadingBlocks.contains(key),
+              !manualTranslationBlocks.contains(key) else {
             return
         }
 
-        reloadingKanjiExampleKeys.insert(card.kanji)
+        manualExampleReloadingBlocks.insert(key)
 
         Task { @MainActor in
-            defer { reloadingKanjiExampleKeys.remove(card.kanji) }
+            defer { manualExampleReloadingBlocks.remove(key) }
             let loadedCard = await KanjiDataLoader.reloadExamples(for: card)
             let examples = loadedCard.englishExamples
-            guard !retranslationKanjiExampleKeys.contains(card.kanji) else {
+            guard !manualTranslationBlocks.contains(key) else {
                 return
             }
 
@@ -193,7 +200,7 @@ extension TranslationViewModel {
             }
 
             let translatedExamples = await translateKanjiExamples(examples, manual: true)
-            guard !retranslationKanjiExampleKeys.contains(card.kanji) else {
+            guard !manualTranslationBlocks.contains(key) else {
                 return
             }
 

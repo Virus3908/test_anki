@@ -1,27 +1,48 @@
 import Foundation
 
+enum TranslationBlockKey: Hashable, Sendable {
+    case kanjiMeaning(String)
+    case kanjiExamples(String)
+    case wordMeaning(String)
+    case wordExamples(String)
+}
+
 @MainActor
 @Observable
 final class TranslationViewModel {
-    var translationKanjiMeaningKeys: Set<String> = []
-    var translationKanjiExampleKeys: Set<String> = []
-    var translationWordKeys: Set<String> = []
-    var translationWordExampleKeys: Set<String> = []
-    var retranslationKanjiMeaningKeys: Set<String> = []
-    var retranslationKanjiExampleKeys: Set<String> = []
-    var retranslationWordKeys: Set<String> = []
-    var retranslationWordExampleKeys: Set<String> = []
-    var reloadingKanjiExampleKeys: Set<String> = []
-    var reloadingWordExampleKeys: Set<String> = []
+    var automaticTranslationBlocks: Set<TranslationBlockKey> = []
+    var manualTranslationBlocks: Set<TranslationBlockKey> = []
+    var automaticExampleLoadingBlocks: Set<TranslationBlockKey> = []
+    var manualExampleReloadingBlocks: Set<TranslationBlockKey> = []
+    var translatedTexts: [TranslationBlockKey: [String]] = [:]
     var kanjiUsageExamples: [String: [KanjiExample]] = [:]
     var kanjiExampleTranslations: [String: [KanjiExample]] = [:]
-    var wordMeaningTranslations: [String: String] = [:]
     var wordExampleTranslations: [String: [WordUsageExample]] = [:]
     var wordUsageExamples: [String: [WordUsageExample]] = [:]
-    var loadingWordExampleKeys: Set<String> = []
 
-    func loadSavedWordTranslations() {
-        wordMeaningTranslations = TranslationRepository.loadWordTranslations()
+    func loadSavedTranslations() {
+        translatedTexts = TranslationRepository.loadWordTranslations().reduce(into: translatedTexts) { result, item in
+            result[.wordMeaning(item.key)] = [item.value]
+        }
+        translatedTexts = TranslationRepository.loadKanjiMeaningTranslations().reduce(into: translatedTexts) { result, item in
+            result[.kanjiMeaning(item.key)] = item.value
+        }
         wordExampleTranslations = TranslationRepository.loadWordExampleTranslations()
+    }
+
+    func isAutomaticallyTranslating(_ key: TranslationBlockKey) -> Bool {
+        automaticTranslationBlocks.contains(key)
+    }
+
+    func isManuallyTranslating(_ key: TranslationBlockKey) -> Bool {
+        manualTranslationBlocks.contains(key)
+    }
+
+    func isAutomaticallyLoadingExamples(_ key: TranslationBlockKey) -> Bool {
+        automaticExampleLoadingBlocks.contains(key)
+    }
+
+    func isManuallyReloadingExamples(_ key: TranslationBlockKey) -> Bool {
+        manualExampleReloadingBlocks.contains(key)
     }
 }

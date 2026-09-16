@@ -4,46 +4,50 @@ extension TranslationViewModel {
     func displayedWordMeaning(for card: WordStudyCard, language: MeaningLanguage) -> String {
         switch language {
         case .russian:
-            return wordMeaningTranslations[card.id] ?? RussianMeaningTranslator.translateLocally([card.meaning]).first ?? card.meaning
+            return translatedTexts[.wordMeaning(card.id)]?.first
+                ?? RussianMeaningTranslator.translateLocally([card.meaning]).first
+                ?? card.meaning
         case .english:
             return card.meaning
         }
     }
 
     func translateWordMeaningIfNeeded(for card: WordStudyCard, language: MeaningLanguage) async {
+        let key = TranslationBlockKey.wordMeaning(card.id)
         guard language == .russian,
-              wordMeaningTranslations[card.id] == nil,
-              !translationWordKeys.contains(card.id),
-              !retranslationWordKeys.contains(card.id) else {
+              translatedTexts[key] == nil,
+              !automaticTranslationBlocks.contains(key),
+              !manualTranslationBlocks.contains(key) else {
             return
         }
 
-        translationWordKeys.insert(card.id)
-        defer { translationWordKeys.remove(card.id) }
+        automaticTranslationBlocks.insert(key)
+        defer { automaticTranslationBlocks.remove(key) }
         let translatedMeaning = await RussianMeaningTranslator.translateAutomatically([card.meaning]).first ?? card.meaning
-        guard wordMeaningTranslations[card.id] == nil,
-              !retranslationWordKeys.contains(card.id),
+        guard translatedTexts[key] == nil,
+              !manualTranslationBlocks.contains(key),
               translatedMeaning.trimmingCharacters(in: .whitespacesAndNewlines)
                 .caseInsensitiveCompare(card.meaning.trimmingCharacters(in: .whitespacesAndNewlines)) != .orderedSame else {
             return
         }
 
-        wordMeaningTranslations[card.id] = translatedMeaning
+        translatedTexts[key] = [translatedMeaning]
         TranslationRepository.saveWordTranslation(translatedMeaning, for: card.id)
     }
 
     func retranslateWordMeaning(_ card: WordStudyCard, language: MeaningLanguage) {
+        let key = TranslationBlockKey.wordMeaning(card.id)
         guard language == .russian,
-              !retranslationWordKeys.contains(card.id) else {
+              !manualTranslationBlocks.contains(key) else {
             return
         }
 
-        retranslationWordKeys.insert(card.id)
+        manualTranslationBlocks.insert(key)
 
         Task { @MainActor in
-            defer { retranslationWordKeys.remove(card.id) }
+            defer { manualTranslationBlocks.remove(key) }
             let translatedMeaning = await RussianMeaningTranslator.translateManual([card.meaning]).first ?? card.meaning
-            wordMeaningTranslations[card.id] = translatedMeaning
+            translatedTexts[key] = [translatedMeaning]
             TranslationRepository.saveWordTranslation(translatedMeaning, for: card.id)
         }
     }

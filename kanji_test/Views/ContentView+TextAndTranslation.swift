@@ -19,13 +19,11 @@ extension ContentView {
 
     func translateKanjiMeaningsIfNeeded(for card: KanjiCard, deck: KanjiDeck) async {
         let currentCard = coordinator.latestKanjiCard(for: card, previewCards: deckState.previewCards)
-        if let translatedCard = await translationState.translateKanjiMeaningsIfNeeded(
+        await translationState.translateKanjiMeaningsIfNeeded(
             for: currentCard,
             deck: deck,
             language: meaningLanguage
-        ) {
-            replaceCard(translatedCard)
-        }
+        )
     }
 
     func translateKanjiExamplesIfNeeded(for card: KanjiCard, deck: KanjiDeck) async {
@@ -46,9 +44,7 @@ extension ContentView {
 
     func retranslateKanjiMeanings(_ card: KanjiCard, deck: KanjiDeck) {
         let currentCard = coordinator.latestKanjiCard(for: card, previewCards: deckState.previewCards)
-        translationState.retranslateKanjiMeanings(currentCard, deck: deck, language: meaningLanguage) { translatedCard in
-            replaceCard(translatedCard)
-        }
+        translationState.retranslateKanjiMeanings(currentCard, deck: deck, language: meaningLanguage)
     }
 
     func retranslateKanjiExamples(_ card: KanjiCard, deck: KanjiDeck) {
