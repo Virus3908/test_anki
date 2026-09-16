@@ -1,9 +1,10 @@
 import SwiftUI
 
 extension ContentView {
-    @ViewBuilder
     func activeTrainingView() -> some View {
-        Group {
+        @Bindable var coordinator = coordinator
+
+        return Group {
             switch practiceMode {
             case .kanji:
                 if let card = cards[safe: trainingSession.currentIndex] {

@@ -1,5 +1,6 @@
 import Foundation
 
+@MainActor
 @Observable
 final class TranslationViewModel {
     var retranslationKanjiMeaningKeys: Set<String> = []

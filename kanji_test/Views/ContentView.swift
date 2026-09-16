@@ -1,56 +1,102 @@
 import SwiftUI
 
-enum FrontFieldKind: String, CaseIterable, Identifiable {
-    case readings
-    case meanings
-    case character
-
-    var id: String { rawValue }
-
-    var title: String {
-        switch self {
-        case .readings:
-            return "Чтения"
-        case .meanings:
-            return "Значения"
-        case .character:
-            return "Знак"
-        }
-    }
-}
-
-enum MeaningLanguage: String, CaseIterable, Identifiable {
-    case russian
-    case english
-
-    var id: String { rawValue }
-
-    var title: String {
-        switch self {
-        case .russian:
-            return "Русский"
-        case .english:
-            return "English"
-        }
-    }
-}
-
 struct ContentView: View {
-    @State var practiceMode: PracticeMode = .kanji
-    @State var deckState = DeckPreviewViewModel()
-    @State var coordinator = StudyCoordinator()
+    @State var appModel = StudyAppViewModel()
 
-    @State var trainingSession = TrainingSessionViewModel()
-    @State var showsPromptCharacters = false
-    @State var showsPromptReading = true
-    @State var showsPromptMeaning = false
-    @State var frontFieldOrder: [FrontFieldKind] = [.readings, .meanings, .character]
-    @State var isSettingsPresented = false
-    @State var isAboutPresented = false
-    @State var translationState = TranslationViewModel()
     @AppStorage("kanjiDailyNewCardLimit") var kanjiDailyNewCardLimit = 10
     @AppStorage("kanjiLearningSuccessTarget") var kanjiLearningSuccessTarget = KanjiReviewStore.defaultLearningSuccessTarget
-    @State var meaningLanguage: MeaningLanguage = .russian
+
+    var practiceMode: PracticeMode {
+        get { appModel.practiceMode }
+        nonmutating set { appModel.practiceMode = newValue }
+    }
+
+    var practiceModeBinding: Binding<PracticeMode> {
+        Binding(
+            get: { practiceMode },
+            set: { practiceMode = $0 }
+        )
+    }
+
+    var meaningLanguage: MeaningLanguage {
+        get { appModel.meaningLanguage }
+        nonmutating set { appModel.meaningLanguage = newValue }
+    }
+
+    var meaningLanguageBinding: Binding<MeaningLanguage> {
+        Binding(
+            get: { meaningLanguage },
+            set: { meaningLanguage = $0 }
+        )
+    }
+
+    var showsPromptCharacters: Bool {
+        get { appModel.showsPromptCharacters }
+        nonmutating set { appModel.showsPromptCharacters = newValue }
+    }
+
+    var showsPromptReading: Bool {
+        get { appModel.showsPromptReading }
+        nonmutating set { appModel.showsPromptReading = newValue }
+    }
+
+    var showsPromptMeaning: Bool {
+        get { appModel.showsPromptMeaning }
+        nonmutating set { appModel.showsPromptMeaning = newValue }
+    }
+
+    var frontFieldOrder: [FrontFieldKind] {
+        get { appModel.frontFieldOrder }
+        nonmutating set { appModel.frontFieldOrder = newValue }
+    }
+
+    var isSettingsPresented: Bool {
+        get { appModel.isSettingsPresented }
+        nonmutating set { appModel.isSettingsPresented = newValue }
+    }
+
+    var isSettingsPresentedBinding: Binding<Bool> {
+        Binding(
+            get: { isSettingsPresented },
+            set: { isSettingsPresented = $0 }
+        )
+    }
+
+    var isAboutPresented: Bool {
+        get { appModel.isAboutPresented }
+        nonmutating set { appModel.isAboutPresented = newValue }
+    }
+
+    var isAboutPresentedBinding: Binding<Bool> {
+        Binding(
+            get: { isAboutPresented },
+            set: { isAboutPresented = $0 }
+        )
+    }
+
+    var deckState: DeckPreviewViewModel {
+        get { appModel.deckState }
+        nonmutating set { appModel.deckState = newValue }
+    }
+
+    var coordinator: StudyCoordinator {
+        get { appModel.coordinator }
+        nonmutating set { appModel.coordinator = newValue }
+    }
+
+    var trainingSession: TrainingSessionViewModel {
+        get { appModel.trainingSession }
+        nonmutating set { appModel.trainingSession = newValue }
+    }
+
+    var drawingSession: DrawingSessionViewModel {
+        trainingSession.drawingSession
+    }
+
+    var translationState: TranslationViewModel {
+        get { appModel.translationState }
+        nonmutating set { appModel.translationState = newValue }
+    }
 
     var cards: [KanjiCard] {
         get { coordinator.cards }
@@ -102,7 +148,7 @@ struct ContentView: View {
                     startView()
                 }
             }
-            .navigationTitle(coordinator.hasStartedTraining ? "Kanji Trainer" : deckState.previewDeck == nil && deckState.previewKanaDeck == nil && deckState.previewWordDeck == nil ? "Набор карточек" : "Колода")
+            .navigationTitle(appModel.navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(AppPalette.background, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
@@ -117,7 +163,7 @@ struct ContentView: View {
                     .disabled(deckState.isLoadingDeck)
                 }
             }
-            .sheet(isPresented: $isSettingsPresented) {
+            .sheet(isPresented: isSettingsPresentedBinding) {
                 settingsView()
             }
             .task {

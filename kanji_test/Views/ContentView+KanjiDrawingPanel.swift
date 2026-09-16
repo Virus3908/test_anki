@@ -2,6 +2,7 @@ import SwiftUI
 
 extension ContentView {
     func drawingPanel(for card: KanjiCard, panelHeight: CGFloat) -> some View {
+        @Bindable var drawingSession = trainingSession.drawingSession
         let boardSide = drawingBoardSide(for: panelHeight)
 
         return VStack(spacing: 8) {
@@ -9,10 +10,10 @@ extension ContentView {
 
             ZStack {
                 DrawingBoard(
-                    drawnStrokes: $trainingSession.drawnStrokes,
-                    currentStroke: $trainingSession.currentStroke,
+                    drawnStrokes: $drawingSession.drawnStrokes,
+                    currentStroke: $drawingSession.currentStroke,
                     expectedStrokes: expectedStrokesForCurrentCard(card),
-                    feedback: trainingSession.feedback,
+                    feedback: drawingSession.feedback,
                     onStrokeFinished: {
                         handleGuidedStrokeFinished(card)
                     }
@@ -26,13 +27,13 @@ extension ContentView {
                         } label: {
                             Image(systemName: "trash")
                         }
-                        .disabled(trainingSession.drawnStrokes.isEmpty && trainingSession.currentStroke.isEmpty)
+                        .disabled(drawingSession.drawnStrokes.isEmpty && drawingSession.currentStroke.isEmpty)
 
                         Spacer()
 
-                        feedbackInfoButton(items: trainingSession.feedback)
-                            .disabled(trainingSession.feedback.isEmpty)
-                            .tint(trainingSession.feedback.isEmpty ? AppPalette.mutedText : AppPalette.accent)
+                        feedbackInfoButton(items: drawingSession.feedback)
+                            .disabled(drawingSession.feedback.isEmpty)
+                            .tint(drawingSession.feedback.isEmpty ? AppPalette.mutedText : AppPalette.accent)
                     }
 
                     Spacer()
@@ -44,7 +45,7 @@ extension ContentView {
                     } label: {
                         Image(systemName: "arrow.uturn.backward")
                     }
-                    .disabled(trainingSession.drawnStrokes.isEmpty)
+                    .disabled(drawingSession.drawnStrokes.isEmpty)
 
                     Spacer()
 
@@ -81,7 +82,7 @@ extension ContentView {
                         reviewButton("+", rating: .good, card: card)
                     }
                 }
-                .disabled(trainingSession.feedback.isEmpty && !isCurrentCardAnswered)
+                .disabled(drawingSession.feedback.isEmpty && !isCurrentCardAnswered)
 
                 Spacer(minLength: 12)
 

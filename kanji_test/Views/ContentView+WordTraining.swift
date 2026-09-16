@@ -40,7 +40,7 @@ extension ContentView {
 
     @ViewBuilder
     func wordCharacterField(for wordCard: WordStudyCard) -> some View {
-        if trainingSession.isAnswerVisible || showsPromptCharacters {
+        if drawingSession.isAnswerVisible || showsPromptCharacters {
             detailBlock("Слово") {
                 Text(wordCard.word)
                     .font(.system(size: 42, weight: .regular, design: .serif))
@@ -50,7 +50,7 @@ extension ContentView {
 
     @ViewBuilder
     func wordReadingField(for wordCard: WordStudyCard) -> some View {
-        if trainingSession.isAnswerVisible || showsPromptReading {
+        if drawingSession.isAnswerVisible || showsPromptReading {
             detailBlock("Чтение") {
                 Text(wordCard.reading)
             }
@@ -59,7 +59,7 @@ extension ContentView {
 
     @ViewBuilder
     func wordMeaningField(for wordCard: WordStudyCard) -> some View {
-        if trainingSession.isAnswerVisible || showsPromptMeaning {
+        if drawingSession.isAnswerVisible || showsPromptMeaning {
             translatableTextBlock("Значения", text: displayedWordMeaning(for: wordCard)) {
                 retranslateWordButton(for: wordCard)
             }
@@ -68,21 +68,21 @@ extension ContentView {
 
     func completedWordStrip(for wordCard: WordStudyCard) -> some View {
         HStack(spacing: 8) {
-            ForEach(wordCard.kanjiCards.indices, id: \.self) { index in
-                let isSelected = index == trainingSession.currentWordKanjiIndex
+            ForEach(wordCard.kanjiCards.enumerated(), id: \.element.kanji) { index, kanjiCard in
+                let isSelected = index == drawingSession.currentWordKanjiIndex
                 ZStack {
-                    if isSelected && !trainingSession.drawnStrokes.isEmpty {
-                        UserStrokePreview(strokes: trainingSession.drawnStrokes)
-                    } else if index < trainingSession.completedWordDrawings.count {
-                        UserStrokePreview(strokes: trainingSession.completedWordDrawings[index])
-                    } else if trainingSession.isAnswerVisible || showsPromptCharacters {
-                        Text(wordCard.kanjiCards[index].kanji)
+                    if isSelected && !drawingSession.drawnStrokes.isEmpty {
+                        UserStrokePreview(strokes: drawingSession.drawnStrokes)
+                    } else if index < drawingSession.completedWordDrawings.count {
+                        UserStrokePreview(strokes: drawingSession.completedWordDrawings[index])
+                    } else if drawingSession.isAnswerVisible || showsPromptCharacters {
+                        Text(kanjiCard.kanji)
                             .font(.title3.weight(.semibold))
-                            .foregroundStyle(trainingSession.isAnswerVisible ? AppPalette.text : AppPalette.secondaryText)
+                            .foregroundStyle(drawingSession.isAnswerVisible ? AppPalette.text : AppPalette.secondaryText)
                     } else {
                         Text("\(index + 1)")
                             .font(.caption.weight(.bold))
-                            .foregroundStyle(index == trainingSession.currentWordKanjiIndex ? AppPalette.accent : AppPalette.mutedText)
+                            .foregroundStyle(index == drawingSession.currentWordKanjiIndex ? AppPalette.accent : AppPalette.mutedText)
                     }
                 }
                 .frame(width: 34, height: 34)
@@ -100,7 +100,7 @@ extension ContentView {
     }
 
     func currentWordKanjiCard(for wordCard: WordStudyCard) -> KanjiCard? {
-        wordCard.kanjiCards[safe: trainingSession.currentWordKanjiIndex]
+        wordCard.kanjiCards[safe: drawingSession.currentWordKanjiIndex]
     }
 
 }

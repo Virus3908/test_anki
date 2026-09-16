@@ -10,7 +10,7 @@ extension ContentView {
                 Text("Выбери набор")
                     .font(.largeTitle.weight(.bold))
 
-                Picker("Режим", selection: $practiceMode) {
+                Picker("Режим", selection: practiceModeBinding) {
                     ForEach(PracticeMode.allCases) { mode in
                         Text(mode.title).tag(mode)
                     }

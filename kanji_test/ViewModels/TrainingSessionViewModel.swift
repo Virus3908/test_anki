@@ -1,6 +1,6 @@
-import CoreGraphics
 import Foundation
 
+@MainActor
 @Observable
 final class TrainingSessionViewModel {
     var isPreparingCard = false
@@ -15,15 +15,7 @@ final class TrainingSessionViewModel {
     var kanjiRecoveryGoodCounts: [String: Int] = [:]
     var sessionAnswerStates: [String: SessionAnswerState] = [:]
     var kanjiSessionPhase: KanjiLearningSessionPhase = .learning
-    var currentWordKanjiIndex = 0
-    var completedWordDrawings: [[[CGPoint]]] = []
-    var wordFeedbackByKanji: [[StrokeFeedback]] = []
-    var drawnStrokes: [[CGPoint]] = []
-    var currentStroke: [CGPoint] = []
-    var feedback: [StrokeFeedback] = []
-    var guidedStrokeLimit = 1
-    var showsFeedbackInfo = false
-    var isAnswerVisible = false
+    var drawingSession = DrawingSessionViewModel()
     var scrollToTopToken = 0
 
     func resetSessionProgress(total: Int) {
@@ -45,20 +37,73 @@ final class TrainingSessionViewModel {
         resetReviewCounters()
     }
 
-    func resetWordDrawingState(resetKanjiIndex: Bool = true) {
-        if resetKanjiIndex {
-            currentWordKanjiIndex = 0
+    func prepareStudyPack<Item: StudyItem>(
+        _ items: [Item],
+        guided: Bool? = nil,
+        scrollToTop: Bool = false
+    ) {
+        resetQueuePosition()
+        resetWordDrawingState()
+        resetSessionProgress(total: TrainingSessionEngine.uniqueReviewItemCount(items))
+        if let guided {
+            isGuidedSingleKanjiPractice = guided
         }
-        completedWordDrawings.removeAll()
-        wordFeedbackByKanji.removeAll()
+        isPreparingCard = false
+        resetCurrentAnswer()
+        if scrollToTop {
+            requestScrollToTop()
+        }
+    }
+
+    func answerID(for mode: PracticeMode, index: Int) -> String {
+        "\(mode.rawValue):\(index)"
+    }
+
+    func currentAnswerID(for mode: PracticeMode) -> String {
+        answerID(for: mode, index: currentIndex)
+    }
+
+    func moveToNextCard(resetWordDrawing: Bool = false) {
+        currentIndex += 1
+        if resetWordDrawing {
+            resetWordDrawingState()
+        }
+        resetCurrentAnswer()
+        requestScrollToTop()
+    }
+
+    func moveToPreviousCard() {
+        currentIndex -= 1
+        resetWordDrawingState()
+        resetCurrentAnswer()
+        requestScrollToTop()
+    }
+
+    func moveToCard(at index: Int) {
+        currentIndex = index
+        resetCurrentAnswer()
+        requestScrollToTop()
+    }
+
+    func resetFinishedSession() {
+        resetQueuePosition()
+        kanjiSessionPhase = .learning
+        resetWordDrawingState()
+        resetSessionProgress(total: 0)
+        isGuidedSingleKanjiPractice = false
+        isPreparingCard = false
+        resetCurrentAnswer()
+    }
+
+    func resetWordDrawingState(resetKanjiIndex: Bool = true) {
+        drawingSession.resetWordDrawingState(resetKanjiIndex: resetKanjiIndex)
     }
 
     func resetCurrentAnswer() {
-        drawnStrokes.removeAll()
-        currentStroke.removeAll()
-        feedback.removeAll()
-        showsFeedbackInfo = false
-        guidedStrokeLimit = 1
-        isAnswerVisible = false
+        drawingSession.resetCurrentAnswer()
+    }
+
+    func requestScrollToTop() {
+        scrollToTopToken += 1
     }
 }

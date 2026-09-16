@@ -21,7 +21,7 @@ extension ContentView {
     func headerControls() -> some View {
         HStack(spacing: 12) {
             Button {
-                coordinator.hasStartedTraining = false
+                finishTraining()
             } label: {
                 Image(systemName: "square.grid.2x2")
                     .frame(width: 34, height: 30)

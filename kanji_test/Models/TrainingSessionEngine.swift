@@ -37,21 +37,6 @@ struct ReviewQueueDecision {
 }
 
 enum TrainingSessionEngine {
-    static func nextSessionItems<Item: StudyItem>(
-        from sourceItems: [Item],
-        reviewStore: KanjiReviewStore,
-        newCardLimit: Int,
-        learningSuccessTarget: Int
-    ) -> (items: [Item], phase: KanjiLearningSessionPhase) {
-        nextSessionItems(
-            from: sourceItems,
-            reviewStore: reviewStore,
-            key: \.reviewKey,
-            newCardLimit: newCardLimit,
-            learningSuccessTarget: learningSuccessTarget
-        )
-    }
-
     static func makeAnswerState(
         reviewKey: String,
         rating: ReviewRating,
@@ -68,34 +53,6 @@ enum TrainingSessionEngine {
             recoveryGoodCountBefore: recoveryGoodCountBefore,
             wasMastered: wasMastered
         )
-    }
-
-    static func nextSessionItems<Item>(
-        from sourceItems: [Item],
-        reviewStore: KanjiReviewStore,
-        key: (Item) -> String,
-        newCardLimit: Int,
-        learningSuccessTarget: Int
-    ) -> (items: [Item], phase: KanjiLearningSessionPhase) {
-        let dueReviewItems = reviewStore.dueReviewItems(
-            from: sourceItems,
-            key: key,
-            learningSuccessTarget: learningSuccessTarget
-        )
-        if !dueReviewItems.isEmpty {
-            return (dueReviewItems, .review)
-        }
-
-        let learningItems = reviewStore.newLearningItems(
-            from: sourceItems,
-            key: key,
-            newCardLimit: newCardLimit
-        )
-        if !learningItems.isEmpty {
-            return (learningItems, .learning)
-        }
-
-        return (Array(sourceItems.shuffled().prefix(max(1, newCardLimit))), .fallbackReview)
     }
 
     static func makeAnswerPlan(
@@ -170,89 +127,8 @@ enum TrainingSessionEngine {
         }
     }
 
-    static func applyQueueDecision<Item>(
-        _ decision: ReviewQueueDecision,
-        item: Item,
-        key: String,
-        currentIndex: Int,
-        items: inout [Item],
-        keyFor: (Item) -> String
-    ) {
-        switch decision.repeatPlacement {
-        case .none:
-            if decision.shouldRemoveFutureRepeats {
-                removeFutureRepeats(after: currentIndex, key: key, items: &items, keyFor: keyFor)
-            }
-        case .after(let offset):
-            removeFutureRepeats(after: currentIndex, key: key, items: &items, keyFor: keyFor)
-            insertRepeat(item, after: offset, currentIndex: currentIndex, items: &items)
-
-            if let additionalRepeatOffset = decision.additionalRepeatOffset {
-                insertRepeat(item, after: additionalRepeatOffset, currentIndex: currentIndex, items: &items)
-            }
-        case .atEnd:
-            removeFutureRepeats(after: currentIndex, key: key, items: &items, keyFor: keyFor)
-            items.append(item)
-        }
-    }
-
-    static func applyQueueDecision<Item: StudyItem>(
-        _ decision: ReviewQueueDecision,
-        item: Item,
-        key: String,
-        currentIndex: Int,
-        items: inout [Item]
-    ) {
-        applyQueueDecision(
-            decision,
-            item: item,
-            key: key,
-            currentIndex: currentIndex,
-            items: &items,
-            keyFor: \.reviewKey
-        )
-    }
-
     static func uniqueReviewItemCount<Item: StudyItem>(_ items: [Item]) -> Int {
         Set(items.map(\.reviewKey)).count
-    }
-
-    static func removeFutureRepeats<Item>(
-        after index: Int,
-        key: String,
-        items: inout [Item],
-        keyFor: (Item) -> String
-    ) {
-        guard index + 1 < items.count else {
-            return
-        }
-
-        for itemIndex in items.indices.reversed() where itemIndex > index && keyFor(items[itemIndex]) == key {
-            items.remove(at: itemIndex)
-        }
-    }
-
-    static func removeFutureRepeats<Item: StudyItem>(
-        after index: Int,
-        key: String,
-        items: inout [Item]
-    ) {
-        removeFutureRepeats(
-            after: index,
-            key: key,
-            items: &items,
-            keyFor: \.reviewKey
-        )
-    }
-
-    private static func insertRepeat<Item>(
-        _ item: Item,
-        after offset: Int,
-        currentIndex: Int,
-        items: inout [Item]
-    ) {
-        let insertIndex = min(currentIndex + offset, items.count)
-        items.insert(item, at: insertIndex)
     }
 
     private static func recoveryProgress(

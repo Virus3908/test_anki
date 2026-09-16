@@ -7,14 +7,14 @@ extension ContentView {
     ) -> some View {
         ZStack {
             front()
-                .opacity(trainingSession.isAnswerVisible ? 0 : 1)
-                .rotation3DEffect(.degrees(trainingSession.isAnswerVisible ? 180 : 0), axis: (x: 0, y: 1, z: 0))
+                .opacity(drawingSession.isAnswerVisible ? 0 : 1)
+                .rotation3DEffect(.degrees(drawingSession.isAnswerVisible ? 180 : 0), axis: (x: 0, y: 1, z: 0))
 
             ScrollView {
                 back()
             }
-            .opacity(trainingSession.isAnswerVisible ? 1 : 0)
-            .rotation3DEffect(.degrees(trainingSession.isAnswerVisible ? 0 : -180), axis: (x: 0, y: 1, z: 0))
+            .opacity(drawingSession.isAnswerVisible ? 1 : 0)
+            .rotation3DEffect(.degrees(drawingSession.isAnswerVisible ? 0 : -180), axis: (x: 0, y: 1, z: 0))
         }
         .padding(18)
         .frame(maxWidth: .infinity, alignment: .topLeading)
@@ -24,7 +24,7 @@ extension ContentView {
         .gesture(cardSwipeGesture())
         .onTapGesture {
             withAnimation(.easeInOut(duration: 0.24)) {
-                trainingSession.isAnswerVisible.toggle()
+                drawingSession.isAnswerVisible.toggle()
             }
         }
     }
@@ -90,28 +90,7 @@ extension ContentView {
     }
 
     func learningStatusText(forReviewKey key: String) -> String {
-        guard let record = reviewStore.record(for: key) else {
-            return "Не изучена"
-        }
-
-        guard record.state == .review else {
-            return record.state == .relearning ? "Переучивается" : "Изучается"
-        }
-
-        let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
-        let dueDay = calendar.startOfDay(for: record.dueDate)
-        let daysUntilReview = calendar.dateComponents([.day], from: today, to: dueDay).day ?? 0
-
-        if daysUntilReview > 7 {
-            return "Хорошо изучена"
-        }
-
-        if daysUntilReview >= 2 {
-            return "Изучается"
-        }
-
-        return "На повторении"
+        StudyProgressStatus(record: reviewStore.record(for: key)).title
     }
 }
 
