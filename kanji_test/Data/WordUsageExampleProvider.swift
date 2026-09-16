@@ -1,36 +1,47 @@
 import Foundation
 
-enum WordUsageExampleProvider {
-    private static let session: URLSession = {
+protocol WordExampleProviding {
+    func loadExamples(for card: WordStudyCard, limit: Int) async -> [WordUsageExample]
+    func reloadRemoteExamples(for card: WordStudyCard, limit: Int) async -> [WordUsageExample]
+}
+
+struct TatoebaWordExampleProvider: WordExampleProviding {
+    private let session: URLSession
+
+    nonisolated init(session: URLSession = TatoebaWordExampleProvider.defaultSession) {
+        self.session = session
+    }
+
+    nonisolated private static let defaultSession: URLSession = {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.timeoutIntervalForRequest = 8
         configuration.timeoutIntervalForResource = 12
         return URLSession(configuration: configuration)
     }()
 
-    static func loadExamples(for card: WordStudyCard, limit: Int = 3) async -> [WordUsageExample] {
+    func loadExamples(for card: WordStudyCard, limit: Int = 3) async -> [WordUsageExample] {
         if !card.examples.isEmpty {
             return Array(card.examples.prefix(limit))
         }
 
-        if let cachedExamples = loadCachedExamples(for: card.id) {
+        if let cachedExamples = WordExampleCacheRepository.loadExamples(for: card.id) {
             return Array(cachedExamples.prefix(limit))
         }
 
         let remoteExamples = await loadRemoteExamples(for: card, limit: limit)
-        saveCachedExamples(remoteExamples, for: card.id)
+        WordExampleCacheRepository.saveExamples(remoteExamples, for: card.id)
         return remoteExamples
     }
 
-    static func reloadRemoteExamples(for card: WordStudyCard, limit: Int = 3) async -> [WordUsageExample] {
+    func reloadRemoteExamples(for card: WordStudyCard, limit: Int = 3) async -> [WordUsageExample] {
         let remoteExamples = await loadRemoteExamples(for: card, limit: limit)
         if !remoteExamples.isEmpty {
-            saveCachedExamples(remoteExamples, for: card.id)
+            WordExampleCacheRepository.saveExamples(remoteExamples, for: card.id)
         }
         return remoteExamples
     }
 
-    private static func loadRemoteExamples(for card: WordStudyCard, limit: Int) async -> [WordUsageExample] {
+    private func loadRemoteExamples(for card: WordStudyCard, limit: Int) async -> [WordUsageExample] {
         guard var components = URLComponents(string: "https://api.tatoeba.org/unstable/sentences") else {
             return []
         }
@@ -59,7 +70,7 @@ enum WordUsageExampleProvider {
                 .map { sentence in
                     WordUsageExample(
                         sentence: sentence.text,
-                        reading: fallbackReading(for: card, in: sentence.text),
+                        reading: Self.fallbackReading(for: card, in: sentence.text),
                         meaning: sentence.preferredEnglishTranslation
                     )
                 }
@@ -76,44 +87,17 @@ enum WordUsageExampleProvider {
         return "\(card.word): \(card.reading)"
     }
 
-    private static func loadCachedExamples(for wordID: String) -> [WordUsageExample]? {
-        let store = loadCache()
-        return store[wordID]
+}
+
+enum WordUsageExampleProvider {
+    private static let provider = TatoebaWordExampleProvider()
+
+    static func loadExamples(for card: WordStudyCard, limit: Int = 3) async -> [WordUsageExample] {
+        await provider.loadExamples(for: card, limit: limit)
     }
 
-    private static func saveCachedExamples(_ examples: [WordUsageExample], for wordID: String) {
-        var store = loadCache()
-        store[wordID] = examples
-
-        do {
-            let url = cacheURL()
-            try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-            let data = try JSONEncoder().encode(store)
-            try data.write(to: url, options: .atomic)
-        } catch {
-            assertionFailure("Failed to cache word usage examples: \(error)")
-        }
-    }
-
-    private static func loadCache() -> [String: [WordUsageExample]] {
-        let url = cacheURL()
-        guard FileManager.default.fileExists(atPath: url.path) else {
-            return [:]
-        }
-
-        do {
-            let data = try Data(contentsOf: url)
-            return try JSONDecoder().decode([String: [WordUsageExample]].self, from: data)
-        } catch {
-            return [:]
-        }
-    }
-
-    private static func cacheURL() -> URL {
-        let caches = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
-        return caches
-            .appendingPathComponent("WordExampleCache", isDirectory: true)
-            .appendingPathComponent("tatoeba-examples.json")
+    static func reloadRemoteExamples(for card: WordStudyCard, limit: Int = 3) async -> [WordUsageExample] {
+        await provider.reloadRemoteExamples(for: card, limit: limit)
     }
 }
 

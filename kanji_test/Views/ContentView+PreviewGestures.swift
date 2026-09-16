@@ -27,16 +27,12 @@ extension ContentView {
                 }
 
                 if width < 0, let nextCard = deckState.previewWordCards[safe: index + 1] {
-                    coordinator.previewSwipeDirection = -1
                     withAnimation(.easeInOut(duration: 0.22)) {
-                        coordinator.selectedWordPreviewCard = nextCard
-                        coordinator.presentedWordPreview = PresentedWordPreview(card: nextCard)
+                        coordinator.showWordPreview(nextCard, swipeDirection: -1)
                     }
                 } else if width > 0, let previousCard = deckState.previewWordCards[safe: index - 1] {
-                    coordinator.previewSwipeDirection = 1
                     withAnimation(.easeInOut(duration: 0.22)) {
-                        coordinator.selectedWordPreviewCard = previousCard
-                        coordinator.presentedWordPreview = PresentedWordPreview(card: previousCard)
+                        coordinator.showWordPreview(previousCard, swipeDirection: 1)
                     }
                 }
             }
@@ -56,16 +52,12 @@ extension ContentView {
                 }
 
                 if width < 0, let nextCard = deckState.previewKanaCards[safe: index + 1] {
-                    coordinator.previewSwipeDirection = -1
                     withAnimation(.easeInOut(duration: 0.22)) {
-                        coordinator.selectedKanaPreviewCard = nextCard
-                        coordinator.presentedKanaPreview = PresentedKanaPreview(card: nextCard)
+                        coordinator.showKanaPreview(nextCard, swipeDirection: -1)
                     }
                 } else if width > 0, let previousCard = deckState.previewKanaCards[safe: index - 1] {
-                    coordinator.previewSwipeDirection = 1
                     withAnimation(.easeInOut(duration: 0.22)) {
-                        coordinator.selectedKanaPreviewCard = previousCard
-                        coordinator.presentedKanaPreview = PresentedKanaPreview(card: previousCard)
+                        coordinator.showKanaPreview(previousCard, swipeDirection: 1)
                     }
                 }
             }
@@ -85,16 +77,12 @@ extension ContentView {
                 }
 
                 if width < 0, let nextCard = deckState.previewCards[safe: index + 1] {
-                    coordinator.previewSwipeDirection = -1
                     withAnimation(.easeInOut(duration: 0.22)) {
-                        coordinator.selectedPreviewCard = nextCard
-                        coordinator.presentedKanjiPreview = PresentedKanjiPreview(card: nextCard)
+                        coordinator.showKanjiPreview(nextCard, swipeDirection: -1)
                     }
                 } else if width > 0, let previousCard = deckState.previewCards[safe: index - 1] {
-                    coordinator.previewSwipeDirection = 1
                     withAnimation(.easeInOut(duration: 0.22)) {
-                        coordinator.selectedPreviewCard = previousCard
-                        coordinator.presentedKanjiPreview = PresentedKanjiPreview(card: previousCard)
+                        coordinator.showKanjiPreview(previousCard, swipeDirection: 1)
                     }
                 }
             }

@@ -40,10 +40,9 @@ enum KanaDataLoader {
 
     private static func loadSVGText(for character: String) async throws -> String {
         let fileName = svgFileName(for: character)
-        let cachedURL = cacheURL(for: fileName)
 
-        if FileManager.default.fileExists(atPath: cachedURL.path) {
-            return try String(contentsOf: cachedURL, encoding: .utf8)
+        if let cachedText = try KanaSVGCacheRepository.loadSVGText(fileName: fileName) {
+            return cachedText
         }
 
         let url = URL(string: "https://raw.githubusercontent.com/KanjiVG/kanjivg/master/kanji/\(fileName)")!
@@ -53,8 +52,7 @@ enum KanaDataLoader {
         }
 
         let svgText = String(decoding: data, as: UTF8.self)
-        try FileManager.default.createDirectory(at: cachedURL.deletingLastPathComponent(), withIntermediateDirectories: true)
-        try svgText.write(to: cachedURL, atomically: true, encoding: .utf8)
+        try KanaSVGCacheRepository.saveSVGText(svgText, fileName: fileName)
         return svgText
     }
 
@@ -67,20 +65,6 @@ enum KanaDataLoader {
     }
 
     static func clearCache() {
-        let directory = cacheDirectoryURL()
-        guard FileManager.default.fileExists(atPath: directory.path) else {
-            return
-        }
-
-        try? FileManager.default.removeItem(at: directory)
-    }
-
-    private static func cacheURL(for fileName: String) -> URL {
-        cacheDirectoryURL().appendingPathComponent(fileName)
-    }
-
-    private static func cacheDirectoryURL() -> URL {
-        let caches = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
-        return caches.appendingPathComponent("KanaVGCache", isDirectory: true)
+        try? KanaSVGCacheRepository.clearCache()
     }
 }

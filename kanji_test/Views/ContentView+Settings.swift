@@ -86,6 +86,7 @@ extension ContentView {
 
             Button {
                 reviewStore.advanceReviewDates(byDays: 1)
+                ReviewRepository.save(reviewStore)
             } label: {
                 Label("Перейти на следующий день", systemImage: "calendar.badge.clock")
                     .frame(maxWidth: .infinity)
@@ -356,7 +357,7 @@ extension ContentView {
 
     func loadReviewMemory() async {
         await Task.yield()
-        reviewStore = KanjiReviewStore.load()
+        reviewStore = ReviewRepository.load()
         translationState.loadSavedWordTranslations()
     }
 

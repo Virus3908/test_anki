@@ -26,7 +26,7 @@ extension ContentView {
             }
         }
         .sheet(item: $coordinator.selectedLinkedKanjiCard, onDismiss: {
-            coordinator.selectedLinkedKanjiCard = nil
+            coordinator.closeLinkedKanjiPreview()
         }) { card in
             kanjiPreviewDetail(for: card)
         }

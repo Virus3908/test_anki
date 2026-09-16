@@ -37,6 +37,21 @@ struct ReviewQueueDecision {
 }
 
 enum TrainingSessionEngine {
+    static func nextSessionItems<Item: StudyItem>(
+        from sourceItems: [Item],
+        reviewStore: KanjiReviewStore,
+        newCardLimit: Int,
+        learningSuccessTarget: Int
+    ) -> (items: [Item], phase: KanjiLearningSessionPhase) {
+        nextSessionItems(
+            from: sourceItems,
+            reviewStore: reviewStore,
+            key: \.reviewKey,
+            newCardLimit: newCardLimit,
+            learningSuccessTarget: learningSuccessTarget
+        )
+    }
+
     static func makeAnswerState(
         reviewKey: String,
         rating: ReviewRating,
@@ -181,6 +196,27 @@ enum TrainingSessionEngine {
         }
     }
 
+    static func applyQueueDecision<Item: StudyItem>(
+        _ decision: ReviewQueueDecision,
+        item: Item,
+        key: String,
+        currentIndex: Int,
+        items: inout [Item]
+    ) {
+        applyQueueDecision(
+            decision,
+            item: item,
+            key: key,
+            currentIndex: currentIndex,
+            items: &items,
+            keyFor: \.reviewKey
+        )
+    }
+
+    static func uniqueReviewItemCount<Item: StudyItem>(_ items: [Item]) -> Int {
+        Set(items.map(\.reviewKey)).count
+    }
+
     static func removeFutureRepeats<Item>(
         after index: Int,
         key: String,
@@ -194,6 +230,19 @@ enum TrainingSessionEngine {
         for itemIndex in items.indices.reversed() where itemIndex > index && keyFor(items[itemIndex]) == key {
             items.remove(at: itemIndex)
         }
+    }
+
+    static func removeFutureRepeats<Item: StudyItem>(
+        after index: Int,
+        key: String,
+        items: inout [Item]
+    ) {
+        removeFutureRepeats(
+            after: index,
+            key: key,
+            items: &items,
+            keyFor: \.reviewKey
+        )
     }
 
     private static func insertRepeat<Item>(

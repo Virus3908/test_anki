@@ -1,11 +1,19 @@
 import Foundation
 import Translation
 
-enum RussianMeaningTranslator {
+protocol MeaningTranslating {
+    func translateLocally(_ meanings: [String]) -> [String]
+    func translate(_ meanings: [String]) async -> [String]
+    func translatePreservingOrder(_ meanings: [String]) async -> [String]
+}
+
+struct SystemRussianMeaningTranslator: MeaningTranslating {
+    nonisolated init() {}
+
     private actor SystemTranslationQueue {
         func translate(_ meanings: [String]) async throws -> [String] {
-            try await RussianMeaningTranslator.withTimeout(seconds: 8) {
-                try await RussianMeaningTranslator.translateWithSystem(meanings)
+            try await SystemRussianMeaningTranslator.withTimeout(seconds: 8) {
+                try await SystemRussianMeaningTranslator.translateWithSystem(meanings)
             }
         }
     }
@@ -103,34 +111,34 @@ enum RussianMeaningTranslator {
         "year": "год"
     ]
 
-    static func translateLocally(_ meanings: [String]) -> [String] {
-        unique(dictionaryTranslation(for: meanings))
+    func translateLocally(_ meanings: [String]) -> [String] {
+        Self.unique(Self.dictionaryTranslation(for: meanings))
     }
 
-    static func translate(_ meanings: [String]) async -> [String] {
-        unique(await translatePreservingOrder(meanings))
+    func translate(_ meanings: [String]) async -> [String] {
+        Self.unique(await translatePreservingOrder(meanings))
     }
 
-    static func translatePreservingOrder(_ meanings: [String]) async -> [String] {
+    func translatePreservingOrder(_ meanings: [String]) async -> [String] {
         var bestTranslation: [String]?
 
         for _ in 0..<3 {
-            guard let systemTranslation = try? await systemTranslationQueue.translate(meanings),
+            guard let systemTranslation = try? await Self.systemTranslationQueue.translate(meanings),
                   !systemTranslation.isEmpty else {
                 continue
             }
 
             bestTranslation = systemTranslation
-            if !hasUntranslatedItems(systemTranslation, comparedTo: meanings) {
+            if !Self.hasUntranslatedItems(systemTranslation, comparedTo: meanings) {
                 return systemTranslation
             }
         }
 
         guard let bestTranslation, bestTranslation.count == meanings.count else {
-            return dictionaryTranslation(for: meanings)
+            return Self.dictionaryTranslation(for: meanings)
         }
 
-        let localTranslation = dictionaryTranslation(for: meanings)
+        let localTranslation = Self.dictionaryTranslation(for: meanings)
         return bestTranslation.enumerated().map { index, translatedItem in
             translatedItem.trimmingCharacters(in: .whitespacesAndNewlines)
                 .caseInsensitiveCompare(meanings[index].trimmingCharacters(in: .whitespacesAndNewlines)) == .orderedSame
@@ -201,5 +209,21 @@ enum RussianMeaningTranslator {
             translatedItem.trimmingCharacters(in: .whitespacesAndNewlines)
                 .caseInsensitiveCompare(sourceItem.trimmingCharacters(in: .whitespacesAndNewlines)) == .orderedSame
         }
+    }
+}
+
+enum RussianMeaningTranslator {
+    private static let translator = SystemRussianMeaningTranslator()
+
+    static func translateLocally(_ meanings: [String]) -> [String] {
+        translator.translateLocally(meanings)
+    }
+
+    static func translate(_ meanings: [String]) async -> [String] {
+        await translator.translate(meanings)
+    }
+
+    static func translatePreservingOrder(_ meanings: [String]) async -> [String] {
+        await translator.translatePreservingOrder(meanings)
     }
 }

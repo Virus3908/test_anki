@@ -121,21 +121,6 @@ struct KanjiReviewStore: Codable {
 
     private(set) var records: [String: KanjiReviewRecord]
 
-    static func load() -> KanjiReviewStore {
-        do {
-            let url = try storageURL()
-            guard FileManager.default.fileExists(atPath: url.path) else {
-                return KanjiReviewStore(records: [:])
-            }
-
-            let data = try Data(contentsOf: url)
-            return try JSONDecoder().decode(KanjiReviewStore.self, from: data)
-        } catch {
-            assertionFailure("Failed to load review memory: \(error)")
-            return KanjiReviewStore(records: [:])
-        }
-    }
-
     mutating func apply(
         _ rating: ReviewRating,
         to kanji: String,
@@ -226,7 +211,6 @@ struct KanjiReviewStore: Codable {
         }
 
         records[kanji] = record
-        save()
     }
 
     func record(for kanji: String) -> KanjiReviewRecord? {
@@ -235,7 +219,6 @@ struct KanjiReviewStore: Codable {
 
     mutating func restore(_ record: KanjiReviewRecord?, for key: String) {
         records[key] = record
-        save()
     }
 
     func orderedCards(_ cards: [KanjiCard], now: Date = Date()) -> [KanjiCard] {
@@ -302,6 +285,19 @@ struct KanjiReviewStore: Codable {
             }
     }
 
+    func dueReviewItems<Item: StudyItem>(
+        from items: [Item],
+        learningSuccessTarget: Int = Self.defaultLearningSuccessTarget,
+        now: Date = Date()
+    ) -> [Item] {
+        dueReviewItems(
+            from: items,
+            key: \.reviewKey,
+            learningSuccessTarget: learningSuccessTarget,
+            now: now
+        )
+    }
+
     func newLearningItems<Item>(
         from items: [Item],
         key: (Item) -> String,
@@ -332,6 +328,19 @@ struct KanjiReviewStore: Codable {
             .prefix(max(0, newCardLimit))
 
         return inProgressItems + Array(newItems)
+    }
+
+    func newLearningItems<Item: StudyItem>(
+        from items: [Item],
+        newCardLimit: Int,
+        now: Date = Date()
+    ) -> [Item] {
+        newLearningItems(
+            from: items,
+            key: \.reviewKey,
+            newCardLimit: newCardLimit,
+            now: now
+        )
     }
 
     func dueReviewCards(
@@ -402,18 +411,6 @@ struct KanjiReviewStore: Codable {
             records[key] = record
         }
 
-        save()
-    }
-
-    private func save() {
-        do {
-            let url = try Self.storageURL()
-            try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-            let data = try JSONEncoder().encode(self)
-            try data.write(to: url, options: .atomic)
-        } catch {
-            assertionFailure("Failed to save review memory: \(error)")
-        }
     }
 
     private static func nextDay(after date: Date) -> Date {
@@ -437,16 +434,4 @@ struct KanjiReviewStore: Codable {
         }
     }
 
-    private static func storageURL() throws -> URL {
-        let directory = try FileManager.default.url(
-            for: .applicationSupportDirectory,
-            in: .userDomainMask,
-            appropriateFor: nil,
-            create: true
-        )
-
-        return directory
-            .appendingPathComponent("KanjiTrainer", isDirectory: true)
-            .appendingPathComponent("review-memory.json")
-    }
 }

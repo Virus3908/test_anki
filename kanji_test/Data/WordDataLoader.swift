@@ -5,7 +5,7 @@ enum WordDataLoader {
         await Task.yield()
 
         let entries = await loadDictionaryEntries()
-        let kanjiCards = await loadKanjiCards(for: entries)
+        let kanjiCards = await loadKanjiCards(for: entries, provider: KanjiAPIProvider())
         let cardsByCharacter = Dictionary(kanjiCards.map { ($0.kanji, $0) }, uniquingKeysWith: { current, _ in current })
         let loadedWords = buildWords(from: entries, cardsByCharacter: cardsByCharacter)
 
@@ -20,7 +20,7 @@ enum WordDataLoader {
         loadBundledEntries()
     }
 
-    private static func loadKanjiCards(for entries: [WordDictionaryEntry]) async -> [KanjiCard] {
+    private static func loadKanjiCards(for entries: [WordDictionaryEntry], provider: KanjiProviding) async -> [KanjiCard] {
         var sourceCards = loadSourceKanjiCards()
         let knownCharacters = Set(sourceCards.map(\.kanji))
         let missingCharacters = Array(requiredKanjiCharacters(in: entries).subtracting(knownCharacters)).sorted()
@@ -30,7 +30,7 @@ enum WordDataLoader {
         }
 
         do {
-            let remoteCards = try await RemoteKanjiProvider.loadCards(for: missingCharacters)
+            let remoteCards = try await provider.loadCards(for: missingCharacters)
             if !remoteCards.isEmpty {
                 KanjiDataLoader.cacheCards(remoteCards)
                 sourceCards.append(contentsOf: remoteCards)

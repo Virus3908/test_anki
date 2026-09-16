@@ -5,9 +5,8 @@ extension ContentView {
         trainingCardShell {
             wordCardFront(for: wordCard)
         } back: {
-            VStack(alignment: .leading, spacing: 16) {
+            studyCardBackShell(reviewKey: wordCard.reviewKey) {
                 wordFullCardContent(for: wordCard)
-                learningStatusLabel(forReviewKey: reviewKey(for: wordCard))
             }
         }
         .task(id: "\(wordCard.id)-\(meaningLanguage.rawValue)") {
@@ -16,29 +15,13 @@ extension ContentView {
     }
 
     func wordCardFront(for wordCard: WordStudyCard) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Задание")
-                .font(.caption.weight(.bold))
-                .foregroundStyle(AppPalette.secondaryText)
-                .textCase(.uppercase)
-
+        studyCardFrontShell(
+            fallbackPrompt: "Нарисуй символы слова по памяти.",
+            footerText: "Проверка покажет слово, чтение, перевод и состав.",
+            reviewKey: wordCard.reviewKey
+        ) {
             wordFrontFields(for: wordCard)
-
-            if !showsPromptCharacters && !showsPromptReading && !showsPromptMeaning {
-                Text("Нарисуй символы слова по памяти.")
-                    .font(.title2.weight(.semibold))
-                    .foregroundStyle(AppPalette.text)
-            }
-
-            Spacer(minLength: 16)
-
-            Text("Проверка покажет слово, чтение, перевод и состав.")
-                .foregroundStyle(AppPalette.secondaryText)
-
-            learningStatusLabel(forReviewKey: reviewKey(for: wordCard))
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .textSelection(.enabled)
     }
 
     @ViewBuilder
@@ -77,13 +60,8 @@ extension ContentView {
     @ViewBuilder
     func wordMeaningField(for wordCard: WordStudyCard) -> some View {
         if trainingSession.isAnswerVisible || showsPromptMeaning {
-            detailBlock("Значения") {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(displayedWordMeaning(for: wordCard))
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    retranslateWordButton(for: wordCard)
-                }
+            translatableTextBlock("Значения", text: displayedWordMeaning(for: wordCard)) {
+                retranslateWordButton(for: wordCard)
             }
         }
     }

@@ -1,25 +1,38 @@
 import Foundation
 
-enum RemoteKanjiProvider {
-    private static let session: URLSession = {
+protocol KanjiProviding {
+    func loadKanjiList(deck: KanjiDeck) async throws -> [String]
+    func loadCards(deck: KanjiDeck) async throws -> [KanjiCard]
+    func loadCards(for kanjiList: [String]) async throws -> [KanjiCard]
+    func loadCardsStream(for kanjiList: [String]) -> AsyncStream<[KanjiCard]>
+}
+
+struct KanjiAPIProvider: KanjiProviding {
+    private let session: URLSession
+
+    nonisolated init(session: URLSession = KanjiAPIProvider.defaultSession) {
+        self.session = session
+    }
+
+    nonisolated private static let defaultSession: URLSession = {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.timeoutIntervalForRequest = 5
         configuration.timeoutIntervalForResource = 8
         return URLSession(configuration: configuration)
     }()
 
-    static func loadKanjiList(deck: KanjiDeck) async throws -> [String] {
+    func loadKanjiList(deck: KanjiDeck) async throws -> [String] {
         let listURL = URL(string: "https://kanjiapi.dev/v1/kanji/\(deck.endpointPath)")!
         let (listData, _) = try await session.data(from: listURL)
         return try JSONDecoder().decode([String].self, from: listData)
     }
 
-    static func loadCards(deck: KanjiDeck) async throws -> [KanjiCard] {
+    func loadCards(deck: KanjiDeck) async throws -> [KanjiCard] {
         let kanjiList = try await loadKanjiList(deck: deck)
         return try await loadCards(for: kanjiList)
     }
 
-    static func loadCards(for kanjiList: [String]) async throws -> [KanjiCard] {
+    func loadCards(for kanjiList: [String]) async throws -> [KanjiCard] {
         var cards: [KanjiCard] = []
         var nextIndex = 0
         let maxConcurrentRequests = 16
@@ -53,7 +66,7 @@ enum RemoteKanjiProvider {
         return cards.sorted { $0.kanji < $1.kanji }
     }
 
-    static func loadCardsStream(for kanjiList: [String]) -> AsyncStream<[KanjiCard]> {
+    func loadCardsStream(for kanjiList: [String]) -> AsyncStream<[KanjiCard]> {
         AsyncStream { continuation in
             let task = Task {
                 var batch: [KanjiCard] = []
@@ -114,7 +127,7 @@ enum RemoteKanjiProvider {
         }
     }
 
-    private static func loadCard(for kanji: String) async throws -> KanjiCard {
+    private func loadCard(for kanji: String) async throws -> KanjiCard {
         let detailURL = URL(string: "https://kanjiapi.dev/v1/kanji/\(kanji)")!
         let svgURL = URL(string: "https://raw.githubusercontent.com/KanjiVG/kanjivg/master/kanji/\(svgFileName(for: kanji))")!
 
@@ -148,7 +161,7 @@ enum RemoteKanjiProvider {
         )
     }
 
-    private static func loadExamples(for kanji: String) async -> [KanjiExample] {
+    private func loadExamples(for kanji: String) async -> [KanjiExample] {
         do {
             let wordsURL = URL(string: "https://kanjiapi.dev/v1/words/\(kanji)")!
             let (data, _) = try await withTimeout(seconds: 3) {
@@ -175,7 +188,7 @@ enum RemoteKanjiProvider {
         }
     }
 
-    private static func withTimeout<Value>(seconds: UInt64, operation: @escaping () async throws -> Value) async throws -> Value {
+    private func withTimeout<Value>(seconds: UInt64, operation: @escaping () async throws -> Value) async throws -> Value {
         try await withThrowingTaskGroup(of: Value.self) { group in
             group.addTask {
                 try await operation()
@@ -194,12 +207,32 @@ enum RemoteKanjiProvider {
         }
     }
 
-    private static func svgFileName(for kanji: String) -> String {
+    private func svgFileName(for kanji: String) -> String {
         guard let scalar = kanji.unicodeScalars.first else {
             return "00000.svg"
         }
 
         return String(format: "%05x.svg", scalar.value)
+    }
+}
+
+enum RemoteKanjiProvider {
+    private static let provider = KanjiAPIProvider()
+
+    static func loadKanjiList(deck: KanjiDeck) async throws -> [String] {
+        try await provider.loadKanjiList(deck: deck)
+    }
+
+    static func loadCards(deck: KanjiDeck) async throws -> [KanjiCard] {
+        try await provider.loadCards(deck: deck)
+    }
+
+    static func loadCards(for kanjiList: [String]) async throws -> [KanjiCard] {
+        try await provider.loadCards(for: kanjiList)
+    }
+
+    static func loadCardsStream(for kanjiList: [String]) -> AsyncStream<[KanjiCard]> {
+        provider.loadCardsStream(for: kanjiList)
     }
 }
 

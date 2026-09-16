@@ -58,7 +58,7 @@ extension ContentView {
             }
 
             translationState.wordMeaningTranslations[card.id] = translatedMeaning
-            KanjiTranslationStore.saveWordTranslation(translatedMeaning, for: card.id)
+            TranslationRepository.saveWordTranslation(translatedMeaning, for: card.id)
         }
     }
 
@@ -72,7 +72,7 @@ extension ContentView {
         Task { @MainActor in
             let translatedMeaning = await RussianMeaningTranslator.translate([card.meaning]).first ?? card.meaning
             translationState.wordMeaningTranslations[card.id] = translatedMeaning
-            KanjiTranslationStore.saveWordTranslation(translatedMeaning, for: card.id)
+            TranslationRepository.saveWordTranslation(translatedMeaning, for: card.id)
             translationState.retranslationWordKeys.remove(card.id)
         }
     }
@@ -91,7 +91,7 @@ extension ContentView {
             }
 
             translationState.wordExampleTranslations[card.id] = translatedExamples
-            KanjiTranslationStore.saveWordExampleTranslation(translatedExamples, for: card.id)
+            TranslationRepository.saveWordExampleTranslation(translatedExamples, for: card.id)
         }
     }
 
@@ -110,7 +110,7 @@ extension ContentView {
         Task { @MainActor in
             let translatedExamples = await translateWordUsageExamples(examples)
             translationState.wordExampleTranslations[card.id] = translatedExamples
-            KanjiTranslationStore.saveWordExampleTranslation(translatedExamples, for: card.id)
+            TranslationRepository.saveWordExampleTranslation(translatedExamples, for: card.id)
             translationState.retranslationWordExampleKeys.remove(card.id)
         }
     }

@@ -40,8 +40,7 @@ extension ContentView {
             .foregroundStyle(AppPalette.text)
         }
         .sheet(item: $coordinator.presentedKanjiPreview, onDismiss: {
-            coordinator.selectedPreviewCard = nil
-            coordinator.previewSwipeDirection = 0
+            coordinator.closeKanjiPreview()
         }) { presentedPreview in
             kanjiPreviewDetail(for: coordinator.selectedPreviewCard ?? presentedPreview.card)
         }
@@ -85,8 +84,7 @@ extension ContentView {
             .foregroundStyle(AppPalette.text)
         }
         .sheet(item: $coordinator.presentedKanaPreview, onDismiss: {
-            coordinator.selectedKanaPreviewCard = nil
-            coordinator.previewSwipeDirection = 0
+            coordinator.closeKanaPreview()
         }) { presentedPreview in
             kanaPreviewDetail(for: coordinator.selectedKanaPreviewCard ?? presentedPreview.card, deck: deck)
         }
@@ -126,9 +124,7 @@ extension ContentView {
             .foregroundStyle(AppPalette.text)
         }
         .sheet(item: $coordinator.presentedWordPreview, onDismiss: {
-            coordinator.selectedWordPreviewCard = nil
-            coordinator.selectedLinkedKanjiCard = nil
-            coordinator.previewSwipeDirection = 0
+            coordinator.closeWordPreview()
         }) { presentedPreview in
             wordPreviewDetail(for: coordinator.selectedWordPreviewCard ?? presentedPreview.card, deck: deck)
         }
@@ -201,7 +197,7 @@ extension ContentView {
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Готово") {
-                        coordinator.isDeckSchedulePresented = false
+                        coordinator.closeDeckSchedule()
                     }
                 }
             }

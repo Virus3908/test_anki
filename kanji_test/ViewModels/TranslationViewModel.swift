@@ -12,7 +12,7 @@ final class TranslationViewModel {
     var loadingWordExampleKeys: Set<String> = []
 
     func loadSavedWordTranslations() {
-        wordMeaningTranslations = KanjiTranslationStore.loadWordTranslations()
-        wordExampleTranslations = KanjiTranslationStore.loadWordExampleTranslations()
+        wordMeaningTranslations = TranslationRepository.loadWordTranslations()
+        wordExampleTranslations = TranslationRepository.loadWordExampleTranslations()
     }
 }

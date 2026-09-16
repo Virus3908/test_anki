@@ -37,21 +37,91 @@ final class StudyCoordinator {
     var isDeckSchedulePresented = false
 
     func openKanjiPreviewCard(_ card: KanjiCard) {
-        selectedPreviewCard = card
-        previewSwipeDirection = 0
-        presentedKanjiPreview = PresentedKanjiPreview(card: card)
+        showKanjiPreview(card, swipeDirection: 0)
     }
 
     func openKanaPreviewCard(_ card: KanaStudyCard) {
-        selectedKanaPreviewCard = card
-        previewSwipeDirection = 0
-        presentedKanaPreview = PresentedKanaPreview(card: card)
+        showKanaPreview(card, swipeDirection: 0)
     }
 
     func openWordPreviewCard(_ card: WordStudyCard) {
+        showWordPreview(card, swipeDirection: 0)
+    }
+
+    func openLinkedKanjiPreview(_ card: KanjiCard) {
+        selectedLinkedKanjiCard = card
+    }
+
+    func showKanjiPreview(_ card: KanjiCard, swipeDirection: Int) {
+        selectedPreviewCard = card
+        previewSwipeDirection = swipeDirection
+        presentedKanjiPreview = PresentedKanjiPreview(card: card)
+    }
+
+    func showKanaPreview(_ card: KanaStudyCard, swipeDirection: Int) {
+        selectedKanaPreviewCard = card
+        previewSwipeDirection = swipeDirection
+        presentedKanaPreview = PresentedKanaPreview(card: card)
+    }
+
+    func showWordPreview(_ card: WordStudyCard, swipeDirection: Int) {
         selectedWordPreviewCard = card
-        previewSwipeDirection = 0
+        previewSwipeDirection = swipeDirection
         presentedWordPreview = PresentedWordPreview(card: card)
+    }
+
+    func closeKanjiPreview() {
+        selectedPreviewCard = nil
+        presentedKanjiPreview = nil
+        previewSwipeDirection = 0
+    }
+
+    func closeKanaPreview() {
+        selectedKanaPreviewCard = nil
+        presentedKanaPreview = nil
+        previewSwipeDirection = 0
+    }
+
+    func closeWordPreview() {
+        selectedWordPreviewCard = nil
+        presentedWordPreview = nil
+        closeLinkedKanjiPreview()
+        previewSwipeDirection = 0
+    }
+
+    func closeLinkedKanjiPreview() {
+        selectedLinkedKanjiCard = nil
+    }
+
+    func closeDeckSchedule() {
+        isDeckSchedulePresented = false
+    }
+
+    func mergeSelectedKanjiPreview(with card: KanjiCard) {
+        guard selectedPreviewCard?.kanji == card.kanji else {
+            return
+        }
+
+        selectedPreviewCard = selectedPreviewCard?.mergedForDisplay(with: card)
+    }
+
+    func mergeLinkedKanjiPreview(with card: KanjiCard) {
+        guard selectedLinkedKanjiCard?.kanji == card.kanji else {
+            return
+        }
+
+        selectedLinkedKanjiCard = selectedLinkedKanjiCard?.mergedForDisplay(with: card)
+    }
+
+    func replaceSelectedWordPreview(_ card: WordStudyCard) {
+        selectedWordPreviewCard = card
+    }
+
+    func clearDeckSelection() {
+        selectedPreviewCard = nil
+        selectedKanaPreviewCard = nil
+        selectedWordPreviewCard = nil
+        closeDeckSchedule()
     }
 
     func resetPreviewSelection() {

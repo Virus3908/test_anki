@@ -9,22 +9,34 @@ extension ContentView {
         trainingSession.resetWordDrawingState(resetKanjiIndex: resetKanjiIndex)
     }
 
+    func prepareStudyPack<Item: StudyItem>(
+        _ items: [Item],
+        guided: Bool? = nil,
+        scrollToTop: Bool = false
+    ) {
+        trainingSession.resetQueuePosition()
+        resetWordDrawingState()
+        resetSessionProgress(total: TrainingSessionEngine.uniqueReviewItemCount(items))
+        if let guided {
+            trainingSession.isGuidedSingleKanjiPractice = guided
+        }
+        trainingSession.isPreparingCard = false
+        resetCurrentAnswer()
+        if scrollToTop {
+            trainingSession.scrollToTopToken += 1
+        }
+    }
+
     func openKanjiPreviewCard(_ card: KanjiCard) {
-        coordinator.selectedPreviewCard = card
-        coordinator.previewSwipeDirection = 0
-        coordinator.presentedKanjiPreview = PresentedKanjiPreview(card: card)
+        coordinator.openKanjiPreviewCard(card)
     }
 
     func openKanaPreviewCard(_ card: KanaStudyCard) {
-        coordinator.selectedKanaPreviewCard = card
-        coordinator.previewSwipeDirection = 0
-        coordinator.presentedKanaPreview = PresentedKanaPreview(card: card)
+        coordinator.openKanaPreviewCard(card)
     }
 
     func openWordPreviewCard(_ card: WordStudyCard) {
-        coordinator.selectedWordPreviewCard = card
-        coordinator.previewSwipeDirection = 0
-        coordinator.presentedWordPreview = PresentedWordPreview(card: card)
+        coordinator.openWordPreviewCard(card)
     }
 
     func clearDeckCache() {
@@ -45,14 +57,7 @@ extension ContentView {
         deckState.previewDeck = nil
         deckState.previewKanaDeck = nil
         deckState.previewWordDeck = nil
-        coordinator.presentedKanjiPreview = nil
-        coordinator.presentedKanaPreview = nil
-        coordinator.presentedWordPreview = nil
-        coordinator.isDeckSchedulePresented = false
-        coordinator.selectedPreviewCard = nil
-        coordinator.selectedKanaPreviewCard = nil
-        coordinator.selectedWordPreviewCard = nil
-        coordinator.selectedLinkedKanjiCard = nil
+        coordinator.resetPreviewSelection()
         trainingSession.resetQueuePosition()
         trainingSession.kanjiSessionPhase = .learning
         resetWordDrawingState()
@@ -67,10 +72,7 @@ extension ContentView {
         deckState.previewWordDeck = nil
         deckState.previewWordCards.removeAll()
         deckState.previewKanaCards.removeAll()
-        coordinator.selectedKanaPreviewCard = nil
-        coordinator.selectedWordPreviewCard = nil
-        coordinator.selectedPreviewCard = nil
-        coordinator.isDeckSchedulePresented = false
+        coordinator.clearDeckSelection()
         deckState.previewCards.removeAll()
         deckState.previewExpectedCount = nil
         deckState.isLoadingDeck = true
@@ -98,10 +100,9 @@ extension ContentView {
         deckState.previewDeck = nil
         deckState.previewCards.removeAll()
         deckState.previewExpectedCount = nil
-        coordinator.selectedPreviewCard = nil
-        coordinator.presentedKanjiPreview = nil
+        coordinator.closeKanjiPreview()
         deckState.isLoadingDeck = false
-        coordinator.isDeckSchedulePresented = false
+        coordinator.closeDeckSchedule()
     }
 
     func openKanaPreview(_ deck: KanaDeck) {
@@ -111,9 +112,7 @@ extension ContentView {
         deckState.previewWordDeck = nil
         deckState.previewWordCards.removeAll()
         deckState.previewKanaCards = deck.baseCards
-        coordinator.selectedPreviewCard = nil
-        coordinator.selectedWordPreviewCard = nil
-        coordinator.selectedKanaPreviewCard = nil
+        coordinator.clearDeckSelection()
         deckState.isLoadingDeck = true
         resetCurrentAnswer()
 
@@ -133,9 +132,7 @@ extension ContentView {
     func closeKanaPreview() {
         deckState.previewKanaDeck = nil
         deckState.previewKanaCards.removeAll()
-        coordinator.selectedPreviewCard = nil
-        coordinator.selectedKanaPreviewCard = nil
-        coordinator.presentedKanaPreview = nil
+        coordinator.closeKanaPreview()
         deckState.isLoadingDeck = false
         resetCurrentAnswer()
     }
@@ -156,24 +153,8 @@ extension ContentView {
         kanaCards.removeAll()
         deckState.wordSourceCards.removeAll()
         deckState.kanaSourceCards.removeAll()
-        trainingSession.resetQueuePosition()
-        resetWordDrawingState()
-        resetSessionProgress(total: Set(cards.map(\.kanji)).count)
-        trainingSession.isGuidedSingleKanjiPractice = guided
+        prepareStudyPack(cards, guided: guided)
         coordinator.hasStartedTraining = true
-        resetCurrentAnswer()
-    }
-
-    func reviewKey(for card: KanjiCard) -> String {
-        card.kanji
-    }
-
-    func reviewKey(for card: WordStudyCard) -> String {
-        "word:\(card.id)"
-    }
-
-    func reviewKey(for card: KanaStudyCard) -> String {
-        "kana:\(card.character)"
     }
 
     func currentSessionAnswerID() -> String {
@@ -185,22 +166,21 @@ extension ContentView {
     }
 
     func nextKanjiSessionCards(from sourceCards: [KanjiCard]) -> [KanjiCard] {
-        nextSessionItems(from: sourceCards, key: \.kanji)
+        nextSessionItems(from: sourceCards)
     }
 
     func nextWordSessionCards(from sourceCards: [WordStudyCard]) -> [WordStudyCard] {
-        nextSessionItems(from: sourceCards, key: reviewKey(for:))
+        nextSessionItems(from: sourceCards)
     }
 
     func nextKanaSessionCards(from sourceCards: [KanaStudyCard]) -> [KanaStudyCard] {
-        nextSessionItems(from: sourceCards, key: reviewKey(for:))
+        nextSessionItems(from: sourceCards)
     }
 
-    func nextSessionItems<Item>(from sourceItems: [Item], key: (Item) -> String) -> [Item] {
+    func nextSessionItems<Item: StudyItem>(from sourceItems: [Item]) -> [Item] {
         let result = TrainingSessionEngine.nextSessionItems(
             from: sourceItems,
             reviewStore: reviewStore,
-            key: key,
             newCardLimit: kanjiDailyNewCardLimit,
             learningSuccessTarget: kanjiLearningSuccessTarget
         )
@@ -218,9 +198,7 @@ extension ContentView {
             cards[index] = cards[index].mergedForDisplay(with: card)
         }
 
-        if coordinator.selectedPreviewCard?.kanji == card.kanji {
-            coordinator.selectedPreviewCard = coordinator.selectedPreviewCard?.mergedForDisplay(with: card)
-        }
+        coordinator.mergeSelectedKanjiPreview(with: card)
 
         for index in wordCards.indices {
             wordCards[index] = replacingNestedKanji(card, in: wordCards[index])
@@ -231,12 +209,10 @@ extension ContentView {
         }
 
         if let selectedWordPreviewCard = coordinator.selectedWordPreviewCard {
-            coordinator.selectedWordPreviewCard = replacingNestedKanji(card, in: selectedWordPreviewCard)
+            coordinator.replaceSelectedWordPreview(replacingNestedKanji(card, in: selectedWordPreviewCard))
         }
 
-        if coordinator.selectedLinkedKanjiCard?.kanji == card.kanji {
-            coordinator.selectedLinkedKanjiCard = coordinator.selectedLinkedKanjiCard?.mergedForDisplay(with: card)
-        }
+        coordinator.mergeLinkedKanjiPreview(with: card)
     }
 
     func replacingNestedKanji(_ card: KanjiCard, in wordCard: WordStudyCard) -> WordStudyCard {
@@ -261,9 +237,7 @@ extension ContentView {
         deckState.previewWordDeck = deck
         deckState.previewDeck = nil
         deckState.previewKanaDeck = nil
-        coordinator.selectedWordPreviewCard = nil
-        coordinator.selectedPreviewCard = nil
-        coordinator.selectedKanaPreviewCard = nil
+        coordinator.clearDeckSelection()
         deckState.previewWordCards.removeAll()
         deckState.isLoadingDeck = true
 
@@ -285,9 +259,7 @@ extension ContentView {
     func closeWordPreview() {
         deckState.previewWordDeck = nil
         deckState.previewWordCards.removeAll()
-        coordinator.selectedWordPreviewCard = nil
-        coordinator.selectedLinkedKanjiCard = nil
-        coordinator.presentedWordPreview = nil
+        coordinator.closeWordPreview()
         deckState.isLoadingDeck = false
         resetCurrentAnswer()
     }
@@ -305,13 +277,9 @@ extension ContentView {
         deckState.kanaSourceCards.removeAll()
         wordCards = trainingCards
         deckState.wordSourceCards = sourceCards ?? trainingCards
-        trainingSession.resetQueuePosition()
-        resetWordDrawingState()
-        resetSessionProgress(total: Set(wordCards.map(\.id)).count)
-        trainingSession.isGuidedSingleKanjiPractice = guided
+        prepareStudyPack(wordCards, guided: guided)
         deckState.isLoadingDeck = false
         coordinator.hasStartedTraining = true
-        resetCurrentAnswer()
     }
 
     func startKanaTraining(
@@ -330,12 +298,8 @@ extension ContentView {
         let sourceCards = providedSourceCards ?? trainingCards ?? deck.cards
         deckState.kanaSourceCards = sourceCards
         kanaCards = trainingCards ?? nextKanaSessionCards(from: sourceCards)
-        trainingSession.resetQueuePosition()
-        resetWordDrawingState()
-        resetSessionProgress(total: Set(kanaCards.map(\.character)).count)
-        trainingSession.isGuidedSingleKanjiPractice = guided
+        prepareStudyPack(kanaCards, guided: guided)
         coordinator.hasStartedTraining = !kanaCards.isEmpty
-        resetCurrentAnswer()
     }
 
     func loadSelectedDeck() async {
@@ -355,13 +319,13 @@ extension ContentView {
         deckState.kanjiSourceCards = loadedCards
         cards = orderedCards
         wordCards = WordStudyCard.build(from: loadedCards)
-        trainingSession.resetQueuePosition()
-        resetWordDrawingState()
-        resetSessionProgress(total: practiceMode == .words ? Set(wordCards.map(\.id)).count : Set(orderedCards.map(\.kanji)).count)
-        trainingSession.isGuidedSingleKanjiPractice = false
+        if practiceMode == .words {
+            prepareStudyPack(wordCards, guided: false)
+        } else {
+            prepareStudyPack(orderedCards, guided: false)
+        }
         deckState.isLoadingDeck = false
         coordinator.hasStartedTraining = true
-        resetCurrentAnswer()
     }
 
 }

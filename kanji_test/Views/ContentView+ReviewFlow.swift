@@ -7,21 +7,11 @@ extension ContentView {
         }
 
         let wordCard = wordCards[trainingSession.currentIndex]
-        let key = reviewKey(for: wordCard)
-        let answerID = currentSessionAnswerID()
-        let existingAnswer = trainingSession.sessionAnswerStates[answerID]
-        prepareReviewReapply(existingAnswer) {
-            removeFutureRepeats(after: trainingSession.currentIndex, key: key, from: &wordCards, keyFor: reviewKey(for:))
-        }
-
-        let shouldAdvance = applyReviewedItem(
+        let shouldAdvance = applyStudyItemReview(
             wordCard,
             rating: rating,
-            key: key,
-            existingAnswer: existingAnswer,
             masteredKeys: &trainingSession.masteredWordKeys,
-            items: &wordCards,
-            keyFor: reviewKey(for:)
+            items: &wordCards
         )
 
         if !shouldAdvance {
@@ -57,21 +47,11 @@ extension ContentView {
         }
 
         let kanaCard = kanaCards[trainingSession.currentIndex]
-        let key = reviewKey(for: kanaCard)
-        let answerID = currentSessionAnswerID()
-        let existingAnswer = trainingSession.sessionAnswerStates[answerID]
-        prepareReviewReapply(existingAnswer) {
-            removeFutureRepeats(after: trainingSession.currentIndex, key: key, from: &kanaCards, keyFor: reviewKey(for:))
-        }
-
-        let shouldAdvance = applyReviewedItem(
+        let shouldAdvance = applyStudyItemReview(
             kanaCard,
             rating: rating,
-            key: key,
-            existingAnswer: existingAnswer,
             masteredKeys: &trainingSession.masteredKanaKeys,
-            items: &kanaCards,
-            keyFor: reviewKey(for:)
+            items: &kanaCards
         )
 
         if !shouldAdvance {
@@ -111,25 +91,15 @@ extension ContentView {
     }
 
     func applyReviewAndAdvance(_ rating: ReviewRating, to card: KanjiCard) async {
-        guard cards.indices.contains(trainingSession.currentIndex), cards[trainingSession.currentIndex].kanji == card.kanji else {
+        guard cards.indices.contains(trainingSession.currentIndex), cards[trainingSession.currentIndex].reviewKey == card.reviewKey else {
             return
         }
 
-        let key = reviewKey(for: card)
-        let answerID = currentSessionAnswerID()
-        let existingAnswer = trainingSession.sessionAnswerStates[answerID]
-        prepareReviewReapply(existingAnswer) {
-            removeFutureRepeats(after: trainingSession.currentIndex, key: key, from: &cards, keyFor: \.kanji)
-        }
-
-        let shouldAdvance = applyReviewedItem(
+        let shouldAdvance = applyStudyItemReview(
             card,
             rating: rating,
-            key: key,
-            existingAnswer: existingAnswer,
             masteredKeys: &trainingSession.masteredKanjiKeys,
-            items: &cards,
-            keyFor: \.kanji
+            items: &cards
         )
 
         if !shouldAdvance {
@@ -139,8 +109,52 @@ extension ContentView {
         await advanceToNextKanjiOrFinish()
     }
 
+    func applyStudyItemReview<Item: StudyItem>(
+        _ item: Item,
+        rating: ReviewRating,
+        masteredKeys: inout Set<String>,
+        items: inout [Item]
+    ) -> Bool {
+        if trainingSession.isGuidedSingleKanjiPractice {
+            applyPracticeOnlyReview(item, rating: rating)
+            return false
+        }
+
+        let key = item.reviewKey
+        let answerID = currentSessionAnswerID()
+        let existingAnswer = trainingSession.sessionAnswerStates[answerID]
+        prepareReviewReapply(existingAnswer) {
+            removeFutureRepeats(after: trainingSession.currentIndex, key: key, from: &items)
+        }
+
+        return applyReviewedItem(
+            item,
+            rating: rating,
+            key: key,
+            existingAnswer: existingAnswer,
+            masteredKeys: &masteredKeys,
+            items: &items
+        )
+    }
+
+    func applyPracticeOnlyReview<Item: StudyItem>(_ item: Item, rating: ReviewRating) {
+        let answerID = currentSessionAnswerID()
+        let existingAnswer = trainingSession.sessionAnswerStates[answerID]
+        var answerState = existingAnswer ?? TrainingSessionEngine.makeAnswerState(
+            reviewKey: item.reviewKey,
+            rating: rating,
+            recordBefore: nil,
+            againCountBefore: nil,
+            recoveryGoodCountBefore: nil,
+            wasMastered: false
+        )
+        answerState.rating = rating
+        trainingSession.sessionAnswerStates[answerID] = answerState
+    }
+
     func restoreSessionAnswer(_ answer: SessionAnswerState) {
         reviewStore.restore(answer.recordBefore, for: answer.reviewKey)
+        ReviewRepository.save(reviewStore)
         restoreCounter(answer.againCountBefore, for: answer.reviewKey, in: &trainingSession.kanjiAgainCounts)
         restoreCounter(answer.recoveryGoodCountBefore, for: answer.reviewKey, in: &trainingSession.kanjiRecoveryGoodCounts)
 
@@ -182,14 +196,13 @@ extension ContentView {
         rollbackFutureSessionAnswers(after: trainingSession.currentIndex)
     }
 
-    func applyReviewedItem<Item>(
+    func applyReviewedItem<Item: StudyItem>(
         _ reviewedItem: Item,
         rating: ReviewRating,
         key: String,
         existingAnswer: SessionAnswerState?,
         masteredKeys: inout Set<String>,
-        items: inout [Item],
-        keyFor: (Item) -> String
+        items: inout [Item]
     ) -> Bool {
         var answerState = existingAnswer ?? TrainingSessionEngine.makeAnswerState(
             reviewKey: key,
@@ -219,8 +232,7 @@ extension ContentView {
             item: reviewedItem,
             key: key,
             masteredKeys: &masteredKeys,
-            items: &items,
-            keyFor: keyFor
+            items: &items
         )
 
         trainingSession.sessionCompletedCards = masteredKeys.count
@@ -248,18 +260,18 @@ extension ContentView {
                 learningSuccessTarget: kanjiLearningSuccessTarget,
                 resetIntervalOnGood: answerPlan.shouldResetIntervalOnGood
             )
+            ReviewRepository.save(reviewStore)
         }
 
         return answerPlan
     }
 
-    func applyQueueDecision<Item>(
+    func applyQueueDecision<Item: StudyItem>(
         _ decision: ReviewQueueDecision,
         item: Item,
         key: String,
         masteredKeys: inout Set<String>,
-        items: inout [Item],
-        keyFor: (Item) -> String
+        items: inout [Item]
     ) {
         if decision.isMastered {
             masteredKeys.insert(key)
@@ -272,8 +284,7 @@ extension ContentView {
             item: item,
             key: key,
             currentIndex: trainingSession.currentIndex,
-            items: &items,
-            keyFor: keyFor
+            items: &items
         )
 
         if decision.shouldClearRecoveryCounters {
@@ -319,25 +330,23 @@ extension ContentView {
     func removeFutureRepeatsForCurrentMode(after index: Int, key: String) {
         switch practiceMode {
         case .kanji:
-            removeFutureRepeats(after: index, key: key, from: &cards, keyFor: \.kanji)
+            removeFutureRepeats(after: index, key: key, from: &cards)
         case .words:
-            removeFutureRepeats(after: index, key: key, from: &wordCards, keyFor: reviewKey(for:))
+            removeFutureRepeats(after: index, key: key, from: &wordCards)
         case .kana:
-            removeFutureRepeats(after: index, key: key, from: &kanaCards, keyFor: reviewKey(for:))
+            removeFutureRepeats(after: index, key: key, from: &kanaCards)
         }
     }
 
-    func removeFutureRepeats<Item>(
+    func removeFutureRepeats<Item: StudyItem>(
         after index: Int,
         key: String,
-        from items: inout [Item],
-        keyFor: (Item) -> String
+        from items: inout [Item]
     ) {
         TrainingSessionEngine.removeFutureRepeats(
             after: index,
             key: key,
-            items: &items,
-            keyFor: keyFor
+            items: &items
         )
     }
 
@@ -388,12 +397,7 @@ extension ContentView {
         wordCards = nextCards
         cards.removeAll()
         kanaCards.removeAll()
-        trainingSession.resetQueuePosition()
-        resetWordDrawingState()
-        resetSessionProgress(total: Set(nextCards.map(\.id)).count)
-        trainingSession.isPreparingCard = false
-        resetCurrentAnswer()
-        trainingSession.scrollToTopToken += 1
+        prepareStudyPack(nextCards, scrollToTop: true)
         return true
     }
 
@@ -411,12 +415,7 @@ extension ContentView {
         kanaCards = nextCards
         cards.removeAll()
         wordCards.removeAll()
-        trainingSession.resetQueuePosition()
-        resetWordDrawingState()
-        resetSessionProgress(total: Set(nextCards.map(\.character)).count)
-        trainingSession.isPreparingCard = false
-        resetCurrentAnswer()
-        trainingSession.scrollToTopToken += 1
+        prepareStudyPack(nextCards, scrollToTop: true)
         return true
     }
 
@@ -430,12 +429,7 @@ extension ContentView {
         cards = nextCards
         wordCards.removeAll()
         kanaCards.removeAll()
-        trainingSession.resetQueuePosition()
-        resetWordDrawingState()
-        resetSessionProgress(total: Set(nextCards.map(\.kanji)).count)
-        trainingSession.isPreparingCard = false
-        resetCurrentAnswer()
-        trainingSession.scrollToTopToken += 1
+        prepareStudyPack(nextCards, scrollToTop: true)
         return true
     }
 
@@ -453,13 +447,7 @@ extension ContentView {
         trainingSession.isGuidedSingleKanjiPractice = false
         trainingSession.isPreparingCard = false
         coordinator.hasStartedTraining = false
-        coordinator.selectedPreviewCard = nil
-        coordinator.selectedKanaPreviewCard = nil
-        coordinator.selectedWordPreviewCard = nil
-        coordinator.selectedLinkedKanjiCard = nil
-        coordinator.presentedKanjiPreview = nil
-        coordinator.presentedKanaPreview = nil
-        coordinator.presentedWordPreview = nil
+        coordinator.resetPreviewSelection()
         resetCurrentAnswer()
     }
 

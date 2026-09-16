@@ -36,8 +36,7 @@ extension ContentView {
                         kanaPreviewCardContent(for: card)
 
                         primaryActionButton(title: "Тренировать этот знак", systemImage: "pencil.and.scribble") {
-                            coordinator.presentedKanaPreview = nil
-                            coordinator.selectedKanaPreviewCard = nil
+                            coordinator.closeKanaPreview()
                             startKanaTraining(deck: deck, cards: [card], guided: true)
                         }
                     }

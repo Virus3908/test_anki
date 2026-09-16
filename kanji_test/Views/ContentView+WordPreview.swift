@@ -41,8 +41,7 @@ extension ContentView {
                         wordFullCard(for: card)
 
                         primaryActionButton(title: "Практиковать слово", systemImage: "pencil.and.scribble") {
-                            coordinator.presentedWordPreview = nil
-                            coordinator.selectedWordPreviewCard = nil
+                            coordinator.closeWordPreview()
                             startWordTraining(with: [card], guided: true)
                         }
                     }
@@ -56,7 +55,7 @@ extension ContentView {
         }
         .background(AppPalette.background.ignoresSafeArea())
         .sheet(item: $coordinator.selectedLinkedKanjiCard, onDismiss: {
-            coordinator.selectedLinkedKanjiCard = nil
+            coordinator.closeLinkedKanjiPreview()
         }) { card in
             kanjiPreviewDetail(for: card)
         }
@@ -87,14 +86,8 @@ extension ContentView {
             }
             .frame(maxWidth: .infinity)
 
-            detailBlock("Перевод") {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(displayedWordMeaning(for: card))
-                        .foregroundStyle(AppPalette.text)
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    retranslateWordButton(for: card)
-                }
+            translatableTextBlock("Перевод", text: displayedWordMeaning(for: card)) {
+                retranslateWordButton(for: card)
             }
 
             detailBlock("Состав") {
@@ -193,7 +186,7 @@ extension ContentView {
                 if meaningLanguage == .russian {
                     let translatedExamples = await translateWordUsageExamples(examples)
                     translationState.wordExampleTranslations[card.id] = translatedExamples
-                    KanjiTranslationStore.saveWordExampleTranslation(translatedExamples, for: card.id)
+                    TranslationRepository.saveWordExampleTranslation(translatedExamples, for: card.id)
                 }
             }
 
@@ -230,7 +223,7 @@ extension ContentView {
 
     func wordComponentLink(for card: KanjiCard) -> some View {
         Button {
-            coordinator.selectedLinkedKanjiCard = card
+            coordinator.openLinkedKanjiPreview(card)
         } label: {
             HStack(spacing: 6) {
                 Text(card.kanji)

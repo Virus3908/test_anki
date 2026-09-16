@@ -90,6 +90,22 @@ extension ContentView {
         }
     }
 
+    func translatableTextBlock<Controls: View>(
+        _ title: String,
+        text: String,
+        @ViewBuilder controls: () -> Controls
+    ) -> some View {
+        detailBlock(title) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(text)
+                    .foregroundStyle(AppPalette.text)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                controls()
+            }
+        }
+    }
+
 }
 
 struct SurfaceCardModifier: ViewModifier {
