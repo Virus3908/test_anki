@@ -16,9 +16,16 @@ extension TrainingView {
             reviewKey: kanaCard.reviewKey,
             isTextSelectable: false
         ) {
-            detailBlock("Чтение") {
-                Text(kanaCard.reading)
-                    .font(.largeTitle.weight(.bold))
+            ForEach(frontFieldOrder) { field in
+                if field == .readings && showsPromptReading {
+                    detailBlock("Чтение") {
+                        Text(kanaCard.reading).font(.largeTitle.weight(.bold))
+                    }
+                } else if field == .character && showsPromptCharacters {
+                    detailBlock("Знак") {
+                        Text(kanaCard.character).font(.system(size: 58, design: .serif))
+                    }
+                }
             }
         }
     }

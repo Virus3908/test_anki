@@ -1,11 +1,12 @@
 import SwiftUI
 
 struct DeckPreviewView: View, CardContentRendering {
+    var deckID: String? { deckState.navigation.route.deck?.id }
     let deckState: DeckPreviewViewModel
     let coordinator: StudyCoordinator
     let settings: StudyPreferences
     let translationState: TranslationViewModel
-    let reviewStore: KanjiReviewStore
+    let reviewStore: StudyProgressStore
     let onPractice: (PracticeSelection) -> Void
     var previewKanjiCards: [KanjiCard] { deckState.previewCards }
     var previewWordCards: [WordStudyCard] { deckState.previewWordCards }

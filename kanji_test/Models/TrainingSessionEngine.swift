@@ -1,148 +1,63 @@
 import Foundation
 
-enum KanjiLearningSessionPhase {
-    case review
-    case learning
-    case fallbackReview
-}
-
 struct SessionAnswerState {
     let reviewKey: String
     var rating: ReviewRating
-    let recordBefore: KanjiReviewRecord?
-    let againCountBefore: Int?
-    let recoveryGoodCountBefore: Int?
-    let wasMastered: Bool
-    var queueBefore: [String] = []
 }
 
-struct ReviewAnswerPlan {
-    let updatedRecoveryGoodCount: Int?
-    let needsMoreRecovery: Bool
-    let shouldUpdateSchedule: Bool
-    let shouldResetIntervalOnGood: Bool
+struct ReviewUndo {
+    let id: String
+    let reviewKey: String
+    let recordBefore: StudyReviewRecord?
+    let logID: UUID
 }
 
-enum ReviewRepeatPlacement {
-    case none
-    case after(Int)
-    case atEnd
+nonisolated struct StudyQueuePlan {
+    let readyIDs: [String]
+    let nextLearningDate: Date?
+    let hiddenReviews: Int
 }
 
-struct ReviewQueueDecision {
-    let isMastered: Bool
-    let repeatPlacement: ReviewRepeatPlacement
-    let additionalRepeatOffset: Int?
-    let shouldClearRecoveryCounters: Bool
-    let shouldRemoveFutureRepeats: Bool
-}
-
-enum TrainingSessionEngine {
-    static func makeAnswerState(
-        reviewKey: String,
-        rating: ReviewRating,
-        recordBefore: KanjiReviewRecord?,
-        againCountBefore: Int?,
-        recoveryGoodCountBefore: Int?,
-        wasMastered: Bool
-    ) -> SessionAnswerState {
-        SessionAnswerState(
-            reviewKey: reviewKey,
-            rating: rating,
-            recordBefore: recordBefore,
-            againCountBefore: againCountBefore,
-            recoveryGoodCountBefore: recoveryGoodCountBefore,
-            wasMastered: wasMastered
-        )
-    }
-
-    static func makeAnswerPlan(
-        rating: ReviewRating,
-        record: KanjiReviewRecord?,
-        phase: KanjiLearningSessionPhase,
-        mistakeCount: Int,
-        recoveryGoodCount: Int
-    ) -> ReviewAnswerPlan {
-        let recovery = recoveryProgress(
-            rating: rating,
-            mistakeCount: mistakeCount,
-            recoveryGoodCount: recoveryGoodCount
-        )
-        let needsMoreRecovery = recovery.needsMoreRecovery
-        let shouldUpdateSchedule = phase != .fallbackReview && !needsMoreRecovery
-        let shouldResetIntervalOnGood = rating == .good && record?.state == .review && mistakeCount >= 2
-
-        return ReviewAnswerPlan(
-            updatedRecoveryGoodCount: recovery.updatedGoodCount,
-            needsMoreRecovery: needsMoreRecovery,
-            shouldUpdateSchedule: shouldUpdateSchedule,
-            shouldResetIntervalOnGood: shouldResetIntervalOnGood
-        )
-    }
-
-    static func shouldScheduleAdditionalRepeat(mistakeCount: Int) -> Bool {
-        mistakeCount >= 3
-    }
-
-    static func makeQueueDecision(
-        rating: ReviewRating,
-        isLearned: Bool,
-        needsMoreRecovery: Bool,
-        mistakeCount: Int
-    ) -> ReviewQueueDecision {
-        switch rating {
-        case .again:
-            return ReviewQueueDecision(
-                isMastered: false,
-                repeatPlacement: .after(2),
-                additionalRepeatOffset: shouldScheduleAdditionalRepeat(mistakeCount: mistakeCount) ? 5 : nil,
-                shouldClearRecoveryCounters: false,
-                shouldRemoveFutureRepeats: false
-            )
-        case .hard:
-            return ReviewQueueDecision(
-                isMastered: false,
-                repeatPlacement: .after(5),
-                additionalRepeatOffset: nil,
-                shouldClearRecoveryCounters: false,
-                shouldRemoveFutureRepeats: false
-            )
-        case .good:
-            if isLearned && !needsMoreRecovery {
-                return ReviewQueueDecision(
-                    isMastered: true,
-                    repeatPlacement: .none,
-                    additionalRepeatOffset: nil,
-                    shouldClearRecoveryCounters: true,
-                    shouldRemoveFutureRepeats: true
-                )
-            }
-
-            return ReviewQueueDecision(
-                isMastered: false,
-                repeatPlacement: .atEnd,
-                additionalRepeatOffset: nil,
-                shouldClearRecoveryCounters: false,
-                shouldRemoveFutureRepeats: false
-            )
+/// Rebuild from persisted due dates after every answer; no fixed-position repeats.
+nonisolated enum TrainingSessionEngine {
+    static func plan(sourceIDs: [String], mode: PracticeMode, deckID: String,
+                     progress: StudyProgressStore, options: DeckOptions, now: Date = Date()) -> StudyQueuePlan {
+        let date = progress.studyDate(now: now)
+        let options = options.validated
+        var seen: Set<String> = []
+        let items = sourceIDs.filter { seen.insert($0).inserted }.map { ReviewItem(id: $0, mode: mode) }
+        let keys = Set(items.map(\.reviewKey))
+        let newLimit = progress.remainingNewCards(limit: options.dailyNewCardLimit, keys: keys, now: now)
+        let reviewLimit = progress.remainingReviews(limit: options.dailyReviewLimit, deckID: deckID, now: now)
+        var learning: [ReviewItem] = []
+        var reviews: [ReviewItem] = []
+        var started: [ReviewItem] = []
+        var fresh: [ReviewItem] = []
+        var nextLearning: Date?
+        for item in items {
+            if let record = progress.record(for: item.reviewKey) {
+                if progress.isDue(record, now: now) {
+                    if progress.consumesReviewLimit(record) { reviews.append(item) }
+                    else { learning.append(item) }
+                } else if record.state != .review,
+                          Calendar.current.isDate(record.dueDate, inSameDayAs: date) {
+                    nextLearning = min(nextLearning ?? record.dueDate, record.dueDate)
+                }
+            } else if progress.firstShownAt[item.reviewKey] != nil { started.append(item) }
+            else { fresh.append(item) }
         }
-    }
-
-    static func uniqueReviewItemCount<Item: StudyItem>(_ items: [Item]) -> Int {
-        Set(items.map(\.reviewKey)).count
-    }
-
-    private static func recoveryProgress(
-        rating: ReviewRating,
-        mistakeCount: Int,
-        recoveryGoodCount: Int
-    ) -> (updatedGoodCount: Int?, needsMoreRecovery: Bool) {
-        guard rating == .good, mistakeCount >= 2 else {
-            return (nil, false)
+        let byDue: (ReviewItem, ReviewItem) -> Bool = {
+            let left = progress.records[$0.reviewKey]?.dueDate ?? .distantPast
+            let right = progress.records[$1.reviewKey]?.dueDate ?? .distantPast
+            return left == right ? $0.reviewKey < $1.reviewKey : left < right
         }
-
-        let updatedGoodCount = recoveryGoodCount + 1
-        let requiredGoodCount = 1 + (mistakeCount / 2)
-        return (updatedGoodCount, updatedGoodCount < requiredGoodCount)
+        learning.sort(by: byDue)
+        reviews.sort(by: byDue)
+        let selectedReviews = Array(reviews.prefix(reviewLimit))
+        // As in Anki's default: reaching the review cap pauses introductions,
+        // while cards already being learned today can complete their steps.
+        let selectedNew = reviewLimit > 0 ? Array(fresh.prefix(newLimit)) : []
+        return StudyQueuePlan(readyIDs: (learning + selectedReviews + started + selectedNew).map(\.id),
+                              nextLearningDate: nextLearning, hiddenReviews: max(0, reviews.count - selectedReviews.count))
     }
 }

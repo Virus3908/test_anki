@@ -6,7 +6,6 @@ extension TrainingView {
         let boardSide = drawingBoardSide(for: panelHeight)
 
         return VStack(spacing: 8) {
-            let isCurrentCardAnswered = currentSessionRating() != nil
 
             ZStack {
                 DrawingBoard(
@@ -63,44 +62,8 @@ extension TrainingView {
             .tint(AppPalette.accent)
             .font(.title3.weight(.semibold))
 
-            HStack(spacing: 8) {
-                Button {
-                    moveToPreviousCard()
-                } label: {
-                    Image(systemName: "chevron.left")
-                }
-                .disabled(trainingSession.currentIndex <= 0 || trainingSession.isPreparingCard)
+            reviewControls()
 
-                Spacer(minLength: 12)
-
-                VStack(spacing: 4) {
-                    sessionAnswerLabel()
-
-                    HStack(spacing: 10) {
-                        reviewButton("-", rating: .again, card: card)
-                        reviewButton("~", rating: .hard, card: card)
-                        reviewButton("+", rating: .good, card: card)
-                    }
-                }
-                .disabled(drawingSession.feedback.isEmpty && !isCurrentCardAnswered)
-
-                Spacer(minLength: 12)
-
-                Button {
-                    moveToNextCard()
-                } label: {
-                    if trainingSession.isPreparingCard {
-                        ProgressView()
-                            .controlSize(.small)
-                    } else {
-                        Image(systemName: "chevron.right")
-                    }
-                }
-                .disabled(trainingSession.currentIndex >= cards.count - 1 || trainingSession.isPreparingCard)
-            }
-            .buttonStyle(.bordered)
-            .tint(AppPalette.accent)
-            .font(.title3.weight(.semibold))
         }
         .frame(height: panelHeight)
         .frame(maxWidth: .infinity)

@@ -1,6 +1,6 @@
 import Foundation
 
-nonisolated extension KanjiReviewStore {
+nonisolated extension StudyProgressStore {
     func scheduleBuckets(for cards: [KanjiCard], now: Date = Date()) -> [KanjiReviewScheduleBucket] {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: studyDate(now: now))

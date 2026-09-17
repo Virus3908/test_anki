@@ -4,8 +4,10 @@ extension SettingsView {
     func frontSettingsView() -> some View {
         settingsSection("Лицевая сторона") {
             VStack(spacing: 8) {
-                ForEach(settings.frontFieldOrder) { field in
-                    frontSettingRow(for: field)
+                ForEach(options.frontFieldOrder) { field in
+                    if field != .meanings || StudyDeck.builtIn.first(where: { $0.id == selectedDeckID })?.mode != .kana {
+                        frontSettingRow(for: field)
+                    }
                 }
             }
         }
@@ -44,52 +46,40 @@ extension SettingsView {
         .background(AppPalette.background.opacity(0.7))
         .clipShape(RoundedRectangle(cornerRadius: 7))
         .frame(maxWidth: .infinity)
-        .animation(.spring(response: 0.28, dampingFraction: 0.95), value: settings.frontFieldOrder)
+        .animation(.spring(response: 0.28, dampingFraction: 0.95), value: options.frontFieldOrder)
     }
 
     func canMoveFrontField(_ field: FrontFieldKind, direction: Int) -> Bool {
-        guard let currentIndex = settings.frontFieldOrder.firstIndex(of: field) else {
+        guard let currentIndex = options.frontFieldOrder.firstIndex(of: field) else {
             return false
         }
 
-        return settings.frontFieldOrder.indices.contains(currentIndex + direction)
+        return options.frontFieldOrder.indices.contains(currentIndex + direction)
     }
 
     func moveFrontField(_ field: FrontFieldKind, direction: Int) {
-        guard let currentIndex = settings.frontFieldOrder.firstIndex(of: field) else {
+        guard let currentIndex = options.frontFieldOrder.firstIndex(of: field) else {
             return
         }
 
         let targetIndex = currentIndex + direction
-        guard settings.frontFieldOrder.indices.contains(targetIndex) else {
+        guard options.frontFieldOrder.indices.contains(targetIndex) else {
             return
         }
 
         withAnimation(.easeOut(duration: 0.16)) {
-            settings.frontFieldOrder.move(
-                fromOffsets: IndexSet(integer: currentIndex),
-                toOffset: targetIndex > currentIndex ? targetIndex + 1 : targetIndex
-            )
+            settings.updateOptions(for: deckID) {
+                $0.frontFieldOrder.move(fromOffsets: IndexSet(integer: currentIndex),
+                    toOffset: targetIndex > currentIndex ? targetIndex + 1 : targetIndex)
+            }
         }
     }
 
     func binding(for field: FrontFieldKind) -> Binding<Bool> {
         switch field {
-        case .readings:
-            return Binding(
-                get: { settings.showsPromptReading },
-                set: { settings.showsPromptReading = $0 }
-            )
-        case .meanings:
-            return Binding(
-                get: { settings.showsPromptMeaning },
-                set: { settings.showsPromptMeaning = $0 }
-            )
-        case .character:
-            return Binding(
-                get: { settings.showsPromptCharacters },
-                set: { settings.showsPromptCharacters = $0 }
-            )
+        case .readings: return optionBinding(\.showsPromptReading)
+        case .meanings: return optionBinding(\.showsPromptMeaning)
+        case .character: return optionBinding(\.showsPromptCharacters)
         }
     }
 }

@@ -1,35 +1,47 @@
 import SwiftUI
 
 extension TrainingView {
-    func reviewButton(_ title: String, rating: ReviewRating, card: KanjiCard) -> some View {
-        ratingActionButton(
-            title,
-            color: ratingButtonColor(for: rating, hasFeedback: !drawingSession.feedback.isEmpty, isAnswered: currentSessionRating() != nil),
-            isSelected: sessionRating(at: trainingSession.currentIndex) == rating
-        ) {
-            applyReview(rating, to: card)
+    func reviewControls() -> some View {
+        VStack(spacing: 6) {
+            HStack {
+                Button {
+                    moveToPreviousCard()
+                } label: {
+                    Label(trainingSession.isGuidedSingleKanjiPractice ? "Назад" : "Отменить ответ",
+                          systemImage: "arrow.uturn.backward")
+                        .font(.caption)
+                }
+                .disabled(!trainingSession.canGoBack || trainingSession.isPreparingCard)
+                Spacer()
+                if trainingSession.isGuidedSingleKanjiPractice {
+                    sessionAnswerLabel()
+                    Button("Дальше", systemImage: "chevron.right") { moveToNextCard() }
+                        .disabled(!trainingSession.canGoForward)
+                }
+            }
+            HStack(spacing: 6) {
+                ForEach(ReviewRating.allCases) { rating in
+                    Button {
+                        switch practiceMode {
+                        case .kanji:
+                            if let card = cards[safe: trainingSession.currentIndex] { applyReview(rating, to: card) }
+                        case .words: applyWordReview(rating)
+                        case .kana: applyKanaReview(rating)
+                        }
+                    } label: {
+                        VStack(spacing: 3) {
+                            Text(rating.title).font(.caption.weight(.bold))
+                            let interval = trainingSession.intervalLabel(for: rating)
+                            if !interval.isEmpty { Text(interval).font(.caption2) }
+                        }
+                        .frame(maxWidth: .infinity, minHeight: 34)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(ratingButtonColor(for: rating, hasFeedback: true, isAnswered: true))
+                    .disabled(!drawingSession.isAnswerVisible || trainingSession.isPreparingCard)
+                }
+            }
         }
-        .disabled(trainingSession.isPreparingCard)
-    }
-
-    func ratingActionButton(
-        _ title: String,
-        color: Color,
-        isSelected: Bool = false,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            Text(title)
-                .font(.title3.weight(.bold))
-                .foregroundStyle(Color.white)
-                .frame(width: 18, height: 18)
-        }
-        .buttonStyle(.borderedProminent)
-        .tint(color)
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(isSelected ? AppPalette.text.opacity(0.75) : Color.clear, lineWidth: 2)
-        )
     }
 
     func currentSessionRating() -> ReviewRating? {
@@ -52,6 +64,8 @@ extension TrainingView {
             return AppPalette.warning
         case .good:
             return AppPalette.success
+        case .easy:
+            return AppPalette.accent
         }
     }
 
@@ -101,11 +115,11 @@ extension TrainingView {
     }
 
     func drawingPanelHeight(for size: CGSize) -> CGFloat {
-        min(max(size.height * 0.36, 250), 300)
+        min(max(size.height * 0.42, 310), 355)
     }
 
     func drawingBoardSide(for panelHeight: CGFloat) -> CGFloat {
-        min(max(panelHeight - 88, 160), 205)
+        min(max(panelHeight - 132, 160), 205)
     }
 
 }

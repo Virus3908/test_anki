@@ -27,8 +27,8 @@ final class StudyAppViewModel {
          translator: any MeaningTranslating = SystemRussianMeaningTranslator(),
          kanjiProvider: any KanjiProviding = KanjiAPIProvider(),
          wordProvider: any WordExampleProviding = TatoebaWordExampleProvider()) {
-        let settings = StudyPreferences()
         let errors = StorageStatus()
+        let settings = StudyPreferences(errors: errors)
         let catalog = StudyCardCatalog()
         let navigation = StudyNavigation()
         self.settings = settings

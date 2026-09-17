@@ -1,7 +1,7 @@
 import Foundation
 
 extension StudyCoordinator {
-    func openDeckPreview(_ deck: KanjiDeck, deckState: DeckPreviewViewModel, reviewStore: KanjiReviewStore) {
+    func openDeckPreview(_ deck: KanjiDeck, deckState: DeckPreviewViewModel, reviewStore: StudyProgressStore) {
         selectedDeck = deck
         clearDeckSelection()
         deckState.openKanjiPreview(deck, reviewStore: reviewStore)

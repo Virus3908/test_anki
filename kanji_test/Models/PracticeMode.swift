@@ -1,6 +1,6 @@
 import Foundation
 
-enum PracticeMode: String, CaseIterable, Identifiable {
+nonisolated enum PracticeMode: String, CaseIterable, Identifiable, Codable, Sendable {
     case kanji
     case words
     case kana

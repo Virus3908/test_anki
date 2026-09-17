@@ -25,7 +25,8 @@ struct ContentView: View {
                         canRestoreTranslations: appModel.translationState.canRestoreBackup,
                         onNextDay: { Task { await appModel.advanceReviewDay() } },
                         onClearCache: { Task { await appModel.clearDeckCache() } },
-                        onRestoreTranslations: { Task { await appModel.translationState.restoreBackup() } })
+                        onRestoreTranslations: { Task { await appModel.translationState.restoreBackup() } },
+                        initialDeck: appModel.trainingSession.deck ?? appModel.navigation.route.deck)
                 }
                 .disabled(!appModel.hasLoadedSavedState || appModel.isSavingReview || appModel.isLoadingSavedState)
                 .overlay { loadingOverlay }

@@ -37,25 +37,23 @@ enum ActiveStudyQueue {
 
 struct TrainingSessionState {
     var queue: ActiveStudyQueue = .idle
+    var deck: StudyDeck?
     var currentIndex = 0
-    var sessionTotalCards = 0
     var sessionCompletedCards = 0
-    var masteredKeys: Set<String> = []
     var isGuidedSingleKanjiPractice = false
-    var kanjiAgainCounts: [String: Int] = [:]
-    var kanjiRecoveryGoodCounts: [String: Int] = [:]
     var sessionAnswerStates: [String: SessionAnswerState] = [:]
-    var kanjiSessionPhase: KanjiLearningSessionPhase = .learning
+    var undoHistory: [ReviewUndo] = []
     var studyDay: Date?
+    var nextLearningDate: Date?
+    var hiddenReviews = 0
 
-    func currentAnswerID(for mode: PracticeMode) -> String { "\(mode.rawValue):\(currentIndex)" }
     mutating func replaceQueue(_ ids: [String]) {
         guard let mode = queue.mode, let source = queue.value?.sourceIDs else { return }
         queue = .make(mode: mode, ids: ids, sourceIDs: source)
     }
 }
 
-struct ReviewItem: StudyItem {
+nonisolated struct ReviewItem: StudyItem {
     let id: String
     let mode: PracticeMode
     nonisolated var reviewKey: String {

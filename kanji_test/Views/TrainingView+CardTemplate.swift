@@ -44,7 +44,7 @@ extension TrainingView {
 
             fields()
 
-            if !showsPromptCharacters && !showsPromptReading && !showsPromptMeaning {
+            if !showsPromptCharacters && !showsPromptReading && (practiceMode == .kana || !showsPromptMeaning) {
                 Text(fallbackPrompt)
                     .font(.title2.weight(.semibold))
                     .foregroundStyle(AppPalette.text)

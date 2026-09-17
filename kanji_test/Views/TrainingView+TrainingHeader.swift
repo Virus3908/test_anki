@@ -4,6 +4,7 @@ extension TrainingView {
     func cardSwipeGesture() -> some Gesture {
         DragGesture(minimumDistance: 35)
             .onEnded { value in
+                guard trainingSession.isGuidedSingleKanjiPractice else { return }
                 let width = value.translation.width
                 let height = value.translation.height
                 guard abs(width) > abs(height) * 1.4, abs(width) > 70 else {
@@ -32,10 +33,10 @@ extension TrainingView {
 
             Spacer()
 
-            Text("Закреплено \(trainingSession.sessionCompletedCards) / \(trainingSession.sessionTotalCards)")
+            Text(trainingSession.isGuidedSingleKanjiPractice ? "Практика" : "Ответов: \(trainingSession.sessionCompletedCards) · Осталось: \(trainingSession.sessionTotalCards)")
                 .font(.footnote.weight(.semibold))
                 .foregroundStyle(AppPalette.secondaryText)
-                .frame(minWidth: 128, alignment: .trailing)
+                .multilineTextAlignment(.trailing)
         }
         .buttonStyle(.bordered)
         .tint(AppPalette.accent)

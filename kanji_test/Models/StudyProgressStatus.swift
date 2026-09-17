@@ -25,7 +25,7 @@ enum StudyProgressStatus {
         }
     }
 
-    init(record: KanjiReviewRecord?, now: Date = Date()) {
+    init(record: StudyReviewRecord?, now: Date = Date()) {
         guard let record else {
             self = .notStarted
             return

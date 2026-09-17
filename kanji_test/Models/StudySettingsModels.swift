@@ -1,6 +1,6 @@
 import Foundation
 
-enum FrontFieldKind: String, CaseIterable, Identifiable {
+nonisolated enum FrontFieldKind: String, CaseIterable, Identifiable, Codable, Sendable {
     case readings
     case meanings
     case character
@@ -19,7 +19,7 @@ enum FrontFieldKind: String, CaseIterable, Identifiable {
     }
 }
 
-enum MeaningLanguage: String, CaseIterable, Identifiable {
+nonisolated enum MeaningLanguage: String, CaseIterable, Identifiable, Codable, Sendable {
     case russian
     case english
 

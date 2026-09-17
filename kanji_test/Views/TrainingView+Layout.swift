@@ -10,19 +10,19 @@ extension TrainingView {
                 if let card = cards[safe: trainingSession.currentIndex] {
                     trainingView(for: card)
                 } else {
-                    ContentUnavailableView("Тренировка завершена", systemImage: "checkmark.circle")
+                    sessionWaitingView()
                 }
             case .words:
                 if let wordCard = wordCards[safe: trainingSession.currentIndex] {
                     wordTrainingView(for: wordCard)
                 } else {
-                    ContentUnavailableView("Тренировка завершена", systemImage: "checkmark.circle")
+                    sessionWaitingView()
                 }
             case .kana:
                 if let kanaCard = kanaCards[safe: trainingSession.currentIndex] {
                     kanaTrainingView(for: kanaCard)
                 } else {
-                    ContentUnavailableView("Тренировка завершена", systemImage: "checkmark.circle")
+                    sessionWaitingView()
                 }
             }
         }
@@ -96,6 +96,16 @@ extension TrainingView {
 
                     if let currentKanji {
                         wordDrawingPanel(for: wordCard, currentKanji: currentKanji, panelHeight: panelHeight)
+                    } else {
+                        VStack(spacing: 12) {
+                            if !drawingSession.isAnswerVisible {
+                                Button("Показать ответ") { revealDrawingAnswer() }
+                                    .buttonStyle(.borderedProminent)
+                            }
+                            reviewControls()
+                        }
+                        .padding(16)
+                        .background(AppPalette.surface)
                     }
                 }
         }

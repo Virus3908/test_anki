@@ -1,7 +1,7 @@
 import Foundation
 
 extension DeckPreviewViewModel {
-    func openKanjiPreview(_ deck: KanjiDeck, reviewStore: KanjiReviewStore) {
+    func openKanjiPreview(_ deck: KanjiDeck, reviewStore: StudyProgressStore) {
         cancelPreviewTask()
         navigation.route = .kanjiDeck(deck)
         loadError = nil
@@ -41,7 +41,7 @@ extension DeckPreviewViewModel {
         expectedCount: Int?,
         deck: KanjiDeck,
         requestID: UUID,
-        reviewStore: KanjiReviewStore
+        reviewStore: StudyProgressStore
     ) {
         guard previewDeck == deck, previewRequestID == requestID, !Task.isCancelled else {
             return

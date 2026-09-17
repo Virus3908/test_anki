@@ -1,12 +1,11 @@
 import Foundation
 import Observation
 
-/// Sole owner of active training, progress and introduction accounting.
 @MainActor
 @Observable
 final class TrainingSessionViewModel {
     private(set) var state = TrainingSessionState()
-    private(set) var reviewStore = KanjiReviewStore(records: [:])
+    private(set) var reviewStore = StudyProgressStore(records: [:])
     private(set) var isPreparingCard = false
     private(set) var hasLoadedProgress = false
     private(set) var canRestoreBackup = false
@@ -23,14 +22,17 @@ final class TrainingSessionViewModel {
         self.settings = settings
         self.errors = errors
     }
-
     var isActive: Bool { state.queue.mode != nil }
     var mode: PracticeMode? { state.queue.mode }
+    var deck: StudyDeck? { state.deck }
+    var options: DeckOptions { settings.options(for: deck?.id) }
     var currentIndex: Int { state.currentIndex }
-    var sessionTotalCards: Int { state.sessionTotalCards }
+    var sessionTotalCards: Int { queueIDs.count }
     var sessionCompletedCards: Int { state.sessionCompletedCards }
     var isGuidedSingleKanjiPractice: Bool { state.isGuidedSingleKanjiPractice }
     var sessionAnswerStates: [String: SessionAnswerState] { state.sessionAnswerStates }
+    var canGoBack: Bool { isGuidedSingleKanjiPractice ? currentIndex > 0 : !state.undoHistory.isEmpty }
+    var canGoForward: Bool { isGuidedSingleKanjiPractice && currentIndex + 1 < queueIDs.count }
     var cards: [KanjiCard] { mode == .kanji ? queueIDs.compactMap(catalog.kanji) : [] }
     var wordCards: [WordStudyCard] { mode == .words ? queueIDs.compactMap(catalog.word) : [] }
     var kanaCards: [KanaStudyCard] { mode == .kana ? queueIDs.compactMap(catalog.kana) : [] }
@@ -47,7 +49,6 @@ final class TrainingSessionViewModel {
             throw error
         }
     }
-
     func restoreProgressBackup() async throws {
         guard !isPreparingCard else { return }
         isPreparingCard = true
@@ -57,19 +58,22 @@ final class TrainingSessionViewModel {
         canRestoreBackup = false
         publish(TrainingSessionState())
     }
-
-    func start(mode: PracticeMode, sourceIDs: [String], guided: Bool = false) async -> Bool {
+    func start(deck: StudyDeck, sourceIDs: [String], guided: Bool = false) async -> Bool {
         guard hasLoadedProgress, !isPreparingCard else { return false }
         isPreparingCard = true
         defer { isPreparingCard = false }
+        var seen: Set<String> = []
+        let source = sourceIDs.filter { seen.insert($0).inserted }
+        guard !source.isEmpty else { return false }
+        var next = TrainingSessionState()
+        next.deck = deck
+        next.queue = .make(mode: deck.mode, ids: source, sourceIDs: source)
+        next.isGuidedSingleKanjiPractice = guided
+        next.studyDay = reviewStore.studyDate()
         var progress = reviewStore
-        var next = makePack(mode: mode, sourceIDs: sourceIDs, progress: progress, guided: guided)
-        guard next.queue.mode != nil else {
-            errors.message = "На сегодня всё готово: повторений нет, новые карточки закончились или дневной лимит достигнут."
-            return false
-        }
+        if !guided { rebuild(&next, progress: progress) }
         do {
-            if markCurrentShown(in: &next, progress: &progress) { try await repository.save(progress) }
+            if markCurrentShown(in: next, progress: &progress) { try await repository.save(progress) }
             reviewStore = progress
             publish(next)
             return true
@@ -78,61 +82,63 @@ final class TrainingSessionViewModel {
             return false
         }
     }
-
     func submitReview(_ rating: ReviewRating, expectedKey: String?) async {
-        guard hasLoadedProgress, !isPreparingCard, let mode else { return }
+        guard hasLoadedProgress, !isPreparingCard, let mode, let deck,
+              let id = queueIDs[safe: currentIndex] else { return }
         if hasStudyDayChanged { await refreshForNewDay(); return }
+        let key = ReviewItem(id: id, mode: mode).reviewKey
+        guard expectedKey == nil || expectedKey == key else { return }
+        if isGuidedSingleKanjiPractice {
+            state.sessionAnswerStates[answerID(for: mode, index: currentIndex)] = SessionAnswerState(reviewKey: key, rating: rating)
+            return
+        }
         isPreparingCard = true
         defer { isPreparingCard = false }
         var next = state
         var progress = reviewStore
-        var items = queueIDs.map { ReviewItem(id: $0, mode: mode) }
-        guard let item = items[safe: currentIndex], expectedKey == nil || item.reviewKey == expectedKey else { return }
-        let shouldAdvance = TrainingReviewService.applyReview(item: item, rating: rating, mode: mode,
-            session: &next, reviewStore: &progress, items: &items, learningSuccessTarget: settings.learningSuccessTarget)
-        next.replaceQueue(items.map(\.id))
-        if shouldAdvance {
-            if next.sessionCompletedCards >= next.sessionTotalCards {
-                next = makePack(mode: mode, sourceIDs: next.queue.value?.sourceIDs ?? [], progress: progress)
-            } else if next.currentIndex + 1 < items.count {
-                next.currentIndex += 1
-            }
-        }
-        _ = markCurrentShown(in: &next, progress: &progress)
+        let previous = progress.record(for: key)
         do {
-            if !state.isGuidedSingleKanjiPractice { try await repository.save(progress) }
-            reviewStore = progress
-            if shouldAdvance { publish(next) } else { state = next }
-        } catch {
-            errors.report("Ответ не сохранён. Попробуй оценить карточку ещё раз.", error: error)
-        }
-    }
-
-    func moveToPreviousCard() async { await move(to: currentIndex - 1) }
-    func moveToNextCard() async { await move(to: currentIndex + 1) }
-
-    private func move(to index: Int) async {
-        guard !isPreparingCard, queueIDs.indices.contains(index) else { return }
-        if hasStudyDayChanged { await refreshForNewDay(); return }
-        isPreparingCard = true
-        defer { isPreparingCard = false }
-        var next = state
-        var progress = reviewStore
-        next.currentIndex = index
-        do {
-            if markCurrentShown(in: &next, progress: &progress) { try await repository.save(progress) }
+            let logID = try progress.apply(rating, to: key, deckID: deck.id, options: options)
+            next.undoHistory.append(ReviewUndo(id: id, reviewKey: key, recordBefore: previous, logID: logID))
+            next.sessionCompletedCards += 1
+            rebuild(&next, progress: progress)
+            _ = markCurrentShown(in: next, progress: &progress)
+            try await repository.save(progress)
             reviewStore = progress
             publish(next)
-        } catch {
-            errors.report("Не удалось сохранить показ карточки.", error: error)
-        }
+        } catch { errors.report("Ответ не сохранён. Попробуй оценить карточку ещё раз.", error: error) }
     }
-
+    func moveToPreviousCard() async {
+        if isGuidedSingleKanjiPractice { moveInPractice(to: currentIndex - 1); return }
+        guard !isPreparingCard, let undo = state.undoHistory.last else { return }
+        if hasStudyDayChanged { await refreshForNewDay(); return }
+        isPreparingCard = true
+        defer { isPreparingCard = false }
+        var progress = reviewStore
+        progress.undo(logID: undo.logID, record: undo.recordBefore, key: undo.reviewKey)
+        var next = state
+        next.undoHistory.removeLast()
+        next.sessionCompletedCards = max(0, next.sessionCompletedCards - 1)
+        rebuild(&next, progress: progress, preferredID: undo.id)
+        do {
+            try await repository.save(progress)
+            reviewStore = progress
+            publish(next)
+        } catch { errors.report("Не удалось отменить ответ.", error: error) }
+    }
+    func moveToNextCard() async {
+        if isGuidedSingleKanjiPractice { moveInPractice(to: currentIndex + 1) }
+    }
+    private func moveInPractice(to index: Int) {
+        guard !isPreparingCard, queueIDs.indices.contains(index) else { return }
+        var next = state
+        next.currentIndex = index
+        publish(next)
+    }
     func finish() {
         guard !isPreparingCard else { return }
         publish(TrainingSessionState())
     }
-
     func advanceStudyDay() async throws {
         guard hasLoadedProgress, !isPreparingCard else { return }
         isPreparingCard = true
@@ -143,72 +149,62 @@ final class TrainingSessionViewModel {
         reviewStore = progress
         publish(TrainingSessionState())
     }
-
     private var hasStudyDayChanged: Bool {
         guard let day = state.studyDay else { return false }
         return !Calendar.current.isDate(day, inSameDayAs: reviewStore.studyDate())
     }
-
     func refreshForNewDay() async {
-        guard !isPreparingCard, let mode, hasStudyDayChanged,
-              let source = state.queue.value?.sourceIDs else { return }
-        if makePack(mode: mode, sourceIDs: source, progress: reviewStore,
-                    guided: state.isGuidedSingleKanjiPractice).queue.mode == nil {
-            finish()
-            return
-        }
-        _ = await start(mode: mode, sourceIDs: source, guided: state.isGuidedSingleKanjiPractice)
+        guard isActive, !isPreparingCard, !isGuidedSingleKanjiPractice else { return }
+        isPreparingCard = true
+        defer { isPreparingCard = false }
+        var next = state
+        var progress = reviewStore
+        let previousID = queueIDs[safe: currentIndex]
+        if hasStudyDayChanged { next.undoHistory = []; next.sessionCompletedCards = 0 }
+        rebuild(&next, progress: progress, preferredID: hasStudyDayChanged ? nil : previousID)
+        do {
+            if markCurrentShown(in: next, progress: &progress) { try await repository.save(progress) }
+            reviewStore = progress
+            if previousID == next.queue.value?.ids.first { state = next }
+            else { publish(next) }
+        } catch { errors.report("Не удалось обновить очередь обучения.", error: error) }
     }
-
-    private func makePack(mode: PracticeMode, sourceIDs: [String], progress: KanjiReviewStore, guided: Bool = false) -> TrainingSessionState {
-        var seen: Set<String> = []
-        let source = sourceIDs.filter { seen.insert($0).inserted }
-        let items = source.map { ReviewItem(id: $0, mode: mode) }
-        let selection = guided ? (items: items, phase: KanjiLearningSessionPhase.fallbackReview) :
-            TrainingSessionEngine.nextSessionItems(from: items, reviewStore: progress,
-                newCardLimit: settings.dailyNewCardLimit, learningSuccessTarget: settings.learningSuccessTarget)
-        guard !selection.items.isEmpty else { return TrainingSessionState() }
-        var next = TrainingSessionState()
-        next.queue = .make(mode: mode, ids: selection.items.map(\.id), sourceIDs: source)
-        next.sessionTotalCards = selection.items.count
-        next.kanjiSessionPhase = selection.phase
-        next.isGuidedSingleKanjiPractice = guided
+    private func rebuild(_ next: inout TrainingSessionState, progress: StudyProgressStore, preferredID: String? = nil) {
+        guard let queue = next.queue.value, let deck = next.deck else { return }
+        let plan = TrainingSessionEngine.plan(sourceIDs: queue.sourceIDs, mode: deck.mode, deckID: deck.id,
+            progress: progress, options: settings.options(for: deck.id))
+        var ids = plan.readyIDs
+        if let preferredID, let index = ids.firstIndex(of: preferredID) { ids.remove(at: index); ids.insert(preferredID, at: 0) }
+        next.replaceQueue(ids)
+        next.currentIndex = 0
         next.studyDay = progress.studyDate()
-        return next
+        next.nextLearningDate = plan.nextLearningDate
+        next.hiddenReviews = plan.hiddenReviews
     }
-
-    /// Persist only actual introductions, not every card preselected for a pack.
     @discardableResult
-    private func markCurrentShown(in next: inout TrainingSessionState, progress: inout KanjiReviewStore) -> Bool {
+    private func markCurrentShown(in next: TrainingSessionState, progress: inout StudyProgressStore) -> Bool {
         guard !next.isGuidedSingleKanjiPractice, let mode = next.queue.mode,
-              let ids = next.queue.value?.ids else { return false }
-        var available = progress.remainingNewCards(limit: settings.dailyNewCardLimit)
-        var retained: [String] = []
-        for (index, id) in ids.enumerated() {
-            let key = ReviewItem(id: id, mode: mode).reviewKey
-            let introduced = progress.records[key] != nil || progress.firstShownAt[key] != nil
-            if index < next.currentIndex || introduced { retained.append(id) }
-            else if available > 0 { retained.append(id); available -= 1 }
-        }
-        next.replaceQueue(retained)
-        next.sessionTotalCards = Set(retained).count
-        guard let id = retained[safe: next.currentIndex] else {
-            next = TrainingSessionState()
-            return false
-        }
+              let id = next.queue.value?.ids[safe: next.currentIndex] else { return false }
         let key = ReviewItem(id: id, mode: mode).reviewKey
         let isNew = progress.records[key] == nil && progress.firstShownAt[key] == nil
         progress.markShown(key)
         return isNew
     }
-
+    func intervalLabel(for rating: ReviewRating) -> String {
+        guard !isGuidedSingleKanjiPractice, let mode, let id = queueIDs[safe: currentIndex] else { return "" }
+        let key = ReviewItem(id: id, mode: mode).reviewKey
+        let now = reviewStore.studyDate()
+        guard let next = try? StudyScheduler.record(after: rating, cardID: key, existingRecord: reviewStore.record(for: key), options: options, now: now) else { return "—" }
+        if next.intervalDays >= 1 { return "\(Int(next.intervalDays)) дн." }
+        let minutes = max(1, Int(ceil(next.dueDate.timeIntervalSince(now) / 60)))
+        return minutes < 60 ? "\(minutes) мин." : "\(minutes / 60) ч."
+    }
     private func publish(_ next: TrainingSessionState) {
         state = next
         drawingSession.resetWordDrawingState()
         drawingSession.resetCurrentAnswer()
         scrollToTopToken += 1
     }
-
     func answerID(for mode: PracticeMode, index: Int) -> String { "\(mode.rawValue):\(index)" }
     func evaluateFeedback(for card: KanjiCard, reveal: Bool) -> Bool { drawingSession.evaluateFeedback(for: card, reveal: reveal) }
 }

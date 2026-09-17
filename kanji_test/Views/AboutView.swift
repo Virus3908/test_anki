@@ -8,6 +8,14 @@ struct AboutView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     aboutIntroView()
+                    licenseCard(title: "FSRS-6 · swift-fsrs", subtitle: "Расчёт интервалов повторения",
+                        license: "MIT · Copyright (c) 2023 Ben Smiley",
+                        links: [("Исходный код", "https://github.com/open-spaced-repetition/swift-fsrs")])
+                    if let url = Bundle.main.url(forResource: "FSRS-LICENSE", withExtension: "txt"),
+                       let license = try? String(contentsOf: url, encoding: .utf8) {
+                        Text(license).font(.caption2).foregroundStyle(AppPalette.secondaryText)
+                    }
+
 
                     licenseCard(
                         title: "JMdict / KANJIDIC",
