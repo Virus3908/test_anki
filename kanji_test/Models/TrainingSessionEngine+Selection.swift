@@ -41,6 +41,6 @@ extension TrainingSessionEngine {
             return (learningItems, .learning)
         }
 
-        return (Array(sourceItems.shuffled().prefix(max(1, newCardLimit))), .fallbackReview)
+        return ([], .learning)
     }
 }

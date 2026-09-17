@@ -1,13 +1,17 @@
 import Foundation
 
 struct WordStudyCard: Identifiable, Sendable {
-    var id: String { "\(word)-\(reading)" }
+    nonisolated var id: String { "\(word)-\(reading)" }
 
     let word: String
     let reading: String
     let meaning: String
     let examples: [WordUsageExample]
     let kanjiCards: [KanjiCard]
+
+    var hasCompleteDrawingResources: Bool {
+        !kanjiCards.isEmpty && kanjiCards.allSatisfy { !$0.strokes.isEmpty }
+    }
 
     var kanjiText: String {
         kanjiCards.map(\.kanji).joined()

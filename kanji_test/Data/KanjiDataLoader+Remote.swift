@@ -2,13 +2,13 @@ import Foundation
 
 extension KanjiDataLoader {
     static func loadCards(deck: KanjiDeck = .jlpt5, provider: KanjiProviding = KanjiAPIProvider()) async -> [KanjiCard] {
-        let availableCards = loadAvailableCards(deck: deck)
+        let availableCards = await loadAvailableCards(deck: deck)
         if !availableCards.isEmpty {
             return availableCards
         }
 
         do {
-            let cachedCards = try KanjiDeckCacheRepository.loadCards(for: deck) ?? []
+            let cachedCards = try await KanjiDeckCacheRepository.shared.loadCards(for: deck) ?? []
             let remoteKanjiList = uniqueKanjiList(try await provider.loadKanjiList(deck: deck))
 
             if !cachedCards.isEmpty {
@@ -16,7 +16,7 @@ extension KanjiDataLoader {
                 let missingKanji = remoteKanjiList.filter { cachedByKanji[$0] == nil }
 
                 if missingKanji.isEmpty {
-                    return prepareLoadedCards(remoteKanjiList.compactMap { cachedByKanji[$0] })
+                    return await prepareLoadedCards(remoteKanjiList.compactMap { cachedByKanji[$0] })
                 }
 
                 let missingCards = try await provider.loadCards(for: missingKanji)
@@ -26,25 +26,27 @@ extension KanjiDataLoader {
                 let mergedCards = remoteKanjiList.compactMap { mergedByKanji[$0] }
 
                 if !mergedCards.isEmpty {
-                    try KanjiDeckCacheRepository.mergeCardsIntoAllCache(mergedCards)
-                    return TranslationRepository.apply(to: mergedCards)
+                    try await KanjiDeckCacheRepository.shared.mergeCardsIntoAllCache(mergedCards)
+                    return mergedCards.map(\.withoutTranslations)
                 }
             }
 
             let remoteCards = try await provider.loadCards(for: remoteKanjiList)
             if !remoteCards.isEmpty {
-                try KanjiDeckCacheRepository.mergeCardsIntoAllCache(remoteCards)
-                return TranslationRepository.apply(to: remoteCards)
+                try await KanjiDeckCacheRepository.shared.mergeCardsIntoAllCache(remoteCards)
+                return remoteCards.map(\.withoutTranslations)
             }
+        } catch is CancellationError {
+            return []
         } catch {
-            if let cachedCards = try? KanjiDeckCacheRepository.loadCards(for: deck), !cachedCards.isEmpty {
-                return prepareLoadedCards(cachedCards)
+            if let cachedCards = try? await KanjiDeckCacheRepository.shared.loadCards(for: deck), !cachedCards.isEmpty {
+                return await prepareLoadedCards(cachedCards)
             }
 
-            assertionFailure("Failed to load remote kanji data: \(error)")
+            if Task.isCancelled { return [] }
         }
 
-        return loadLocalCards()
+        return await loadLocalCards()
     }
 
     static func loadCardsProgressively(
@@ -52,7 +54,7 @@ extension KanjiDataLoader {
         provider: KanjiProviding = KanjiAPIProvider(),
         onUpdate: @MainActor @escaping ([KanjiCard], Int?) -> Void
     ) async {
-        let bundledOrCachedCards = loadAvailableCards(deck: deck)
+        let bundledOrCachedCards = await loadAvailableCards(deck: deck)
         if !bundledOrCachedCards.isEmpty {
             onUpdate(bundledOrCachedCards, bundledOrCachedCards.count)
         }
@@ -64,11 +66,12 @@ extension KanjiDataLoader {
 
             if missingKanji.isEmpty {
                 let orderedCards = remoteKanjiList.compactMap { cardsByKanji[$0] }
-                onUpdate(TranslationRepository.apply(to: orderedCards), remoteKanjiList.count)
+                onUpdate(orderedCards.map(\.withoutTranslations), remoteKanjiList.count)
                 return
             }
 
             for await batch in provider.loadCardsStream(for: missingKanji) {
+                guard !Task.isCancelled else { return }
                 for card in batch {
                     if let existingCard = cardsByKanji[card.kanji] {
                         cardsByKanji[card.kanji] = KanjiDeckCacheRepository.mergeCachedCard(existingCard, with: card)
@@ -78,17 +81,19 @@ extension KanjiDataLoader {
                 }
 
                 let orderedCards = remoteKanjiList.compactMap { cardsByKanji[$0] }
-                onUpdate(TranslationRepository.apply(to: orderedCards), remoteKanjiList.count)
+                onUpdate(orderedCards.map(\.withoutTranslations), remoteKanjiList.count)
             }
 
+            guard !Task.isCancelled else { return }
             let finalCards = remoteKanjiList.compactMap { cardsByKanji[$0] }
             if !finalCards.isEmpty {
-                try KanjiDeckCacheRepository.mergeCardsIntoAllCache(finalCards)
-                onUpdate(TranslationRepository.apply(to: finalCards), remoteKanjiList.count)
+                try await KanjiDeckCacheRepository.shared.mergeCardsIntoAllCache(finalCards)
+                onUpdate(finalCards.map(\.withoutTranslations), remoteKanjiList.count)
             }
         } catch {
+            guard !Task.isCancelled else { return }
             if bundledOrCachedCards.isEmpty {
-                onUpdate(loadLocalCards(), nil)
+                onUpdate(await loadLocalCards(), nil)
             }
         }
     }
@@ -98,19 +103,11 @@ extension KanjiDataLoader {
         return kanjiList.filter { seen.insert($0).inserted }
     }
 
-    static func cacheCards(_ cards: [KanjiCard]) {
-        do {
-            try KanjiDeckCacheRepository.mergeCardsIntoAllCache(cards)
-        } catch {
-            assertionFailure("Failed to cache kanji cards: \(error)")
-        }
+    static func cacheCards(_ cards: [KanjiCard]) async throws {
+        try await KanjiDeckCacheRepository.shared.mergeCardsIntoAllCache(cards)
     }
 
-    static func clearCache() {
-        do {
-            try KanjiDeckCacheRepository.clearCache()
-        } catch {
-            assertionFailure("Failed to clear kanji deck cache: \(error)")
-        }
+    static func clearCache() async throws {
+        try await KanjiDeckCacheRepository.shared.clearCache()
     }
 }

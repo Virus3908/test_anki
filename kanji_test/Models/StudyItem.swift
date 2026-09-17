@@ -2,14 +2,11 @@ import Foundation
 
 protocol StudyItem {
     var id: String { get }
-    var reviewKey: String { get }
-    var displayTitle: String { get }
-    var displaySubtitle: String { get }
-    var strokes: [KanjiStroke] { get }
+    nonisolated var reviewKey: String { get }
 }
 
 extension KanjiCard: StudyItem {
-    var reviewKey: String {
+    nonisolated var reviewKey: String {
         kanji
     }
 
@@ -23,7 +20,7 @@ extension KanjiCard: StudyItem {
 }
 
 extension WordStudyCard: StudyItem {
-    var reviewKey: String {
+    nonisolated var reviewKey: String {
         "word:\(id)"
     }
 
@@ -43,7 +40,7 @@ extension WordStudyCard: StudyItem {
 }
 
 extension KanaStudyCard: StudyItem {
-    var reviewKey: String {
+    nonisolated var reviewKey: String {
         "kana:\(character)"
     }
 

@@ -7,33 +7,35 @@ extension DeckPreviewViewModel {
         }
 
         cancelPreviewTask()
-        previewWordDeck = deck
-        previewDeck = nil
-        previewKanaDeck = nil
+        navigation.route = .wordDeck(deck)
+        loadError = nil
         previewWordCards.removeAll()
         isLoadingDeck = true
 
+        let requestID = previewRequestID
+        let provider = kanjiProvider
         deckPreviewTask = Task { [weak self] in
-            let preparedWords = await WordDataLoader.loadWords(for: deck)
-            self?.finishWordPreviewLoad(preparedWords, for: deck)
+            do {
+                let preparedWords = try await WordDataLoader.loadWords(for: deck, provider: provider)
+                self?.finishWordPreviewLoad(preparedWords, for: deck, requestID: requestID)
+            } catch {
+                guard let self, self.previewRequestID == requestID, !Task.isCancelled else { return }
+                self.loadError = "Не удалось загрузить словарь: \(error.localizedDescription)"
+                self.isLoadingDeck = false
+                self.deckPreviewTask = nil
+            }
         }
     }
 
     func closeWordPreview() {
         cancelPreviewTask()
-        previewWordDeck = nil
+        navigation.route = .start
         previewWordCards.removeAll()
         isLoadingDeck = false
     }
 
-    func replacePreviewWordCards(using transform: (WordStudyCard) -> WordStudyCard) {
-        for index in previewWordCards.indices {
-            previewWordCards[index] = transform(previewWordCards[index])
-        }
-    }
-
-    private func finishWordPreviewLoad(_ loadedCards: [WordStudyCard], for deck: WordFrequencyDeck) {
-        guard previewWordDeck == deck else {
+    private func finishWordPreviewLoad(_ loadedCards: [WordStudyCard], for deck: WordFrequencyDeck, requestID: UUID) {
+        guard previewWordDeck == deck, previewRequestID == requestID, !Task.isCancelled else {
             return
         }
 

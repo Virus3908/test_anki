@@ -1,9 +1,9 @@
 import Foundation
 
-extension KanjiReviewStore {
+nonisolated extension KanjiReviewStore {
     func scheduleBuckets(for cards: [KanjiCard], now: Date = Date()) -> [KanjiReviewScheduleBucket] {
         let calendar = Calendar.current
-        let today = calendar.startOfDay(for: now)
+        let today = calendar.startOfDay(for: studyDate(now: now))
         let deckKanji = Set(cards.map(\.kanji))
         let deckRecords = records.filter { deckKanji.contains($0.key) }.map(\.value)
         let futureStart = calendar.date(byAdding: .day, value: 7, to: today) ?? today.addingTimeInterval(7 * 24 * 60 * 60)

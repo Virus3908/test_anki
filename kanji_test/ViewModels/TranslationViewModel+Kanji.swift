@@ -2,246 +2,65 @@ import Foundation
 
 extension TranslationViewModel {
     func displayedKanjiMeanings(for card: KanjiCard, language: MeaningLanguage) -> [String] {
-        switch language {
-        case .russian:
-            return translatedTexts[.kanjiMeaning(card.kanji)] ?? card.cachedRussianMeanings ?? card.englishMeanings
-        case .english:
-            return card.englishMeanings
-        }
+        language == .russian ? cached(.kanjiMeaning(card.id), source: card.englishMeanings) ?? card.englishMeanings : card.englishMeanings
     }
-
+    func originalKanjiExamples(for card: KanjiCard) -> [KanjiExample] { kanjiUsageExamples[card.id] ?? card.englishExamples }
+    func kanjiExampleSource(_ examples: [KanjiExample]) -> [String] { examples.flatMap { [$0.word, $0.reading, $0.meaning] } }
     func displayedKanjiExamples(for card: KanjiCard, language: MeaningLanguage) -> [KanjiExample] {
         let examples = originalKanjiExamples(for: card)
-        switch language {
-        case .russian:
-            return kanjiExampleTranslations[card.kanji] ?? card.cachedRussianExamples ?? examples
-        case .english:
-            return examples
+        guard language == .russian, let meanings = cached(.kanjiExamples(card.id), source: kanjiExampleSource(examples)),
+              meanings.count == examples.count else { return examples }
+        return zip(examples, meanings).map { KanjiExample(word: $0.word, reading: $0.reading, meaning: $1) }
+    }
+    func translateKanjiMeaningsIfNeeded(for card: KanjiCard, deck: KanjiDeck, language: MeaningLanguage) async {
+        guard language == .russian else { return }
+        await translateAutomatically(.kanjiMeaning(card.id), texts: card.englishMeanings, source: card.englishMeanings,
+                                     legacy: store.legacy.kanjiTranslations[card.id]?.russianMeanings)
+    }
+    func retranslateKanjiMeanings(_ card: KanjiCard, deck: KanjiDeck, language: MeaningLanguage) {
+        guard language == .russian else { return }
+        let key = TranslationBlockKey.kanjiMeaning(card.id)
+        runManual(key, kind: .manualTranslation) { id in
+            await self.translate(key, texts: card.englishMeanings, source: card.englishMeanings, manual: true, id: id)
         }
     }
-
-    func originalKanjiExamples(for card: KanjiCard) -> [KanjiExample] {
-        kanjiUsageExamples[card.kanji] ?? card.englishExamples
+    func loadKanjiExamplesIfNeeded(for card: KanjiCard, language: MeaningLanguage) async {
+        let key = TranslationBlockKey.kanjiExamples(card.id)
+        guard let id = beginAutomatic(key, kind: .automaticTranslation) else { return }
+        defer { end(id, key: key) }
+        let examples: [KanjiExample]
+        if let loaded = kanjiUsageExamples[card.id] { examples = loaded }
+        else {
+            examples = await KanjiDataLoader.loadExamplesIfNeeded(card, provider: kanjiProvider).englishExamples
+        }
+        guard current(id, key: key) else { return }
+        kanjiUsageExamples[card.id] = examples
+        guard language == .russian else { return }
+        let old = store.legacy.kanjiTranslations[card.id]?.russianExamples
+        let legacy = old?.map(\.id) == examples.map(\.id) ? old?.map(\.meaning) : nil
+        await translate(key, texts: examples.map(\.meaning), source: kanjiExampleSource(examples), manual: false, id: id, legacy: legacy)
     }
-
-    func translateKanjiMeaningsIfNeeded(
-        for card: KanjiCard,
-        deck: KanjiDeck,
-        language: MeaningLanguage
-    ) async {
-        let key = TranslationBlockKey.kanjiMeaning(card.kanji)
-        guard language == .russian,
-              translatedTexts[key] == nil,
-              !card.hasRussianMeanings,
-              !automaticTranslationBlocks.contains(key),
-              !manualTranslationBlocks.contains(key) else {
-            if translatedTexts[key] == nil, let cachedMeanings = card.cachedRussianMeanings, !cachedMeanings.isEmpty {
-                translatedTexts[key] = cachedMeanings
-            }
-            return
-        }
-
-        automaticTranslationBlocks.insert(key)
-        defer { automaticTranslationBlocks.remove(key) }
-        let meanings = await RussianMeaningTranslator.translateAutomatically(card.englishMeanings)
-        guard !manualTranslationBlocks.contains(key),
-              hasDifferentStrings(meanings, comparedTo: card.englishMeanings) else {
-            return
-        }
-
-        translatedTexts[key] = meanings
-        TranslationRepository.saveKanjiMeaningTranslation(meanings, for: card.kanji)
-    }
-
-    func translateKanjiExamplesIfNeeded(
-        for card: KanjiCard,
-        deck: KanjiDeck,
-        language: MeaningLanguage
-    ) async -> KanjiCard? {
-        let key = TranslationBlockKey.kanjiExamples(card.kanji)
-        guard language == .russian,
-              needsKanjiExampleTranslation(for: card),
-              !automaticTranslationBlocks.contains(key),
-              !manualTranslationBlocks.contains(key) else {
-            return nil
-        }
-
-        automaticTranslationBlocks.insert(key)
-        defer { automaticTranslationBlocks.remove(key) }
-        let loadedCard = await KanjiDataLoader.loadExamplesIfNeeded(card)
-        guard !manualTranslationBlocks.contains(key) else {
-            return nil
-        }
-
-        let translatedExamples = await translateKanjiExamples(loadedCard.englishExamples)
-        guard hasDifferentKanjiExamples(translatedExamples, comparedTo: loadedCard.englishExamples) else {
-            return loadedCard
-        }
-
-        let translatedCard = loadedCard.withRussianExamples(translatedExamples)
-        TranslationRepository.saveKanjiTranslation(from: translatedCard)
-        return translatedCard
-    }
-
-    func loadKanjiExamplesIfNeeded(
-        for card: KanjiCard,
-        language: MeaningLanguage
-    ) async {
-        let key = TranslationBlockKey.kanjiExamples(card.kanji)
-        guard kanjiUsageExamples[card.kanji] == nil,
-              !automaticTranslationBlocks.contains(key),
-              !manualTranslationBlocks.contains(key),
-              !manualExampleReloadingBlocks.contains(key) else {
-            return
-        }
-
-        automaticTranslationBlocks.insert(key)
-        defer { automaticTranslationBlocks.remove(key) }
-
-        let loadedCard = await KanjiDataLoader.loadExamplesIfNeeded(card)
-        let examples = loadedCard.englishExamples
-        guard !manualTranslationBlocks.contains(key),
-              !manualExampleReloadingBlocks.contains(key) else {
-            return
-        }
-
-        kanjiUsageExamples[card.kanji] = examples
-
-        guard language == .russian, !examples.isEmpty else {
-            return
-        }
-
-        let translatedExamples = await translateKanjiExamples(examples)
-        guard !manualTranslationBlocks.contains(key),
-              !manualExampleReloadingBlocks.contains(key),
-              hasDifferentKanjiExamples(translatedExamples, comparedTo: examples) else {
-            return
-        }
-
-        kanjiExampleTranslations[card.kanji] = translatedExamples
-        TranslationRepository.saveKanjiTranslation(from: loadedCard.withRussianExamples(translatedExamples))
-    }
-
-    private func needsKanjiExampleTranslation(for card: KanjiCard) -> Bool {
-        card.englishExamples.isEmpty || !card.hasRussianExamples
-    }
-
-    func retranslateKanjiMeanings(
-        _ card: KanjiCard,
-        deck: KanjiDeck,
-        language: MeaningLanguage
-    ) {
-        let key = TranslationBlockKey.kanjiMeaning(card.kanji)
-        guard language == .russian,
-              !manualTranslationBlocks.contains(key) else {
-            return
-        }
-
-        manualTranslationBlocks.insert(key)
-
-        Task { @MainActor in
-            defer { manualTranslationBlocks.remove(key) }
-            let meanings = await RussianMeaningTranslator.translateManual(card.englishMeanings)
-            translatedTexts[key] = meanings
-            TranslationRepository.saveKanjiMeaningTranslation(meanings, for: card.kanji)
+    func retranslateKanjiExamples(_ card: KanjiCard, language: MeaningLanguage) {
+        guard language == .russian else { return }
+        let key = TranslationBlockKey.kanjiExamples(card.id)
+        runManual(key, kind: .manualTranslation) { id in
+            let examples: [KanjiExample]
+            if let loaded = self.kanjiUsageExamples[card.id] { examples = loaded }
+            else { examples = await KanjiDataLoader.loadExamplesIfNeeded(card, provider: self.kanjiProvider).englishExamples }
+            guard self.current(id, key: key) else { return }
+            self.kanjiUsageExamples[card.id] = examples
+            await self.translate(key, texts: examples.map(\.meaning), source: self.kanjiExampleSource(examples), manual: true, id: id)
         }
     }
-
-    func retranslateKanjiExamples(
-        _ card: KanjiCard,
-        language: MeaningLanguage
-    ) {
-        let key = TranslationBlockKey.kanjiExamples(card.kanji)
-        guard language == .russian,
-              !manualTranslationBlocks.contains(key) else {
-            return
-        }
-
-        manualTranslationBlocks.insert(key)
-
-        Task { @MainActor in
-            defer { manualTranslationBlocks.remove(key) }
-            let loadedCard = await KanjiDataLoader.loadExamplesIfNeeded(card)
-            let examples = loadedCard.englishExamples
-            kanjiUsageExamples[card.kanji] = examples
-            guard !examples.isEmpty else {
-                kanjiExampleTranslations[card.kanji] = nil
-                return
-            }
-
-            let translatedExamples = await translateKanjiExamples(examples, manual: true)
-            kanjiExampleTranslations[card.kanji] = translatedExamples
-            TranslationRepository.saveKanjiTranslation(from: loadedCard.withRussianExamples(translatedExamples))
-        }
-    }
-
     func reloadKanjiExamples(_ card: KanjiCard, language: MeaningLanguage) {
-        let key = TranslationBlockKey.kanjiExamples(card.kanji)
-        guard !manualExampleReloadingBlocks.contains(key),
-              !manualTranslationBlocks.contains(key) else {
-            return
-        }
-
-        manualExampleReloadingBlocks.insert(key)
-
-        Task { @MainActor in
-            defer { manualExampleReloadingBlocks.remove(key) }
-            let loadedCard = await KanjiDataLoader.reloadExamples(for: card)
-            let examples = loadedCard.englishExamples
-            guard !manualTranslationBlocks.contains(key) else {
-                return
+        let key = TranslationBlockKey.kanjiExamples(card.id)
+        runManual(key, kind: .manualExamples) { id in
+            let examples = await KanjiDataLoader.reloadExamples(for: card, provider: self.kanjiProvider).englishExamples
+            guard self.current(id, key: key), !examples.isEmpty else { return }
+            self.kanjiUsageExamples[card.id] = examples
+            if language == .russian {
+                await self.translate(key, texts: examples.map(\.meaning), source: self.kanjiExampleSource(examples), manual: true, id: id)
             }
-
-            kanjiUsageExamples[card.kanji] = examples
-            kanjiExampleTranslations[card.kanji] = nil
-
-            guard language == .russian, !examples.isEmpty else {
-                return
-            }
-
-            let translatedExamples = await translateKanjiExamples(examples, manual: true)
-            guard !manualTranslationBlocks.contains(key) else {
-                return
-            }
-
-            kanjiExampleTranslations[card.kanji] = translatedExamples
-            TranslationRepository.saveKanjiTranslation(from: loadedCard.withRussianExamples(translatedExamples))
-        }
-    }
-
-    private func translateKanjiExamples(_ examples: [KanjiExample]) async -> [KanjiExample] {
-        await translateKanjiExamples(examples, manual: false)
-    }
-
-    private func translateKanjiExamples(_ examples: [KanjiExample], manual: Bool) async -> [KanjiExample] {
-        let sourceMeanings = examples.map(\.meaning)
-        let translatedMeanings = manual
-            ? await RussianMeaningTranslator.translatePreservingOrderManual(sourceMeanings)
-            : await RussianMeaningTranslator.translateAutomatically(sourceMeanings)
-        return examples.enumerated().map { index, example in
-            KanjiExample(
-                word: example.word,
-                reading: example.reading,
-                meaning: translatedMeanings[safe: index] ?? example.meaning
-            )
-        }
-    }
-
-    private func hasDifferentStrings(_ translated: [String], comparedTo source: [String]) -> Bool {
-        zip(translated, source).contains { translatedItem, sourceItem in
-            translatedItem.trimmingCharacters(in: .whitespacesAndNewlines)
-                .caseInsensitiveCompare(sourceItem.trimmingCharacters(in: .whitespacesAndNewlines)) != .orderedSame
-        }
-    }
-
-    private func hasDifferentKanjiExamples(_ translated: [KanjiExample], comparedTo source: [KanjiExample]) -> Bool {
-        guard translated.count == source.count else {
-            return true
-        }
-
-        return zip(translated, source).contains { translatedExample, sourceExample in
-            translatedExample.meaning.trimmingCharacters(in: .whitespacesAndNewlines)
-                .caseInsensitiveCompare(sourceExample.meaning.trimmingCharacters(in: .whitespacesAndNewlines)) != .orderedSame
         }
     }
 }

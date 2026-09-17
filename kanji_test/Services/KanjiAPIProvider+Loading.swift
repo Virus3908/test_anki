@@ -13,7 +13,7 @@ extension KanjiAPIProvider {
 
         await withTaskGroup(of: KanjiCard?.self) { group in
             func enqueueNextCard() {
-                guard nextIndex < kanjiList.count else {
+                guard !Task.isCancelled, nextIndex < kanjiList.count else {
                     return
                 }
 
@@ -37,6 +37,7 @@ extension KanjiAPIProvider {
             }
         }
 
+        try Task.checkCancellation()
         return cards.sorted { $0.kanji < $1.kanji }
     }
 
@@ -50,7 +51,7 @@ extension KanjiAPIProvider {
 
                 await withTaskGroup(of: KanjiCard?.self) { group in
                     func enqueueNextCard() {
-                        guard nextIndex < kanjiList.count else {
+                        guard !Task.isCancelled, nextIndex < kanjiList.count else {
                             return
                         }
 

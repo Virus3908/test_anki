@@ -43,7 +43,7 @@ enum StudyProgressStatus {
 
         if daysUntilReview > 7 {
             self = .wellLearned
-        } else if daysUntilReview >= 2 {
+        } else if daysUntilReview > 0 {
             self = .studying
         } else {
             self = .due

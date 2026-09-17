@@ -1,6 +1,6 @@
 import Foundation
 
-enum KanjiReviewScheduler {
+nonisolated enum KanjiReviewScheduler {
     static func record(
         after rating: ReviewRating,
         existingRecord: KanjiReviewRecord?,
@@ -22,9 +22,6 @@ enum KanjiReviewScheduler {
         record.attempts += 1
         record.lastRating = rating
         record.lastReviewedAt = now
-        if record.successes < successTarget, record.state == .review {
-            record.state = .learning
-        }
 
         switch rating {
         case .again:

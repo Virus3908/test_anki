@@ -1,6 +1,6 @@
 import Foundation
 
-struct KanjiCard: Codable, Identifiable, Sendable {
+nonisolated struct KanjiCard: Codable, Identifiable, Sendable {
     var id: String { kanji }
 
     let kanji: String
@@ -52,7 +52,7 @@ struct KanjiCard: Codable, Identifiable, Sendable {
 
 }
 
-struct KanjiExample: Codable, Identifiable, Sendable {
+nonisolated struct KanjiExample: Codable, Identifiable, Sendable {
     var id: String { "\(word)-\(reading)" }
 
     let word: String

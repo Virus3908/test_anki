@@ -1,175 +1,80 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State var appModel = StudyAppViewModel()
-
-    @AppStorage("kanjiDailyNewCardLimit") var kanjiDailyNewCardLimit = 10
-    @AppStorage("kanjiLearningSuccessTarget") var kanjiLearningSuccessTarget = KanjiReviewStore.defaultLearningSuccessTarget
-
-    var practiceMode: PracticeMode {
-        get { appModel.practiceMode }
-        nonmutating set { appModel.practiceMode = newValue }
-    }
-
-    var practiceModeBinding: Binding<PracticeMode> {
-        Binding(
-            get: { practiceMode },
-            set: { practiceMode = $0 }
-        )
-    }
-
-    var meaningLanguage: MeaningLanguage {
-        get { appModel.meaningLanguage }
-        nonmutating set { appModel.meaningLanguage = newValue }
-    }
-
-    var meaningLanguageBinding: Binding<MeaningLanguage> {
-        Binding(
-            get: { meaningLanguage },
-            set: { meaningLanguage = $0 }
-        )
-    }
-
-    var showsPromptCharacters: Bool {
-        get { appModel.showsPromptCharacters }
-        nonmutating set { appModel.showsPromptCharacters = newValue }
-    }
-
-    var showsPromptReading: Bool {
-        get { appModel.showsPromptReading }
-        nonmutating set { appModel.showsPromptReading = newValue }
-    }
-
-    var showsPromptMeaning: Bool {
-        get { appModel.showsPromptMeaning }
-        nonmutating set { appModel.showsPromptMeaning = newValue }
-    }
-
-    var frontFieldOrder: [FrontFieldKind] {
-        get { appModel.frontFieldOrder }
-        nonmutating set { appModel.frontFieldOrder = newValue }
-    }
-
-    var isSettingsPresented: Bool {
-        get { appModel.isSettingsPresented }
-        nonmutating set { appModel.isSettingsPresented = newValue }
-    }
-
-    var isSettingsPresentedBinding: Binding<Bool> {
-        Binding(
-            get: { isSettingsPresented },
-            set: { isSettingsPresented = $0 }
-        )
-    }
-
-    var isAboutPresented: Bool {
-        get { appModel.isAboutPresented }
-        nonmutating set { appModel.isAboutPresented = newValue }
-    }
-
-    var isAboutPresentedBinding: Binding<Bool> {
-        Binding(
-            get: { isAboutPresented },
-            set: { isAboutPresented = $0 }
-        )
-    }
-
-    var deckState: DeckPreviewViewModel {
-        get { appModel.deckState }
-        nonmutating set { appModel.deckState = newValue }
-    }
-
-    var coordinator: StudyCoordinator {
-        get { appModel.coordinator }
-        nonmutating set { appModel.coordinator = newValue }
-    }
-
-    var trainingSession: TrainingSessionViewModel {
-        get { appModel.trainingSession }
-        nonmutating set { appModel.trainingSession = newValue }
-    }
-
-    var drawingSession: DrawingSessionViewModel {
-        trainingSession.drawingSession
-    }
-
-    var translationState: TranslationViewModel {
-        get { appModel.translationState }
-        nonmutating set { appModel.translationState = newValue }
-    }
-
-    var cards: [KanjiCard] {
-        get { coordinator.cards }
-        nonmutating set { coordinator.cards = newValue }
-    }
-
-    var wordCards: [WordStudyCard] {
-        get { coordinator.wordCards }
-        nonmutating set { coordinator.wordCards = newValue }
-    }
-
-    var kanaCards: [KanaStudyCard] {
-        get { coordinator.kanaCards }
-        nonmutating set { coordinator.kanaCards = newValue }
-    }
-
-    var selectedDeck: KanjiDeck {
-        get { coordinator.selectedDeck }
-        nonmutating set { coordinator.selectedDeck = newValue }
-    }
-
-    var selectedKanaDeck: KanaDeck {
-        get { coordinator.selectedKanaDeck }
-        nonmutating set { coordinator.selectedKanaDeck = newValue }
-    }
-
-    var selectedWordDeck: WordFrequencyDeck {
-        get { coordinator.selectedWordDeck }
-        nonmutating set { coordinator.selectedWordDeck = newValue }
-    }
-
-    var reviewStore: KanjiReviewStore {
-        get { coordinator.reviewStore }
-        nonmutating set { coordinator.reviewStore = newValue }
-    }
+    @State private var appModel = StudyAppViewModel()
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
+        @Bindable var model = appModel
         NavigationStack {
-            Group {
-                if coordinator.hasStartedTraining {
-                    activeTrainingView()
-                } else if let previewDeck = deckState.previewDeck {
-                    deckPreviewView(for: previewDeck)
-                } else if let previewKanaDeck = deckState.previewKanaDeck {
-                    kanaPreviewView(for: previewKanaDeck)
-                } else if let previewWordDeck = deckState.previewWordDeck {
-                    wordPreviewView(for: previewWordDeck)
-                } else {
-                    startView()
-                }
-            }
-            .navigationTitle(appModel.navigationTitle)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(AppPalette.background, for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarColorScheme(.light, for: .navigationBar)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        isSettingsPresented = true
-                    } label: {
-                        Image(systemName: "gearshape")
+            screen
+                .navigationTitle(appModel.navigationTitle)
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbarBackground(AppPalette.background, for: .navigationBar)
+                .toolbarBackground(.visible, for: .navigationBar)
+                .toolbarColorScheme(.light, for: .navigationBar)
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button { appModel.isSettingsPresented = true } label: { Image(systemName: "gearshape") }
+                            .disabled(appModel.deckState.isLoadingDeck)
                     }
-                    .disabled(deckState.isLoadingDeck)
                 }
-            }
-            .sheet(isPresented: isSettingsPresentedBinding) {
-                settingsView()
-            }
-            .task {
-                await loadReviewMemory()
-            }
+                .sheet(isPresented: $model.isSettingsPresented) {
+                    SettingsView(settings: appModel.settings,
+                        isBusy: appModel.isSavingReview || appModel.deckState.isLoadingDeck,
+                        canRestoreTranslations: appModel.translationState.canRestoreBackup,
+                        onNextDay: { Task { await appModel.advanceReviewDay() } },
+                        onClearCache: { Task { await appModel.clearDeckCache() } },
+                        onRestoreTranslations: { Task { await appModel.translationState.restoreBackup() } })
+                }
+                .disabled(!appModel.hasLoadedSavedState || appModel.isSavingReview || appModel.isLoadingSavedState)
+                .overlay { loadingOverlay }
+                .alert("Сообщение", isPresented: Binding(
+                    get: { appModel.errors.message != nil },
+                    set: { if !$0 { appModel.errors.message = nil } }
+                )) {
+                    Button("Понятно") { appModel.errors.message = nil }
+                } message: { Text(appModel.errors.message ?? "") }
+                .task { await appModel.loadSavedState() }
+                .onChange(of: appModel.trainingSession.isActive) { appModel.synchronizeTrainingRoute() }
+                .onChange(of: scenePhase) { if scenePhase == .active { Task { await appModel.resume() } } }
+                .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged)) { _ in
+                    Task { await appModel.resume() }
+                }
         }
     }
 
+    @ViewBuilder private var screen: some View {
+        switch appModel.navigation.route {
+        case .start:
+            StartView(practiceMode: Binding(get: { appModel.practiceMode }, set: { appModel.practiceMode = $0 }),
+                      isLoading: appModel.deckState.isLoadingDeck, onOpen: appModel.openDeck)
+        case .training:
+            TrainingView(trainingSession: appModel.trainingSession, settings: appModel.settings,
+                         translationState: appModel.translationState, coordinator: appModel.coordinator, onPractice: appModel.practice)
+        default:
+            DeckPreviewView(deckState: appModel.deckState, coordinator: appModel.coordinator, settings: appModel.settings,
+                            translationState: appModel.translationState, reviewStore: appModel.trainingSession.reviewStore,
+                            onPractice: appModel.practice)
+        }
+    }
+
+    @ViewBuilder private var loadingOverlay: some View {
+        if appModel.isLoadingSavedState {
+            ProgressView("Загружаю прогресс")
+        } else if !appModel.hasLoadedSavedState {
+            VStack(spacing: 12) {
+                Text("Не удалось загрузить прогресс. Повтори загрузку, чтобы продолжить обучение.")
+                    .multilineTextAlignment(.center)
+                Button("Повторить") { Task { await appModel.loadSavedState() } }
+                if appModel.trainingSession.canRestoreBackup {
+                    Button("Восстановить последнюю резервную копию") { Task { await appModel.restoreProgressBackup() } }
+                    Text("Последнее сохранённое действие может быть отменено. Исходный файл останется доступен для восстановления.")
+                        .font(.caption).multilineTextAlignment(.center)
+                }
+            }
+            .padding()
+            .background(.regularMaterial)
+        }
+    }
 }

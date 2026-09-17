@@ -8,24 +8,16 @@ extension WordDataLoader {
         var seen: Set<String> = []
 
         return entries.compactMap { entry in
-            guard seen.insert(entry.word).inserted else {
+            guard seen.insert(entry.id).inserted else {
                 return nil
             }
 
-            let characterCards = entry.word.map(String.init).compactMap { character -> KanjiCard? in
+            let characterCards = entry.word.map(String.init).map { character -> KanjiCard in
                 if let card = cardsByCharacter[character] {
                     return card
                 }
 
-                guard isKana(character) else {
-                    return nil
-                }
-
-                return kanaCard(for: character)
-            }
-
-            guard characterCards.count == entry.word.count else {
-                return nil
+                return isKana(character) ? kanaCard(for: character) : unavailableDrawingCard(for: character)
             }
 
             return WordStudyCard(
@@ -36,6 +28,11 @@ extension WordDataLoader {
                 kanjiCards: characterCards
             )
         }
+    }
+
+    static func unavailableDrawingCard(for character: String) -> KanjiCard {
+        KanjiCard(kanji: character, meanings: [], onyomi: [], kunyomi: [], examples: [],
+                  source: KanjiSource(name: "", file: "", license: ""), strokes: [])
     }
 
     static func kanaCard(for character: String) -> KanjiCard {

@@ -2,35 +2,67 @@ import Foundation
 import Observation
 
 struct PresentedKanjiPreview: Identifiable {
-    let card: KanjiCard
+    let cardID: String
     var id: String { "kanji-preview" }
 }
 
 struct PresentedKanaPreview: Identifiable {
-    let card: KanaStudyCard
+    let cardID: String
     var id: String { "kana-preview" }
 }
 
 struct PresentedWordPreview: Identifiable {
-    let card: WordStudyCard
+    let cardID: String
     var id: String { "word-preview" }
 }
 
 @MainActor
 @Observable
 final class StudyCoordinator {
-    var hasStartedTraining = false
-    var cards: [KanjiCard] = []
-    var wordCards: [WordStudyCard] = []
-    var kanaCards: [KanaStudyCard] = []
+    let catalog: StudyCardCatalog
+    let navigation: StudyNavigation
+
+    init(catalog: StudyCardCatalog, navigation: StudyNavigation) {
+        self.catalog = catalog
+        self.navigation = navigation
+    }
+
+    var hasStartedTraining: Bool {
+        if case .training = navigation.route { return true }
+        return false
+    }
     var selectedDeck: KanjiDeck = .jlpt5
     var selectedKanaDeck: KanaDeck = .hiragana
     var selectedWordDeck: WordFrequencyDeck = .top1000
-    var reviewStore = KanjiReviewStore(records: [:])
-    var selectedPreviewCard: KanjiCard?
-    var selectedKanaPreviewCard: KanaStudyCard?
-    var selectedWordPreviewCard: WordStudyCard?
-    var selectedLinkedKanjiCard: KanjiCard?
+    var selectedPreviewCard: KanjiCard? {
+        get { (presentedKanjiPreview?.cardID).flatMap { catalog.kanji($0) } }
+        set {
+            if let newValue { catalog.register([newValue]) }
+            presentedKanjiPreview = newValue.map { PresentedKanjiPreview(cardID: $0.id) }
+        }
+    }
+    var selectedKanaPreviewCard: KanaStudyCard? {
+        get { (presentedKanaPreview?.cardID).flatMap { catalog.kana($0) } }
+        set {
+            if let newValue { catalog.register([newValue]) }
+            presentedKanaPreview = newValue.map { PresentedKanaPreview(cardID: $0.id) }
+        }
+    }
+    var selectedWordPreviewCard: WordStudyCard? {
+        get { (presentedWordPreview?.cardID).flatMap { catalog.word($0) } }
+        set {
+            if let newValue { catalog.register([newValue]) }
+            presentedWordPreview = newValue.map { PresentedWordPreview(cardID: $0.id) }
+        }
+    }
+    private var selectedLinkedKanjiCardID: String?
+    var selectedLinkedKanjiCard: KanjiCard? {
+        get { selectedLinkedKanjiCardID.flatMap { catalog.kanji($0) } }
+        set {
+            if let newValue { catalog.register([newValue]) }
+            selectedLinkedKanjiCardID = newValue?.id
+        }
+    }
     var presentedKanjiPreview: PresentedKanjiPreview?
     var presentedKanaPreview: PresentedKanaPreview?
     var presentedWordPreview: PresentedWordPreview?

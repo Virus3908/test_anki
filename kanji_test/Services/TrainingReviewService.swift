@@ -1,19 +1,17 @@
 import Foundation
 
-@MainActor
 enum TrainingReviewService {
     static func applyReview<Item: StudyItem>(
         item: Item,
         rating: ReviewRating,
         mode: PracticeMode,
-        session: TrainingSessionViewModel,
+        session: inout TrainingSessionState,
         reviewStore: inout KanjiReviewStore,
-        masteredKeys: inout Set<String>,
         items: inout [Item],
         learningSuccessTarget: Int
     ) -> Bool {
         if session.isGuidedSingleKanjiPractice {
-            applyPracticeOnlyReview(item: item, rating: rating, mode: mode, session: session)
+            applyPracticeOnlyReview(item: item, rating: rating, mode: mode, session: &session)
             return false
         }
 
@@ -22,11 +20,9 @@ enum TrainingReviewService {
         let existingAnswer = session.sessionAnswerStates[answerID]
         prepareReviewReapply(
             existingAnswer,
-            key: key,
             mode: mode,
-            session: session,
+            session: &session,
             reviewStore: &reviewStore,
-            masteredKeys: &masteredKeys,
             items: &items
         )
 
@@ -36,9 +32,8 @@ enum TrainingReviewService {
             key: key,
             mode: mode,
             existingAnswer: existingAnswer,
-            session: session,
+            session: &session,
             reviewStore: &reviewStore,
-            masteredKeys: &masteredKeys,
             items: &items,
             learningSuccessTarget: learningSuccessTarget
         )
@@ -50,9 +45,8 @@ enum TrainingReviewService {
         key: String,
         mode: PracticeMode,
         existingAnswer: SessionAnswerState?,
-        session: TrainingSessionViewModel,
+        session: inout TrainingSessionState,
         reviewStore: inout KanjiReviewStore,
-        masteredKeys: inout Set<String>,
         items: inout [Item],
         learningSuccessTarget: Int
     ) -> Bool {
@@ -62,12 +56,13 @@ enum TrainingReviewService {
             recordBefore: reviewStore.record(for: key),
             againCountBefore: session.kanjiAgainCounts[key],
             recoveryGoodCountBefore: session.kanjiRecoveryGoodCounts[key],
-            wasMastered: masteredKeys.contains(key)
+            wasMastered: session.masteredKeys.contains(key)
         )
+        if existingAnswer == nil { answerState.queueBefore = items.map(\.reviewKey) }
         let answerPlan = makeAndApplyAnswerPlan(
             for: key,
             rating: rating,
-            session: session,
+            session: &session,
             reviewStore: &reviewStore,
             learningSuccessTarget: learningSuccessTarget
         )
@@ -89,12 +84,11 @@ enum TrainingReviewService {
             queueDecision,
             item: reviewedItem,
             key: key,
-            session: session,
-            masteredKeys: &masteredKeys,
+            session: &session,
             items: &items
         )
 
-        session.sessionCompletedCards = masteredKeys.count
+        session.sessionCompletedCards = session.masteredKeys.count
         answerState.rating = rating
         session.sessionAnswerStates[session.currentAnswerID(for: mode)] = answerState
         return existingAnswer == nil
@@ -103,7 +97,7 @@ enum TrainingReviewService {
     private static func makeAndApplyAnswerPlan(
         for key: String,
         rating: ReviewRating,
-        session: TrainingSessionViewModel,
+        session: inout TrainingSessionState,
         reviewStore: inout KanjiReviewStore,
         learningSuccessTarget: Int
     ) -> ReviewAnswerPlan {
@@ -125,7 +119,6 @@ enum TrainingReviewService {
                 learningSuccessTarget: learningSuccessTarget,
                 resetIntervalOnGood: answerPlan.shouldResetIntervalOnGood
             )
-            ReviewRepository.save(reviewStore)
         }
 
         return answerPlan

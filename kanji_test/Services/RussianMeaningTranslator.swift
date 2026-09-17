@@ -4,6 +4,7 @@ protocol MeaningTranslating {
     func translateLocally(_ meanings: [String]) -> [String]
     func translate(_ meanings: [String]) async -> [String]
     func translatePreservingOrder(_ meanings: [String]) async -> [String]
+    func translatePreservingOrderManual(_ meanings: [String]) async -> [String]
 }
 
 struct SystemRussianMeaningTranslator: MeaningTranslating {
@@ -35,6 +36,7 @@ struct SystemRussianMeaningTranslator: MeaningTranslating {
         var bestTranslation: [String]?
 
         for _ in 0..<2 {
+            guard !Task.isCancelled else { return meanings }
             guard let systemTranslation = try? await Self.systemTranslationQueue.translate(meanings, priority: priority),
                   !systemTranslation.isEmpty else {
                 continue
@@ -82,6 +84,7 @@ private enum TranslationPriority {
 }
 
 private struct QueuedTranslationJob {
+    let id: UUID
     let meanings: [String]
     let continuation: CheckedContinuation<[String], any Error>
 }
@@ -90,13 +93,28 @@ private actor PriorityTranslationQueue {
     private var manualJobs: [QueuedTranslationJob] = []
     private var automaticJobs: [QueuedTranslationJob] = []
     private var isProcessing = false
+    private var activeJobID: UUID?
+    private var activeTask: Task<[String], Error>?
 
     func translate(_ meanings: [String], priority: TranslationPriority) async throws -> [String] {
-        try await withCheckedThrowingContinuation { continuation in
-            enqueue(
-                QueuedTranslationJob(meanings: meanings, continuation: continuation),
-                priority: priority
-            )
+        let id = UUID()
+        return try await withTaskCancellationHandler {
+            try Task.checkCancellation()
+            return try await withCheckedThrowingContinuation { continuation in
+                enqueue(QueuedTranslationJob(id: id, meanings: meanings, continuation: continuation), priority: priority)
+            }
+        } onCancel: {
+            Task { await self.cancel(id) }
+        }
+    }
+
+    private func cancel(_ id: UUID) {
+        if let index = manualJobs.firstIndex(where: { $0.id == id }) {
+            manualJobs.remove(at: index).continuation.resume(throwing: CancellationError())
+        } else if let index = automaticJobs.firstIndex(where: { $0.id == id }) {
+            automaticJobs.remove(at: index).continuation.resume(throwing: CancellationError())
+        } else if activeJobID == id {
+            activeTask?.cancel()
         }
     }
 
@@ -120,12 +138,21 @@ private actor PriorityTranslationQueue {
 
     private func processJobs() async {
         while let job = nextJob() {
-            do {
+            let task = Task {
+                try Task.checkCancellation()
                 let translated = try await SystemTranslationClient.translate(job.meanings)
-                job.continuation.resume(returning: translated)
+                try Task.checkCancellation()
+                return translated
+            }
+            activeJobID = job.id
+            activeTask = task
+            do {
+                job.continuation.resume(returning: try await task.value)
             } catch {
                 job.continuation.resume(throwing: error)
             }
+            activeJobID = nil
+            activeTask = nil
         }
 
         isProcessing = false
@@ -141,33 +168,5 @@ private actor PriorityTranslationQueue {
         }
 
         return nil
-    }
-}
-
-enum RussianMeaningTranslator {
-    private static let translator = SystemRussianMeaningTranslator()
-
-    static func translateLocally(_ meanings: [String]) -> [String] {
-        translator.translateLocally(meanings)
-    }
-
-    static func translateAutomatically(_ meanings: [String]) async -> [String] {
-        await translator.translate(meanings)
-    }
-
-    static func translate(_ meanings: [String]) async -> [String] {
-        await translator.translate(meanings)
-    }
-
-    static func translatePreservingOrder(_ meanings: [String]) async -> [String] {
-        await translator.translatePreservingOrder(meanings)
-    }
-
-    static func translateManual(_ meanings: [String]) async -> [String] {
-        await translator.translateManual(meanings)
-    }
-
-    static func translatePreservingOrderManual(_ meanings: [String]) async -> [String] {
-        await translator.translatePreservingOrderManual(meanings)
     }
 }

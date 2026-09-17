@@ -1,12 +1,12 @@
 import Foundation
 
-extension KanjiReviewStore {
+nonisolated extension KanjiReviewStore {
     func orderedCards(_ cards: [KanjiCard], now: Date = Date()) -> [KanjiCard] {
         cards.sorted { left, right in
             let leftDate = records[left.kanji]?.dueDate ?? .distantPast
             let rightDate = records[right.kanji]?.dueDate ?? .distantPast
-            let leftDue = leftDate <= now
-            let rightDue = rightDate <= now
+            let leftDue = Calendar.current.startOfDay(for: leftDate) <= Calendar.current.startOfDay(for: studyDate(now: now))
+            let rightDue = Calendar.current.startOfDay(for: rightDate) <= Calendar.current.startOfDay(for: studyDate(now: now))
 
             if leftDue != rightDue {
                 return leftDue
@@ -44,14 +44,13 @@ extension KanjiReviewStore {
         learningSuccessTarget: Int = Self.defaultLearningSuccessTarget,
         now: Date = Date()
     ) -> [Item] {
-        let successTarget = max(1, learningSuccessTarget)
         return items
             .filter { item in
                 guard let record = records[key(item)] else {
                     return false
                 }
 
-                return record.state == .review && record.successes >= successTarget && record.dueDate <= now
+                return record.state == .review && isDue(record, now: now)
             }
             .sorted { left, right in
                 let leftDate = records[key(left)]?.dueDate ?? .distantPast
@@ -90,7 +89,7 @@ extension KanjiReviewStore {
                     return false
                 }
 
-                return record.state != .review && record.dueDate <= now
+                return record.state != .review && isDue(record, now: now)
             }
             .sorted { left, right in
                 let leftDate = records[key(left)]?.dueDate ?? .distantPast
@@ -103,11 +102,11 @@ extension KanjiReviewStore {
                 return key(left) < key(right)
             }
 
+        let startedWithoutAnswer = items.filter { records[key($0)] == nil && firstShownAt[key($0)] != nil }
         let newItems = items
-            .filter { records[key($0)] == nil }
-            .prefix(max(0, newCardLimit))
-
-        return inProgressItems + Array(newItems)
+            .filter { records[key($0)] == nil && firstShownAt[key($0)] == nil }
+            .prefix(remainingNewCards(limit: newCardLimit, now: now))
+        return inProgressItems + startedWithoutAnswer + Array(newItems)
     }
 
     func newLearningItems<Item: StudyItem>(

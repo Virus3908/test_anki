@@ -41,7 +41,7 @@ enum KanaDataLoader {
     private static func loadSVGText(for character: String) async throws -> String {
         let fileName = svgFileName(for: character)
 
-        if let cachedText = try KanaSVGCacheRepository.loadSVGText(fileName: fileName) {
+        if let cachedText = try await KanaSVGCacheRepository.shared.loadSVGText(fileName: fileName) {
             return cachedText
         }
 
@@ -52,7 +52,7 @@ enum KanaDataLoader {
         }
 
         let svgText = String(decoding: data, as: UTF8.self)
-        try KanaSVGCacheRepository.saveSVGText(svgText, fileName: fileName)
+        try await KanaSVGCacheRepository.shared.saveSVGText(svgText, fileName: fileName)
         return svgText
     }
 
@@ -64,7 +64,7 @@ enum KanaDataLoader {
         return String(format: "%05x.svg", scalar.value)
     }
 
-    static func clearCache() {
-        try? KanaSVGCacheRepository.clearCache()
+    static func clearCache() async throws {
+        try await KanaSVGCacheRepository.shared.clearCache()
     }
 }

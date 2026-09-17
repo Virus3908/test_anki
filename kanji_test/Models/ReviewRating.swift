@@ -1,6 +1,6 @@
 import Foundation
 
-enum ReviewRating: String, CaseIterable, Identifiable, Codable {
+nonisolated enum ReviewRating: String, CaseIterable, Sendable, Identifiable, Codable {
     case again
     case hard
     case good

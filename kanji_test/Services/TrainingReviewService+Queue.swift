@@ -5,14 +5,13 @@ extension TrainingReviewService {
         _ decision: ReviewQueueDecision,
         item: Item,
         key: String,
-        session: TrainingSessionViewModel,
-        masteredKeys: inout Set<String>,
+        session: inout TrainingSessionState,
         items: inout [Item]
     ) {
         if decision.isMastered {
-            masteredKeys.insert(key)
+            session.masteredKeys.insert(key)
         } else {
-            masteredKeys.remove(key)
+            session.masteredKeys.remove(key)
         }
 
         TrainingSessionEngine.applyQueueDecision(

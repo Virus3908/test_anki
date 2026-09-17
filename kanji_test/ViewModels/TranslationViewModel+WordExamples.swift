@@ -1,168 +1,51 @@
 import Foundation
 
 extension TranslationViewModel {
-    func originalWordUsageExamples(for card: WordStudyCard) -> [WordUsageExample] {
-        wordUsageExamples[card.id] ?? card.examples
+    func originalWordUsageExamples(for card: WordStudyCard) -> [WordUsageExample] { wordUsageExamples[card.id] ?? card.examples }
+    func wordExampleSource(_ examples: [WordUsageExample]) -> [String] {
+        examples.flatMap { [$0.sentence, $0.reading ?? "", $0.meaning ?? ""] }
     }
-
     func displayedWordUsageExamples(for card: WordStudyCard, language: MeaningLanguage) -> [WordUsageExample] {
         let examples = originalWordUsageExamples(for: card)
-        switch language {
-        case .russian:
-            guard let translatedExamples = wordExampleTranslations[card.id], !translatedExamples.isEmpty else {
-                return examples
-            }
-
-            return translatedExamples
-        case .english:
-            return examples
+        guard language == .russian, let meanings = cached(.wordExamples(card.id), source: wordExampleSource(examples)),
+              meanings.count == examples.count else { return examples }
+        return zip(examples, meanings).map { example, meaning in
+            WordUsageExample(sentence: example.sentence, reading: example.reading, meaning: meaning.isEmpty ? nil : meaning)
         }
     }
-
-    func translateWordExamplesIfNeeded(
-        for card: WordStudyCard,
-        examples: [WordUsageExample],
-        language: MeaningLanguage
-    ) async {
+    func loadAndTranslateWordExamples(for card: WordStudyCard, language: MeaningLanguage) async {
         let key = TranslationBlockKey.wordExamples(card.id)
-        guard language == .russian,
-              wordExampleTranslations[card.id] == nil,
-              !examples.isEmpty,
-              !automaticTranslationBlocks.contains(key),
-              !manualTranslationBlocks.contains(key) else {
-            return
-        }
-
-        automaticTranslationBlocks.insert(key)
-        defer { automaticTranslationBlocks.remove(key) }
-        let translatedExamples = await translateWordUsageExamples(examples)
-        guard wordExampleTranslations[card.id] == nil,
-              !manualTranslationBlocks.contains(key),
-              hasDifferentWordExamples(translatedExamples, comparedTo: examples) else {
-            return
-        }
-
-        wordExampleTranslations[card.id] = translatedExamples
-        TranslationRepository.saveWordExampleTranslation(translatedExamples, for: card.id)
-    }
-
-    func retranslateWordExamples(_ card: WordStudyCard, language: MeaningLanguage) {
-        let key = TranslationBlockKey.wordExamples(card.id)
-        guard language == .russian,
-              !manualTranslationBlocks.contains(key) else {
-            return
-        }
-
-        let examples = originalWordUsageExamples(for: card)
-        guard !examples.isEmpty else {
-            return
-        }
-
-        manualTranslationBlocks.insert(key)
-
-        Task { @MainActor in
-            defer { manualTranslationBlocks.remove(key) }
-            let translatedExamples = await translateWordUsageExamples(examples, manual: true)
-            wordExampleTranslations[card.id] = translatedExamples
-            TranslationRepository.saveWordExampleTranslation(translatedExamples, for: card.id)
-        }
-    }
-
-    func loadWordUsageExamplesIfNeeded(for card: WordStudyCard) async {
-        let key = TranslationBlockKey.wordExamples(card.id)
-        guard wordUsageExamples[card.id] == nil,
-              !automaticExampleLoadingBlocks.contains(key),
-              !manualExampleReloadingBlocks.contains(key) else {
-            return
-        }
-
-        automaticExampleLoadingBlocks.insert(key)
-        let examples = await WordUsageExampleProvider.loadExamples(for: card)
-        guard !manualExampleReloadingBlocks.contains(key) else {
-            automaticExampleLoadingBlocks.remove(key)
-            return
-        }
-
+        guard let id = beginAutomatic(key, kind: .automaticExamples) else { return }
+        defer { end(id, key: key) }
+        let examples: [WordUsageExample]
+        if let loaded = wordUsageExamples[card.id] { examples = loaded }
+        else { examples = await wordProvider.loadExamples(for: card, limit: 3) }
+        guard current(id, key: key) else { return }
         wordUsageExamples[card.id] = examples
-        automaticExampleLoadingBlocks.remove(key)
+        guard language == .russian else { return }
+        let old = store.legacy.wordExampleTranslations[card.id]
+        let legacy = old?.map(\.sentence) == examples.map(\.sentence) && old?.map(\.reading) == examples.map(\.reading)
+            ? old?.map { $0.meaning ?? "" } : nil
+        await translate(key, texts: examples.map { $0.meaning ?? "" },
+                        source: wordExampleSource(examples), manual: false, id: id, legacy: legacy)
     }
-
+    func retranslateWordExamples(_ card: WordStudyCard, language: MeaningLanguage) {
+        guard language == .russian else { return }
+        let key = TranslationBlockKey.wordExamples(card.id)
+        let examples = originalWordUsageExamples(for: card)
+        runManual(key, kind: .manualTranslation) { id in
+            await self.translate(key, texts: examples.map { $0.meaning ?? "" }, source: self.wordExampleSource(examples), manual: true, id: id)
+        }
+    }
     func reloadWordUsageExamples(for card: WordStudyCard, language: MeaningLanguage) {
         let key = TranslationBlockKey.wordExamples(card.id)
-        guard !manualExampleReloadingBlocks.contains(key),
-              !manualTranslationBlocks.contains(key) else {
-            return
-        }
-
-        manualExampleReloadingBlocks.insert(key)
-
-        Task { @MainActor in
-            defer { manualExampleReloadingBlocks.remove(key) }
-            let examples = await WordUsageExampleProvider.reloadRemoteExamples(for: card)
-            guard !manualTranslationBlocks.contains(key) else {
-                return
+        runManual(key, kind: .manualExamples) { id in
+            let examples = await self.wordProvider.reloadRemoteExamples(for: card, limit: 3)
+            guard self.current(id, key: key), !examples.isEmpty else { return }
+            self.wordUsageExamples[card.id] = examples
+            if language == .russian {
+                await self.translate(key, texts: examples.map { $0.meaning ?? "" }, source: self.wordExampleSource(examples), manual: true, id: id)
             }
-
-            if !examples.isEmpty {
-                wordUsageExamples[card.id] = examples
-                wordExampleTranslations[card.id] = nil
-
-                if language == .russian {
-                    let translatedExamples = await translateWordUsageExamples(examples, manual: true)
-                    guard !manualTranslationBlocks.contains(key) else {
-                        return
-                    }
-
-                    wordExampleTranslations[card.id] = translatedExamples
-                    TranslationRepository.saveWordExampleTranslation(translatedExamples, for: card.id)
-                }
-            }
-        }
-    }
-
-    func translateWordUsageExamples(_ examples: [WordUsageExample]) async -> [WordUsageExample] {
-        await translateWordUsageExamples(examples, manual: false)
-    }
-
-    private func translateWordUsageExamples(_ examples: [WordUsageExample], manual: Bool) async -> [WordUsageExample] {
-        let indexesAndMeanings = examples.enumerated().compactMap { index, example -> (Int, String)? in
-            guard let meaning = example.meaning?.trimmingCharacters(in: .whitespacesAndNewlines), !meaning.isEmpty else {
-                return nil
-            }
-
-            return (index, meaning)
-        }
-
-        guard !indexesAndMeanings.isEmpty else {
-            return examples
-        }
-
-        let sourceMeanings = indexesAndMeanings.map(\.1)
-        let translatedMeanings = manual
-            ? await RussianMeaningTranslator.translateManual(sourceMeanings)
-            : await RussianMeaningTranslator.translateAutomatically(sourceMeanings)
-        var translatedByIndex: [Int: String] = [:]
-        for (translationIndex, source) in indexesAndMeanings.enumerated() {
-            translatedByIndex[source.0] = translatedMeanings[safe: translationIndex] ?? source.1
-        }
-
-        return examples.enumerated().map { index, example in
-            WordUsageExample(
-                sentence: example.sentence,
-                reading: example.reading,
-                meaning: translatedByIndex[index] ?? example.meaning
-            )
-        }
-    }
-
-    private func hasDifferentWordExamples(_ translated: [WordUsageExample], comparedTo source: [WordUsageExample]) -> Bool {
-        guard translated.count == source.count else {
-            return true
-        }
-
-        return zip(translated, source).contains { translatedExample, sourceExample in
-            (translatedExample.meaning ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-                .caseInsensitiveCompare((sourceExample.meaning ?? "").trimmingCharacters(in: .whitespacesAndNewlines)) != .orderedSame
         }
     }
 }

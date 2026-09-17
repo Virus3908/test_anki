@@ -1,0 +1,64 @@
+import SwiftUI
+
+extension TrainingView {
+    func trainingCardShell<Front: View, Back: View>(
+        @ViewBuilder front: () -> Front,
+        @ViewBuilder back: () -> Back
+    ) -> some View {
+        ZStack {
+            front()
+                .opacity(drawingSession.isAnswerVisible ? 0 : 1)
+                .rotation3DEffect(.degrees(drawingSession.isAnswerVisible ? 180 : 0), axis: (x: 0, y: 1, z: 0))
+
+            ScrollView {
+                back()
+            }
+            .opacity(drawingSession.isAnswerVisible ? 1 : 0)
+            .rotation3DEffect(.degrees(drawingSession.isAnswerVisible ? 0 : -180), axis: (x: 0, y: 1, z: 0))
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .topLeading)
+        .aspectRatio(1, contentMode: .fit)
+        .appSurfaceCard()
+        .contentShape(RoundedRectangle(cornerRadius: 8))
+        .gesture(cardSwipeGesture())
+        .onTapGesture {
+            withAnimation(.easeInOut(duration: 0.24)) {
+                drawingSession.isAnswerVisible.toggle()
+            }
+        }
+    }
+
+    func studyCardFrontShell<Fields: View>(
+        fallbackPrompt: String,
+        footerText: String,
+        reviewKey: String,
+        isTextSelectable: Bool = true,
+        @ViewBuilder fields: () -> Fields
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Задание")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(AppPalette.secondaryText)
+                .textCase(.uppercase)
+
+            fields()
+
+            if !showsPromptCharacters && !showsPromptReading && !showsPromptMeaning {
+                Text(fallbackPrompt)
+                    .font(.title2.weight(.semibold))
+                    .foregroundStyle(AppPalette.text)
+            }
+
+            Spacer(minLength: 16)
+
+            Text(footerText)
+                .foregroundStyle(AppPalette.secondaryText)
+
+            learningStatusLabel(forReviewKey: reviewKey)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .modifier(TextSelectionModeModifier(isEnabled: isTextSelectable))
+    }
+
+}

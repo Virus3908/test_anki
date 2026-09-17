@@ -3,50 +3,47 @@ import Foundation
 extension DeckPreviewViewModel {
     func openKanjiPreview(_ deck: KanjiDeck, reviewStore: KanjiReviewStore) {
         cancelPreviewTask()
-        previewDeck = deck
-        previewKanaDeck = nil
-        previewWordDeck = nil
+        navigation.route = .kanjiDeck(deck)
+        loadError = nil
         previewWordCards.removeAll()
         previewKanaCards.removeAll()
         previewCards.removeAll()
         previewExpectedCount = nil
         isLoadingDeck = true
 
+        let requestID = previewRequestID
+        let provider = kanjiProvider
         deckPreviewTask = Task { [weak self] in
-            await KanjiDataLoader.loadCardsProgressively(deck: deck) { loadedCards, expectedCount in
+            await KanjiDataLoader.loadCardsProgressively(deck: deck, provider: provider) { loadedCards, expectedCount in
                 self?.applyKanjiPreviewUpdate(
                     loadedCards,
                     expectedCount: expectedCount,
                     deck: deck,
+                    requestID: requestID,
                     reviewStore: reviewStore
                 )
             }
 
-            self?.finishKanjiPreviewLoad(for: deck)
+            self?.finishKanjiPreviewLoad(for: deck, requestID: requestID)
         }
     }
 
     func closeKanjiPreview() {
         cancelPreviewTask()
-        previewDeck = nil
+        navigation.route = .start
         previewCards.removeAll()
         previewExpectedCount = nil
         isLoadingDeck = false
-    }
-
-    func replaceKanjiPreviewCard(_ card: KanjiCard) {
-        for index in previewCards.indices where previewCards[index].kanji == card.kanji {
-            previewCards[index] = previewCards[index].mergedForDisplay(with: card)
-        }
     }
 
     private func applyKanjiPreviewUpdate(
         _ loadedCards: [KanjiCard],
         expectedCount: Int?,
         deck: KanjiDeck,
+        requestID: UUID,
         reviewStore: KanjiReviewStore
     ) {
-        guard previewDeck == deck else {
+        guard previewDeck == deck, previewRequestID == requestID, !Task.isCancelled else {
             return
         }
 
@@ -68,8 +65,8 @@ extension DeckPreviewViewModel {
         return cardsByKanji.values.sorted { $0.kanji < $1.kanji }
     }
 
-    private func finishKanjiPreviewLoad(for deck: KanjiDeck) {
-        guard previewDeck == deck else {
+    private func finishKanjiPreviewLoad(for deck: KanjiDeck, requestID: UUID) {
+        guard previewDeck == deck, previewRequestID == requestID, !Task.isCancelled else {
             return
         }
 

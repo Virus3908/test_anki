@@ -1,12 +1,12 @@
 import Foundation
 
-enum KanjiReviewState: String, Codable {
+nonisolated enum KanjiReviewState: String, Codable, Sendable {
     case learning
     case review
     case relearning
 }
 
-struct KanjiReviewRecord: Codable {
+nonisolated struct KanjiReviewRecord: Codable, Sendable {
     var attempts: Int
     var successes: Int
     var streak: Int

@@ -1,32 +1,27 @@
 import Foundation
 
 enum WordDataLoader {
-    static func loadWords() async -> [WordStudyCard] {
-        await loadWords(in: nil)
+    static func loadWords(provider: any KanjiProviding = KanjiAPIProvider()) async throws -> [WordStudyCard] {
+        try await loadWords(in: nil, provider: provider)
     }
 
-    static func loadWords(for deck: WordFrequencyDeck) async -> [WordStudyCard] {
-        await loadWords(in: deck.bounds)
+    static func loadWords(for deck: WordFrequencyDeck, provider: any KanjiProviding = KanjiAPIProvider()) async throws -> [WordStudyCard] {
+        try await loadWords(in: deck.bounds, provider: provider)
     }
 
-    private static func loadWords(in range: Range<Int>?) async -> [WordStudyCard] {
-        await Task.yield()
-
-        let allEntries = await loadDictionaryEntries()
+    private static func loadWords(in range: Range<Int>?, provider: any KanjiProviding) async throws -> [WordStudyCard] {
+        let allEntries = try await loadDictionaryEntries()
         let entries: [WordDictionaryEntry]
         if let range {
             entries = Array(allEntries[range.clamped(to: allEntries.indices)])
         } else {
             entries = allEntries
         }
-        let kanjiCards = await loadKanjiCards(for: entries, provider: KanjiAPIProvider())
+        let kanjiCards = await loadKanjiCards(for: entries, provider: provider)
         let cardsByCharacter = Dictionary(kanjiCards.map { ($0.kanji, $0) }, uniquingKeysWith: { current, _ in current })
         let loadedWords = buildWords(from: entries, cardsByCharacter: cardsByCharacter)
 
-        if !loadedWords.isEmpty {
-            return loadedWords
-        }
-
-        return WordStudyCard.build(from: kanjiCards)
+        try Task.checkCancellation()
+        return loadedWords
     }
 }

@@ -170,6 +170,7 @@ final class DrawingSessionViewModel {
     func evaluateWordParts(_ wordCard: WordStudyCard) -> [[StrokeFeedback]] {
         wordCard.kanjiCards.indices.map { index in
             let strokes = index < completedWordDrawings.count ? completedWordDrawings[index] : []
+            guard !wordCard.kanjiCards[index].strokes.isEmpty else { return [] }
             return StrokeEvaluator.evaluate(actual: strokes, expected: wordCard.kanjiCards[index].strokes)
         }
     }

@@ -23,7 +23,11 @@ struct KanjiAPIProvider: KanjiProviding {
     }()
 
     func loadKanjiList(deck: KanjiDeck) async throws -> [String] {
-        let (listData, _) = try await session.data(from: KanjiAPIEndpoint.kanjiList(deck: deck))
+        let (listData, response) = try await session.data(from: KanjiAPIEndpoint.kanjiList(deck: deck))
+        guard let response = response as? HTTPURLResponse, (200..<300).contains(response.statusCode) else {
+            throw URLError(.badServerResponse)
+        }
+        try Task.checkCancellation()
         return try JSONDecoder().decode([String].self, from: listData)
     }
 
@@ -44,29 +48,5 @@ struct KanjiAPIProvider: KanjiProviding {
             group.cancelAll()
             return value
         }
-    }
-}
-
-enum RemoteKanjiProvider {
-    private static let provider = KanjiAPIProvider()
-
-    static func loadKanjiList(deck: KanjiDeck) async throws -> [String] {
-        try await provider.loadKanjiList(deck: deck)
-    }
-
-    static func loadCards(deck: KanjiDeck) async throws -> [KanjiCard] {
-        try await provider.loadCards(deck: deck)
-    }
-
-    static func loadCards(for kanjiList: [String]) async throws -> [KanjiCard] {
-        try await provider.loadCards(for: kanjiList)
-    }
-
-    static func loadCardsStream(for kanjiList: [String]) -> AsyncStream<[KanjiCard]> {
-        provider.loadCardsStream(for: kanjiList)
-    }
-
-    static func loadExamples(for kanji: String) async -> [KanjiExample] {
-        await provider.loadExamples(for: kanji)
     }
 }

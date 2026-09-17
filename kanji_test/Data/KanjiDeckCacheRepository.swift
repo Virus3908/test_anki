@@ -1,17 +1,24 @@
 import Foundation
 
-enum KanjiDeckCacheRepository {
-    static func loadCards(for deck: KanjiDeck) throws -> [KanjiCard]? {
+actor KanjiDeckCacheRepository {
+    static let shared = KanjiDeckCacheRepository()
+    private var decodedDecks: [KanjiDeck: [KanjiCard]] = [:]
+
+    func loadCards(for deck: KanjiDeck) throws -> [KanjiCard]? {
+        if let cached = decodedDecks[deck] { return cached }
         let url = cacheURL(for: deck)
         guard FileManager.default.fileExists(atPath: url.path) else {
             return nil
         }
 
         let data = try Data(contentsOf: url)
-        return try JSONDecoder().decode([KanjiCard].self, from: data)
+        let cards = try JSONDecoder().decode([KanjiCard].self, from: data)
+        decodedDecks[deck] = cards
+        return cards
     }
 
-    static func mergeCardsIntoAllCache(_ cards: [KanjiCard]) throws {
+    func mergeCardsIntoAllCache(_ cards: [KanjiCard]) throws {
+        try Task.checkCancellation()
         guard !cards.isEmpty else {
             return
         }
@@ -21,7 +28,7 @@ enum KanjiDeckCacheRepository {
 
         for card in cards {
             if let existingCard = cardsByKanji[card.kanji] {
-                cardsByKanji[card.kanji] = mergeCachedCard(existingCard, with: card)
+                cardsByKanji[card.kanji] = Self.mergeCachedCard(existingCard, with: card)
             } else {
                 cardsByKanji[card.kanji] = card
             }
@@ -30,7 +37,8 @@ enum KanjiDeckCacheRepository {
         try saveCards(cardsByKanji.values.sorted { $0.kanji < $1.kanji }, for: .all)
     }
 
-    static func clearCache() throws {
+    func clearCache() throws {
+        decodedDecks.removeAll()
         let directory = cacheDirectoryURL()
         guard FileManager.default.fileExists(atPath: directory.path) else {
             return
@@ -39,7 +47,7 @@ enum KanjiDeckCacheRepository {
         try FileManager.default.removeItem(at: directory)
     }
 
-    static func mergeCachedCard(_ cached: KanjiCard, with fresh: KanjiCard) -> KanjiCard {
+    nonisolated static func mergeCachedCard(_ cached: KanjiCard, with fresh: KanjiCard) -> KanjiCard {
         KanjiCard(
             kanji: fresh.kanji,
             meanings: fresh.englishMeanings,
@@ -58,19 +66,20 @@ enum KanjiDeckCacheRepository {
         )
     }
 
-    private static func saveCards(_ cards: [KanjiCard], for deck: KanjiDeck) throws {
+    private func saveCards(_ cards: [KanjiCard], for deck: KanjiDeck) throws {
         let url = cacheURL(for: deck)
         try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
         let data = try JSONEncoder().encode(cards.map(\.withoutTranslations))
         try data.write(to: url, options: .atomic)
+        decodedDecks[deck] = cards.map(\.withoutTranslations)
     }
 
-    private static func cacheURL(for deck: KanjiDeck) -> URL {
+    private func cacheURL(for deck: KanjiDeck) -> URL {
         cacheDirectoryURL()
             .appendingPathComponent("\(deck.rawValue).json")
     }
 
-    private static func cacheDirectoryURL() -> URL {
+    private func cacheDirectoryURL() -> URL {
         let caches = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
         return caches.appendingPathComponent("KanjiDeckCacheV2", isDirectory: true)
     }

@@ -3,41 +3,35 @@ import Foundation
 extension TrainingReviewService {
     static func prepareReviewReapply<Item: StudyItem>(
         _ existingAnswer: SessionAnswerState?,
-        key: String,
         mode: PracticeMode,
-        session: TrainingSessionViewModel,
+        session: inout TrainingSessionState,
         reviewStore: inout KanjiReviewStore,
-        masteredKeys: inout Set<String>,
         items: inout [Item]
     ) {
         guard let existingAnswer else {
             return
         }
 
-        restoreSessionAnswer(
-            existingAnswer,
-            session: session,
-            reviewStore: &reviewStore,
-            masteredKeys: &masteredKeys
-        )
-        removeFutureRepeats(after: session.currentIndex, key: key, from: &items)
         rollbackFutureSessionAnswers(
             after: session.currentIndex,
             mode: mode,
-            session: session,
-            reviewStore: &reviewStore,
-            masteredKeys: &masteredKeys,
-            items: &items
+            session: &session,
+            reviewStore: &reviewStore
         )
+        restoreSessionAnswer(
+            existingAnswer,
+            session: &session,
+            reviewStore: &reviewStore
+        )
+        let itemsByKey = Dictionary(items.map { ($0.reviewKey, $0) }, uniquingKeysWith: { first, _ in first })
+        items = existingAnswer.queueBefore.compactMap { itemsByKey[$0] }
     }
 
-    static func rollbackFutureSessionAnswers<Item: StudyItem>(
+    static func rollbackFutureSessionAnswers(
         after index: Int,
         mode: PracticeMode,
-        session: TrainingSessionViewModel,
-        reviewStore: inout KanjiReviewStore,
-        masteredKeys: inout Set<String>,
-        items: inout [Item]
+        session: inout TrainingSessionState,
+        reviewStore: inout KanjiReviewStore
     ) {
         let prefix = "\(mode.rawValue):"
 
@@ -58,29 +52,26 @@ extension TrainingReviewService {
         }
 
         for (answerID, _, answer) in futureAnswers {
-            restoreSessionAnswer(answer, session: session, reviewStore: &reviewStore, masteredKeys: &masteredKeys)
-            removeFutureRepeats(after: index, key: answer.reviewKey, from: &items)
+            restoreSessionAnswer(answer, session: &session, reviewStore: &reviewStore)
             session.sessionAnswerStates[answerID] = nil
         }
     }
 
     static func restoreSessionAnswer(
         _ answer: SessionAnswerState,
-        session: TrainingSessionViewModel,
-        reviewStore: inout KanjiReviewStore,
-        masteredKeys: inout Set<String>
+        session: inout TrainingSessionState,
+        reviewStore: inout KanjiReviewStore
     ) {
         reviewStore.restore(answer.recordBefore, for: answer.reviewKey)
-        ReviewRepository.save(reviewStore)
         restoreCounter(answer.againCountBefore, for: answer.reviewKey, in: &session.kanjiAgainCounts)
         restoreCounter(answer.recoveryGoodCountBefore, for: answer.reviewKey, in: &session.kanjiRecoveryGoodCounts)
 
         if answer.wasMastered {
-            masteredKeys.insert(answer.reviewKey)
+            session.masteredKeys.insert(answer.reviewKey)
         } else {
-            masteredKeys.remove(answer.reviewKey)
+            session.masteredKeys.remove(answer.reviewKey)
         }
-        session.sessionCompletedCards = masteredKeys.count
+        session.sessionCompletedCards = session.masteredKeys.count
     }
 
     static func restoreCounter(_ value: Int?, for key: String, in dictionary: inout [String: Int]) {
@@ -91,15 +82,4 @@ extension TrainingReviewService {
         }
     }
 
-    static func removeFutureRepeats<Item: StudyItem>(
-        after index: Int,
-        key: String,
-        from items: inout [Item]
-    ) {
-        TrainingSessionEngine.removeFutureRepeats(
-            after: index,
-            key: key,
-            items: &items
-        )
-    }
 }

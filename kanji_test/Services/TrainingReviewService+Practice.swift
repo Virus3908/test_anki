@@ -5,7 +5,7 @@ extension TrainingReviewService {
         item: Item,
         rating: ReviewRating,
         mode: PracticeMode,
-        session: TrainingSessionViewModel
+        session: inout TrainingSessionState
     ) {
         let answerID = session.currentAnswerID(for: mode)
         let existingAnswer = session.sessionAnswerStates[answerID]

@@ -1,32 +1,52 @@
 import Foundation
+import Observation
 
 @MainActor
 @Observable
 final class StudyAppViewModel {
-    var practiceMode: PracticeMode = .kanji
-    var meaningLanguage: MeaningLanguage = .russian
-    var showsPromptCharacters = false
-    var showsPromptReading = true
-    var showsPromptMeaning = false
-    var frontFieldOrder: [FrontFieldKind] = [.readings, .meanings, .character]
+    var selectedPracticeMode: PracticeMode = .kanji
+    var practiceMode: PracticeMode {
+        get { trainingSession.mode ?? selectedPracticeMode }
+        set { selectedPracticeMode = newValue }
+    }
+    let settings: StudyPreferences
+    let errors: StorageStatus
+    let catalog: StudyCardCatalog
+    let navigation: StudyNavigation
+    let deckState: DeckPreviewViewModel
+    let coordinator: StudyCoordinator
+    let trainingSession: TrainingSessionViewModel
+    let translationState: TranslationViewModel
     var isSettingsPresented = false
-    var isAboutPresented = false
-    var deckState = DeckPreviewViewModel()
-    var coordinator = StudyCoordinator()
-    var trainingSession = TrainingSessionViewModel()
-    var translationState = TranslationViewModel()
+    var isLoadingSavedState = false
+    var hasLoadedSavedState = false
+    var isSavingReview: Bool { trainingSession.isPreparingCard }
+
+    init(reviewRepository: (any ReviewPersisting)? = nil,
+         translationRepository: (any TranslationPersisting)? = nil,
+         translator: any MeaningTranslating = SystemRussianMeaningTranslator(),
+         kanjiProvider: any KanjiProviding = KanjiAPIProvider(),
+         wordProvider: any WordExampleProviding = TatoebaWordExampleProvider()) {
+        let settings = StudyPreferences()
+        let errors = StorageStatus()
+        let catalog = StudyCardCatalog()
+        let navigation = StudyNavigation()
+        self.settings = settings
+        self.errors = errors
+        self.catalog = catalog
+        self.navigation = navigation
+        self.trainingSession = TrainingSessionViewModel(repository: reviewRepository ?? ReviewRepository(), catalog: catalog, settings: settings, errors: errors)
+        self.deckState = DeckPreviewViewModel(catalog: catalog, navigation: navigation, kanjiProvider: kanjiProvider)
+        self.coordinator = StudyCoordinator(catalog: catalog, navigation: navigation)
+        self.translationState = TranslationViewModel(repository: translationRepository ?? TranslationRepository(), translator: translator,
+            kanjiProvider: kanjiProvider, wordProvider: wordProvider, errors: errors)
+    }
 
     var navigationTitle: String {
-        if coordinator.hasStartedTraining {
-            return "Kanji Trainer"
+        switch navigation.route {
+        case .start: return "Набор карточек"
+        case .training: return "Kanji Trainer"
+        default: return "Колода"
         }
-
-        if deckState.previewDeck == nil,
-           deckState.previewKanaDeck == nil,
-           deckState.previewWordDeck == nil {
-            return "Набор карточек"
-        }
-
-        return "Колода"
     }
 }

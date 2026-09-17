@@ -1,6 +1,6 @@
 import Foundation
 
-struct WordDictionaryEntry: Codable, Identifiable, Sendable {
+nonisolated struct WordDictionaryEntry: Codable, Identifiable, Sendable {
     var id: String { "\(word)-\(reading)" }
 
     let word: String
@@ -31,7 +31,7 @@ struct WordDictionaryEntry: Codable, Identifiable, Sendable {
     }
 }
 
-struct WordUsageExample: Codable, Identifiable, Sendable {
+nonisolated struct WordUsageExample: Codable, Identifiable, Sendable {
     var id: String { "\(sentence)-\(reading ?? "")-\(meaning ?? "")" }
 
     let sentence: String
@@ -70,7 +70,7 @@ struct WordUsageExample: Codable, Identifiable, Sendable {
     }
 }
 
-struct StudyExample: Identifiable, Sendable, Hashable {
+nonisolated struct StudyExample: Identifiable, Sendable, Hashable {
     let id: String
     let text: String
     let reading: String?
@@ -103,7 +103,7 @@ struct StudyExample: Identifiable, Sendable, Hashable {
 }
 
 private extension String {
-    var nilIfBlank: String? {
+    nonisolated var nilIfBlank: String? {
         let trimmed = trimmingCharacters(in: .whitespacesAndNewlines)
         return trimmed.isEmpty ? nil : trimmed
     }

@@ -1,13 +1,13 @@
 import Foundation
 import CoreGraphics
 
-struct KanjiSource: Codable, Sendable {
+nonisolated struct KanjiSource: Codable, Sendable {
     let name: String
     let file: String
     let license: String
 }
 
-struct KanjiStroke: Codable, Identifiable, Sendable {
+nonisolated struct KanjiStroke: Codable, Identifiable, Sendable {
     var id: Int { order }
 
     let order: Int
@@ -33,7 +33,7 @@ struct KanjiStroke: Codable, Identifiable, Sendable {
     }
 }
 
-enum StrokeAxis: String, Codable, Sendable {
+nonisolated enum StrokeAxis: String, Codable, Sendable {
     case horizontal
     case vertical
     case corner

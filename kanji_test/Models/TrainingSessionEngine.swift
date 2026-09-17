@@ -13,6 +13,7 @@ struct SessionAnswerState {
     let againCountBefore: Int?
     let recoveryGoodCountBefore: Int?
     let wasMastered: Bool
+    var queueBefore: [String] = []
 }
 
 struct ReviewAnswerPlan {
