@@ -59,15 +59,13 @@ final class DrawingSessionViewModel {
         return min(max(drawnStrokes.count + 1, 1), card.strokes.count)
     }
 
-    func undoStroke(expected card: KanjiCard?) -> Bool {
+    func undoStroke(expected card: KanjiCard?) {
         _ = drawnStrokes.popLast()
         feedback.removeAll()
         showsFeedbackInfo = false
         if let card {
             guidedStrokeLimit = nextGuidedStrokeLimit(for: card)
         }
-
-        return isAnswerVisible
     }
 
     func clearDrawing(expected card: KanjiCard) {
@@ -76,7 +74,7 @@ final class DrawingSessionViewModel {
         feedback.removeAll()
         guidedStrokeLimit = nextGuidedStrokeLimit(for: card)
         showsFeedbackInfo = false
-        isAnswerVisible = false
+//        isAnswerVisible = false
     }
 
     func evaluateFeedback(for card: KanjiCard, reveal: Bool) -> Bool {
@@ -187,13 +185,12 @@ final class DrawingSessionViewModel {
         }
     }
 
-    func undoCurrentWordStroke(_ wordCard: WordStudyCard, currentKanji: KanjiCard) -> Bool {
+    func undoCurrentWordStroke(_ wordCard: WordStudyCard, currentKanji: KanjiCard) {
         _ = drawnStrokes.popLast()
         storeCurrentWordFeedback([], in: wordCard)
         feedback = flattenedWordFeedback(for: wordCard)
         guidedStrokeLimit = nextGuidedStrokeLimit(for: currentKanji)
         showsFeedbackInfo = false
-        return isAnswerVisible
     }
 
     func clearCurrentWordDrawing(_ wordCard: WordStudyCard, currentKanji: KanjiCard) {
@@ -203,7 +200,7 @@ final class DrawingSessionViewModel {
         feedback = flattenedWordFeedback(for: wordCard)
         guidedStrokeLimit = nextGuidedStrokeLimit(for: currentKanji)
         showsFeedbackInfo = false
-        isAnswerVisible = false
+//        isAnswerVisible = false
     }
 
     func storeCurrentWordFeedback(_ items: [StrokeFeedback], in wordCard: WordStudyCard) {
