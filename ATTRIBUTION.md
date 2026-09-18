@@ -44,6 +44,10 @@ Source repository: https://github.com/onlyskin/kanjiapi.dev
 
 ## Anki Import Libraries
 
+Native Anki field parsing uses SwiftSoup 2.11.2 (MIT), with LRUCache (MIT) and
+Swift Atomics (Apache-2.0 with Swift Runtime Library Exception).
+Full notices are bundled in `kanji_test/Data/AnkiHTMLParserLicenses.txt`.
+
 Anki package import uses ZIPFoundation 0.9.20 (MIT, Thomas Zoechling) and
 Zstandard 1.5.7 (BSD-3-Clause, Meta Platforms, Inc. and affiliates).
 Full license notices are bundled in `kanji_test/Data/AnkiThirdPartyLicenses.txt`

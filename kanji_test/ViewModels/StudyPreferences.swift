@@ -4,6 +4,7 @@ import Observation
 @MainActor
 @Observable
 final class StudyPreferences {
+    private static let hiddenKanjiDeckIDsKey = "hiddenKanjiDeckIDs"
     private struct StoredOptions: Codable {
         var version = 1
         var defaults: DeckOptions
@@ -13,11 +14,13 @@ final class StudyPreferences {
     private let errors: StorageStatus
     private var stored: StoredOptions
     private var canSave = true
+    private(set) var hiddenKanjiDeckIDs: Set<String>
 
     init(defaults: UserDefaults = .standard, errors: StorageStatus) {
         self.defaults = defaults
         self.errors = errors
         stored = StoredOptions(defaults: DeckOptions(), decks: [:])
+        hiddenKanjiDeckIDs = Set(defaults.stringArray(forKey: Self.hiddenKanjiDeckIDsKey) ?? [])
         if let data = defaults.data(forKey: "studyDeckOptions") {
             do {
                 let decoded = try JSONDecoder().decode(StoredOptions.self, from: data)
@@ -49,5 +52,10 @@ final class StudyPreferences {
             defaults.set(data, forKey: "studyDeckOptions")
             stored = next
         } catch { errors.report("Не удалось сохранить настройки колоды.", error: error) }
+    }
+
+    func hideKanjiDeck(_ deck: KanjiDeck) {
+        hiddenKanjiDeckIDs.insert(deck.id)
+        defaults.set(hiddenKanjiDeckIDs.sorted(), forKey: Self.hiddenKanjiDeckIDsKey)
     }
 }

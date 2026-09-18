@@ -2,12 +2,14 @@ import Foundation
 
 nonisolated enum TranslationBlockKey: Hashable, Sendable {
     case kanjiMeaning(String), kanjiExamples(String), wordMeaning(String), wordExamples(String)
+    case ankiContent(String)
     var storageKey: String {
         switch self {
         case .kanjiMeaning(let id): return "kanji-meaning:\(id):ru"
         case .kanjiExamples(let id): return "kanji-examples:\(id):ru"
         case .wordMeaning(let id): return "word-meaning:\(id):ru"
         case .wordExamples(let id): return "word-examples:\(id):ru"
+        case .ankiContent(let id): return "anki-content:\(id):ru"
         }
     }
 }
@@ -51,6 +53,7 @@ nonisolated struct TranslationStore: Codable, Sendable {
         case .wordExamples(let id): legacy.wordExampleTranslations[id] = nil
         case .kanjiMeaning(let id): legacy.kanjiTranslations[id]?.russianMeanings = nil
         case .kanjiExamples(let id): legacy.kanjiTranslations[id]?.russianExamples = nil
+        case .ankiContent: break
         }
     }
 }

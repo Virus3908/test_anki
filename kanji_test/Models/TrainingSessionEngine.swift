@@ -28,7 +28,10 @@ nonisolated enum TrainingSessionEngine {
         let date = progress.studyDate(now: now)
         let options = options.validated
         var seen: Set<String> = []
-        let items = sourceIDs.filter { seen.insert($0).inserted }.map { ReviewItem(id: $0, mode: mode) }
+        let items = sourceIDs
+            .filter { seen.insert($0).inserted }
+            .map { ReviewItem(id: $0, mode: mode) }
+            .filter { !progress.isExcluded($0.reviewKey) }
         let keys = Set(items.map(\.reviewKey))
         let newLimit = progress.remainingNewCards(limit: options.dailyNewCardLimit, keys: keys, now: now)
         let reviewLimit = progress.remainingReviews(limit: options.dailyReviewLimit, deckID: deckID, now: now)

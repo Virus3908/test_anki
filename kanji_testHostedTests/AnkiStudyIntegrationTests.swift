@@ -108,7 +108,7 @@ final class AnkiStudyIntegrationTests: XCTestCase {
     }
 }
 
-private actor MemoryReviews: ReviewPersisting {
+@MainActor private final class MemoryReviews: ReviewPersisting {
     private var progress = StudyProgressStore(records: [:])
     func load() async throws -> StudyProgressStore { progress }
     func save(_ value: StudyProgressStore) async throws { progress = value }

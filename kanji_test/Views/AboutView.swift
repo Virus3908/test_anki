@@ -28,6 +28,16 @@ struct AboutView: View {
                         }
                     }
 
+                    licenseCard(title: "SwiftSoup", subtitle: "Разбор полей Anki для обычного вида",
+                        license: "MIT · Jonathan Hedley, Nabil Chatbi; LRUCache: MIT; Swift Atomics: Apache 2.0",
+                        links: [("SwiftSoup", "https://github.com/scinfu/SwiftSoup")])
+                    if let url = Bundle.main.url(forResource: "AnkiHTMLParserLicenses", withExtension: "txt"),
+                       let license = try? String(contentsOf: url, encoding: .utf8) {
+                        DisclosureGroup("Лицензии HTML-парсера") {
+                            Text(license).font(.caption2).foregroundStyle(AppPalette.secondaryText)
+                        }
+                    }
+
                     licenseCard(
                         title: "JMdict / KANJIDIC",
                         subtitle: "Слова, чтения, значения и часть kanji-данных",

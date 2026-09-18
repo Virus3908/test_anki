@@ -11,12 +11,35 @@ extension StartView {
     }
 
     func deckButton(for deck: KanjiDeck) -> some View {
-        deckSelectionButton(
-            title: deck.title,
-            subtitle: deck.endpointPath, isDisabled: isLoading
-        ) {
-            onOpen(.kanjiDeck(deck))
+        HStack(spacing: 12) {
+            Button {
+                onOpen(.kanjiDeck(deck))
+            } label: {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(deck.title)
+                        .font(.headline)
+                    Text(deck.endpointPath)
+                        .font(.caption)
+                        .foregroundStyle(AppPalette.secondaryText)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .disabled(isLoading)
+
+            Button(role: .destructive) {
+                deckPendingDeletion = deck
+            } label: {
+                Image(systemName: "trash")
+                    .accessibilityLabel("Удалить колоду \(deck.title)")
+            }
+            .buttonStyle(.borderless)
+            .disabled(isLoading)
         }
+        .padding(14)
+        .frame(maxWidth: .infinity)
+        .appSurfaceCard()
     }
 
     func wordDeckButton(for deck: WordFrequencyDeck) -> some View {

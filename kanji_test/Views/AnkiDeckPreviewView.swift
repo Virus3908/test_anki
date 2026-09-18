@@ -4,6 +4,7 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
     let deck: AnkiDeckReference
     let model: AnkiLibraryViewModel
     let settings: StudyPreferences
+    let translationState: TranslationViewModel
     let reviewStore: StudyProgressStore
     let onBack: () -> Void
     let onPractice: (PracticeSelection) -> Void
@@ -47,7 +48,8 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
             .padding(.horizontal, 12).padding(.top, 20).padding(.bottom, 4).foregroundStyle(AppPalette.text)
         }
         .sheet(item: $selectedCard) { card in
-            AnkiCardPreviewView(cards: cards, initialCard: card) { selected in
+            AnkiCardPreviewView(cards: cards, initialCard: card, translationState: translationState,
+                                language: settings.options(for: deck.id).meaningLanguage) { selected in
                 selectedCard = nil
                 onPractice(.anki(deck, [selected], guided: true))
             }
@@ -76,13 +78,18 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
 private struct AnkiCardPreviewView: View, StudyViewStyling {
     let cards: [AnkiStudyCard]
     let onPractice: (AnkiStudyCard) -> Void
+    let translationState: TranslationViewModel
+    let language: MeaningLanguage
     @State private var index: Int
     @State private var answer = false
     @Environment(\.dismiss) private var dismiss
 
-    init(cards: [AnkiStudyCard], initialCard: AnkiStudyCard, onPractice: @escaping (AnkiStudyCard) -> Void) {
+    init(cards: [AnkiStudyCard], initialCard: AnkiStudyCard, translationState: TranslationViewModel,
+         language: MeaningLanguage, onPractice: @escaping (AnkiStudyCard) -> Void) {
         self.cards = cards
         self.onPractice = onPractice
+        self.translationState = translationState
+        self.language = language
         _index = State(initialValue: cards.firstIndex(where: { $0.id == initialCard.id }) ?? 0)
     }
 
@@ -90,7 +97,7 @@ private struct AnkiCardPreviewView: View, StudyViewStyling {
         NavigationStack {
             VStack(spacing: 14) {
                 if let card = cards[safe: index] {
-                    AnkiCardContentView(card: card, answer: answer)
+                    AnkiCardContentView(card: card, answer: answer, translationState: translationState, language: language)
                     HStack {
                         Button { index -= 1; answer = false } label: { Image(systemName: "chevron.left") }
                             .disabled(index == 0).accessibilityLabel("Предыдущая карточка")

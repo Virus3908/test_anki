@@ -33,7 +33,7 @@ nonisolated struct AnkiStudyCard: Identifiable, Sendable, StudyItem {
     nonisolated var id: String { "\(importID):card:\(card.id)" }
     nonisolated var reviewKey: String { "anki:\(id)" }
     var displayTitle: String {
-        let text = (note.fields.first ?? "").replacingOccurrences(of: "<[^>]*>|\\[sound:[^\\]]+\\]", with: "", options: .regularExpression)
+        let text = (note.parsedFields?.first?.plainText ?? note.fields.first ?? "")
             .trimmingCharacters(in: .whitespacesAndNewlines)
         return text.isEmpty ? "Карточка \(card.id)" : String(text.prefix(120))
     }

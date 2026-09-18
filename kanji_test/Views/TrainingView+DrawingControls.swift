@@ -35,9 +35,10 @@ extension TrainingView {
                             let interval = trainingSession.intervalLabel(for: rating)
                             if !interval.isEmpty { Text(interval).font(.caption2) }
                         }
-                        .frame(maxWidth: .infinity, minHeight: 34)
+                        .frame(maxWidth: .infinity, minHeight: 30)
                     }
                     .buttonStyle(.borderedProminent)
+                    .controlSize(.small)
                     .tint(ratingButtonColor(for: rating, hasFeedback: true, isAnswered: true))
                     .disabled(!drawingSession.isAnswerVisible || trainingSession.isPreparingCard)
                 }

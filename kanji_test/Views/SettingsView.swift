@@ -11,6 +11,7 @@ struct SettingsView: View, StudyViewStyling {
     var importedDecks: [StudyDeck] = []
     @Environment(\.dismiss) var dismiss
     @State var isAboutPresented = false
+    @AppStorage("ankiCardDisplayMode") var ankiCardDisplayMode = "native"
     @State private var hasInitialized = false
     @State var selectedDeckID = ""
     @State var learningStepsText = ""

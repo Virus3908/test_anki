@@ -30,6 +30,7 @@ public enum AnkiPackageParser {
         var total: Int64 = 0
         try extract(databaseEntry, archive: archive, to: databaseURL, compressed: version == 3, limit: 512 * 1024 * 1024, total: &total)
         var collection = try AnkiDatabase(url: databaseURL).read()
+        collection.prepareNativeFields()
 
         struct MediaEntry {
             let index: String

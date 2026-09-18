@@ -55,6 +55,7 @@ struct TrainingView: View, CardContentRendering {
     func finishTraining() { trainingSession.finish() }
     func moveToPreviousCard() { Task { await trainingSession.moveToPreviousCard() } }
     func moveToNextCard() { Task { await trainingSession.moveToNextCard() } }
+    func excludeCurrentCard() { Task { await trainingSession.excludeCurrentCard() } }
     func applyWordReview(_ rating: ReviewRating) {
         let key = wordCards[safe: trainingSession.currentIndex]?.reviewKey
         Task { await trainingSession.submitReview(rating, expectedKey: key) }

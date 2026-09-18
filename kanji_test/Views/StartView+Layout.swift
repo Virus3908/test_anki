@@ -54,7 +54,7 @@ extension StartView {
                                 }
                             }
                         } else {
-                            ForEach(KanjiDeck.groups, id: \.title) { group in
+                            ForEach(visibleKanjiGroups, id: \.title) { group in
                                 VStack(alignment: .leading, spacing: 10) {
                                     Text(group.title)
                                         .font(.headline)
@@ -87,6 +87,27 @@ extension StartView {
             .padding(.top, 20)
             .padding(.bottom, 4)
             .foregroundStyle(AppPalette.text)
+        }
+        .alert("Удалить колоду?", isPresented: Binding(
+            get: { deckPendingDeletion != nil },
+            set: { if !$0 { deckPendingDeletion = nil } }
+        ), presenting: deckPendingDeletion) { deck in
+            Button("Удалить", role: .destructive) {
+                settings.hideKanjiDeck(deck)
+                deckPendingDeletion = nil
+            }
+            Button("Отмена", role: .cancel) {
+                deckPendingDeletion = nil
+            }
+        } message: { deck in
+            Text("«\(deck.title)» исчезнет из списка колод. Карточки и прогресс останутся сохранены.")
+        }
+    }
+
+    private var visibleKanjiGroups: [(title: String, decks: [KanjiDeck])] {
+        KanjiDeck.groups.compactMap { group in
+            let decks = group.decks.filter { !settings.hiddenKanjiDeckIDs.contains($0.id) }
+            return decks.isEmpty ? nil : (group.title, decks)
         }
     }
 

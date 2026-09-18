@@ -57,9 +57,11 @@ struct ContentView: View {
         switch appModel.navigation.route {
         case .start:
             StartView(practiceMode: Binding(get: { appModel.practiceMode }, set: { appModel.practiceMode = $0 }),
-                      isLoading: appModel.deckState.isLoadingDeck, onOpen: appModel.openDeck, ankiModel: appModel.ankiLibrary)
+                      isLoading: appModel.deckState.isLoadingDeck, onOpen: appModel.openDeck,
+                      settings: appModel.settings, ankiModel: appModel.ankiLibrary)
         case .ankiDeck(let deck):
             AnkiDeckPreviewView(deck: deck, model: appModel.ankiLibrary, settings: appModel.settings,
+                translationState: appModel.translationState,
                 reviewStore: appModel.trainingSession.reviewStore,
                 onBack: { appModel.ankiLibrary.closeDeck(); appModel.navigation.route = .start },
                 onPractice: appModel.practice)

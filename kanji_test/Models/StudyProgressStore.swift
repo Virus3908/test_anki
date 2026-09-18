@@ -4,15 +4,17 @@ nonisolated struct StudyProgressStore: Codable, Sendable {
     private(set) var records: [String: StudyReviewRecord]
     private(set) var firstShownAt: [String: Date] = [:]
     private(set) var reviewLog: [StudyReviewLog] = []
+    private(set) var excludedReviewKeys: Set<String> = []
     private(set) var studyDayOffset = 0
 
     init(records: [String: StudyReviewRecord]) { self.records = records }
-    private enum CodingKeys: String, CodingKey { case records, firstShownAt, studyDayOffset, reviewLog }
+    private enum CodingKeys: String, CodingKey { case records, firstShownAt, studyDayOffset, reviewLog, excludedReviewKeys }
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         records = try values.decode([String: StudyReviewRecord].self, forKey: .records)
         firstShownAt = try values.decodeIfPresent([String: Date].self, forKey: .firstShownAt) ?? [:]
         reviewLog = try values.decodeIfPresent([StudyReviewLog].self, forKey: .reviewLog) ?? []
+        excludedReviewKeys = try values.decodeIfPresent(Set<String>.self, forKey: .excludedReviewKeys) ?? []
         studyDayOffset = try values.decodeIfPresent(Int.self, forKey: .studyDayOffset) ?? 0
     }
     func studyDate(now: Date = Date()) -> Date {
@@ -65,6 +67,8 @@ nonisolated struct StudyProgressStore: Codable, Sendable {
         return id
     }
     func record(for key: String) -> StudyReviewRecord? { records[key] }
+    func isExcluded(_ key: String) -> Bool { excludedReviewKeys.contains(key) }
+    mutating func exclude(_ key: String) { excludedReviewKeys.insert(key) }
     mutating func undo(logID: UUID, record: StudyReviewRecord?, key: String) {
         records[key] = record
         reviewLog.removeAll { $0.id == logID }

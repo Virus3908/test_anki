@@ -6,7 +6,8 @@ extension TrainingView {
             AppPalette.background.ignoresSafeArea()
             VStack(spacing: 16) {
                 headerControls()
-                AnkiCardContentView(card: card, answer: drawingSession.isAnswerVisible)
+                AnkiCardContentView(card: card, answer: drawingSession.isAnswerVisible,
+                                    translationState: translationState, language: trainingSession.options.meaningLanguage)
                     .id("\(card.id)-\(trainingSession.scrollToTopToken)")
                 learningStatusLabel(forReviewKey: card.reviewKey)
                 VStack(spacing: 12) {

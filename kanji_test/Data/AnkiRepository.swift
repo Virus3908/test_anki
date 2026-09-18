@@ -79,7 +79,11 @@ actor AnkiRepository {
     func collection(_ summary: AnkiImportSummary) async throws -> AnkiCollection {
         let url = try directory(summary).appendingPathComponent("collection.json")
         return try await Task.detached(priority: .userInitiated) {
-            try JSONDecoder().decode(AnkiCollection.self, from: Data(contentsOf: url))
+            var collection = try JSONDecoder().decode(AnkiCollection.self, from: Data(contentsOf: url))
+            if collection.prepareNativeFields() {
+                try JSONEncoder().encode(collection).write(to: url, options: .atomic)
+            }
+            return collection
         }.value
     }
 

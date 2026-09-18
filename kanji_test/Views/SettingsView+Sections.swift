@@ -6,9 +6,10 @@ extension SettingsView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     deckSelectionView()
-                    if !isAnkiDeck { translationSettingsView() }
+                    translationSettingsView()
                     learningSettingsView()
                     if !isAnkiDeck { frontSettingsView() }
+                    ankiDisplaySettingsView()
                     storageSettingsView()
                     aboutSettingsView()
                 }
@@ -102,6 +103,20 @@ extension SettingsView {
     }
 
     private var isAnkiDeck: Bool { selectedDeckID.hasPrefix("anki:") }
+
+    private func ankiDisplaySettingsView() -> some View {
+        settingsSection("Вид карточек Anki") {
+            Picker("Отображение", selection: $ankiCardDisplayMode) {
+                Text("Обычный вид").tag("native")
+                Text("Шаблон Anki").tag("template")
+            }
+            .pickerStyle(.segmented)
+            Text("Применяется ко всем колодам Anki в просмотре и тренировке. Обычный вид использует оформление приложения, шаблон — оформление исходной колоды.")
+                .font(.caption)
+                .foregroundStyle(AppPalette.secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
 
     func storageSettingsView() -> some View {
         settingsSection("Данные") {

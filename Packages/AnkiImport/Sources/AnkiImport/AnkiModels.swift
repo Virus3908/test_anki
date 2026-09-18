@@ -27,6 +27,7 @@ public struct AnkiNote: Codable, Sendable, Identifiable {
     public let noteTypeID: Int64
     public let fields: [String]
     public let tags: [String]
+    public var parsedFields: [AnkiContent]? = nil
 }
 
 public struct AnkiCard: Codable, Sendable, Identifiable {
@@ -46,7 +47,7 @@ public struct AnkiMedia: Codable, Sendable {
 public struct AnkiCollection: Codable, Sendable {
     public let decks: [AnkiDeck]
     public let noteTypes: [AnkiNoteType]
-    public let notes: [AnkiNote]
+    public var notes: [AnkiNote]
     public let cards: [AnkiCard]
     public var media: [AnkiMedia] = []
     public var warnings: [String] = []

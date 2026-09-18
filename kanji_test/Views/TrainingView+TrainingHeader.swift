@@ -20,23 +20,35 @@ extension TrainingView {
     }
 
     func headerControls() -> some View {
-        HStack(spacing: 12) {
-            Button {
-                finishTraining()
-            } label: {
-                Image(systemName: "square.grid.2x2")
-                    .frame(width: 34, height: 30)
+        VStack(alignment: .leading, spacing: 5) {
+            HStack(spacing: 12) {
+                Button {
+                    finishTraining()
+                } label: {
+                    Image(systemName: "square.grid.2x2")
+                        .frame(width: 34, height: 30)
+                }
+
+                Text(trainingTitle)
+                    .font(.headline)
+                    .lineLimit(1)
+
+                Spacer()
+
+                if !trainingSession.isGuidedSingleKanjiPractice {
+                    Button {
+                        excludeCurrentCard()
+                    } label: {
+                        Image(systemName: "xmark.circle")
+                    }
+                    .accessibilityLabel("Исключить карточку из тренировок")
+                }
             }
-
-            Text(trainingTitle)
-                .font(.headline)
-
-            Spacer()
 
             Text(trainingSession.isGuidedSingleKanjiPractice ? "Практика" : "Ответов: \(trainingSession.sessionCompletedCards) · Осталось: \(trainingSession.sessionTotalCards)")
                 .font(.footnote.weight(.semibold))
                 .foregroundStyle(AppPalette.secondaryText)
-                .multilineTextAlignment(.trailing)
+                .frame(maxWidth: .infinity, alignment: .trailing)
         }
         .buttonStyle(.bordered)
         .tint(AppPalette.accent)

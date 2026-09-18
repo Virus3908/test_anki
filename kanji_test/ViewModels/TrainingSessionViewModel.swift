@@ -142,6 +142,24 @@ final class TrainingSessionViewModel {
     func moveToNextCard() async {
         if isGuidedSingleKanjiPractice { moveInPractice(to: currentIndex + 1) }
     }
+    func excludeCurrentCard() async {
+        guard hasLoadedProgress, !isPreparingCard, !isGuidedSingleKanjiPractice,
+              let mode, let id = queueIDs[safe: currentIndex] else { return }
+        isPreparingCard = true
+        defer { isPreparingCard = false }
+        var next = state
+        var progress = reviewStore
+        progress.exclude(ReviewItem(id: id, mode: mode).reviewKey)
+        rebuild(&next, progress: progress)
+        do {
+            try await repository.save(progress)
+            reviewStore = progress
+            if next.todayIDs.isEmpty { finishCompletedToday() }
+            else { publish(next) }
+        } catch {
+            errors.report("Не удалось исключить карточку из тренировки.", error: error)
+        }
+    }
     private func moveInPractice(to index: Int) {
         guard !isPreparingCard, queueIDs.indices.contains(index) else { return }
         var next = state
