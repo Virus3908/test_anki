@@ -10,19 +10,29 @@ extension StartView {
                 Text("Выбери набор")
                     .font(.largeTitle.weight(.bold))
 
-                Picker("Режим", selection: practiceModeBinding) {
-                    ForEach(PracticeMode.allCases) { mode in
-                        Text(mode.title).tag(mode)
+                Picker("Раздел", selection: $selectedSection) {
+                    ForEach(StartMenuSection.allCases) { section in
+                        Text(section.title).tag(section)
                     }
                 }
                 .pickerStyle(.segmented)
+                .onChange(of: selectedSection) { _, section in
+                    if let mode = section.practiceMode {
+                        practiceMode = mode
+                    }
+                }
+                .onAppear {
+                    selectedSection = StartMenuSection(rawValue: practiceMode.rawValue) ?? .kanji
+                }
 
                 Text(startSubtitle)
                     .foregroundStyle(AppPalette.secondaryText)
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 18) {
-                        if practiceMode == .kana {
+                        if selectedSection == .anki {
+                            ankiDecksPlaceholder
+                        } else if practiceMode == .kana {
                             ForEach(KanaDeck.allCases) { deck in
                                 kanaDeckButton(for: deck)
                             }
@@ -75,6 +85,19 @@ extension StartView {
             .padding(.bottom, 4)
             .foregroundStyle(AppPalette.text)
         }
+    }
+
+    var ankiDecksPlaceholder: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Колоды Anki")
+                .font(.headline)
+            Text("Импорт колод будет доступен здесь.")
+                .font(.subheadline)
+                .foregroundStyle(AppPalette.secondaryText)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .appSurfaceCard()
     }
 
 }
