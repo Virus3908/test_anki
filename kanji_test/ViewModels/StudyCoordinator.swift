@@ -31,9 +31,18 @@ final class StudyCoordinator {
         if case .training = navigation.route { return true }
         return false
     }
-    var selectedDeck: KanjiDeck = .jlpt5
-    var selectedKanaDeck: KanaDeck = .hiragana
-    var selectedWordDeck: WordFrequencyDeck = .top1000
+    var selectedDeck: KanjiDeck {
+        if case .kanjiDeck(let deck) = navigation.deckRoute { return deck }
+        return .jlpt5
+    }
+    var selectedKanaDeck: KanaDeck {
+        if case .kanaDeck(let deck) = navigation.deckRoute { return deck }
+        return .hiragana
+    }
+    var selectedWordDeck: WordFrequencyDeck {
+        if case .wordDeck(let deck) = navigation.deckRoute { return deck }
+        return .top1000
+    }
     var selectedPreviewCard: KanjiCard? {
         get { (presentedKanjiPreview?.cardID).flatMap { catalog.kanji($0) } }
         set {

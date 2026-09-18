@@ -3,7 +3,7 @@ import Foundation
 extension DeckPreviewViewModel {
     func openKanjiPreview(_ deck: KanjiDeck, reviewStore: StudyProgressStore) {
         cancelPreviewTask()
-        navigation.route = .kanjiDeck(deck)
+        navigation.open(.kanjiDeck(deck))
         loadError = nil
         previewWordCards.removeAll()
         previewKanaCards.removeAll()
@@ -30,7 +30,7 @@ extension DeckPreviewViewModel {
 
     func closeKanjiPreview() {
         cancelPreviewTask()
-        navigation.route = .start
+        navigation.open(.start)
         previewCards.removeAll()
         previewExpectedCount = nil
         isLoadingDeck = false

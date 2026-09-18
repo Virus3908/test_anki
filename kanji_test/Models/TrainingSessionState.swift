@@ -58,6 +58,33 @@ struct TrainingSessionState {
         guard let mode = queue.mode, let source = queue.value?.sourceIDs else { return }
         queue = .make(mode: mode, ids: ids, sourceIDs: source)
     }
+
+    mutating func rebuild(progress: StudyProgressStore, options: DeckOptions, preferredID: String? = nil) {
+        guard let queue = queue.value, let deck else { return }
+        let plan = TrainingSessionEngine.plan(sourceIDs: queue.sourceIDs, mode: deck.mode,
+            deckID: deck.id, progress: progress, options: options)
+        var ids = plan.readyIDs
+        if let preferredID, let index = ids.firstIndex(of: preferredID) {
+            ids.remove(at: index)
+            ids.insert(preferredID, at: 0)
+        }
+        replaceQueue(ids)
+        todayIDs = plan.todayIDs
+        currentIndex = 0
+        studyDay = progress.studyDate()
+        nextLearningDate = plan.nextLearningDate
+        hiddenReviews = plan.hiddenReviews
+    }
+
+    @discardableResult
+    func markCurrentShown(progress: inout StudyProgressStore) -> Bool {
+        guard !isGuidedSingleKanjiPractice, let mode = queue.mode,
+              let id = queue.value?.ids[safe: currentIndex] else { return false }
+        let key = ReviewItem(id: id, mode: mode).reviewKey
+        let isNew = progress.records[key] == nil && progress.firstShownAt[key] == nil
+        progress.markShown(key)
+        return isNew
+    }
 }
 
 nonisolated struct ReviewItem: StudyItem {

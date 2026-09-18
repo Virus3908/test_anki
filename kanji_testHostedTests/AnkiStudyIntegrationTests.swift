@@ -16,7 +16,7 @@ final class AnkiStudyIntegrationTests: XCTestCase {
         XCTAssertEqual(Set(model.decks.map(\.id)).count, 2)
         XCTAssertTrue(model.decks.allSatisfy { $0.studyDeck.mode == .anki })
         let navigation = StudyNavigation()
-        navigation.route = .ankiDeck(model.decks[1])
+        navigation.open(.ankiDeck(model.decks[1]))
         navigation.beginTraining(.anki)
         navigation.finishTraining()
         XCTAssertEqual(navigation.route.deck?.id, model.decks[1].id)

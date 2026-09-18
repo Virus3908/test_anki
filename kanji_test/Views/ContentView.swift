@@ -42,7 +42,7 @@ struct ContentView: View {
                     get: { appModel.errors.message != nil },
                     set: { if !$0 { appModel.errors.message = nil } }
                 )) {
-                    Button("Понятно") { appModel.errors.message = nil }
+                    Button("Понятно", role: .cancel) {}
                 } message: { Text(appModel.errors.message ?? "") }
                 .task { await appModel.loadSavedState() }
                 .onChange(of: appModel.trainingSession.isActive) { appModel.synchronizeTrainingRoute() }
@@ -63,7 +63,7 @@ struct ContentView: View {
             AnkiDeckPreviewView(deck: deck, model: appModel.ankiLibrary, settings: appModel.settings,
                 translationState: appModel.translationState,
                 reviewStore: appModel.trainingSession.reviewStore,
-                onBack: { appModel.ankiLibrary.closeDeck(); appModel.navigation.route = .start },
+                onBack: appModel.closeAnkiDeck,
                 onPractice: appModel.practice)
         case .training:
             TrainingView(trainingSession: appModel.trainingSession, settings: appModel.settings,

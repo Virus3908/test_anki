@@ -29,40 +29,10 @@ nonisolated extension KanjiCard {
     }
 
     func mergedForDisplay(with updatedCard: KanjiCard) -> KanjiCard {
-        KanjiCard(
-            kanji: updatedCard.kanji,
-            meanings: updatedCard.englishMeanings,
-            onyomi: updatedCard.onyomi,
-            kunyomi: updatedCard.kunyomi,
-            examples: updatedCard.englishExamples,
-            sourceMeanings: nil,
-            sourceExamples: nil,
-            russianMeanings: nil,
-            russianExamples: nil,
-            source: updatedCard.source,
-            strokes: updatedCard.strokes,
-            grade: updatedCard.grade,
-            jlpt: updatedCard.jlpt,
-            translationState: nil
-        )
+        updatedCard.withoutTranslations
     }
 
     var withoutTranslations: KanjiCard {
-        KanjiCard(
-            kanji: kanji,
-            meanings: englishMeanings,
-            onyomi: onyomi,
-            kunyomi: kunyomi,
-            examples: englishExamples,
-            sourceMeanings: nil,
-            sourceExamples: nil,
-            russianMeanings: nil,
-            russianExamples: nil,
-            source: source,
-            strokes: strokes,
-            grade: grade,
-            jlpt: jlpt,
-            translationState: nil
-        )
+        withEnglishExamples(englishExamples)
     }
 }

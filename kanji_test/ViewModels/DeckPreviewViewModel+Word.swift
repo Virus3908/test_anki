@@ -7,7 +7,7 @@ extension DeckPreviewViewModel {
         }
 
         cancelPreviewTask()
-        navigation.route = .wordDeck(deck)
+        navigation.open(.wordDeck(deck))
         loadError = nil
         previewWordCards.removeAll()
         isLoadingDeck = true
@@ -29,7 +29,7 @@ extension DeckPreviewViewModel {
 
     func closeWordPreview() {
         cancelPreviewTask()
-        navigation.route = .start
+        navigation.open(.start)
         previewWordCards.removeAll()
         isLoadingDeck = false
     }

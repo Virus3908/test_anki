@@ -2,7 +2,12 @@ import Foundation
 
 actor KanaSVGCacheRepository {
     static let shared = KanaSVGCacheRepository()
+    enum CacheError: LocalizedError {
+        case invalidFileName
+        var errorDescription: String? { "Неверное имя SVG-файла кэша." }
+    }
     func loadSVGText(fileName: String) throws -> String? {
+        guard Self.isSafeFileName(fileName) else { throw CacheError.invalidFileName }
         let url = cacheURL(for: fileName)
         guard FileManager.default.fileExists(atPath: url.path) else {
             return nil
@@ -13,6 +18,7 @@ actor KanaSVGCacheRepository {
 
     func saveSVGText(_ svgText: String, fileName: String) throws {
         try Task.checkCancellation()
+        guard Self.isSafeFileName(fileName) else { throw CacheError.invalidFileName }
         let url = cacheURL(for: fileName)
         try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
         try svgText.write(to: url, atomically: true, encoding: .utf8)
@@ -29,6 +35,12 @@ actor KanaSVGCacheRepository {
 
     private func cacheURL(for fileName: String) -> URL {
         cacheDirectoryURL().appendingPathComponent(fileName)
+    }
+
+    private nonisolated static func isSafeFileName(_ fileName: String) -> Bool {
+        fileName == URL(fileURLWithPath: fileName).lastPathComponent &&
+        fileName.hasSuffix(".svg") &&
+        !fileName.isEmpty && !fileName.contains("..")
     }
 
     private func cacheDirectoryURL() -> URL {

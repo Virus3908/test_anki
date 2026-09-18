@@ -4,7 +4,7 @@ import AnkiImport
 
 @MainActor @Observable
 final class AnkiLibraryViewModel {
-    private let repository = AnkiRepository()
+    private let repository: any AnkiLibraryPersisting
     var imports: [AnkiImportSummary] = []
     var isImporting = false
     var isLoaded = false
@@ -14,7 +14,13 @@ final class AnkiLibraryViewModel {
     private(set) var previewDeck: AnkiDeckReference?
     private(set) var isOpeningDeck = false
     var loadError: String?
-    private var openToken = UUID()
+    private let request = LoadRequest()
+    private var openToken: UUID { request.id }
+    private var isLoading = false
+
+    init(repository: any AnkiLibraryPersisting = AnkiRepository()) {
+        self.repository = repository
+    }
 
     var decks: [AnkiDeckReference] {
         var result: [AnkiDeckReference] = []
@@ -29,7 +35,9 @@ final class AnkiLibraryViewModel {
     }
 
     func load() async {
-        guard !isLoaded else { return }
+        guard !isLoaded, !isLoading else { return }
+        isLoading = true
+        defer { isLoading = false }
         do { imports = try await repository.load(); isLoaded = true }
         catch { message = error.localizedDescription; canRestoreBackup = await repository.hasRecoverableBackup() }
     }
@@ -54,13 +62,17 @@ final class AnkiLibraryViewModel {
 
     func open(_ summary: AnkiImportSummary) async throws -> (AnkiCollection, URL) {
         let collection = try await repository.collection(summary)
-        let media = try await repository.mediaDirectory(summary)
+            let media = try await repository.mediaDirectory(summary)
         return (collection, media)
     }
 
     func openDeck(_ deck: AnkiDeckReference) async {
-        let token = UUID()
-        openToken = token
+        request.cancel()
+        await loadDeck(deck)
+    }
+
+    private func loadDeck(_ deck: AnkiDeckReference) async {
+        let token = openToken
         previewDeck = deck
         previewCards = []
         loadError = nil
@@ -79,16 +91,21 @@ final class AnkiLibraryViewModel {
                     return AnkiStudyCard(importID: deck.importID, card: card, note: note, noteType: type, deckName: deck.title, mediaDirectory: media)
                 }
             }.value
-            guard openToken == token else { return }
+            guard openToken == token, !Task.isCancelled else { return }
             previewCards = cards
         } catch { if openToken == token { loadError = error.localizedDescription } }
     }
 
     func closeDeck() {
-        openToken = UUID()
+        request.cancel()
         isOpeningDeck = false
         previewCards = []
         previewDeck = nil
         loadError = nil
+    }
+
+    func beginOpening(_ deck: AnkiDeckReference) {
+        request.cancel()
+        request.task = Task { [weak self] in await self?.loadDeck(deck) }
     }
 }

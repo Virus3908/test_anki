@@ -2,7 +2,6 @@ import Foundation
 
 extension StudyCoordinator {
     func openDeckPreview(_ deck: KanjiDeck, deckState: DeckPreviewViewModel, reviewStore: StudyProgressStore) {
-        selectedDeck = deck
         clearDeckSelection()
         deckState.openKanjiPreview(deck, reviewStore: reviewStore)
     }
@@ -17,7 +16,6 @@ extension StudyCoordinator {
         _ deck: KanaDeck,
         deckState: DeckPreviewViewModel
     ) {
-        selectedKanaDeck = deck
         clearDeckSelection()
         deckState.openKanaPreview(deck)
     }
@@ -32,7 +30,6 @@ extension StudyCoordinator {
             return
         }
 
-        selectedWordDeck = deck
         clearDeckSelection()
         deckState.openWordPreview(deck)
     }
@@ -98,10 +95,7 @@ extension StudyCoordinator {
     }
 
     func clearDeckSelection() {
-        selectedPreviewCard = nil
-        selectedKanaPreviewCard = nil
-        selectedWordPreviewCard = nil
-        closeDeckSchedule()
+        resetPreviewSelection()
     }
 
     func resetPreviewSelection() {

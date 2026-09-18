@@ -17,18 +17,26 @@ final class StudyAppViewModel {
     let coordinator: StudyCoordinator
     let trainingSession: TrainingSessionViewModel
     let translationState: TranslationViewModel
-    let ankiLibrary = AnkiLibraryViewModel()
+    let ankiLibrary: AnkiLibraryViewModel
     var isSettingsPresented = false
     var isTodayCompletionPresented = false
     var isLoadingSavedState = false
     var hasLoadedSavedState = false
     var isSavingReview: Bool { trainingSession.isPreparingCard }
+    @ObservationIgnored var trainingStartTask: Task<Void, Never>?
+    @ObservationIgnored var supplementalLoadTask: Task<Void, Never>?
+
+    deinit {
+        trainingStartTask?.cancel()
+        supplementalLoadTask?.cancel()
+    }
 
     init(reviewRepository: (any ReviewPersisting)? = nil,
          translationRepository: (any TranslationPersisting)? = nil,
          translator: any MeaningTranslating = SystemRussianMeaningTranslator(),
          kanjiProvider: any KanjiProviding = KanjiAPIProvider(),
-         wordProvider: any WordExampleProviding = TatoebaWordExampleProvider()) {
+         wordProvider: any WordExampleProviding = TatoebaWordExampleProvider(),
+         ankiRepository: any AnkiLibraryPersisting = AnkiRepository()) {
         let errors = StorageStatus()
         let settings = StudyPreferences(errors: errors)
         let catalog = StudyCardCatalog()
@@ -40,6 +48,7 @@ final class StudyAppViewModel {
         self.trainingSession = TrainingSessionViewModel(repository: reviewRepository ?? ReviewRepository(), catalog: catalog, settings: settings, errors: errors)
         self.deckState = DeckPreviewViewModel(catalog: catalog, navigation: navigation, kanjiProvider: kanjiProvider)
         self.coordinator = StudyCoordinator(catalog: catalog, navigation: navigation)
+        self.ankiLibrary = AnkiLibraryViewModel(repository: ankiRepository)
         self.translationState = TranslationViewModel(repository: translationRepository ?? TranslationRepository(), translator: translator,
             kanjiProvider: kanjiProvider, wordProvider: wordProvider, errors: errors)
     }

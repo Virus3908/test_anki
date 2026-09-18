@@ -10,10 +10,15 @@ extension StudyAppViewModel {
         case .ankiDeck(let deck):
             deckState.cancelPreviewTask()
             selectedPracticeMode = .anki
-            navigation.route = route
-            Task { await ankiLibrary.openDeck(deck) }
+            navigation.open(route)
+            ankiLibrary.beginOpening(deck)
         default: break
         }
+    }
+
+    func closeAnkiDeck() {
+        ankiLibrary.closeDeck()
+        navigation.open(.start)
     }
     func practice(_ selection: PracticeSelection) {
         switch selection {

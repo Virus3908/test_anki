@@ -9,7 +9,6 @@ extension StudyAppViewModel {
         start(deck: .words(coordinator.selectedWordDeck), ids: catalog.register(guided ? cards : sourceCards ?? cards), guided: guided)
     }
     func startKanaTraining(deck: KanaDeck, cards: [KanaStudyCard]? = nil, sourceCards: [KanaStudyCard]? = nil, guided: Bool = false) {
-        coordinator.selectedKanaDeck = deck
         start(deck: .kana(deck), ids: catalog.register(guided ? cards ?? deck.cards : sourceCards ?? cards ?? deck.cards), guided: guided)
     }
     func startAnkiTraining(deck: AnkiDeckReference, cards: [AnkiStudyCard], guided: Bool = false) {
@@ -17,7 +16,10 @@ extension StudyAppViewModel {
     }
     private func start(deck: StudyDeck, ids: [String], guided: Bool) {
         guard hasLoadedSavedState else { return }
-        Task {
+        guard trainingStartTask == nil else { return }
+        trainingStartTask = Task { [weak self] in
+            guard let self else { return }
+            defer { trainingStartTask = nil }
             if await trainingSession.start(deck: deck, sourceIDs: ids, guided: guided) {
                 selectedPracticeMode = deck.mode
                 deckState.cancelPreviewTask()

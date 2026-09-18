@@ -3,7 +3,16 @@ import CryptoKit
 import AnkiImport
 
 /// Anki content is separate from built-in content; review-memory.json remains owned by ReviewRepository.
-actor AnkiRepository {
+nonisolated protocol AnkiLibraryPersisting: Sendable {
+    func load() async throws -> [AnkiImportSummary]
+    func hasRecoverableBackup() async -> Bool
+    func restoreBackup() async throws -> [AnkiImportSummary]
+    func importPackage(_ url: URL) async throws -> AnkiImportResult
+    func collection(_ summary: AnkiImportSummary) async throws -> AnkiCollection
+    func mediaDirectory(_ summary: AnkiImportSummary) async throws -> URL
+}
+
+actor AnkiRepository: AnkiLibraryPersisting {
     private let store = JSONFileStore<[AnkiImportSummary]>(filename: "anki-library.json", emptyValue: [])
     private var importing = false
 
@@ -87,7 +96,7 @@ actor AnkiRepository {
         }.value
     }
 
-    func mediaDirectory(_ summary: AnkiImportSummary) throws -> URL {
+    func mediaDirectory(_ summary: AnkiImportSummary) async throws -> URL {
         try directory(summary).appendingPathComponent("media", isDirectory: true)
     }
 

@@ -4,23 +4,32 @@ extension StudyAppViewModel {
     func loadSavedState() async {
         guard !hasLoadedSavedState, !isLoadingSavedState else { return }
         isLoadingSavedState = true
-        defer { isLoadingSavedState = false }
         do {
             try await trainingSession.loadProgress()
-            await translationState.loadSavedTranslations()
-            await ankiLibrary.load()
             hasLoadedSavedState = true
         } catch {
             errors.report("Не удалось загрузить прогресс. Исходный файл сохранён.", error: error)
         }
+        isLoadingSavedState = false
+        loadSupplementalState()
     }
     func restoreProgressBackup() async {
         do {
             try await trainingSession.restoreProgressBackup()
-            await translationState.loadSavedTranslations()
             hasLoadedSavedState = true
             synchronizeTrainingRoute()
+            loadSupplementalState()
         } catch { errors.report("Не удалось восстановить резервную копию.", error: error) }
+    }
+    private func loadSupplementalState() {
+        guard supplementalLoadTask == nil else { return }
+        supplementalLoadTask = Task { [weak self] in
+            guard let self else { return }
+            defer { supplementalLoadTask = nil }
+            async let translations: Void = translationState.loadSavedTranslations()
+            async let library: Void = ankiLibrary.load()
+            _ = await (translations, library)
+        }
     }
     func advanceReviewDay() async {
         do { try await trainingSession.advanceStudyDay(); synchronizeTrainingRoute() }
@@ -33,6 +42,7 @@ extension StudyAppViewModel {
     func clearDeckCache() async {
         guard !isSavingReview else { return }
         trainingSession.finish()
+        ankiLibrary.closeDeck()
         translationState.clearLoadedExamples()
         deckState.clearCacheState()
         coordinator.resetPreviewSelection()

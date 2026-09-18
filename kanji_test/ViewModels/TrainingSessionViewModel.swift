@@ -9,14 +9,15 @@ final class TrainingSessionViewModel {
     private(set) var isPreparingCard = false
     private(set) var hasLoadedProgress = false
     private(set) var canRestoreBackup = false
-    private(set) var scrollToTopToken = 0
+    let presentation = TrainingPresentation()
+    var scrollToTopToken: Int { presentation.revision }
     /// Set only when the normal study queue for the day has been exhausted.
     /// The app uses this to return to the deck and present the completion sheet.
     private(set) var didCompleteToday = false
     private var addedNewCardsToday = 0
     private var addedNewCardsStudyDay: Date?
     private var addedNewCardsDeckID: String?
-    let drawingSession = DrawingSessionViewModel()
+    var drawingSession: DrawingSessionViewModel { presentation.drawing }
     private let repository: any ReviewPersisting
     private let catalog: StudyCardCatalog
     private let settings: StudyPreferences
@@ -213,41 +214,23 @@ final class TrainingSessionViewModel {
         } catch { errors.report("Не удалось обновить очередь обучения.", error: error) }
     }
     private func rebuild(_ next: inout TrainingSessionState, progress: StudyProgressStore, preferredID: String? = nil) {
-        guard let queue = next.queue.value, let deck = next.deck else { return }
-        let plan = TrainingSessionEngine.plan(sourceIDs: queue.sourceIDs, mode: deck.mode, deckID: deck.id,
-            progress: progress, options: effectiveOptions(for: deck.id, studyDay: progress.studyDate()))
-        var ids = plan.readyIDs
-        if let preferredID, let index = ids.firstIndex(of: preferredID) { ids.remove(at: index); ids.insert(preferredID, at: 0) }
-        next.replaceQueue(ids)
-        next.todayIDs = plan.todayIDs
-        next.currentIndex = 0
-        next.studyDay = progress.studyDate()
-        next.nextLearningDate = plan.nextLearningDate
-        next.hiddenReviews = plan.hiddenReviews
+        next.rebuild(progress: progress,
+            options: effectiveOptions(for: next.deck?.id, studyDay: progress.studyDate()), preferredID: preferredID)
     }
     @discardableResult
     private func markCurrentShown(in next: TrainingSessionState, progress: inout StudyProgressStore) -> Bool {
-        guard !next.isGuidedSingleKanjiPractice, let mode = next.queue.mode,
-              let id = next.queue.value?.ids[safe: next.currentIndex] else { return false }
-        let key = ReviewItem(id: id, mode: mode).reviewKey
-        let isNew = progress.records[key] == nil && progress.firstShownAt[key] == nil
-        progress.markShown(key)
-        return isNew
+        next.markCurrentShown(progress: &progress)
     }
     func intervalLabel(for rating: ReviewRating) -> String {
         guard !isGuidedSingleKanjiPractice, let mode, let id = queueIDs[safe: currentIndex] else { return "" }
         let key = ReviewItem(id: id, mode: mode).reviewKey
         let now = reviewStore.studyDate()
-        guard let next = try? StudyScheduler.record(after: rating, cardID: key, existingRecord: reviewStore.record(for: key), options: options, now: now) else { return "—" }
-        if next.intervalDays >= 1 { return "\(Int(next.intervalDays)) дн." }
-        let minutes = max(1, Int(ceil(next.dueDate.timeIntervalSince(now) / 60)))
-        return minutes < 60 ? "\(minutes) мин." : "\(minutes / 60) ч."
+        let next = try? StudyScheduler.record(after: rating, cardID: key, existingRecord: reviewStore.record(for: key), options: options, now: now)
+        return TrainingPresentation.intervalLabel(next, now: now)
     }
     private func publish(_ next: TrainingSessionState) {
         state = next
-        drawingSession.resetWordDrawingState()
-        drawingSession.resetCurrentAnswer()
-        scrollToTopToken += 1
+        presentation.reset()
     }
     private func finishCompletedToday() {
         didCompleteToday = true

@@ -8,7 +8,8 @@ final class DeckPreviewViewModel {
     let navigation: StudyNavigation
     let kanjiProvider: any KanjiProviding
     var loadError: String?
-    var previewRequestID = UUID()
+    let request = LoadRequest()
+    var previewRequestID: UUID { request.id }
 
     init(catalog: StudyCardCatalog, navigation: StudyNavigation, kanjiProvider: any KanjiProviding) {
         self.catalog = catalog
@@ -44,7 +45,10 @@ final class DeckPreviewViewModel {
         get { previewKanaIDs.compactMap { catalog.kana($0) } }
         set { previewKanaIDs = catalog.register(newValue) }
     }
-    var deckPreviewTask: Task<Void, Never>?
+    var deckPreviewTask: Task<Void, Never>? {
+        get { request.task }
+        set { request.task = newValue }
+    }
     var isLoadingDeck = false
 
     func clearCacheState() {
@@ -72,9 +76,7 @@ final class DeckPreviewViewModel {
     }
 
     func cancelPreviewTask() {
-        previewRequestID = UUID()
-        deckPreviewTask?.cancel()
-        deckPreviewTask = nil
+        request.cancel()
     }
 
 }

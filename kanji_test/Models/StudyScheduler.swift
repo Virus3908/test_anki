@@ -6,6 +6,16 @@ import FSRS
 nonisolated enum StudyScheduler {
     static let version = "fsrs-6"
 
+    enum Error: LocalizedError {
+        case invalidRating
+
+        var errorDescription: String? {
+            switch self {
+            case .invalidRating: return "Не удалось преобразовать оценку в формат планировщика."
+            }
+        }
+    }
+
     static func record(after rating: ReviewRating, cardID: String, existingRecord: StudyReviewRecord?,
                        options: DeckOptions, now: Date) throws -> StudyReviewRecord {
         let options = options.validated
@@ -37,7 +47,8 @@ nonisolated enum StudyScheduler {
             utc.timeZone = TimeZone(secondsFromGMT: 0)!
             card.lastReview = utc.startOfDay(for: schedulerNow).addingTimeInterval(-Double(elapsed) * 86400)
         }
-        let result = try scheduler.next(card: card, now: schedulerNow, grade: Rating(rawValue: rating.ankiGrade)!).card
+        guard let grade = Rating(rawValue: rating.ankiGrade) else { throw Error.invalidRating }
+        let result = try scheduler.next(card: card, now: schedulerNow, grade: grade).card
         var record = previous ?? StudyReviewRecord(attempts: 0, intervalDays: 0, dueDate: now,
             lastRating: rating, lastReviewedAt: now, state: .learning, learningStep: 0, lapses: 0,
             stability: result.stability, difficulty: result.difficulty, schedulerVersion: version)

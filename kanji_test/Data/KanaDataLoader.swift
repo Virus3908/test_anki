@@ -1,13 +1,14 @@
 import Foundation
 
 enum KanaDataLoader {
-    static func loadCards(deck: KanaDeck) async -> [KanaStudyCard] {
+    static func loadCards(deck: KanaDeck, cache: KanaSVGCacheRepository = .shared,
+                          session: URLSession = .shared) async -> [KanaStudyCard] {
         let baseCards = deck.baseCards
 
         return await withTaskGroup(of: KanaStudyCard.self) { group in
             for card in baseCards {
                 group.addTask {
-                    await loadCard(card)
+                    await loadCard(card, cache: cache, session: session)
                 }
             }
 
@@ -20,13 +21,13 @@ enum KanaDataLoader {
         }
     }
 
-    private static func loadCard(_ card: KanaStudyCard) async -> KanaStudyCard {
+    private static func loadCard(_ card: KanaStudyCard, cache: KanaSVGCacheRepository, session: URLSession) async -> KanaStudyCard {
         guard card.character.unicodeScalars.count == 1 else {
             return card
         }
 
         do {
-            let svgText = try await loadSVGText(for: card.character)
+            let svgText = try await loadSVGText(for: card.character, cache: cache, session: session)
             let strokes = SVGStrokeExtractor.strokes(from: svgText)
             guard !strokes.isEmpty else {
                 return card
@@ -38,21 +39,21 @@ enum KanaDataLoader {
         }
     }
 
-    private static func loadSVGText(for character: String) async throws -> String {
+    private static func loadSVGText(for character: String, cache: KanaSVGCacheRepository, session: URLSession) async throws -> String {
         let fileName = svgFileName(for: character)
 
-        if let cachedText = try await KanaSVGCacheRepository.shared.loadSVGText(fileName: fileName) {
+        if let cachedText = try await cache.loadSVGText(fileName: fileName) {
             return cachedText
         }
 
         let url = URL(string: "https://raw.githubusercontent.com/KanjiVG/kanjivg/master/kanji/\(fileName)")!
-        let (data, response) = try await URLSession.shared.data(from: url)
+        let (data, response) = try await session.data(from: url)
         if let httpResponse = response as? HTTPURLResponse, !(200..<300).contains(httpResponse.statusCode) {
             throw URLError(.badServerResponse)
         }
 
         let svgText = String(decoding: data, as: UTF8.self)
-        try await KanaSVGCacheRepository.shared.saveSVGText(svgText, fileName: fileName)
+        try await cache.saveSVGText(svgText, fileName: fileName)
         return svgText
     }
 

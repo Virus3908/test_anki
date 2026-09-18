@@ -3,7 +3,7 @@ import Foundation
 extension DeckPreviewViewModel {
     func openKanaPreview(_ deck: KanaDeck) {
         cancelPreviewTask()
-        navigation.route = .kanaDeck(deck)
+        navigation.open(.kanaDeck(deck))
         loadError = nil
         previewWordCards.removeAll()
         previewKanaCards = deck.baseCards
@@ -18,7 +18,7 @@ extension DeckPreviewViewModel {
 
     func closeKanaPreview() {
         cancelPreviewTask()
-        navigation.route = .start
+        navigation.open(.start)
         previewKanaCards.removeAll()
         isLoadingDeck = false
     }

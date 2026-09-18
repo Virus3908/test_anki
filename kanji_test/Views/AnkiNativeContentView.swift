@@ -65,6 +65,7 @@ private struct AnkiNativeImage: View {
     let label: String
     @State private var image: UIImage?
     @State private var failed = false
+    private let media = AnkiMediaService()
     var body: some View {
         Group {
             if let image { Image(uiImage: image).resizable().scaledToFit().accessibilityLabel(label.isEmpty ? url.lastPathComponent : label) }
@@ -73,7 +74,7 @@ private struct AnkiNativeImage: View {
         }.frame(maxWidth: .infinity)
             .task(id: url) {
                 image = nil; failed = false
-                let data = await Task.detached { try? Data(contentsOf: url) }.value
+                let data = try? await media.data(at: url)
                 guard !Task.isCancelled else { return }
                 image = data.flatMap { UIImage(data: $0) }
                 failed = image == nil

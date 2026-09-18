@@ -48,22 +48,7 @@ actor KanjiDeckCacheRepository {
     }
 
     nonisolated static func mergeCachedCard(_ cached: KanjiCard, with fresh: KanjiCard) -> KanjiCard {
-        KanjiCard(
-            kanji: fresh.kanji,
-            meanings: fresh.englishMeanings,
-            onyomi: fresh.onyomi,
-            kunyomi: fresh.kunyomi,
-            examples: fresh.englishExamples,
-            sourceMeanings: nil,
-            sourceExamples: nil,
-            russianMeanings: nil,
-            russianExamples: nil,
-            source: fresh.source,
-            strokes: fresh.strokes,
-            grade: fresh.grade,
-            jlpt: fresh.jlpt,
-            translationState: nil
-        )
+        cached.mergedForDisplay(with: fresh)
     }
 
     private func saveCards(_ cards: [KanjiCard], for deck: KanjiDeck) throws {

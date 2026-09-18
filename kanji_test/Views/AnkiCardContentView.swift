@@ -13,6 +13,7 @@ struct AnkiCardContentView: View {
     @State private var fieldSide = FieldSide.front
     @State private var prepared: PreparedAnkiCard?
     @State private var translatedHTML: String?
+    private let renderer = AnkiCardRenderer()
 
     private let fieldPreferences = AnkiFieldDisplayPreferences.shared
 
@@ -86,15 +87,7 @@ struct AnkiCardContentView: View {
         .padding(18).appSurfaceCard()
         .task(id: "\(card.id)-\(answer)") {
             prepared = nil; translatedHTML = nil
-            let sourceCard = card
-            let isAnswer = answer
-            let value = await Task.detached(priority: .userInitiated) {
-                let rendered = AnkiTemplateRenderer.render(card: sourceCard.card, note: sourceCard.note, type: sourceCard.noteType,
-                    deckName: sourceCard.deckName, answer: isAnswer)
-                let content = AnkiContentParser.parsePreservingSource(rendered.html)
-                return PreparedAnkiCard(html: rendered.html, content: content, warnings: rendered.warnings,
-                    englishTexts: TranslationViewModel.ankiEnglishTexts(in: content))
-            }.value
+            let value = try? await renderer.prepare(card, answer: answer)
             guard !Task.isCancelled else { return }
             prepared = value
         }
@@ -103,10 +96,7 @@ struct AnkiCardContentView: View {
         }
         .task(id: AnkiTranslationRenderRequest(html: prepared?.html ?? "", texts: englishTexts, translated: translations, language: language.rawValue)) {
             guard let prepared, !mapping.isEmpty else { translatedHTML = nil; return }
-            let values = mapping
-            let html = await Task.detached(priority: .userInitiated) {
-                try? AnkiContentParser.replacingTexts(in: prepared.html, translations: values)
-            }.value
+            let html = try? await renderer.translate(prepared.html, mapping: mapping)
             guard !Task.isCancelled else { return }
             translatedHTML = html
         }
@@ -203,13 +193,6 @@ struct AnkiCardContentView: View {
         content.warnings = []
         return content
     }
-}
-
-nonisolated private struct PreparedAnkiCard: Sendable {
-    let html: String
-    let content: AnkiContent
-    let warnings: [String]
-    let englishTexts: [String]
 }
 
 nonisolated private struct AnkiTranslationRenderRequest: Hashable {
