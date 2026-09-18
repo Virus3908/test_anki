@@ -20,7 +20,11 @@ extension StudyAppViewModel {
                 deckState.cancelPreviewTask()
                 deckState.isLoadingDeck = false
                 coordinator.resetPreviewSelection()
-                navigation.beginTraining(deck.mode)
+                if trainingSession.didCompleteToday {
+                    isTodayCompletionPresented = true
+                } else {
+                    navigation.beginTraining(deck.mode)
+                }
             }
         }
     }

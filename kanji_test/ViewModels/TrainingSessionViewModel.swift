@@ -10,6 +10,12 @@ final class TrainingSessionViewModel {
     private(set) var hasLoadedProgress = false
     private(set) var canRestoreBackup = false
     private(set) var scrollToTopToken = 0
+    /// Set only when the normal study queue for the day has been exhausted.
+    /// The app uses this to return to the deck and present the completion sheet.
+    private(set) var didCompleteToday = false
+    private var addedNewCardsToday = 0
+    private var addedNewCardsStudyDay: Date?
+    private var addedNewCardsDeckID: String?
     let drawingSession = DrawingSessionViewModel()
     private let repository: any ReviewPersisting
     private let catalog: StudyCardCatalog
@@ -25,9 +31,9 @@ final class TrainingSessionViewModel {
     var isActive: Bool { state.queue.mode != nil }
     var mode: PracticeMode? { state.queue.mode }
     var deck: StudyDeck? { state.deck }
-    var options: DeckOptions { settings.options(for: deck?.id) }
+    var options: DeckOptions { effectiveOptions(for: deck?.id) }
     var currentIndex: Int { state.currentIndex }
-    var sessionTotalCards: Int { queueIDs.count }
+    var sessionTotalCards: Int { state.todayIDs.count }
     var sessionCompletedCards: Int { state.sessionCompletedCards }
     var isGuidedSingleKanjiPractice: Bool { state.isGuidedSingleKanjiPractice }
     var sessionAnswerStates: [String: SessionAnswerState] { state.sessionAnswerStates }
@@ -60,6 +66,7 @@ final class TrainingSessionViewModel {
     }
     func start(deck: StudyDeck, sourceIDs: [String], guided: Bool = false) async -> Bool {
         guard hasLoadedProgress, !isPreparingCard else { return false }
+        didCompleteToday = false
         isPreparingCard = true
         defer { isPreparingCard = false }
         var seen: Set<String> = []
@@ -75,7 +82,8 @@ final class TrainingSessionViewModel {
         do {
             if markCurrentShown(in: next, progress: &progress) { try await repository.save(progress) }
             reviewStore = progress
-            publish(next)
+            if !guided, next.todayIDs.isEmpty { finishCompletedToday() }
+            else { publish(next) }
             return true
         } catch {
             errors.report("Не удалось начать обучение. Прогресс не изменён.", error: error)
@@ -105,7 +113,8 @@ final class TrainingSessionViewModel {
             _ = markCurrentShown(in: next, progress: &progress)
             try await repository.save(progress)
             reviewStore = progress
-            publish(next)
+            if next.todayIDs.isEmpty { finishCompletedToday() }
+            else { publish(next) }
         } catch { errors.report("Ответ не сохранён. Попробуй оценить карточку ещё раз.", error: error) }
     }
     func moveToPreviousCard() async {
@@ -137,7 +146,19 @@ final class TrainingSessionViewModel {
     }
     func finish() {
         guard !isPreparingCard else { return }
+        didCompleteToday = false
         publish(TrainingSessionState())
+    }
+    func addNewCardsToToday(_ count: Int, for deckID: String) {
+        let today = reviewStore.studyDate()
+        if addedNewCardsDeckID != deckID ||
+            addedNewCardsStudyDay.map({ Calendar.current.isDate($0, inSameDayAs: today) }) != true {
+            addedNewCardsToday = 0
+            addedNewCardsStudyDay = today
+            addedNewCardsDeckID = deckID
+        }
+        addedNewCardsToday = min(9999, addedNewCardsToday + max(1, count))
+        didCompleteToday = false
     }
     func advanceStudyDay() async throws {
         guard hasLoadedProgress, !isPreparingCard else { return }
@@ -172,10 +193,11 @@ final class TrainingSessionViewModel {
     private func rebuild(_ next: inout TrainingSessionState, progress: StudyProgressStore, preferredID: String? = nil) {
         guard let queue = next.queue.value, let deck = next.deck else { return }
         let plan = TrainingSessionEngine.plan(sourceIDs: queue.sourceIDs, mode: deck.mode, deckID: deck.id,
-            progress: progress, options: settings.options(for: deck.id))
+            progress: progress, options: effectiveOptions(for: deck.id, studyDay: progress.studyDate()))
         var ids = plan.readyIDs
         if let preferredID, let index = ids.firstIndex(of: preferredID) { ids.remove(at: index); ids.insert(preferredID, at: 0) }
         next.replaceQueue(ids)
+        next.todayIDs = plan.todayIDs
         next.currentIndex = 0
         next.studyDay = progress.studyDate()
         next.nextLearningDate = plan.nextLearningDate
@@ -204,6 +226,20 @@ final class TrainingSessionViewModel {
         drawingSession.resetWordDrawingState()
         drawingSession.resetCurrentAnswer()
         scrollToTopToken += 1
+    }
+    private func finishCompletedToday() {
+        didCompleteToday = true
+        publish(TrainingSessionState())
+    }
+    private func effectiveOptions(for deckID: String?, studyDay: Date? = nil) -> DeckOptions {
+        var result = settings.options(for: deckID)
+        let day = studyDay ?? reviewStore.studyDate()
+        guard addedNewCardsDeckID == deckID,
+              addedNewCardsStudyDay.map({ Calendar.current.isDate($0, inSameDayAs: day) }) == true else {
+            return result
+        }
+        result.dailyNewCardLimit = min(9999, result.dailyNewCardLimit + addedNewCardsToday)
+        return result
     }
     func answerID(for mode: PracticeMode, index: Int) -> String { "\(mode.rawValue):\(index)" }
     func evaluateFeedback(for card: KanjiCard, reveal: Bool) -> Bool { drawingSession.evaluateFeedback(for: card, reveal: reveal) }

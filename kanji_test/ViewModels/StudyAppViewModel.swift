@@ -18,6 +18,7 @@ final class StudyAppViewModel {
     let trainingSession: TrainingSessionViewModel
     let translationState: TranslationViewModel
     var isSettingsPresented = false
+    var isTodayCompletionPresented = false
     var isLoadingSavedState = false
     var hasLoadedSavedState = false
     var isSavingReview: Bool { trainingSession.isPreparingCard }

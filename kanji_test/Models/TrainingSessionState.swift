@@ -37,6 +37,10 @@ enum ActiveStudyQueue {
 
 struct TrainingSessionState {
     var queue: ActiveStudyQueue = .idle
+    /// Snapshot of cards that still belong to the current study day. This is
+    /// deliberately separate from `queue`, which contains only the card that
+    /// can be shown now (plus the fallback waiting card when necessary).
+    var todayIDs: [String] = []
     var deck: StudyDeck?
     var currentIndex = 0
     var sessionCompletedCards = 0

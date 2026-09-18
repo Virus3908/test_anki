@@ -56,7 +56,13 @@ extension StartView {
                             }
                         }
                     }
+                    .padding(.horizontal, 4)
+                    .padding(.bottom, 44)
                 }
+                .overlay(alignment: .bottom) {
+                    DeckListBottomFade()
+                }
+                .frame(maxHeight: .infinity)
 
                 if isLoading {
                     ProgressView("Загружаю карточки")
@@ -64,11 +70,24 @@ extension StartView {
                         .tint(AppPalette.accent)
                 }
 
-                Spacer()
             }
-            .padding(20)
+            .padding(.horizontal, 10Теп)
+            .padding(.top, 20)
+            .padding(.bottom, 4)
             .foregroundStyle(AppPalette.text)
         }
     }
 
+}
+
+private struct DeckListBottomFade: View {
+    var body: some View {
+        LinearGradient(
+            colors: [.clear, AppPalette.background],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+        .frame(height: 44)
+        .allowsHitTesting(false)
+    }
 }

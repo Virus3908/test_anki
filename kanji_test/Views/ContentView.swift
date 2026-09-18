@@ -28,6 +28,13 @@ struct ContentView: View {
                         onRestoreTranslations: { Task { await appModel.translationState.restoreBackup() } },
                         initialDeck: appModel.trainingSession.deck ?? appModel.navigation.route.deck)
                 }
+                .sheet(isPresented: $model.isTodayCompletionPresented) {
+                    StudyDayCompleteSheet(defaultCount: appModel.additionalCardsDefaultCount,
+                                          onAddCards: appModel.addNewCardsToToday)
+                        .presentationDetents([.fraction(0.5)])
+                        .presentationDragIndicator(.visible)
+                        .presentationBackground(AppPalette.background)
+                }
                 .disabled(!appModel.hasLoadedSavedState || appModel.isSavingReview || appModel.isLoadingSavedState)
                 .overlay { loadingOverlay }
                 .alert("Сообщение", isPresented: Binding(
