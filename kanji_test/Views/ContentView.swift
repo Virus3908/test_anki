@@ -2,7 +2,6 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var appModel = StudyAppViewModel()
-    @State private var ankiModel = AnkiLibraryViewModel()
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
@@ -27,7 +26,8 @@ struct ContentView: View {
                         onNextDay: { Task { await appModel.advanceReviewDay() } },
                         onClearCache: { Task { await appModel.clearDeckCache() } },
                         onRestoreTranslations: { Task { await appModel.translationState.restoreBackup() } },
-                        initialDeck: appModel.trainingSession.deck ?? appModel.navigation.route.deck)
+                        initialDeck: appModel.trainingSession.deck ?? appModel.navigation.route.deck,
+                        importedDecks: appModel.ankiLibrary.decks.map(\.studyDeck))
                 }
                 .sheet(isPresented: $model.isTodayCompletionPresented) {
                     StudyDayCompleteSheet(defaultCount: appModel.additionalCardsDefaultCount,
@@ -57,7 +57,12 @@ struct ContentView: View {
         switch appModel.navigation.route {
         case .start:
             StartView(practiceMode: Binding(get: { appModel.practiceMode }, set: { appModel.practiceMode = $0 }),
-                      isLoading: appModel.deckState.isLoadingDeck, onOpen: appModel.openDeck, ankiModel: ankiModel)
+                      isLoading: appModel.deckState.isLoadingDeck, onOpen: appModel.openDeck, ankiModel: appModel.ankiLibrary)
+        case .ankiDeck(let deck):
+            AnkiDeckPreviewView(deck: deck, model: appModel.ankiLibrary, settings: appModel.settings,
+                reviewStore: appModel.trainingSession.reviewStore,
+                onBack: { appModel.ankiLibrary.closeDeck(); appModel.navigation.route = .start },
+                onPractice: appModel.practice)
         case .training:
             TrainingView(trainingSession: appModel.trainingSession, settings: appModel.settings,
                          translationState: appModel.translationState, coordinator: appModel.coordinator, onPractice: appModel.practice)

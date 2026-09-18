@@ -7,9 +7,22 @@ actor AnkiRepository {
     private let store = JSONFileStore<[AnkiImportSummary]>(filename: "anki-library.json", emptyValue: [])
     private var importing = false
 
-    func load() async throws -> [AnkiImportSummary] { try await store.load() }
+    func load() async throws -> [AnkiImportSummary] {
+        var library = try await store.load()
+        var changed = false
+        for index in library.indices where library[index].deckCardCounts == nil {
+            let collection = try await collection(library[index])
+            library[index].deckCardCounts = Self.counts(collection)
+            changed = true
+        }
+        if changed { try await store.save(library) }
+        return library
+    }
     func hasRecoverableBackup() async -> Bool { await store.hasRecoverableBackup() }
-    func restoreBackup() async throws -> [AnkiImportSummary] { try await store.restoreBackup() }
+    func restoreBackup() async throws -> [AnkiImportSummary] {
+        _ = try await store.restoreBackup()
+        return try await load()
+    }
 
     func importPackage(_ url: URL) async throws -> AnkiImportResult {
         guard !importing else { throw AnkiImportError.invalid("дождитесь завершения текущего импорта") }
@@ -43,7 +56,7 @@ actor AnkiRepository {
             let summary = AnkiImportSummary(id: fingerprint, directory: UUID().uuidString,
                 filename: url.lastPathComponent, importedAt: Date(), decks: collection.decks,
                 cardCount: collection.cards.count, noteCount: collection.notes.count,
-                mediaCount: collection.media.count, warnings: collection.warnings)
+                mediaCount: collection.media.count, warnings: collection.warnings, deckCardCounts: Self.counts(collection))
             return AnkiImportResult(summary: summary, alreadyImported: false)
         }
         let result = try await withTaskCancellationHandler { try await worker.value } onCancel: { worker.cancel() }
@@ -72,6 +85,10 @@ actor AnkiRepository {
 
     func mediaDirectory(_ summary: AnkiImportSummary) throws -> URL {
         try directory(summary).appendingPathComponent("media", isDirectory: true)
+    }
+
+    private nonisolated static func counts(_ collection: AnkiCollection) -> [String: Int] {
+        Dictionary(grouping: collection.cards, by: { String($0.deckID) }).mapValues(\.count)
     }
 
     private func directory(_ summary: AnkiImportSummary) throws -> URL {

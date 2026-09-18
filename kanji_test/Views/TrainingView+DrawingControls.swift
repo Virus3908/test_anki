@@ -27,6 +27,7 @@ extension TrainingView {
                             if let card = cards[safe: trainingSession.currentIndex] { applyReview(rating, to: card) }
                         case .words: applyWordReview(rating)
                         case .kana: applyKanaReview(rating)
+                        case .anki: applyAnkiReview(rating)
                         }
                     } label: {
                         VStack(spacing: 3) {

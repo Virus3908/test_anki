@@ -28,6 +28,8 @@ extension StudyAppViewModel {
             practice(.words(deckState.previewWordCards, guided: false))
         case .kanaDeck(let deck):
             practice(.kana(deck, deckState.previewKanaCards, guided: false))
+        case .ankiDeck(let deck):
+            practice(.anki(deck, ankiLibrary.previewCards, guided: false))
         default:
             break
         }

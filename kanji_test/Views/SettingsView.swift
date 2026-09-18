@@ -8,6 +8,7 @@ struct SettingsView: View, StudyViewStyling {
     let onClearCache: () -> Void
     let onRestoreTranslations: () -> Void
     let initialDeck: StudyDeck?
+    var importedDecks: [StudyDeck] = []
     @Environment(\.dismiss) var dismiss
     @State var isAboutPresented = false
     @State private var hasInitialized = false

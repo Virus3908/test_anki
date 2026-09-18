@@ -1,18 +1,18 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
-struct AnkiLibraryView: View {
+struct AnkiLibraryView: View, StudyViewStyling {
     let model: AnkiLibraryViewModel
+    let isBusy: Bool
+    let onOpen: (StudyRoute) -> Void
     @State private var isImporterPresented = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Button { isImporterPresented = true } label: {
-                Label("Импортировать колоду", systemImage: "square.and.arrow.down")
-                    .frame(maxWidth: .infinity).padding(.vertical, 6)
+            primaryActionButton(title: "Импортировать колоду", systemImage: "square.and.arrow.down") {
+                isImporterPresented = true
             }
-            .buttonStyle(.borderedProminent)
-            .disabled(model.isImporting || !model.isLoaded)
+            .disabled(model.isImporting || !model.isLoaded || isBusy)
             Text("Выбери .apkg или .colpkg в Файлах. При экспорте из Anki включи медиафайлы.")
                 .font(.footnote).foregroundStyle(AppPalette.secondaryText)
             if model.isImporting {
@@ -22,21 +22,13 @@ struct AnkiLibraryView: View {
                 if model.canRestoreBackup {
                     Button("Восстановить библиотеку из резервной копии") { Task { await model.restoreBackup() } }
                 }
-            } else if model.imports.isEmpty {
+            } else if model.decks.isEmpty {
                 ContentUnavailableView("Пока нет колод", systemImage: "rectangle.stack", description: Text("Импортированные колоды появятся здесь."))
             }
-            ForEach(model.imports) { item in
-                NavigationLink {
-                    AnkiCollectionView(summary: item, model: model)
-                } label: {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(item.filename).font(.headline)
-                        Text("\(item.cardCount) карточек · \(item.mediaCount) медиафайлов")
-                            .font(.subheadline).foregroundStyle(AppPalette.secondaryText)
-                        Text(item.importedAt, style: .date).font(.caption).foregroundStyle(AppPalette.secondaryText)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading).padding(14).appSurfaceCard()
-                }.buttonStyle(.plain)
+            ForEach(model.decks) { deck in
+                deckSelectionButton(title: deck.title, subtitle: "\(deck.cardCount) карточек", isDisabled: isBusy || model.isImporting) {
+                    onOpen(.ankiDeck(deck))
+                }
             }
         }
         .task { await model.load() }

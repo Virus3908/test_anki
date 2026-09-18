@@ -6,6 +6,7 @@ enum StudyRoute: Equatable {
     case kanjiDeck(KanjiDeck)
     case wordDeck(WordFrequencyDeck)
     case kanaDeck(KanaDeck)
+    case ankiDeck(AnkiDeckReference)
     case training(PracticeMode)
 }
 

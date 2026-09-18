@@ -34,7 +34,7 @@ extension StartView {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 18) {
                         if selectedSection == .anki {
-                            AnkiLibraryView(model: ankiModel)
+                            AnkiLibraryView(model: ankiModel, isBusy: isLoading, onOpen: onOpen)
                         } else if practiceMode == .kana {
                             ForEach(KanaDeck.allCases) { deck in
                                 kanaDeckButton(for: deck)

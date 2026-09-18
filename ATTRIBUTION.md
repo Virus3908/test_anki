@@ -42,6 +42,16 @@ Project website: https://kanjiapi.dev/
 
 Source repository: https://github.com/onlyskin/kanjiapi.dev
 
+## Anki Import Libraries
+
+Anki package import uses ZIPFoundation 0.9.20 (MIT, Thomas Zoechling) and
+Zstandard 1.5.7 (BSD-3-Clause, Meta Platforms, Inc. and affiliates).
+Full license notices are bundled in `kanji_test/Data/AnkiThirdPartyLicenses.txt`
+and displayed in the application's Sources screen.
+
+- https://github.com/weichsel/ZIPFoundation
+- https://github.com/facebook/zstd
+
 ## System Translation
 
 This project may use Apple system translation APIs to translate English meanings into Russian for display.

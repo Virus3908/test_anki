@@ -11,6 +11,35 @@ nonisolated struct AnkiImportSummary: Codable, Sendable, Identifiable {
     let noteCount: Int
     let mediaCount: Int
     let warnings: [String]
+    var deckCardCounts: [String: Int]? = nil
+}
+
+nonisolated struct AnkiDeckReference: Identifiable, Hashable, Sendable {
+    let importID: String
+    let sourceDeckID: Int64
+    let title: String
+    let cardCount: Int
+    var id: String { "anki:\(importID):deck:\(sourceDeckID)" }
+    var studyDeck: StudyDeck { .init(id: id, title: title, mode: .anki) }
+}
+
+nonisolated struct AnkiStudyCard: Identifiable, Sendable, StudyItem {
+    let importID: String
+    let card: AnkiCard
+    let note: AnkiNote
+    let noteType: AnkiNoteType
+    let deckName: String
+    let mediaDirectory: URL
+    nonisolated var id: String { "\(importID):card:\(card.id)" }
+    nonisolated var reviewKey: String { "anki:\(id)" }
+    var displayTitle: String {
+        let text = (note.fields.first ?? "").replacingOccurrences(of: "<[^>]*>|\\[sound:[^\\]]+\\]", with: "", options: .regularExpression)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return text.isEmpty ? "Карточка \(card.id)" : String(text.prefix(120))
+    }
+    var templateName: String {
+        noteType.isCloze ? "Пропуск \(card.ordinal + 1)" : noteType.templates.first(where: { $0.ordinal == card.ordinal })?.name ?? noteType.name
+    }
 }
 
 nonisolated struct AnkiImportResult: Sendable {

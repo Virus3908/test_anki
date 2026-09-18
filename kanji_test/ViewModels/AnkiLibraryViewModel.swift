@@ -10,6 +10,23 @@ final class AnkiLibraryViewModel {
     var isLoaded = false
     var message: String?
     var canRestoreBackup = false
+    private(set) var previewCards: [AnkiStudyCard] = []
+    private(set) var previewDeck: AnkiDeckReference?
+    private(set) var isOpeningDeck = false
+    var loadError: String?
+    private var openToken = UUID()
+
+    var decks: [AnkiDeckReference] {
+        var result: [AnkiDeckReference] = []
+        for item in imports {
+            for deck in item.decks {
+                let count = item.deckCardCounts?[String(deck.id)] ?? 0
+                guard count > 0 else { continue }
+                result.append(AnkiDeckReference(importID: item.id, sourceDeckID: deck.id, title: deck.name, cardCount: count))
+            }
+        }
+        return result.sorted { $0.title == $1.title ? $0.id < $1.id : $0.title.localizedStandardCompare($1.title) == .orderedAscending }
+    }
 
     func load() async {
         guard !isLoaded else { return }
@@ -30,7 +47,7 @@ final class AnkiLibraryViewModel {
             let result = try await repository.importPackage(url)
             imports = try await repository.load()
             message = result.alreadyImported ? "Этот файл уже импортирован." :
-                "Импортировано: \(result.summary.cardCount) карточек, \(result.summary.noteCount) заметок, \(result.summary.mediaCount) медиафайлов."
+                "Импортировано: \(result.summary.deckCardCounts?.count ?? 0) колод, \(result.summary.cardCount) карточек, \(result.summary.mediaCount) медиафайлов."
             if !result.summary.warnings.isEmpty { message = (message ?? "") + "\n\n" + result.summary.warnings.joined(separator: "\n") }
         } catch { message = error.localizedDescription }
     }
@@ -39,5 +56,39 @@ final class AnkiLibraryViewModel {
         let collection = try await repository.collection(summary)
         let media = try await repository.mediaDirectory(summary)
         return (collection, media)
+    }
+
+    func openDeck(_ deck: AnkiDeckReference) async {
+        let token = UUID()
+        openToken = token
+        previewDeck = deck
+        previewCards = []
+        loadError = nil
+        isOpeningDeck = true
+        defer { if openToken == token { isOpeningDeck = false } }
+        do {
+            guard let summary = imports.first(where: { $0.id == deck.importID }) else {
+                throw AnkiImportError.invalid("колода отсутствует в библиотеке")
+            }
+            let (collection, media) = try await open(summary)
+            let cards = await Task.detached(priority: .userInitiated) {
+                let notes = Dictionary(uniqueKeysWithValues: collection.notes.map { ($0.id, $0) })
+                let types = Dictionary(uniqueKeysWithValues: collection.noteTypes.map { ($0.id, $0) })
+                return collection.cards.filter { $0.deckID == deck.sourceDeckID }.compactMap { card -> AnkiStudyCard? in
+                    guard let note = notes[card.noteID], let type = types[note.noteTypeID] else { return nil }
+                    return AnkiStudyCard(importID: deck.importID, card: card, note: note, noteType: type, deckName: deck.title, mediaDirectory: media)
+                }
+            }.value
+            guard openToken == token else { return }
+            previewCards = cards
+        } catch { if openToken == token { loadError = error.localizedDescription } }
+    }
+
+    func closeDeck() {
+        openToken = UUID()
+        isOpeningDeck = false
+        previewCards = []
+        previewDeck = nil
+        loadError = nil
     }
 }

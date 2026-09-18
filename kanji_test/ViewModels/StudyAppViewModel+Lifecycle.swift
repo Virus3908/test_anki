@@ -8,6 +8,7 @@ extension StudyAppViewModel {
         do {
             try await trainingSession.loadProgress()
             await translationState.loadSavedTranslations()
+            await ankiLibrary.load()
             hasLoadedSavedState = true
         } catch {
             errors.report("Не удалось загрузить прогресс. Исходный файл сохранён.", error: error)

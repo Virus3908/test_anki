@@ -17,6 +17,7 @@ final class StudyAppViewModel {
     let coordinator: StudyCoordinator
     let trainingSession: TrainingSessionViewModel
     let translationState: TranslationViewModel
+    let ankiLibrary = AnkiLibraryViewModel()
     var isSettingsPresented = false
     var isTodayCompletionPresented = false
     var isLoadingSavedState = false

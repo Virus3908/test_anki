@@ -42,6 +42,10 @@ final class TrainingSessionViewModel {
     var cards: [KanjiCard] { mode == .kanji ? queueIDs.compactMap(catalog.kanji) : [] }
     var wordCards: [WordStudyCard] { mode == .words ? queueIDs.compactMap(catalog.word) : [] }
     var kanaCards: [KanaStudyCard] { mode == .kana ? queueIDs.compactMap(catalog.kana) : [] }
+    var currentAnkiCard: AnkiStudyCard? {
+        guard mode == .anki, let id = queueIDs[safe: currentIndex] else { return nil }
+        return catalog.anki(id)
+    }
     private var queueIDs: [String] { state.queue.value?.ids ?? [] }
 
     func loadProgress() async throws {

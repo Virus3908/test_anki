@@ -22,6 +22,7 @@ extension StudyRoute {
         case .kanjiDeck(let value): return .kanji(value)
         case .wordDeck(let value): return .words(value)
         case .kanaDeck(let value): return .kana(value)
+        case .ankiDeck(let value): return value.studyDeck
         default: return nil
         }
     }

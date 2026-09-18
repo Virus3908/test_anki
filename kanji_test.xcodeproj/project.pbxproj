@@ -8,16 +8,33 @@
 
 /* Begin PBXBuildFile section */
 		A10000000000000000000001 /* FSRS in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000002 /* FSRS */; };
+		B10000000000000000000001 /* AnkiImport in Frameworks */ = {isa = PBXBuildFile; productRef = B10000000000000000000002 /* AnkiImport */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C10000000000000000000004 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5BD24D2430583E9F00F23D33 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5BD24D2B30583E9F00F23D33;
+			remoteInfo = kanji_test;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		5BD24D2C30583E9F00F23D33 /* kanji_test.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = kanji_test.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C10000000000000000000002 /* kanji_testHostedTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = kanji_testHostedTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		5BD24D2E30583E9F00F23D33 /* kanji_test */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = kanji_test;
+			sourceTree = "<group>";
+		};
+		C10000000000000000000008 /* kanji_testHostedTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = kanji_testHostedTests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -28,6 +45,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				A10000000000000000000001 /* FSRS in Frameworks */,
+				B10000000000000000000001 /* AnkiImport in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C10000000000000000000009 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -38,6 +63,7 @@
 			isa = PBXGroup;
 			children = (
 				5BD24D2E30583E9F00F23D33 /* kanji_test */,
+				C10000000000000000000008 /* kanji_testHostedTests */,
 				5BD24D2D30583E9F00F23D33 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -46,6 +72,7 @@
 			isa = PBXGroup;
 			children = (
 				5BD24D2C30583E9F00F23D33 /* kanji_test.app */,
+				C10000000000000000000002 /* kanji_testHostedTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -53,6 +80,27 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		5BCD0455305B1D0400722EF9 /* kanji_testHostedTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C10000000000000000000005 /* Build configuration list for PBXNativeTarget "kanji_testHostedTests" */;
+			buildPhases = (
+				C1000000000000000000000A /* Sources */,
+				C10000000000000000000009 /* Frameworks */,
+				C1000000000000000000000B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C10000000000000000000003 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				C10000000000000000000008 /* kanji_testHostedTests */,
+			);
+			name = kanji_testHostedTests;
+			productName = kanji_testHostedTests;
+			productReference = C10000000000000000000002 /* kanji_testHostedTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		5BD24D2B30583E9F00F23D33 /* kanji_test */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5BD24D3730583EA100F23D33 /* Build configuration list for PBXNativeTarget "kanji_test" */;
@@ -71,6 +119,7 @@
 			name = kanji_test;
 			packageProductDependencies = (
 				A10000000000000000000002 /* FSRS */,
+				B10000000000000000000002 /* AnkiImport */,
 			);
 			productName = kanji_test;
 			productReference = 5BD24D2C30583E9F00F23D33 /* kanji_test.app */;
@@ -103,6 +152,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				A10000000000000000000003 /* XCRemoteSwiftPackageReference "swift-fsrs" */,
+				B10000000000000000000003 /* XCLocalSwiftPackageReference "Packages/AnkiImport" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5BD24D2D30583E9F00F23D33 /* Products */;
@@ -110,12 +160,20 @@
 			projectRoot = "";
 			targets = (
 				5BD24D2B30583E9F00F23D33 /* kanji_test */,
+				5BCD0455305B1D0400722EF9 /* kanji_testHostedTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		5BD24D2A30583E9F00F23D33 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C1000000000000000000000B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -132,7 +190,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C1000000000000000000000A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		C10000000000000000000003 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5BD24D2B30583E9F00F23D33 /* kanji_test */;
+			targetProxy = C10000000000000000000004 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		5BD24D3530583EA100F23D33 /* Debug */ = {
@@ -326,6 +399,32 @@
 			};
 			name = Release;
 		};
+		C10000000000000000000006 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.lomach.kanji-test.integration-tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/kanji_test.app/kanji_test";
+			};
+			name = Debug;
+		};
+		C10000000000000000000007 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.lomach.kanji-test.integration-tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/kanji_test.app/kanji_test";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -347,7 +446,23 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		C10000000000000000000005 /* Build configuration list for PBXNativeTarget "kanji_testHostedTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C10000000000000000000006 /* Debug */,
+				C10000000000000000000007 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		B10000000000000000000003 /* XCLocalSwiftPackageReference "Packages/AnkiImport" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/AnkiImport;
+		};
+/* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
 		A10000000000000000000003 /* XCRemoteSwiftPackageReference "swift-fsrs" */ = {
@@ -365,6 +480,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A10000000000000000000003 /* XCRemoteSwiftPackageReference "swift-fsrs" */;
 			productName = FSRS;
+		};
+		B10000000000000000000002 /* AnkiImport */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B10000000000000000000003 /* XCLocalSwiftPackageReference "Packages/AnkiImport" */;
+			productName = AnkiImport;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

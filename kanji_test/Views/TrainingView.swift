@@ -49,6 +49,7 @@ struct TrainingView: View, CardContentRendering {
         case .kanji: return selectedDeck.title
         case .words: return "Слова: \(selectedWordDeck.title)"
         case .kana: return selectedKanaDeck.title
+        case .anki: return "Анки"
         }
     }
     func finishTraining() { trainingSession.finish() }
@@ -60,6 +61,10 @@ struct TrainingView: View, CardContentRendering {
     }
     func applyKanaReview(_ rating: ReviewRating) {
         let key = kanaCards[safe: trainingSession.currentIndex]?.reviewKey
+        Task { await trainingSession.submitReview(rating, expectedKey: key) }
+    }
+    func applyAnkiReview(_ rating: ReviewRating) {
+        guard let key = trainingSession.currentAnkiCard?.reviewKey else { return }
         Task { await trainingSession.submitReview(rating, expectedKey: key) }
     }
     func applyReview(_ rating: ReviewRating, to card: KanjiCard) {

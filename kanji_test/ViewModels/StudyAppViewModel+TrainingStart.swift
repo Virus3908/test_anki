@@ -12,6 +12,9 @@ extension StudyAppViewModel {
         coordinator.selectedKanaDeck = deck
         start(deck: .kana(deck), ids: catalog.register(guided ? cards ?? deck.cards : sourceCards ?? cards ?? deck.cards), guided: guided)
     }
+    func startAnkiTraining(deck: AnkiDeckReference, cards: [AnkiStudyCard], guided: Bool = false) {
+        start(deck: deck.studyDeck, ids: catalog.register(cards), guided: guided)
+    }
     private func start(deck: StudyDeck, ids: [String], guided: Bool) {
         guard hasLoadedSavedState else { return }
         Task {

@@ -7,6 +7,7 @@ final class StudyCardCatalog {
     private var kanjiByID: [String: KanjiCard] = [:]
     private var wordsByID: [String: WordRecord] = [:]
     private var kanaByID: [String: KanaStudyCard] = [:]
+    private var ankiByID: [String: AnkiStudyCard] = [:]
 
     private struct WordRecord {
         let word: String
@@ -18,6 +19,13 @@ final class StudyCardCatalog {
 
     func kanji(_ id: String) -> KanjiCard? { kanjiByID[id] }
     func kana(_ id: String) -> KanaStudyCard? { kanaByID[id] }
+    func anki(_ id: String) -> AnkiStudyCard? { ankiByID[id] }
+
+    @discardableResult
+    func register(_ cards: [AnkiStudyCard]) -> [String] {
+        for card in cards { ankiByID[card.id] = card }
+        return cards.map(\.id)
+    }
     func word(_ id: String) -> WordStudyCard? {
         guard let record = wordsByID[id] else { return nil }
         return WordStudyCard(word: record.word, reading: record.reading, meaning: record.meaning,
@@ -61,5 +69,6 @@ final class StudyCardCatalog {
         kanjiByID.removeAll()
         wordsByID.removeAll()
         kanaByID.removeAll()
+        ankiByID.removeAll()
     }
 }

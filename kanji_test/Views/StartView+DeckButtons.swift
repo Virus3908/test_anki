@@ -4,7 +4,7 @@ extension StartView {
     func kanaDeckButton(for deck: KanaDeck) -> some View {
         deckSelectionButton(
             title: deck.title,
-            subtitle: "\(deck.cards.count) карточек"
+            subtitle: "\(deck.cards.count) карточек", isDisabled: isLoading
         ) {
             onOpen(.kanaDeck(deck))
         }
@@ -13,7 +13,7 @@ extension StartView {
     func deckButton(for deck: KanjiDeck) -> some View {
         deckSelectionButton(
             title: deck.title,
-            subtitle: deck.endpointPath
+            subtitle: deck.endpointPath, isDisabled: isLoading
         ) {
             onOpen(.kanjiDeck(deck))
         }
@@ -22,13 +22,16 @@ extension StartView {
     func wordDeckButton(for deck: WordFrequencyDeck) -> some View {
         deckSelectionButton(
             title: deck.title,
-            subtitle: deck.subtitle
+            subtitle: deck.subtitle, isDisabled: isLoading
         ) {
             onOpen(.wordDeck(deck))
         }
     }
 
-    func deckSelectionButton(title: String, subtitle: String, action: @escaping () -> Void) -> some View {
+}
+
+extension StudyViewStyling {
+    func deckSelectionButton(title: String, subtitle: String, isDisabled: Bool = false, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             HStack {
                 VStack(alignment: .leading, spacing: 3) {
@@ -48,7 +51,7 @@ extension StartView {
             .appSurfaceCard()
         }
         .buttonStyle(.plain)
-        .disabled(isLoading)
+        .disabled(isDisabled)
     }
 
 }

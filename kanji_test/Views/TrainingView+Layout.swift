@@ -24,6 +24,10 @@ extension TrainingView {
                 } else {
                     sessionWaitingView()
                 }
+            case .anki:
+                if let card = trainingSession.currentAnkiCard {
+                    ankiTrainingView(for: card)
+                } else { sessionWaitingView() }
             }
         }
         .sheet(item: $coordinator.selectedLinkedKanjiCard, onDismiss: {

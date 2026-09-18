@@ -22,7 +22,7 @@ enum StartMenuSection: String, CaseIterable, Identifiable {
         case .kanji: .kanji
         case .words: .words
         case .kana: .kana
-        case .anki: nil
+        case .anki: .anki
         }
     }
 }

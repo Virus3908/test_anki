@@ -6,9 +6,9 @@ extension SettingsView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     deckSelectionView()
-                    translationSettingsView()
+                    if !isAnkiDeck { translationSettingsView() }
                     learningSettingsView()
-                    frontSettingsView()
+                    if !isAnkiDeck { frontSettingsView() }
                     storageSettingsView()
                     aboutSettingsView()
                 }
@@ -52,7 +52,7 @@ extension SettingsView {
         settingsSection("Колода") {
             Picker("Настроить", selection: $selectedDeckID) {
                 Text("По умолчанию").tag("")
-                ForEach(StudyDeck.builtIn) { deck in Text("\(deck.mode.title): \(deck.title)").tag(deck.id) }
+                ForEach(StudyDeck.builtIn + importedDecks) { deck in Text("\(deck.mode.title): \(deck.title)").tag(deck.id) }
             }
             Text(deckID == nil ? "Эти настройки используют колоды, у которых ещё нет собственных параметров." : "Изменения применяются только к выбранной колоде.")
                 .font(.caption).foregroundStyle(AppPalette.secondaryText)
@@ -100,6 +100,8 @@ extension SettingsView {
             }
         }
     }
+
+    private var isAnkiDeck: Bool { selectedDeckID.hasPrefix("anki:") }
 
     func storageSettingsView() -> some View {
         settingsSection("Данные") {

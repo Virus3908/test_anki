@@ -2,10 +2,13 @@ import Foundation
 
 nonisolated extension StudyProgressStore {
     func scheduleBuckets(for cards: [KanjiCard], now: Date = Date()) -> [KanjiReviewScheduleBucket] {
+        scheduleBuckets(forReviewKeys: Set(cards.map(\.kanji)), now: now)
+    }
+
+    func scheduleBuckets(forReviewKeys keys: Set<String>, now: Date = Date()) -> [KanjiReviewScheduleBucket] {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: studyDate(now: now))
-        let deckKanji = Set(cards.map(\.kanji))
-        let deckRecords = records.filter { deckKanji.contains($0.key) }.map(\.value)
+        let deckRecords = records.filter { keys.contains($0.key) }.map(\.value)
         let futureStart = calendar.date(byAdding: .day, value: 7, to: today) ?? today.addingTimeInterval(7 * 24 * 60 * 60)
 
         var buckets: [KanjiReviewScheduleBucket] = (0..<7).map { offset in
