@@ -31,7 +31,9 @@ struct StartView: View, StudyViewStyling {
     @Binding var practiceMode: PracticeMode
     let isLoading: Bool
     let onOpen: (StudyRoute) -> Void
+    let ankiModel: AnkiLibraryViewModel
     @State var selectedSection: StartMenuSection = .kanji
+    @State var hasSelectedInitialSection = false
 
     var body: some View { startView() }
     var startSubtitle: String {
@@ -39,7 +41,7 @@ struct StartView: View, StudyViewStyling {
         case .kanji: return "Колоды кандзи с порядком черт и интервальным повторением."
         case .words: return "Слова из локального JMdict, сгруппированные в common-наборы."
         case .kana: return "Хирагана и катакана с просмотром карточек и тренировкой письма."
-        case .anki: return "Здесь появятся импортированные колоды Anki."
+        case .anki: return "Импортируй колоды Anki с полями, картинками и звуком."
         }
     }
 }

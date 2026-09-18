@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var appModel = StudyAppViewModel()
+    @State private var ankiModel = AnkiLibraryViewModel()
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
@@ -56,7 +57,7 @@ struct ContentView: View {
         switch appModel.navigation.route {
         case .start:
             StartView(practiceMode: Binding(get: { appModel.practiceMode }, set: { appModel.practiceMode = $0 }),
-                      isLoading: appModel.deckState.isLoadingDeck, onOpen: appModel.openDeck)
+                      isLoading: appModel.deckState.isLoadingDeck, onOpen: appModel.openDeck, ankiModel: ankiModel)
         case .training:
             TrainingView(trainingSession: appModel.trainingSession, settings: appModel.settings,
                          translationState: appModel.translationState, coordinator: appModel.coordinator, onPractice: appModel.practice)

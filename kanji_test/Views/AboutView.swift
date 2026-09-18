@@ -17,6 +17,17 @@ struct AboutView: View {
                     }
 
 
+                    licenseCard(title: "ZIPFoundation · Zstandard", subtitle: "Импорт архивов Anki",
+                        license: "ZIPFoundation: MIT · Zstandard: BSD-3-Clause",
+                        links: [("ZIPFoundation", "https://github.com/weichsel/ZIPFoundation"),
+                                ("Zstandard", "https://github.com/facebook/zstd")])
+                    if let url = Bundle.main.url(forResource: "AnkiThirdPartyLicenses", withExtension: "txt"),
+                       let license = try? String(contentsOf: url, encoding: .utf8) {
+                        DisclosureGroup("Лицензии библиотек импорта") {
+                            Text(license).font(.caption2).foregroundStyle(AppPalette.secondaryText)
+                        }
+                    }
+
                     licenseCard(
                         title: "JMdict / KANJIDIC",
                         subtitle: "Слова, чтения, значения и часть kanji-данных",

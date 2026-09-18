@@ -22,7 +22,10 @@ extension StartView {
                     }
                 }
                 .onAppear {
-                    selectedSection = StartMenuSection(rawValue: practiceMode.rawValue) ?? .kanji
+                    if !hasSelectedInitialSection {
+                        selectedSection = StartMenuSection(rawValue: practiceMode.rawValue) ?? .kanji
+                        hasSelectedInitialSection = true
+                    }
                 }
 
                 Text(startSubtitle)
@@ -31,7 +34,7 @@ extension StartView {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 18) {
                         if selectedSection == .anki {
-                            ankiDecksPlaceholder
+                            AnkiLibraryView(model: ankiModel)
                         } else if practiceMode == .kana {
                             ForEach(KanaDeck.allCases) { deck in
                                 kanaDeckButton(for: deck)
@@ -85,19 +88,6 @@ extension StartView {
             .padding(.bottom, 4)
             .foregroundStyle(AppPalette.text)
         }
-    }
-
-    var ankiDecksPlaceholder: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Колоды Anki")
-                .font(.headline)
-            Text("Импорт колод будет доступен здесь.")
-                .font(.subheadline)
-                .foregroundStyle(AppPalette.secondaryText)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(14)
-        .appSurfaceCard()
     }
 
 }
