@@ -29,16 +29,20 @@ extension DeckPreviewView {
                             kanjiPreviewTile(for: card)
                         }
                     }
-                    .padding(.bottom, 20)
+                    .padding(.horizontal, 4)
+                    .padding(.bottom, 44)
                 }
+                .mask { BottomScrollMask() }
+                .frame(maxHeight: .infinity)
 
                 if deckState.isLoadingDeck {
-                    ProgressView("Загружаю карточки")
-                        .foregroundStyle(AppPalette.secondaryText)
-                        .tint(AppPalette.accent)
+                    CenteredLoadingIndicator(title: "Загружаю карточки")
+                        .padding(.vertical, 10)
                 }
             }
-            .padding(20)
+            .padding(.horizontal, 12)
+            .padding(.top, 20)
+            .padding(.bottom, 4)
             .foregroundStyle(AppPalette.text)
         }
         .sheet(item: $coordinator.presentedKanjiPreview, onDismiss: {

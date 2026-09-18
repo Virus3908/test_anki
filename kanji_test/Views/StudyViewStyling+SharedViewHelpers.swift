@@ -129,3 +129,31 @@ extension View {
         modifier(SurfaceCardModifier(cornerRadius: cornerRadius, borderOpacity: borderOpacity))
     }
 }
+
+struct BottomScrollMask: View {
+    var body: some View {
+        VStack(spacing: 0) {
+            Color.white
+            LinearGradient(
+                colors: [.white, .clear],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .frame(height: 44)
+        }
+    }
+}
+
+struct CenteredLoadingIndicator: View {
+    let title: String
+
+    var body: some View {
+        HStack(spacing: 8) {
+            ProgressView()
+                .tint(AppPalette.accent)
+            Text(title)
+                .foregroundStyle(AppPalette.secondaryText)
+        }
+        .frame(maxWidth: .infinity)
+    }
+}

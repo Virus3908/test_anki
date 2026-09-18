@@ -21,8 +21,11 @@ extension DeckPreviewView {
                             wordPreviewTile(for: card)
                         }
                     }
-                    .padding(.bottom, 20)
+                    .padding(.horizontal, 4)
+                    .padding(.bottom, 44)
                 }
+                .mask { BottomScrollMask() }
+                .frame(maxHeight: .infinity)
 
                 if let error = deckState.loadError {
                     Text(error).font(.caption).foregroundStyle(AppPalette.correction)
@@ -34,7 +37,9 @@ extension DeckPreviewView {
                         .tint(AppPalette.accent)
                 }
             }
-            .padding(20)
+            .padding(.horizontal, 12)
+            .padding(.top, 20)
+            .padding(.bottom, 4)
             .foregroundStyle(AppPalette.text)
         }
         .sheet(item: $coordinator.presentedWordPreview, onDismiss: {
