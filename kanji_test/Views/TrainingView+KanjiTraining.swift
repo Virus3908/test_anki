@@ -2,14 +2,7 @@ import SwiftUI
 
 extension TrainingView {
     func studyCard(for card: KanjiCard) -> some View {
-        trainingCardShell {
-            cardFront(for: card)
-        } back: {
-            cardBackContent(for: card)
-        }
-        .task(id: "back-\(card.id)-\(meaningLanguage.rawValue)") {
-            await translateKanjiMeaningsIfNeeded(for: card, deck: selectedDeck)
-        }
+        KanjiTrainingCardView(training: self, card: card)
     }
 
     func cardFront(for card: KanjiCard) -> some View {
@@ -71,4 +64,20 @@ extension TrainingView {
         }
     }
 
+}
+
+private struct KanjiTrainingCardView: View {
+    let training: TrainingView
+    let card: KanjiCard
+
+    var body: some View {
+        training.trainingCardShell {
+            training.cardFront(for: card)
+        } back: {
+            training.cardBackContent(for: card)
+        }
+        .task(id: "back-\(card.id)-\(training.meaningLanguage.rawValue)") {
+            await training.translateKanjiMeaningsIfNeeded(for: card, deck: training.selectedDeck)
+        }
+    }
 }

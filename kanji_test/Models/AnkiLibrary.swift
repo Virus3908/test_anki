@@ -32,8 +32,13 @@ nonisolated struct AnkiStudyCard: Identifiable, Sendable, StudyItem {
     let mediaDirectory: URL
     nonisolated var id: String { "\(importID):card:\(card.id)" }
     nonisolated var reviewKey: String { "anki:\(id)" }
+    var fieldPreferencesKey: String { "\(importID):\(card.deckID):\(noteType.id)" }
     var displayTitle: String {
-        let text = (note.parsedFields?.first?.plainText ?? note.fields.first ?? "")
+        displayTitle(using: .defaults(fieldCount: noteType.fields.count))
+    }
+
+    func displayTitle(using options: AnkiFieldDisplayOptions) -> String {
+        let text = (note.parsedFields?[safe: options.titleOrdinal]?.plainText ?? note.fields[safe: options.titleOrdinal] ?? "")
             .trimmingCharacters(in: .whitespacesAndNewlines)
         return text.isEmpty ? "Карточка \(card.id)" : String(text.prefix(120))
     }

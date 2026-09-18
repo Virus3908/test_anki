@@ -2,6 +2,7 @@ import SwiftUI
 import AnkiImport
 
 /// Shared by deck preview and SRS training; the imported HTML stays inside the standard app card.
+@MainActor
 struct AnkiCardContentView: View {
     let card: AnkiStudyCard
     let answer: Bool
@@ -9,11 +10,29 @@ struct AnkiCardContentView: View {
     let language: MeaningLanguage
     @AppStorage("ankiCardDisplayMode") private var displayMode = "native"
     @State private var showFields = false
+    @State private var fieldSide = FieldSide.front
     @State private var prepared: PreparedAnkiCard?
     @State private var translatedHTML: String?
 
+    private let fieldPreferences = AnkiFieldDisplayPreferences.shared
+
+    private enum FieldSide: String, CaseIterable, Identifiable {
+        case front, back
+        var id: String { rawValue }
+        var title: String { self == .front ? "Лицевая сторона" : "Задняя сторона" }
+    }
+
     private var translationKey: TranslationBlockKey { .ankiContent("\(card.id):\(answer ? "answer" : "question")") }
-    private var englishTexts: [String] { prepared?.englishTexts ?? [] }
+    private var fieldOptions: AnkiFieldDisplayOptions {
+        fieldPreferences.options(for: card.fieldPreferencesKey, fieldCount: card.noteType.fields.count)
+    }
+    private var hasCustomFields: Bool { fieldPreferences.hasCustomOptions(for: card.fieldPreferencesKey) }
+    private var englishTexts: [String] {
+        if displayMode == "native", hasCustomFields {
+            return TranslationViewModel.ankiEnglishTexts(in: nativeContent)
+        }
+        return prepared?.englishTexts ?? []
+    }
     private var translations: [String]? {
         language == .russian ? translationState.cached(translationKey, source: englishTexts) : nil
     }
@@ -41,7 +60,8 @@ struct AnkiCardContentView: View {
                         .id("\(card.id)-\(answer)").frame(minHeight: 240)
                 } else {
                     ScrollView {
-                        AnkiNativeContentView(blocks: prepared.content.replacingTexts(mapping).blocks, mediaDirectory: card.mediaDirectory)
+                        AnkiNativeContentView(blocks: (hasCustomFields ? nativeContent : prepared.content).replacingTexts(mapping).blocks,
+                                              mediaDirectory: card.mediaDirectory)
                             .id("\(card.id)-\(answer)")
                     }.frame(minHeight: 240)
                 }
@@ -95,9 +115,28 @@ struct AnkiCardContentView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 14) {
                         Text(card.noteType.name).font(.headline)
-                        ForEach(Array(card.noteType.fields.enumerated()), id: \.offset) { ordinal, name in
+                        Picker("Сторона", selection: $fieldSide) {
+                            ForEach(FieldSide.allCases) { side in Text(side.title).tag(side) }
+                        }.pickerStyle(.segmented)
+                        Picker("Заголовок карточки", selection: Binding(
+                            get: { fieldOptions.titleOrdinal },
+                            set: { ordinal in updateFieldOptions { $0.titleOrdinal = ordinal } })) {
+                            ForEach(Array(card.noteType.fields.enumerated()), id: \.offset) { ordinal, name in Text(name).tag(ordinal) }
+                        }
+                        Text("Поля можно скрыть и расположить в нужном порядке для каждой стороны.")
+                            .font(.caption).foregroundStyle(AppPalette.secondaryText)
+                        ForEach(displayedOrdinals, id: \.self) { ordinal in
+                            let name = card.noteType.fields[ordinal]
                             VStack(alignment: .leading, spacing: 6) {
-                                Text(name).font(.caption.weight(.bold)).foregroundStyle(AppPalette.secondaryText)
+                                HStack {
+                                    Toggle(name, isOn: Binding(
+                                        get: { isVisible(ordinal) },
+                                        set: { setVisible($0, ordinal: ordinal) }))
+                                    Button { moveField(ordinal, direction: -1) } label: { Image(systemName: "chevron.up") }
+                                        .disabled(!canMove(ordinal, direction: -1))
+                                    Button { moveField(ordinal, direction: 1) } label: { Image(systemName: "chevron.down") }
+                                        .disabled(!canMove(ordinal, direction: 1))
+                                }
                                 if let content = card.note.parsedFields?[safe: ordinal] {
                                     AnkiNativeContentView(blocks: content.blocks, mediaDirectory: card.mediaDirectory)
                                 }
@@ -114,6 +153,55 @@ struct AnkiCardContentView: View {
                     .toolbar { Button("Готово") { showFields = false } }
             }
         }
+    }
+
+    private var displayedOrdinals: [Int] {
+        fieldSide == .front ? fieldOptions.frontOrder : fieldOptions.backOrder
+    }
+
+    private var visibleOrdinals: Set<Int> {
+        fieldSide == .front ? fieldOptions.frontVisible : fieldOptions.backVisible
+    }
+
+    private func isVisible(_ ordinal: Int) -> Bool { visibleOrdinals.contains(ordinal) }
+
+    private func setVisible(_ visible: Bool, ordinal: Int) {
+        updateFieldOptions { options in
+            if fieldSide == .front {
+                if visible { options.frontVisible.insert(ordinal) } else { options.frontVisible.remove(ordinal) }
+            } else {
+                if visible { options.backVisible.insert(ordinal) } else { options.backVisible.remove(ordinal) }
+            }
+        }
+    }
+
+    private func canMove(_ ordinal: Int, direction: Int) -> Bool {
+        guard let index = displayedOrdinals.firstIndex(of: ordinal) else { return false }
+        return displayedOrdinals.indices.contains(index + direction)
+    }
+
+    private func moveField(_ ordinal: Int, direction: Int) {
+        guard let index = displayedOrdinals.firstIndex(of: ordinal), displayedOrdinals.indices.contains(index + direction) else { return }
+        updateFieldOptions { options in
+            if fieldSide == .front { options.frontOrder.swapAt(index, index + direction) }
+            else { options.backOrder.swapAt(index, index + direction) }
+        }
+    }
+
+    private func updateFieldOptions(_ change: (inout AnkiFieldDisplayOptions) -> Void) {
+        var options = fieldOptions
+        change(&options)
+        fieldPreferences.update(options, for: card.fieldPreferencesKey, fieldCount: card.noteType.fields.count)
+    }
+
+    private var nativeContent: AnkiContent {
+        let fields = card.note.parsedFields ?? card.note.fields.map { AnkiContentParser.parsePreservingSource($0) }
+        let order = answer ? fieldOptions.backOrder : fieldOptions.frontOrder
+        let visible = answer ? fieldOptions.backVisible : fieldOptions.frontVisible
+        var content = AnkiContentParser.parsePreservingSource("")
+        content.blocks = order.filter { visible.contains($0) }.flatMap { fields[safe: $0]?.blocks ?? [] }
+        content.warnings = []
+        return content
     }
 }
 

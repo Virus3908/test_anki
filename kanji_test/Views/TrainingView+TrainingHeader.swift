@@ -20,24 +20,45 @@ extension TrainingView {
     }
 
     func headerControls() -> some View {
+        TrainingHeaderView(
+            title: trainingTitle,
+            isPractice: trainingSession.isGuidedSingleKanjiPractice,
+            completedCards: trainingSession.sessionCompletedCards,
+            remainingCards: trainingSession.sessionTotalCards,
+            onFinish: finishTraining,
+            onExclude: excludeCurrentCard
+        )
+    }
+
+}
+
+private struct TrainingHeaderView: View {
+    let title: String
+    let isPractice: Bool
+    let completedCards: Int
+    let remainingCards: Int
+    let onFinish: () -> Void
+    let onExclude: () -> Void
+
+    var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             HStack(spacing: 12) {
                 Button {
-                    finishTraining()
+                    onFinish()
                 } label: {
                     Image(systemName: "square.grid.2x2")
                         .frame(width: 34, height: 30)
                 }
 
-                Text(trainingTitle)
+                Text(title)
                     .font(.headline)
                     .lineLimit(1)
 
                 Spacer()
 
-                if !trainingSession.isGuidedSingleKanjiPractice {
+                if !isPractice {
                     Button {
-                        excludeCurrentCard()
+                        onExclude()
                     } label: {
                         Image(systemName: "xmark.circle")
                     }
@@ -45,7 +66,7 @@ extension TrainingView {
                 }
             }
 
-            Text(trainingSession.isGuidedSingleKanjiPractice ? "Практика" : "Ответов: \(trainingSession.sessionCompletedCards) · Осталось: \(trainingSession.sessionTotalCards)")
+            Text(isPractice ? "Практика" : "Ответов: \(completedCards) · Осталось: \(remainingCards)")
                 .font(.footnote.weight(.semibold))
                 .foregroundStyle(AppPalette.secondaryText)
                 .frame(maxWidth: .infinity, alignment: .trailing)

@@ -46,13 +46,8 @@ extension TrainingView {
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
-                ScrollViewReader { scrollProxy in
                 ScrollView(.vertical) {
                     VStack(alignment: .leading, spacing: 16) {
-                        Color.clear
-                            .frame(height: 0)
-                            .id("trainingTop")
-
                         headerControls()
                         studyCard(for: card)
                     }
@@ -62,12 +57,9 @@ extension TrainingView {
                 }
                 .background(AppPalette.background)
                 .simultaneousGesture(cardSwipeGesture())
-                .onChange(of: trainingSession.scrollToTopToken) {
-                    withAnimation(.easeInOut(duration: 0.2)) {
-                            scrollProxy.scrollTo("trainingTop", anchor: .top)
-                    }
-                }
-            }
+                // Replacing the scroll view resets it to the top without racing
+                // ScrollViewReader preferences against the changing card tree.
+                .id(trainingSession.scrollToTopToken)
 
                 drawingPanel(for: card, panelHeight: panelHeight)
             }

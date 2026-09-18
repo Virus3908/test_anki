@@ -6,29 +6,40 @@ import Observation
 final class AnkiAudioPlayback: NSObject, AVAudioPlayerDelegate {
     // One active clip, even when a card contains several audio buttons.
     private static weak var activePlayback: AnkiAudioPlayback?
+    private static let sessionQueue = DispatchQueue(label: "com.kanji-test.audio-session", qos: .userInitiated)
     @ObservationIgnored private var player: AVAudioPlayer?
     private(set) var isPlaying = false
     private(set) var error: String?
 
     func toggle(_ url: URL) {
-        if isPlaying { stop(); return }
+        if player != nil { stop(); return }
         Self.activePlayback?.stop()
         error = nil
         do {
             let next = try AVAudioPlayer(contentsOf: url)
-            let session = AVAudioSession.sharedInstance()
-            // The default session is silenced by the iPhone's Ring/Silent switch.
-            try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
-            try session.setActive(true)
             Self.activePlayback = self
             player = next
             next.delegate = self
-            guard next.prepareToPlay(), next.play() else {
-                error = "Не удалось воспроизвести звук: \(url.lastPathComponent)"
-                stop()
-                return
+
+            // Audio-session activation can block while the system selects a
+            // route, so never perform it synchronously on the main actor.
+            Task { @MainActor [weak self, weak next] in
+                guard let self, let next, self.player === next else { return }
+                do {
+                    try await Self.activateSession()
+                    guard self.player === next else { return }
+                    guard next.prepareToPlay(), next.play() else {
+                        self.error = "Не удалось воспроизвести звук: \(url.lastPathComponent)"
+                        self.stop()
+                        return
+                    }
+                    self.isPlaying = true
+                } catch {
+                    guard self.player === next else { return }
+                    self.error = "Не удалось воспроизвести \(url.lastPathComponent): \(error.localizedDescription)"
+                    self.stop()
+                }
             }
-            isPlaying = true
         } catch {
             self.error = "Не удалось воспроизвести \(url.lastPathComponent): \(error.localizedDescription)"
             stop()
@@ -42,7 +53,32 @@ final class AnkiAudioPlayback: NSObject, AVAudioPlayerDelegate {
         isPlaying = false
         if Self.activePlayback === self {
             Self.activePlayback = nil
-            try? AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
+            Self.deactivateSession()
+        }
+    }
+
+    private static func activateSession() async throws {
+        try await withCheckedThrowingContinuation { continuation in
+            sessionQueue.async {
+                do {
+                    let session = AVAudioSession.sharedInstance()
+                    // The playback category ignores the Ring/Silent switch.
+                    try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
+                    try session.setActive(true)
+                    continuation.resume()
+                } catch {
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+
+    private static func deactivateSession() {
+        sessionQueue.async {
+            try? AVAudioSession.sharedInstance().setActive(
+                false,
+                options: [.notifyOthersOnDeactivation]
+            )
         }
     }
 

@@ -1,5 +1,7 @@
 import SwiftUI
+import AnkiImport
 
+@MainActor
 struct AnkiDeckPreviewView: View, StudyViewStyling {
     let deck: AnkiDeckReference
     let model: AnkiLibraryViewModel
@@ -12,6 +14,7 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
     @State private var showSchedule = false
 
     private var cards: [AnkiStudyCard] { model.previewDeck == deck ? model.previewCards : [] }
+    private let fieldPreferences = AnkiFieldDisplayPreferences.shared
 
     var body: some View {
         ZStack {
@@ -29,7 +32,8 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
                         ForEach(cards) { card in
                             Button { selectedCard = card } label: {
                                 VStack(alignment: .leading, spacing: 8) {
-                                    Text(card.displayTitle).font(.headline).lineLimit(3)
+                                    Text(card.displayTitle(using: fieldPreferences.options(for: card.fieldPreferencesKey, fieldCount: card.noteType.fields.count)))
+                                        .font(.headline).lineLimit(3)
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                     Text(card.templateName).font(.caption).foregroundStyle(AppPalette.secondaryText).lineLimit(1)
                                     Text(StudyProgressStatus(record: reviewStore.record(for: card.reviewKey), now: reviewStore.studyDate()).title)
