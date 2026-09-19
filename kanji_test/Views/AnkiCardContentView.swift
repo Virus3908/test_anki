@@ -13,6 +13,7 @@ struct AnkiCardContentView: View {
     @State private var fieldSide = FieldSide.front
     @State private var prepared: PreparedAnkiCard?
     @State private var translatedHTML: String?
+    @State private var fieldDropTarget: FieldDropTarget?
     private let renderer = AnkiCardRenderer()
 
     private let fieldPreferences = AnkiFieldDisplayPreferences.shared
@@ -21,6 +22,11 @@ struct AnkiCardContentView: View {
         case front, back
         var id: String { rawValue }
         var title: String { self == .front ? "Лицевая сторона" : "Задняя сторона" }
+    }
+
+    private struct FieldDropTarget: Equatable {
+        let before: Int?
+        let intoVisibleList: Bool
     }
 
     private var translationKey: TranslationBlockKey { .ankiContent("\(card.id):\(answer ? "answer" : "question")") }
@@ -148,22 +154,48 @@ struct AnkiCardContentView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title).font(.subheadline.weight(.semibold))
             if ordinals.isEmpty {
-                Text("Перетащите поле сюда")
-                    .font(.caption).foregroundStyle(AppPalette.secondaryText)
+                Label("Перетащите поле сюда", systemImage: "arrow.down.circle")
+                    .font(.caption.weight(.medium)).foregroundStyle(AppPalette.secondaryText)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(12).appSurfaceCard()
-                    .dropDestination(for: String.self) { items, _ in
-                        dropField(items.first, before: nil, intoVisibleList: isVisible)
-                    }
+                    .padding(18).appSurfaceCard()
             } else {
                 ForEach(ordinals, id: \.self) { ordinal in
                     fieldRow(ordinal, intoVisibleList: isVisible)
                 }
             }
         }
-        .dropDestination(for: String.self) { items, _ in
-            dropField(items.first, before: nil, intoVisibleList: isVisible)
+        .padding(8)
+        .background {
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(fieldDropTarget == FieldDropTarget(before: nil, intoVisibleList: isVisible)
+                      ? AppPalette.accent.opacity(0.12) : .clear)
         }
+        .overlay {
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(fieldDropTarget == FieldDropTarget(before: nil, intoVisibleList: isVisible)
+                        ? AppPalette.accent : .clear, lineWidth: 2)
+        }
+        .dropDestination(for: String.self,
+                         action: { items, _ in
+                             return dropField(items.first, before: nil, intoVisibleList: isVisible)
+                         },
+                         isTargeted: { targeted in
+                             updateDropTarget(targeted, before: nil, intoVisibleList: isVisible)
+                         })
+    }
+
+    @ViewBuilder
+    private func fieldDragPreview(_ ordinal: Int) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: "line.3.horizontal")
+            Text(card.noteType.fields[ordinal]).font(.body.weight(.semibold))
+            Spacer()
+        }
+        .foregroundStyle(AppPalette.text)
+        .padding(16)
+        .frame(width: 300, alignment: .leading)
+        .background(AppPalette.background, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay { RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(AppPalette.accent, lineWidth: 2) }
     }
 
     @ViewBuilder
@@ -180,13 +212,41 @@ struct AnkiCardContentView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading).padding(12).appSurfaceCard()
-        .draggable(String(ordinal))
-        .dropDestination(for: String.self) { items, _ in
-            dropField(items.first, before: ordinal, intoVisibleList: isVisible)
+        .overlay(alignment: .top) {
+            if fieldDropTarget == FieldDropTarget(before: ordinal, intoVisibleList: isVisible) {
+                HStack(spacing: 6) {
+                    Image(systemName: "arrow.down")
+                    Text("Вставить сюда").font(.caption.weight(.semibold))
+                }
+                .foregroundStyle(AppPalette.background)
+                .padding(.horizontal, 10).padding(.vertical, 4)
+                .background(AppPalette.accent, in: Capsule())
+                .offset(y: -14)
+            }
         }
+        .overlay {
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(fieldDropTarget == FieldDropTarget(before: ordinal, intoVisibleList: isVisible)
+                        ? AppPalette.accent : .clear, lineWidth: 2)
+        }
+        .draggable(String(ordinal)) { fieldDragPreview(ordinal) }
+        .dropDestination(for: String.self,
+                         action: { items, _ in
+                             return dropField(items.first, before: ordinal, intoVisibleList: isVisible)
+                         },
+                         isTargeted: { targeted in
+                             updateDropTarget(targeted, before: ordinal, intoVisibleList: isVisible)
+                         })
+    }
+
+    private func updateDropTarget(_ targeted: Bool, before: Int?, intoVisibleList: Bool) {
+        let target = FieldDropTarget(before: before, intoVisibleList: intoVisibleList)
+        if targeted { fieldDropTarget = target }
+        else if fieldDropTarget == target { fieldDropTarget = nil }
     }
 
     private func dropField(_ value: String?, before destination: Int?, intoVisibleList: Bool) -> Bool {
+        fieldDropTarget = nil
         guard let value, let ordinal = Int(value), displayedOrdinals.contains(ordinal) else { return false }
         var visible = visibleFieldOrdinals
         var hidden = hiddenFieldOrdinals
