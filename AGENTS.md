@@ -164,8 +164,10 @@ into app UI/ViewModels.
 Anki decks use the same `TrainingSessionViewModel`,
 `TrainingSessionEngine`, `StudyScheduler` and `ReviewRepository` as
 built-in decks. Imported Anki scheduling/history is preserved in the
-imported source database but is **not migrated into the app's FSRS
-state**; imported cards start app-owned SRS from zero.
+source database and bootstrapped once into app-owned FSRS by
+`Services/AnkiSchedulingMigrator.swift`. It replays usable `revlog`
+ratings, preserves the current Anki due/state, and never overwrites an
+existing app-owned record for the same card.
 
 Stable app review keys are namespaced with `anki:` so they do not
 collide with built-in content.

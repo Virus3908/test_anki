@@ -1,6 +1,6 @@
 import Foundation
 
-/// Card identities and numeric grades can later be mapped from Anki's cards/revlog tables.
+/// Persisted app reviews and bootstrapped Anki revlog rows share this audit format.
 nonisolated struct StudyReviewLog: Codable, Sendable, Identifiable {
     let id: UUID
     let cardID: String

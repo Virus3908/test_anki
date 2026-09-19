@@ -12,6 +12,7 @@ nonisolated struct AnkiImportSummary: Codable, Sendable, Identifiable {
     let mediaCount: Int
     let warnings: [String]
     var deckCardCounts: [String: Int]? = nil
+    var schedulingMigrationVersion: String? = nil
 }
 
 nonisolated struct AnkiDeckReference: Identifiable, Hashable, Sendable {

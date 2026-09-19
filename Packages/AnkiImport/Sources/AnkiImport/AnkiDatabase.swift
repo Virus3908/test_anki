@@ -19,7 +19,8 @@ final class AnkiDatabase {
     func rows(_ sql: String, _ visit: (OpaquePointer) throws -> Void) throws {
         var statement: OpaquePointer?
         guard sqlite3_prepare_v2(database, sql, -1, &statement, nil) == SQLITE_OK, let statement else {
-            throw AnkiImportError.invalid("неподдерживаемая или повреждённая структура SQLite")
+            let detail = database.map { String(cString: sqlite3_errmsg($0)) } ?? "unknown SQLite error"
+            throw AnkiImportError.invalid("неподдерживаемая или повреждённая структура SQLite: \(detail)")
         }
         defer { sqlite3_finalize(statement) }
         while true {
@@ -35,6 +36,18 @@ final class AnkiDatabase {
     func read() throws -> AnkiCollection {
         var normalized = false
         try rows("SELECT name FROM sqlite_master WHERE type='table' AND name='notetypes'") { _ in normalized = true }
+        var creationTime: Int64?
+        var hasCollectionTable = false
+        try rows("SELECT name FROM sqlite_master WHERE type='table' AND name='col'") { _ in hasCollectionTable = true }
+        var hasCreationColumn = false
+        if hasCollectionTable {
+            try rows("PRAGMA table_info(col)") { row in
+                if Self.text(row, 1) == "crt" { hasCreationColumn = true }
+            }
+        }
+        if hasCreationColumn {
+            try rows("SELECT crt FROM col LIMIT 1") { row in creationTime = sqlite3_column_int64(row, 0) }
+        }
         var decks: [AnkiDeck] = []
         var models: [AnkiNoteType] = []
         if normalized {
@@ -84,6 +97,47 @@ final class AnkiDatabase {
             cards.append(.init(id: sqlite3_column_int64(row, 0), noteID: sqlite3_column_int64(row, 1), deckID: sqlite3_column_int64(row, 2),
                                ordinal: Int(sqlite3_column_int64(row, 3)), scheduling: values))
         }
+        var historyByCard: [Int64: [AnkiReviewLogEntry]] = [:]
+        var hasRevlog = false
+        try rows("SELECT name FROM sqlite_master WHERE type='table' AND name='revlog'") { _ in hasRevlog = true }
+        if hasRevlog {
+            var columns: [String: String] = [:]
+            try rows("PRAGMA table_info(revlog)") { row in
+                let name = Self.text(row, 1)
+                columns[name.lowercased()] = name
+            }
+            func column(_ alternatives: String...) -> String? {
+                alternatives.compactMap { columns[$0.lowercased()] }.first.map { "\"\($0)\"" }
+            }
+            guard let id = column("id"), let cid = column("cid", "card_id") else {
+                throw AnkiImportError.invalid("таблица revlog не содержит идентификаторы review/card")
+            }
+            let usn = column("usn", "update_sequence_number") ?? "0"
+            let ease = column("ease", "button_chosen", "rating") ?? "0"
+            let interval = column("ivl", "interval") ?? "0"
+            let previousInterval = column("lastIvl", "last_ivl", "last_interval") ?? "0"
+            let factor = column("factor", "ease_factor") ?? "0"
+            let time = column("time", "taken_millis", "answer_time_milliseconds") ?? "0"
+            let type = column("type", "review_kind", "kind") ?? "0"
+            var count = 0
+            // Do not ORDER BY here. Large collections may require a temporary
+            // SQLite file, which is unavailable for some security-scoped imports.
+            // Group in one pass and sort only each card's history in memory.
+            try rows("SELECT \(id), \(cid), \(usn), \(ease), \(interval), \(previousInterval), \(factor), \(time), \(type) FROM revlog") { row in
+                guard count < 5_000_000 else { throw AnkiImportError.limit }
+                count += 1
+                let entry = AnkiReviewLogEntry(
+                    id: sqlite3_column_int64(row, 0), cardID: sqlite3_column_int64(row, 1),
+                    updateSequenceNumber: sqlite3_column_int64(row, 2), ease: Int(sqlite3_column_int64(row, 3)),
+                    interval: sqlite3_column_int64(row, 4), previousInterval: sqlite3_column_int64(row, 5),
+                    factor: sqlite3_column_int64(row, 6), answerTimeMilliseconds: sqlite3_column_int64(row, 7),
+                    type: Int(sqlite3_column_int64(row, 8)))
+                historyByCard[entry.cardID, default: []].append(entry)
+            }
+            for index in cards.indices {
+                cards[index].reviewHistory = (historyByCard[cards[index].id] ?? []).sorted { $0.id < $1.id }
+            }
+        }
         guard Set(models.map(\.id)).count == models.count, Set(decks.map(\.id)).count == decks.count else {
             throw AnkiImportError.invalid("повторяющиеся идентификаторы типов заметок или колод")
         }
@@ -104,7 +158,7 @@ final class AnkiDatabase {
             }
         }
         guard !cards.isEmpty else { throw AnkiImportError.invalid("в пакете нет карточек") }
-        return AnkiCollection(decks: decks, noteTypes: models, notes: notes, cards: cards)
+        return AnkiCollection(decks: decks, noteTypes: models, notes: notes, cards: cards, creationTime: creationTime)
     }
 
     private static func text(_ row: OpaquePointer, _ index: Int32) -> String {

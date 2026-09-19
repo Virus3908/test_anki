@@ -30,13 +30,46 @@ public struct AnkiNote: Codable, Sendable, Identifiable {
     public var parsedFields: [AnkiContent]? = nil
 }
 
+/// Meaning of `revlog.ease` for answer rows. Manual/reschedule rows may use 0.
+public enum AnkiReviewRating: Int, Codable, Sendable {
+    case again = 1, hard = 2, good = 3, easy = 4
+}
+
+/// Values used by Anki's `revlog.type` column.
+public enum AnkiReviewKind: Int, Codable, Sendable {
+    case learning = 0
+    case review = 1
+    case relearning = 2
+    case filtered = 3
+    case manual = 4
+    case rescheduled = 5
+}
+
+public struct AnkiReviewLogEntry: Codable, Sendable, Identifiable {
+    public let id: Int64
+    public let cardID: Int64
+    public let updateSequenceNumber: Int64
+    public let ease: Int
+    public let interval: Int64
+    public let previousInterval: Int64
+    public let factor: Int64
+    public let answerTimeMilliseconds: Int64
+    public let type: Int
+
+    public var rating: AnkiReviewRating? { AnkiReviewRating(rawValue: ease) }
+    public var kind: AnkiReviewKind? { AnkiReviewKind(rawValue: type) }
+    public var reviewedAt: Date { Date(timeIntervalSince1970: Double(id) / 1_000) }
+}
+
 public struct AnkiCard: Codable, Sendable, Identifiable {
     public let id: Int64
     public let noteID: Int64
     public let deckID: Int64
     public let ordinal: Int
-    /// Original Anki values. These are not converted into the application's FSRS state.
+    /// Original Anki card scheduling values.
     public let scheduling: [String: Int64]
+    /// Chronological rows from `revlog` for this card. Nil in older saved imports.
+    public var reviewHistory: [AnkiReviewLogEntry]? = nil
 }
 
 public struct AnkiMedia: Codable, Sendable {
@@ -49,6 +82,8 @@ public struct AnkiCollection: Codable, Sendable {
     public let noteTypes: [AnkiNoteType]
     public var notes: [AnkiNote]
     public let cards: [AnkiCard]
+    /// `col.crt`, in Unix seconds. Review/day-learning `due` values are relative to it.
+    public var creationTime: Int64? = nil
     public var media: [AnkiMedia] = []
     public var warnings: [String] = []
 }

@@ -8,6 +8,7 @@ nonisolated protocol AnkiLibraryPersisting: Sendable {
     func hasRecoverableBackup() async -> Bool
     func restoreBackup() async throws -> [AnkiImportSummary]
     func importPackage(_ url: URL) async throws -> AnkiImportResult
+    func markSchedulingMigration(importID: String, version: String) async throws
     func collection(_ summary: AnkiImportSummary) async throws -> AnkiCollection
     func mediaDirectory(_ summary: AnkiImportSummary) async throws -> URL
 }
@@ -31,6 +32,14 @@ actor AnkiRepository: AnkiLibraryPersisting {
     func restoreBackup() async throws -> [AnkiImportSummary] {
         _ = try await store.restoreBackup()
         return try await load()
+    }
+    func markSchedulingMigration(importID: String, version: String) async throws {
+        var library = try await store.load()
+        guard let index = library.firstIndex(where: { $0.id == importID }) else {
+            throw AnkiImportError.invalid("импорт отсутствует в библиотеке")
+        }
+        library[index].schedulingMigrationVersion = version
+        try await store.save(library)
     }
 
     func importPackage(_ url: URL) async throws -> AnkiImportResult {

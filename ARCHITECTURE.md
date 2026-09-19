@@ -288,6 +288,8 @@ protobuf-метаданными.
 -   `Services/AnkiCardRenderer.swift`;
 -   `Services/AnkiMediaService.swift`;
 -   `Services/AnkiAudioPlayback.swift`;
+-   `Services/AnkiSchedulingMigrator.swift` --- bootstrap истории и
+    расписания Anki в app-owned FSRS;
 -   `TranslationViewModel+Anki.swift`.
 
 ## 15. Как хранится импорт Anki
@@ -318,17 +320,28 @@ Anki.
 -   `StudyScheduler`;
 -   `ReviewRepository`.
 
-При этом оригинальная история/расписание Anki не конвертируются в FSRS
-приложения.
+`AnkiDatabase` читает `revlog` одним проходом и связывает строки с
+карточками. `AnkiSchedulingMigrator` сортирует историю, отображает Anki
+ease 1/2/3/4 в Again/Hard/Good/Easy и воспроизводит ответы через FSRS-6.
+Полученные stability/difficulty сохраняются в обычном `StudyReviewRecord`,
+а исторические строки --- в `StudyReviewLog` без расходования дневного
+лимита и без участия в undo текущей сессии.
 
-То есть:
+Текущий Anki due сохраняется как первый app-owned due. Для intraday
+learning это Unix timestamp; для review/day-learning --- номер дня от
+`col.crt`; для filtered deck используется `odue`. Learning и relearning
+остаются соответствующими состояниями, поэтому существующая политика
+очереди управляет due и waiting steps.
 
--   исходная Anki SQLite и история сохраняются;
--   карточка в этом приложении начинает собственное обучение с нуля;
--   app-owned прогресс сохраняется отдельно;
--   обратные/cloze-карточки имеют независимые ключи.
+Bootstrap применяется только если для стабильного `anki:` review key ещё
+нет app-owned record. Версия миграции отмечается в `anki-library.json`, а
+сам прогресс остаётся в `review-memory.json`. Повторный импорт не создаёт
+историю второй раз и не перезаписывает ответы, сделанные в приложении.
+Обратные/cloze-карточки по-прежнему имеют независимые ключи.
 
-Это принципиально важная граница.
+Replay старых SM-2/Anki scheduler histories создаёт согласованное состояние
+FSRS-6, но не восстанавливает неизвестные исходные FSRS parameters или
+memory states, которых нет в старом `revlog`.
 
 ## 17. Два режима отображения Anki
 

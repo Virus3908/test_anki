@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import AnkiImport
 
 @MainActor
 @Observable
@@ -59,6 +60,23 @@ final class TrainingSessionViewModel {
             canRestoreBackup = await repository.hasRecoverableBackup()
             throw error
         }
+    }
+    func bootstrapAnkiHistory(_ collection: AnkiCollection, importID: String) async throws -> Int {
+        guard hasLoadedProgress, !isPreparingCard else { return 0 }
+        let options = Dictionary(uniqueKeysWithValues: collection.decks.map {
+            ($0.id, settings.options(for: "anki:\(importID):deck:\($0.id)"))
+        })
+        let current = reviewStore
+        let migrated = await Task.detached(priority: .userInitiated) {
+            var progress = current
+            let count = AnkiSchedulingMigrator.bootstrap(collection: collection, importID: importID,
+                optionsByDeck: options, progress: &progress)
+            return (progress, count)
+        }.value
+        guard migrated.1 > 0 else { return 0 }
+        try await repository.save(migrated.0)
+        reviewStore = migrated.0
+        return migrated.1
     }
     func restoreProgressBackup() async throws {
         guard !isPreparingCard else { return }
