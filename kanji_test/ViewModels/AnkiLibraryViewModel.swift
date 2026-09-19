@@ -13,6 +13,7 @@ final class AnkiLibraryViewModel {
     private(set) var previewCards: [AnkiStudyCard] = []
     private(set) var previewDeck: AnkiDeckReference?
     private(set) var isOpeningDeck = false
+    private(set) var isDeletingDeck = false
     var loadError: String?
     private let request = LoadRequest()
     private var openToken: UUID { request.id }
@@ -66,6 +67,21 @@ final class AnkiLibraryViewModel {
             if imported > 0 { message = (message ?? "") + "\nПеренесено расписание: \(imported) карточек." }
             if !result.summary.warnings.isEmpty { message = (message ?? "") + "\n\n" + result.summary.warnings.joined(separator: "\n") }
         } catch { message = error.localizedDescription }
+    }
+
+    func deleteDeck(_ deck: AnkiDeckReference) async -> Bool {
+        guard !isDeletingDeck, !isImporting else { return false }
+        isDeletingDeck = true
+        defer { isDeletingDeck = false }
+        do {
+            try await repository.deleteImport(id: deck.importID)
+            imports = try await repository.load()
+            closeDeck()
+            return true
+        } catch {
+            loadError = error.localizedDescription
+            return false
+        }
     }
 
     private func migratePendingScheduling() async throws {
