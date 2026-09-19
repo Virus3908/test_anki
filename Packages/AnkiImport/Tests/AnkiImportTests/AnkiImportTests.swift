@@ -16,12 +16,29 @@ final class AnkiImportTests: XCTestCase {
             XCTAssertEqual(result.cards.count, 2)
             XCTAssertEqual(result.cards[1].ordinal, 1)
             XCTAssertEqual(result.cards[0].scheduling["reps"], 7)
+            XCTAssertEqual(result.creationTime, 1_700_000_000)
+            XCTAssertEqual(result.cards[0].reviewHistory?.map(\.ease), [1, 3, 3, 2, 3])
+            XCTAssertEqual(result.cards[0].reviewHistory?.map(\.rating), [.again, .good, .good, .hard, .good])
+            XCTAssertEqual(result.cards[0].reviewHistory?.map(\.kind), [.learning, .learning, .review, .review, .review])
+            XCTAssertEqual(result.cards[0].reviewHistory?.last?.interval, 10)
+            XCTAssertEqual(result.cards[0].reviewHistory?.first?.answerTimeMilliseconds, 900)
             XCTAssertEqual(result.decks[0].name, "Japanese::Animals")
             XCTAssertEqual(result.media.count, 2)
             XCTAssertEqual(try Data(contentsOf: output.appendingPathComponent("media/voice.mp3")), Data("audio".utf8))
             XCTAssertTrue(FileManager.default.fileExists(atPath: output.appendingPathComponent("collection.sqlite").path))
             let loaded = try JSONDecoder().decode(AnkiCollection.self, from: Data(contentsOf: output.appendingPathComponent("collection.json")))
             XCTAssertEqual(loaded.noteTypes[0].fields, ["Front", "Back", "Extra"])
+        }
+    }
+
+    func testRevlogIsReadInOneCollectionPassAndGroupedByCard() throws {
+        try withFixture { directory in
+            let source = try package(in: directory, largeHistoryCount: 10_000)
+            let result = try AnkiPackageParser.extract(from: source, to: directory.appendingPathComponent("output"))
+            XCTAssertEqual(result.cards.first(where: { $0.id == 30 })?.reviewHistory?.count, 10_005)
+            XCTAssertEqual(result.cards.first(where: { $0.id == 31 })?.reviewHistory?.count, 0)
+            let ids = result.cards.first(where: { $0.id == 30 })!.reviewHistory!.map(\.id)
+            XCTAssertEqual(ids, ids.sorted())
         }
     }
 
@@ -35,6 +52,7 @@ final class AnkiImportTests: XCTestCase {
             XCTAssertEqual(result.decks[0].name, "Japanese::Animals")
             XCTAssertEqual(result.media.map(\.name), ["voice.mp3", "猫.png"])
             XCTAssertEqual(result.media.last?.size, 128 * 1024)
+            XCTAssertEqual(result.cards[0].reviewHistory?.map(\.ease), [1, 3, 3, 2, 3])
         }
     }
 
@@ -161,7 +179,7 @@ final class AnkiImportTests: XCTestCase {
 
     private func package(in directory: URL, modern: Bool = false, mediaName: String = "猫.png", omitMedia: Bool = false,
                          badChecksum: Bool = false, databaseName: String = "collection.anki2", invalidNote: Bool = false,
-                         wal: Bool = false, image: Data = Data("image".utf8)) throws -> URL {
+                         wal: Bool = false, image: Data = Data("image".utf8), largeHistoryCount: Int = 0) throws -> URL {
         let databaseURL = directory.appendingPathComponent("source.sqlite")
         var database: OpaquePointer?
         XCTAssertEqual(sqlite3_open(databaseURL.path, &database), SQLITE_OK)
@@ -175,8 +193,17 @@ final class AnkiImportTests: XCTestCase {
         func blob(_ data: Data) -> String { "X'" + data.map { String(format: "%02x", $0) }.joined() + "'" }
         try sql("CREATE TABLE notes(id INTEGER PRIMARY KEY, guid TEXT, mid INTEGER, flds TEXT, tags TEXT)")
         try sql("CREATE TABLE cards(id INTEGER PRIMARY KEY, nid INTEGER, did INTEGER, ord INTEGER, type INTEGER, queue INTEGER, due INTEGER, ivl INTEGER, factor INTEGER, reps INTEGER, lapses INTEGER, left INTEGER, odue INTEGER, odid INTEGER, flags INTEGER)")
+        if modern {
+            try sql("CREATE TABLE revlog(id INTEGER PRIMARY KEY, card_id INTEGER, update_sequence_number INTEGER, button_chosen INTEGER, interval INTEGER, last_interval INTEGER, ease_factor INTEGER, taken_millis INTEGER, review_kind INTEGER)")
+        } else {
+            try sql("CREATE TABLE revlog(id INTEGER PRIMARY KEY, cid INTEGER, usn INTEGER, ease INTEGER, ivl INTEGER, lastIvl INTEGER, factor INTEGER, time INTEGER, type INTEGER)")
+        }
         try sql("INSERT INTO notes VALUES(10,'guid',20,\(quote("猫<img src=\"猫.png\">\u{1f}cat[sound:voice.mp3]\u{1f}")),' animal 日本語 ')")
         try sql("INSERT INTO cards VALUES(30,\(invalidNote ? 999 : 10),40,0,2,2,50,10,2500,7,1,0,0,0,0),(31,10,40,1,0,0,1,0,0,0,0,0,0,0,0)")
+        try sql("INSERT INTO revlog VALUES(1700000000000,30,1,1,-60,-60,2500,900,0),(1700000060000,30,2,3,1,-60,2500,800,0),(1700086460000,30,3,3,3,1,2500,700,1),(1700345660000,30,4,2,4,3,2350,600,1),(1700691260000,30,5,3,10,4,2350,500,1)")
+        if largeHistoryCount > 0 {
+            try sql("WITH RECURSIVE n(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM n WHERE x<\(largeHistoryCount)) INSERT INTO revlog SELECT 1800000000000+x,30,x,3,1,1,2500,100,1 FROM n")
+        }
         if modern {
             try sql("CREATE TABLE decks(id INTEGER PRIMARY KEY, name TEXT)")
             try sql("CREATE TABLE notetypes(id INTEGER PRIMARY KEY, name TEXT, config BLOB)")
@@ -192,9 +219,9 @@ final class AnkiImportTests: XCTestCase {
                 try sql("INSERT INTO templates VALUES(20,\(ordinal),'Card',\(blob(config)))")
             }
         } else {
-            try sql("CREATE TABLE col(models TEXT, decks TEXT)")
+            try sql("CREATE TABLE col(crt INTEGER, models TEXT, decks TEXT)")
             let model = #"{"20":{"id":20,"name":"Basic","type":0,"css":".card { color: red; }","flds":[{"name":"Front","ord":0},{"name":"Back","ord":1},{"name":"Extra","ord":2}],"tmpls":[{"name":"Card","ord":0,"qfmt":"{{Front}}","afmt":"{{FrontSide}}<hr>{{Back}}"},{"name":"Reverse","ord":1,"qfmt":"{{Back}}","afmt":"{{Front}}"}]}}"#
-            try sql("INSERT INTO col VALUES(\(quote(model)),\(quote(#"{"40":{"id":40,"name":"Japanese::Animals"}}"#)))")
+            try sql("INSERT INTO col VALUES(1700000000,\(quote(model)),\(quote(#"{"40":{"id":40,"name":"Japanese::Animals"}}"#)))")
         }
         if wal {
             // Leave the header in WAL mode with all data checkpointed into the

@@ -1,247 +1,524 @@
 # ARCHITECTURE.md
 
-# Kanji Trainer — карта проекта
+# Kanji Trainer --- актуальная карта проекта
 
-Этот файл объясняет устройство приложения без необходимости знать Swift.
+Этот файл объясняет устройство текущей версии приложения без
+необходимости знать Swift.
 
-## 1. Общая схема
+## 1. Что сейчас представляет собой приложение
 
-Приложение можно представить так:
+Приложение уже не только тренажёр кандзи. Сейчас в нём четыре режима
+учебного материала:
 
-`Экран -> состояние экрана -> логика приложения -> загрузка/сохранение данных`
+-   кандзи;
+-   слова;
+-   кана;
+-   импортированные колоды Anki.
 
-Главная точка входа — `App/kanji_testApp.swift`. Она открывает `ContentView`.
+В `kanji_test` сейчас примерно **154 Swift-файла и \~10 000 строк
+Swift**, плюс отдельный локальный Swift Package `Packages/AnkiImport`,
+который отвечает за разбор файлов Anki.
 
-`ContentView` создаёт `StudyAppViewModel`. Это главный объект, который связывает крупные части приложения:
+Общая схема:
 
-- настройки;
-- навигацию;
-- список и содержимое карточек;
-- просмотр колоды;
-- тренировочную сессию;
-- переводы и примеры;
-- координатор выбранных карточек/колод.
+`Экран -> ViewModel/состояние -> доменная логика -> репозиторий/сервис -> данные`
 
-Поэтому при неизвестной проблеме верхнего уровня обычно полезно начинать с `StudyAppViewModel` и его файлов `StudyAppViewModel+...`.
+Для встроенных карточек и Anki используется одна общая система
+тренировки и FSRS.
 
-## 2. Навигация
+## 2. Точка входа и главный объект
 
-`StudyNavigation` хранит текущий маршрут.
+`App/kanji_testApp.swift` запускает `ContentView`.
 
-`ContentView` смотрит на него и показывает один из основных экранов:
+`ContentView` создаёт `StudyAppViewModel`. Это composition root
+приложения: он связывает между собой крупные подсистемы.
 
-- `StartView` — выбор режима/колоды;
-- `DeckPreviewView` — просмотр колоды;
-- `TrainingView` — обучение.
+`StudyAppViewModel` владеет:
 
-`StudyCoordinator` хранит выбранные колоды и карточки, которые сейчас открыты в preview.
+-   `StudyPreferences` --- настройками;
+-   `StudyNavigation` --- навигацией;
+-   `StudyCardCatalog` --- каталогом карточек;
+-   `DeckPreviewViewModel` --- просмотром встроенных колод;
+-   `StudyCoordinator` --- выбранными встроенными карточками/колодами;
+-   `TrainingSessionViewModel` --- текущей тренировкой;
+-   `TranslationViewModel` --- переводами и примерами;
+-   `AnkiLibraryViewModel` --- импортированными Anki-колодами.
 
-## 3. Карточки и колоды
+Логика `StudyAppViewModel` дополнительно разнесена по `+Lifecycle`,
+`+ScreenActions`, `+TrainingStart`, `+TrainingFlow`.
 
-В приложении три основные категории учебного материала:
+## 3. Навигация
 
-- кандзи — `KanjiCard`;
-- кана — `KanaStudyCard`;
-- слова — `WordStudyCard`.
+Основные маршруты хранятся в `StudyNavigation`.
 
-Определения колод находятся в `Models`:
-`KanjiDeck`, `KanaDeck`, `WordFrequencyDeck`.
+`ContentView` переключает:
 
-`StudyCardCatalog` служит центральным каталогом уже загруженных карточек.
+-   `StartView` --- стартовый экран;
+-   `DeckPreviewView` --- просмотр встроенной колоды;
+-   `AnkiDeckPreviewView` --- просмотр импортированной Anki-колоды;
+-   `TrainingView` --- обучение.
 
-Загрузкой занимаются:
-- `KanjiDataLoader...`;
-- `KanaDataLoader`;
-- `WordDataLoader...`.
+Таким образом Anki имеет отдельный путь загрузки/просмотра, но после
+запуска тренировки входит в общую тренировочную систему.
 
-Встроенные данные читаются через `BundledStudyData`.
+## 4. Каталог карточек и режимы
 
-### Большой файл слов
+`PracticeMode` сейчас содержит:
 
-`Data/word-data.json` содержит словарные данные и имеет около **60 000 строк**.
+-   `.kanji`;
+-   `.words`;
+-   `.kana`;
+-   `.anki`.
 
-Это ресурс приложения, а не исходный код. Codex не должен читать его целиком при обычных задачах. Он нужен только если проблема непосредственно относится к данным словаря, формату JSON, конкретной записи или загрузке слов.
+`StudyCardCatalog` --- центральное место, через которое тренировочная
+часть получает конкретные карточки разных типов.
 
-Поэтому в `AGENTS.md` он явно помечен как файл, который следует игнорировать при обычном исследовании проекта.
+Ключи прогресса разделены по namespace:
 
-## 4. Как работает обучение
+-   кандзи используют собственный ID;
+-   слова имеют `word:...`;
+-   кана --- `kana:...`;
+-   Anki --- `anki:...`.
 
-Основное состояние текущей тренировки находится в:
+Это не даёт прогрессу разных типов карточек пересекаться.
 
-`TrainingSessionViewModel`
+## 5. Встроенные колоды
 
-Он взаимодействует с доменной логикой:
+Основные модели:
 
-`TrainingSessionEngine`
+-   `KanjiCard`;
+-   `KanaStudyCard`;
+-   `WordStudyCard`;
+-   `KanjiDeck`;
+-   `KanaDeck`;
+-   `WordFrequencyDeck`.
 
-и моделями очереди/сессии:
+Загрузка:
 
+-   `KanjiDataLoader...`;
+-   `KanaDataLoader`;
+-   `WordDataLoader...`;
+-   `BundledStudyData`.
+
+`Data/word-data.json` --- большой словарный ресурс примерно на 60 тысяч
+строк. Он нужен приложению, но Codex не должен читать его целиком при
+обычных задачах.
+
+## 6. Как теперь устроена тренировка
+
+Главные файлы:
+
+`TrainingView` → `TrainingSessionViewModel` → `TrainingSessionState` →
+`TrainingSessionEngine` → `StudyProgressStore / StudyScheduler`
+
+`TrainingSessionViewModel` управляет жизненным циклом сессии: старт,
+ответ, undo, исключение карточки, переход дня, перестроение очереди и
+сохранение.
+
+После обычного ответа `submitReview(...)`:
+
+1.  оценка применяется к `StudyProgressStore`;
+2.  сохраняется undo-запись;
+3.  вызывается `rebuild`;
+4.  `TrainingSessionEngine.plan(...)` заново строит план;
+5.  текущая очередь заменяется;
+6.  текущая карточка помечается показанной;
+7.  прогресс сохраняется через `ReviewRepository`.
+
+То есть очередь пересчитывается после каждого ответа.
+
+## 7. Важное разделение: очередь сейчас и карточки на сегодня
+
+В текущей архитектуре это **два разных понятия**.
+
+`StudyQueue.ids` / `StudyQueuePlan.readyIDs` --- карточки, которые
+попали в активную очередь показа.
+
+`TrainingSessionState.todayIDs` / `StudyQueuePlan.todayIDs` ---
+карточки, которые всё ещё относятся к текущему учебному дню, в том числе
+learning/relearning, время следующего шага которых ещё не наступило.
+
+Это разделение специально описано прямо в `TrainingSessionState`:
+
+> `todayIDs` --- snapshot карточек текущего учебного дня, отдельно от
+> `queue`, которая содержит карточки, доступные сейчас.
+
+Также состояние хранит:
+
+-   `nextLearningDate` --- ближайшее время ожидающего
+    learning/relearning;
+-   `hiddenReviews` --- review-карточки, скрытые дневным лимитом;
+-   `sessionCompletedCards`;
+-   `undoHistory`.
+
+Поэтому надпись вроде «осталось карточек сегодня» не должна
+автоматически считаться как `readyIDs.count`: ожидающие карточки могут
+отсутствовать в `readyIDs`, но оставаться в `todayIDs`.
+
+## 8. Где решается, какую карточку показать
+
+`Models/TrainingSessionEngine.swift`.
+
+Именно здесь карточки разделяются на категории вроде:
+
+-   learning/relearning, которые уже due;
+-   review;
+-   начатые новые карточки;
+-   полностью новые карточки;
+-   learning/relearning, ожидающие своего времени сегодня.
+
+Затем применяется дневной лимит review/new и формируется
+`StudyQueuePlan`.
+
+Это **политика очереди**, а не сам алгоритм FSRS.
+
+Если задача звучит:
+
+> «Карточка с повторением через 5 минут должна вклиниться, когда её
+> время наступило»
+
+или:
+
+> «Если больше ничего нет, разрешить показать ожидающую карточку раньше»
+
+сначала нужно смотреть `TrainingSessionEngine` и перестроение
 `TrainingSessionState`.
 
-Упрощённо поток выглядит так:
+Если задача звучит:
 
-`TrainingView -> TrainingSessionViewModel -> TrainingSessionEngine -> прогресс/расписание`
+> «После Good FSRS рассчитывает неправильный интервал»
 
-Когда пользователь оценивает карточку, результат влияет на сохранённую запись повторения и дату следующего показа.
+тогда смотреть `StudyScheduler`.
 
-## 5. FSRS и интервальные повторения
+## 9. FSRS
 
-Расписание повторений изолировано в:
+`Models/StudyScheduler.swift` --- адаптер между приложением и внешним
+пакетом `swift-fsrs`.
 
-`Models/StudyScheduler.swift`
+Остальной код работает с собственными:
 
-Этот файл является адаптером между приложением и внешней библиотекой `FSRS`.
+-   `StudyReviewRecord`;
+-   `StudyReviewLog`;
+-   `ReviewRating`;
+-   `StudyProgressStore`.
 
-То есть остальные части приложения по возможности не должны напрямую зависеть от деталей FSRS.
+Эта граница важна: изменение порядка карточек не должно случайно
+превращаться в изменение математического расписания FSRS.
 
-Прогресс представлен собственными моделями приложения:
-- `StudyProgressStore`;
-- `StudyReviewRecord`;
-- `StudyReviewLog`;
-- `ReviewRating`.
+## 10. Сохранение прогресса
 
-Это важная граница архитектуры: если меняется алгоритм интервальных повторений, сначала следует смотреть `StudyScheduler`, а не переписывать UI.
+Путь:
 
-## 6. Где сохраняется прогресс
+`TrainingSessionViewModel` → `ReviewRepository` → `JSONFileStore` →
+`review-memory.json`
 
-Путь примерно такой:
+`JSONFileStore` также обеспечивает backup/recovery.
 
-`TrainingSessionViewModel`
-→ `ReviewRepository`
-→ `JSONFileStore`
-→ `review-memory.json`
+Изменения Codable-моделей прогресса нужно делать осторожно: существующие
+данные пользователя должны продолжать читаться.
 
-`ReviewRepository` предоставляет приложению операции загрузки/сохранения.
+## 11. Импорт Anki --- новая крупная подсистема
 
-`JSONFileStore` отвечает за непосредственную работу с JSON-файлом и механизм восстановления/резервной копии.
+Поддержка Anki разделена на две части:
 
-Поэтому проблемы вида «после перезапуска пропал прогресс» относятся прежде всего к этой цепочке.
+1.  независимый пакет `Packages/AnkiImport`;
+2.  интеграция импортированных данных в основное приложение.
 
-## 7. Рисование и проверка штрихов
+Подробная спецификация уже находится в `docs/anki-import.md`.
 
-Состоянием рисования управляет:
+## 12. `Packages/AnkiImport`
 
-`DrawingSessionViewModel`.
+Пакет отвечает за понимание форматов Anki, а не за UI приложения.
 
-Само поле для рисования:
+Основные файлы:
 
-`Drawing/DrawingBoard.swift`.
+-   `AnkiPackageParser.swift` --- распаковка `.apkg` / `.colpkg`;
+-   `AnkiDatabase.swift` --- чтение SQLite;
+-   `AnkiProtobuf.swift` --- современные protobuf-структуры;
+-   `AnkiModels.swift` --- модели импортированной коллекции;
+-   `AnkiContent.swift`;
+-   `AnkiContentParser.swift` --- разбор содержимого полей;
+-   `AnkiTemplateRenderer.swift` --- обработка шаблонов карточек.
 
-Проверкой нарисованного штриха занимается:
+Зависимости пакета:
 
-`StrokeEvaluator` в `Drawing/StrokeFeedback.swift`.
+-   ZIPFoundation 0.9.20;
+-   zstd 1.5.7;
+-   SwiftSoup 2.11.2;
+-   системный SQLite.
 
-Данные из SVG обрабатываются через:
+Пакет имеет собственные тесты в `Packages/AnkiImport/Tests`.
 
-`SVGStrokeExtractor -> SVGPathParser`.
+## 13. Какие Anki-файлы поддерживаются
 
-Для каны также существуют подготовленные формы в `KanaStrokePresets`.
+Текущая реализация умеет работать как со старыми ZIP/SQLite пакетами
+Anki, так и с современным форматом с `collection.anki21b`, Zstandard и
+protobuf-метаданными.
 
-Интеграция с экраном обучения разбита на несколько файлов `TrainingView+...Drawing...`.
+Сохраняются, среди прочего:
 
-Поэтому проблема вида «правильный штрих считается неправильным» обычно ведёт в:
+-   заметки и карточки;
+-   исходные поля;
+-   типы заметок;
+-   шаблоны;
+-   CSS;
+-   cloze;
+-   подколоды;
+-   медиа;
+-   исходная SQLite-база и история Anki.
 
-`DrawingSessionViewModel -> StrokeEvaluator -> SVG...`
+Подробные ограничения, лимиты и поддерживаемые template-функции описаны
+в `docs/anki-import.md`.
 
-а проблема вида «кнопка/подсказка рисования отображается неправильно» — скорее в `TrainingView+...Drawing...`.
+## 14. Anki внутри приложения
 
-## 8. Переводы
+Главные файлы:
 
-Состоянием переводов управляет:
+-   `Data/AnkiRepository.swift` --- импорт и хранение;
+-   `Models/AnkiLibrary.swift` --- app-side модели колод/карточек;
+-   `Models/AnkiFieldDisplayPreferences.swift` --- настройки
+    отображения;
+-   `ViewModels/AnkiLibraryViewModel.swift` --- состояние библиотеки;
+-   `Views/AnkiLibraryView.swift` --- библиотека;
+-   `Views/AnkiDeckPreviewView.swift` --- просмотр колоды;
+-   `Views/AnkiCardContentView.swift` --- содержимое карточки;
+-   `Views/AnkiNativeContentView.swift` --- нативный SwiftUI-рендер;
+-   `Views/AnkiHTMLView.swift` --- WebKit-режим;
+-   `Views/TrainingView+AnkiTraining.swift` --- Anki в тренировке;
+-   `Services/AnkiCardRenderer.swift`;
+-   `Services/AnkiMediaService.swift`;
+-   `Services/AnkiAudioPlayback.swift`;
+-   `Services/AnkiSchedulingMigrator.swift` --- bootstrap истории и
+    расписания Anki в app-owned FSRS;
+-   `TranslationViewModel+Anki.swift`.
 
-`TranslationViewModel`.
+## 15. Как хранится импорт Anki
 
-Он разделён на дополнительные файлы для кандзи, слов и примеров.
+`AnkiRepository` использует существующий `JSONFileStore` для индекса:
 
-Сохранение переводов:
-`TranslationRepository`.
+`anki-library.json`
 
-Системный перевод:
-`SystemTranslationClient`.
+Сам контент импорта хранится отдельно в Application Support в каталоге
+Anki.
 
-Логика получения русских значений:
-`RussianMeaningTranslator` и `RussianMeaningDictionary`.
+Импорт устроен через staging:
 
-Примеры употребления слов могут приходить через Tatoeba-компоненты.
+`выбранный файл -> проверка/распаковка во временный каталог -> валидация -> перенос в постоянный каталог -> запись в индекс`
 
-## 9. Сетевые данные кандзи
+Поэтому неудачный импорт не должен портить уже существующие колоды.
 
-Внешний источник абстрагирован протоколом `KanjiProviding`.
+Для идентичных файлов используется SHA-256.
 
-Основная реализация — `KanjiAPIProvider`.
+Импорт выполняет тяжёлую работу вне MainActor.
 
-Его код разделён на:
-- endpoint;
-- сетевые модели;
-- загрузку;
-- преобразование ответа API в модели приложения.
+## 16. Anki и SRS приложения
 
-Это позволяет остальному приложению работать с `KanjiCard`, не зная устройство ответа сервера.
+После импорта Anki-карточки используют **тот же**:
 
-## 10. Почему файлов Views так много
+-   `TrainingSessionViewModel`;
+-   `TrainingSessionEngine`;
+-   `StudyScheduler`;
+-   `ReviewRepository`.
 
-Например, `TrainingView` разбит на:
+`AnkiDatabase` читает `revlog` одним проходом и связывает строки с
+карточками. `AnkiSchedulingMigrator` сортирует историю, отображает Anki
+ease 1/2/3/4 в Again/Hard/Good/Easy и воспроизводит ответы через FSRS-6.
+Полученные stability/difficulty сохраняются в обычном `StudyReviewRecord`,
+а исторические строки --- в `StudyReviewLog` без расходования дневного
+лимита и без участия в undo текущей сессии.
 
-- основной файл;
-- layout;
-- header;
-- kanji training;
-- kana training;
-- word training;
-- drawing logic;
-- drawing panels;
-- card template и т. д.
+Текущий Anki due сохраняется как первый app-owned due. Для intraday
+learning это Unix timestamp; для review/day-learning --- номер дня от
+`col.crt`; для filtered deck используется `odue`. Learning и relearning
+остаются соответствующими состояниями, поэтому существующая политика
+очереди управляет due и waiting steps.
 
-Это не разные экраны. В основном это части одного большого SwiftUI-компонента, разнесённые по файлам, чтобы один файл не разрастался.
+Bootstrap применяется только если для стабильного `anki:` review key ещё
+нет app-owned record. Версия миграции отмечается в `anki-library.json`, а
+сам прогресс остаётся в `review-memory.json`. Повторный импорт не создаёт
+историю второй раз и не перезаписывает ответы, сделанные в приложении.
+Обратные/cloze-карточки по-прежнему имеют независимые ключи.
 
-То же относится к `CardContentRendering`, `DeckPreviewView`, `SettingsView` и некоторым ViewModel.
+Replay старых SM-2/Anki scheduler histories создаёт согласованное состояние
+FSRS-6, но не восстанавливает неизвестные исходные FSRS parameters или
+memory states, которых нет в старом `revlog`.
 
-## 11. Куда смотреть по типу проблемы
+## 17. Два режима отображения Anki
 
-Если проблема с переходом между экранами:
-`ContentView`, `StudyNavigation`, `StudyAppViewModel+ScreenActions`, `StudyCoordinator`.
+Anki может показываться:
+
+-   нативно через SwiftUI;
+-   через исходный Anki HTML/CSS в WebKit.
+
+Переключение хранится в настройках.
+
+Нативный режим использует структурированное содержимое полей и локальные
+медиа. HTML-режим лучше подходит для сложной раскладки шаблона.
+
+JavaScript и сетевые ресурсы намеренно не являются частью обычного
+рендера.
+
+## 18. Перевод Anki
+
+`TranslationViewModel+Anki.swift` подключает Anki к существующей системе
+переводов.
+
+Перевод не меняет:
+
+-   исходные поля;
+-   импортированные медиа;
+-   SRS;
+-   исходную базу Anki.
+
+Он использует существующий `TranslationRepository` и общий механизм
+переводчика.
+
+## 19. Рисование
+
+Система рисования по-прежнему отделена:
+
+`DrawingSessionViewModel` → `DrawingBoard` → `StrokeEvaluator` →
+`SVGStrokeExtractor / SVGPathParser`
+
+Интеграция с тренировкой находится в `TrainingView+...Drawing...`.
+
+Для ошибок распознавания штриха сначала смотреть `StrokeEvaluator`, а не
+UI.
+
+## 20. Переводы и примеры встроенных карточек
+
+Главные компоненты:
+
+-   `TranslationViewModel` и extensions;
+-   `TranslationRepository`;
+-   `RussianMeaningTranslator`;
+-   `SystemTranslationClient`;
+-   `RussianMeaningDictionary`;
+-   Tatoeba-компоненты для примеров слов.
+
+Anki теперь подключён к этой же подсистеме отдельным extension.
+
+## 21. Сетевые данные кандзи
+
+Абстракция:
+
+`RemoteKanjiProvider`
+
+Основная реализация:
+
+`KanjiAPIProvider`
+
+Код разделён на endpoint, transport models, loading и mapping.
+
+Кэши находятся в отдельных repository-классах.
+
+## 22. Почему Views разбиты на много файлов
+
+Большие SwiftUI-экраны разнесены по feature extensions.
+
+Например `TrainingView` имеет отдельные файлы для:
+
+-   кандзи;
+-   каны;
+-   слов;
+-   Anki;
+-   рисования;
+-   layout;
+-   header;
+-   шаблона карточки.
+
+При UI-баге нужно искать максимально конкретный `+Feature.swift`, а не
+начинать с переписывания основного `TrainingView.swift`.
+
+## 23. Куда смотреть по симптомам
+
+Если неправильно переключается экран: `ContentView`, `StudyNavigation`,
+`StudyAppViewModel+ScreenActions`.
 
 Если неправильно запускается тренировка:
-`StudyAppViewModel+TrainingStart`, `StudyAppViewModel+TrainingFlow`, `TrainingSessionViewModel`, `TrainingSessionEngine`.
+`StudyAppViewModel+TrainingStart`, `TrainingSessionViewModel`,
+`TrainingSessionState`.
 
-Если карточка появляется не вовремя:
-`TrainingSessionEngine`, `StudyProgressStore+Schedule`, `StudyScheduler`.
+Если карточка появляется слишком рано/поздно: `TrainingSessionEngine`,
+затем `StudyProgressStore+Schedule`.
+
+Если неправильный FSRS-интервал: `StudyScheduler`.
+
+Если неправильное число «осталось сегодня»: сначала проверить различие
+`todayIDs` и активной `queue/readyIDs`.
 
 Если не сохраняется прогресс:
-`TrainingSessionViewModel`, `ReviewRepository`, `JSONFileStore`.
+`TrainingSessionViewModel -> ReviewRepository -> JSONFileStore`.
 
-Если проблема с рисованием:
-`DrawingSessionViewModel`, `StrokeEvaluator`, SVG parser/extractor и соответствующие `TrainingView+...Drawing...`.
+Если Anki-файл не импортируется: `docs/anki-import.md`, затем
+`Packages/AnkiImport` и `AnkiRepository`.
 
-Если не загружаются слова:
-`WordDataLoader...`, `BundledStudyData`, затем только при необходимости `word-data.json`.
+Если Anki импортировался, но колода/карточка не отображается:
+`AnkiLibraryViewModel`, `AnkiLibrary`, `AnkiDeckPreviewView`,
+`StudyCardCatalog`.
 
-Если проблема с переводом:
-`TranslationViewModel...`, `RussianMeaningTranslator`, `TranslationRepository`.
+Если Anki-шаблон отображается неправильно: `AnkiTemplateRenderer`,
+`AnkiCardRenderer`, `AnkiHTMLView`/`AnkiNativeContentView`.
 
-Если визуальная проблема:
-сначала конкретный файл в `Views`, соответствующий экрану/функции.
+Если Anki-медиа не работает: `AnkiMediaService`, `AnkiAudioPlayback`,
+затем импортированная media map.
 
-## 12. Что важно не сломать
+Если проблема с рисованием: `DrawingSessionViewModel`,
+`StrokeEvaluator`, SVG parser/extractor.
 
-Особенно осторожно следует менять:
+Если проблема с переводом: `TranslationViewModel...`,
+`RussianMeaningTranslator`, `TranslationRepository`.
 
-- `StudyScheduler` — изменение влияет на интервалы повторений;
-- `StudyProgressStore` и persistence — там пользовательский прогресс;
-- `JSONFileStore` — сохранение и recovery;
-- `StrokeEvaluator` — изменение порогов может поменять распознавание сразу для большого количества карточек;
-- форматы сохранённых Codable-моделей — старые данные пользователей должны продолжать читаться.
+## 24. Что особенно важно не сломать
 
-## 13. Как использовать Codex, если ты не знаешь Swift
+Осторожно менять:
 
-Не требуется угадывать файл.
+-   `StudyScheduler` --- влияет на интервалы;
+-   `TrainingSessionEngine` --- влияет на порядок/доступность карточек;
+-   `todayIDs` vs `readyIDs` --- влияет на завершение дня и счётчики;
+-   `StudyProgressStore` --- пользовательский прогресс;
+-   `JSONFileStore` --- persistence и recovery;
+-   Codable-форматы --- обратная совместимость;
+-   `AnkiRepository` --- атомарность импорта;
+-   `Packages/AnkiImport` --- безопасность архивов и совместимость
+    форматов;
+-   `StrokeEvaluator` --- распознавание штрихов.
 
-Хорошая постановка задачи описывает наблюдаемое поведение:
+## 25. Проверка изменений
 
-> При изучении кандзи после нажатия «Хорошо» карточка иногда сразу появляется снова. Найди причину, исправь её и проверь, что learning/relearning/review продолжают работать корректно.
+Сборка приложения:
 
-`AGENTS.md` должен помочь агенту самостоятельно понять, что для такой задачи сначала нужно исследовать тренировочную сессию и scheduler, а не читать весь проект.
+`xcodebuild -project kanji_test.xcodeproj -scheme kanji_test -sdk iphoneos -configuration Debug CODE_SIGNING_ALLOWED=NO build`
 
-При UI-задаче достаточно описать экран и желаемое поведение. При баге — последовательность действий, ожидаемый результат и фактический результат.
+Тесты парсера Anki:
 
-Главная цель `AGENTS.md`: ты описываешь **что не работает или что хочешь получить**, а агент сам быстро находит **где это реализовано**.
+`swift test --package-path Packages/AnkiImport`
+
+Интеграционные тесты Anki + общего SRS:
+
+`kanji_testHostedTests/AnkiStudyIntegrationTests.swift`
+
+Они запускаются через Test схемы `kanji_test` на iOS Simulator.
+
+## 26. Как ставить задачи Codex
+
+Лучше описывать наблюдаемое поведение, а не просить «посмотреть весь
+проект».
+
+Например:
+
+> После Good карточка получает повтор через 10 минут. Пока есть другие
+> карточки, она не должна показываться раньше due. Когда due наступил,
+> она должна получить приоритет. Если других карточек больше нет, её
+> можно показать досрочно. Счётчик оставшихся карточек сегодня должен
+> учитывать ожидающие learning-карточки.
+
+По `AGENTS.md` Codex должен понять, что здесь нужны:
+
+`TrainingSessionEngine + TrainingSessionState + TrainingSessionViewModel`
+
+и что нельзя автоматически лезть в `StudyScheduler`, пока не доказано,
+что проблема именно в расчёте FSRS.
+
+Главная задача архитектурных файлов --- позволить агенту быстро найти
+нужную подсистему без чтения всего репозитория и огромных data-файлов.

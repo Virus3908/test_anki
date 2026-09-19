@@ -8,6 +8,8 @@ nonisolated protocol AnkiLibraryPersisting: Sendable {
     func hasRecoverableBackup() async -> Bool
     func restoreBackup() async throws -> [AnkiImportSummary]
     func importPackage(_ url: URL) async throws -> AnkiImportResult
+    func deleteImport(id: String) async throws
+    func markSchedulingMigration(importID: String, version: String) async throws
     func collection(_ summary: AnkiImportSummary) async throws -> AnkiCollection
     func mediaDirectory(_ summary: AnkiImportSummary) async throws -> URL
 }
@@ -31,6 +33,14 @@ actor AnkiRepository: AnkiLibraryPersisting {
     func restoreBackup() async throws -> [AnkiImportSummary] {
         _ = try await store.restoreBackup()
         return try await load()
+    }
+    func markSchedulingMigration(importID: String, version: String) async throws {
+        var library = try await store.load()
+        guard let index = library.firstIndex(where: { $0.id == importID }) else {
+            throw AnkiImportError.invalid("импорт отсутствует в библиотеке")
+        }
+        library[index].schedulingMigrationVersion = version
+        try await store.save(library)
     }
 
     func importPackage(_ url: URL) async throws -> AnkiImportResult {
@@ -83,6 +93,40 @@ actor AnkiRepository: AnkiLibraryPersisting {
             throw error
         }
         return result
+    }
+
+    func deleteImport(id: String) async throws {
+        var library = try await store.load()
+        guard let index = library.firstIndex(where: { $0.id == id }) else {
+            throw AnkiImportError.invalid("импорт отсутствует в библиотеке")
+        }
+
+        let summary = library[index]
+        let source = try directory(summary)
+        let root = try rootURL()
+        let deletionStaging = root.appendingPathComponent("deleting-\(UUID().uuidString)", isDirectory: true)
+        let hasFiles = FileManager.default.fileExists(atPath: source.path)
+
+        if hasFiles {
+            try FileManager.default.moveItem(at: source, to: deletionStaging)
+        }
+
+        library.remove(at: index)
+        do {
+            try await store.save(library)
+        } catch {
+            if hasFiles { try? FileManager.default.moveItem(at: deletionStaging, to: source) }
+            throw error
+        }
+
+        do {
+            if hasFiles { try FileManager.default.removeItem(at: deletionStaging) }
+        } catch {
+            // Restore the library entry when its files could not be removed.
+            if hasFiles { try? FileManager.default.moveItem(at: deletionStaging, to: source) }
+            try? await store.save(Array(library.prefix(index)) + [summary] + Array(library.dropFirst(index)))
+            throw error
+        }
     }
 
     func collection(_ summary: AnkiImportSummary) async throws -> AnkiCollection {

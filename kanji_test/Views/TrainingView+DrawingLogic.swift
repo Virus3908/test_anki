@@ -15,14 +15,9 @@ extension TrainingView {
     }
 
     func undoCurrentStroke(expected card: KanjiCard? = nil) {
-        let shouldHideAnswer = drawingSession.undoStroke(expected: card)
-        if shouldHideAnswer {
-            withAnimation(.easeInOut(duration: 0.18)) {
-                drawingSession.hideAnswer()
-            }
-        }
+        drawingSession.undoStroke(expected: card)
     }
-
+    
     func clearCurrentDrawing(expected card: KanjiCard) {
         drawingSession.clearDrawing(expected: card)
     }

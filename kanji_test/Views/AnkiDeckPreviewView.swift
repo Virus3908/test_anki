@@ -12,6 +12,7 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
     let onPractice: (PracticeSelection) -> Void
     @State private var selectedCard: AnkiStudyCard?
     @State private var showSchedule = false
+    @State private var deckPendingDeletion: AnkiDeckReference?
 
     private var cards: [AnkiStudyCard] { model.previewDeck == deck ? model.previewCards : [] }
     private let fieldPreferences = AnkiFieldDisplayPreferences.shared
@@ -23,6 +24,14 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
                 previewHeader(title: deck.title, subtitle: "\(cards.count) карточек", onBack: onBack) {
                     Button { showSchedule = true } label: { Image(systemName: "calendar") }
                         .buttonStyle(.bordered).tint(AppPalette.accent).accessibilityLabel("Расписание повторений")
+                    Button(role: .destructive) {
+                        deckPendingDeletion = deck
+                    } label: {
+                        Image(systemName: "trash")
+                            .accessibilityLabel("Удалить колоду \(deck.title)")
+                    }
+                    .buttonStyle(.borderless)
+                    .disabled(model.isOpeningDeck || model.isDeletingDeck)
                 }
                 previewStartButton(count: cards.count, isDisabled: cards.isEmpty || model.isOpeningDeck) {
                     onPractice(.anki(deck, cards, guided: false))
@@ -75,6 +84,24 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
                     .navigationTitle("Повторения").navigationBarTitleDisplayMode(.inline)
                     .toolbar { Button("Готово") { showSchedule = false } }
             }
+        }
+        .alert("Удалить колоду?", isPresented: Binding(
+            get: { deckPendingDeletion != nil },
+            set: { if !$0 { deckPendingDeletion = nil } }
+        ), presenting: deckPendingDeletion) { deck in
+            Button("Удалить", role: .destructive) {
+                deckPendingDeletion = nil
+                Task {
+                    if await model.deleteDeck(deck) {
+                        onBack()
+                    }
+                }
+            }
+            Button("Отмена", role: .cancel) {
+                deckPendingDeletion = nil
+            }
+        } message: { deck in
+            Text("«\(deck.title)» будет удалена из библиотеки вместе с импортированными карточками и медиафайлами.")
         }
     }
 }

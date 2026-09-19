@@ -1,9 +1,73 @@
 import XCTest
-import AnkiImport
+@testable import AnkiImport
 @testable import kanji_test
 
 @MainActor
 final class AnkiStudyIntegrationTests: XCTestCase {
+    func testSchedulingMigrationKeepsNewCardNew() {
+        var progress = StudyProgressStore(records: [:])
+        let collection = migrationCollection(type: 0, queue: 0, due: 1, interval: 0, reps: 0, history: [])
+        XCTAssertEqual(AnkiSchedulingMigrator.bootstrap(collection: collection, importID: "fixture",
+            optionsByDeck: [40: DeckOptions()], progress: &progress), 0)
+        XCTAssertNil(progress.record(for: migrationKey))
+    }
+
+    func testFutureAndOverdueReviewScheduling() {
+        let now = Date()
+        let today = Calendar.current.startOfDay(for: now)
+        let creation = today.addingTimeInterval(-100 * 86_400)
+        for (dueDay, expectedDue) in [(101, false), (99, true)] {
+            var progress = StudyProgressStore(records: [:])
+            let collection = migrationCollection(type: 2, queue: 2, due: Int64(dueDay), interval: 30,
+                reps: 5, history: ratingHistory(), creation: Int64(creation.timeIntervalSince1970))
+            XCTAssertEqual(AnkiSchedulingMigrator.bootstrap(collection: collection, importID: "fixture",
+                optionsByDeck: [40: DeckOptions()], progress: &progress), 1)
+            let record = progress.record(for: migrationKey)!
+            XCTAssertEqual(record.state, .review)
+            XCTAssertEqual(progress.isDue(record, now: now), expectedDue)
+            XCTAssertGreaterThan(record.stability, 0)
+        }
+    }
+
+    func testLearningAndRelearningRemainWaitingUntilTimestamp() {
+        let now = Date()
+        for (type, expected) in [(1, StudyReviewState.learning), (3, StudyReviewState.relearning)] {
+            var progress = StudyProgressStore(records: [:])
+            let collection = migrationCollection(type: type, queue: 1,
+                due: Int64(now.addingTimeInterval(600).timeIntervalSince1970), interval: 0,
+                reps: 2, lapses: type == 3 ? 1 : 0, left: 1001, history: ratingHistory())
+            _ = AnkiSchedulingMigrator.bootstrap(collection: collection, importID: "fixture",
+                optionsByDeck: [40: DeckOptions()], progress: &progress)
+            let record = progress.record(for: migrationKey)!
+            XCTAssertEqual(record.state, expected)
+            XCTAssertFalse(progress.isDue(record, now: now))
+            let plan = TrainingSessionEngine.plan(sourceIDs: ["fixture:card:30"], mode: .anki,
+                deckID: migrationDeckID, progress: progress, options: DeckOptions(), now: now)
+            XCTAssertEqual(plan.todayIDs, ["fixture:card:30"])
+            XCTAssertEqual(plan.nextLearningDate, record.dueDate)
+        }
+    }
+
+    func testRatingsOrderIdempotenceAndNewerAppProgressWins() throws {
+        var progress = StudyProgressStore(records: [:])
+        let collection = migrationCollection(type: 2, queue: 2, due: 0, interval: 10,
+            reps: 5, history: ratingHistory(), creation: Int64(Date().timeIntervalSince1970))
+        XCTAssertEqual(AnkiSchedulingMigrator.bootstrap(collection: collection, importID: "fixture",
+            optionsByDeck: [40: DeckOptions()], progress: &progress), 1)
+        XCTAssertEqual(progress.reviewLog.map(\.grade), [1, 3, 3, 2, 3])
+        let logIDs = progress.reviewLog.map(\.id)
+        XCTAssertEqual(AnkiSchedulingMigrator.bootstrap(collection: collection, importID: "fixture",
+            optionsByDeck: [40: DeckOptions()], progress: &progress), 0)
+        XCTAssertEqual(progress.reviewLog.map(\.id), logIDs)
+        let appReviewDate = Date().addingTimeInterval(3600)
+        _ = try progress.apply(.easy, to: migrationKey, deckID: migrationDeckID,
+            options: DeckOptions(), now: appReviewDate)
+        let appRecord = progress.record(for: migrationKey)
+        XCTAssertEqual(AnkiSchedulingMigrator.bootstrap(collection: collection, importID: "fixture",
+            optionsByDeck: [40: DeckOptions()], progress: &progress), 0)
+        XCTAssertEqual(progress.record(for: migrationKey)?.lastReviewedAt, appRecord?.lastReviewedAt)
+        XCTAssertEqual(progress.reviewLog.count, 6)
+    }
     func testImportedPackageBecomesTwoDecksAndExcludesEmptyDefault() throws {
         let collection = try fixture()
         let model = AnkiLibraryViewModel()
@@ -105,6 +169,31 @@ final class AnkiStudyIntegrationTests: XCTestCase {
     private func fixture() throws -> AnkiCollection {
         let json = #"{"decks":[{"id":1,"name":"Default"},{"id":10,"name":"First"},{"id":20,"name":"Second"}],"noteTypes":[{"id":5,"name":"Basic","isCloze":false,"fields":["Front","Back"],"templates":[{"ordinal":0,"name":"Forward","question":"{{Front}}","answer":"{{Back}}"},{"ordinal":1,"name":"Reverse","question":"{{Back}}","answer":"{{Front}}"}],"css":""}],"notes":[{"id":6,"guid":"guid","noteTypeID":5,"fields":["猫","cat"],"tags":[]}],"cards":[{"id":7,"noteID":6,"deckID":10,"ordinal":0,"scheduling":{}},{"id":8,"noteID":6,"deckID":10,"ordinal":1,"scheduling":{}},{"id":9,"noteID":6,"deckID":20,"ordinal":0,"scheduling":{}}],"media":[],"warnings":[]}"#
         return try JSONDecoder().decode(AnkiCollection.self, from: Data(json.utf8))
+    }
+
+    private var migrationKey: String { "anki:fixture:card:30" }
+    private var migrationDeckID: String { "anki:fixture:deck:40" }
+
+    private func ratingHistory() -> [AnkiReviewLogEntry] {
+        let base: Int64 = 1_700_000_000_000
+        let ratings = [1, 3, 3, 2, 3]
+        return ratings.enumerated().map { index, ease in
+            AnkiReviewLogEntry(id: base + Int64(index) * 86_400_000, cardID: 30,
+                updateSequenceNumber: Int64(index), ease: ease, interval: Int64(max(1, index * 2)),
+                previousInterval: Int64(max(0, (index - 1) * 2)), factor: 2500,
+                answerTimeMilliseconds: 500, type: index < 2 ? 0 : 1)
+        }
+    }
+
+    private func migrationCollection(type: Int, queue: Int, due: Int64, interval: Int64, reps: Int,
+                                     lapses: Int = 0, left: Int64 = 0, history: [AnkiReviewLogEntry],
+                                     creation: Int64? = nil) -> AnkiCollection {
+        let card = AnkiCard(id: 30, noteID: 10, deckID: 40, ordinal: 0,
+            scheduling: ["type": Int64(type), "queue": Int64(queue), "due": due, "ivl": interval,
+                         "factor": 2500, "reps": Int64(reps), "lapses": Int64(lapses), "left": left,
+                         "odue": 0, "odid": 0, "flags": 0], reviewHistory: history)
+        return AnkiCollection(decks: [.init(id: 40, name: "Deck")], noteTypes: [], notes: [],
+            cards: [card], creationTime: creation)
     }
 }
 

@@ -35,7 +35,6 @@ struct StartView: View, StudyViewStyling {
     let ankiModel: AnkiLibraryViewModel
     @State var selectedSection: StartMenuSection = .kanji
     @State var hasSelectedInitialSection = false
-    @State var deckPendingDeletion: KanjiDeck?
 
     var body: some View { startView() }
     var startSubtitle: String {

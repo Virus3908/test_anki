@@ -67,6 +67,17 @@ nonisolated struct StudyProgressStore: Codable, Sendable {
         return id
     }
     func record(for key: String) -> StudyReviewRecord? { records[key] }
+    /// Seeds imported progress once. Imported history is persisted for audit and
+    /// FSRS continuity, but never participates in the current session's undo stack.
+    @discardableResult
+    mutating func bootstrap(_ record: StudyReviewRecord, logs: [StudyReviewLog], for key: String) -> Bool {
+        guard records[key] == nil else { return false }
+        firstShownAt[key] = firstShownAt[key] ?? record.lastReviewedAt
+        records[key] = record
+        let existing = Set(reviewLog.map(\.id))
+        reviewLog.append(contentsOf: logs.filter { !existing.contains($0.id) })
+        return true
+    }
     func isExcluded(_ key: String) -> Bool { excludedReviewKeys.contains(key) }
     mutating func exclude(_ key: String) { excludedReviewKeys.insert(key) }
     mutating func undo(logID: UUID, record: StudyReviewRecord?, key: String) {

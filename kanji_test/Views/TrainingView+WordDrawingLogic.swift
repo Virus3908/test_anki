@@ -29,12 +29,7 @@ extension TrainingView {
     }
 
     func undoCurrentWordStroke(_ wordCard: WordStudyCard, currentKanji: KanjiCard) {
-        let shouldHideAnswer = drawingSession.undoCurrentWordStroke(wordCard, currentKanji: currentKanji)
-        if shouldHideAnswer {
-            withAnimation(.easeInOut(duration: 0.18)) {
-                drawingSession.hideAnswer()
-            }
-        }
+        drawingSession.undoCurrentWordStroke(wordCard, currentKanji: currentKanji)
     }
 
     func clearCurrentWordDrawing(_ wordCard: WordStudyCard, currentKanji: KanjiCard) {
