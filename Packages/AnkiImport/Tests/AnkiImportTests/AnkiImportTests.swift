@@ -38,6 +38,24 @@ final class AnkiImportTests: XCTestCase {
         }
     }
 
+    func testModernWALDatabaseHeaderIsNormalizedBeforeOpen() throws {
+        try withFixture { directory in
+            // Modern Anki exports leave the SQLite header in WAL mode after the
+            // final checkpoint (write/read version 2, no -wal sidecar); a
+            // SQLITE_OPEN_READONLY connection cannot open such a database.
+            let source = try package(in: directory, modern: true, wal: true)
+            let output = directory.appendingPathComponent("output")
+            let result = try AnkiPackageParser.extract(from: source, to: output)
+            XCTAssertEqual(result.cards.count, 2)
+            XCTAssertEqual(result.cards[0].scheduling["reps"], 7)
+            let handle = try FileHandle(forReadingFrom: output.appendingPathComponent("collection.sqlite"))
+            defer { try? handle.close() }
+            let header = try handle.read(upToCount: 20) ?? Data()
+            XCTAssertEqual(header.count, 20)
+            XCTAssertEqual([header[18], header[19]], [1, 1])
+        }
+    }
+
     func testLegacy21PreferredOverCompatibilityDatabase() throws {
         try withFixture { directory in
             let source = try package(in: directory, databaseName: "collection.anki21")
@@ -143,7 +161,7 @@ final class AnkiImportTests: XCTestCase {
 
     private func package(in directory: URL, modern: Bool = false, mediaName: String = "猫.png", omitMedia: Bool = false,
                          badChecksum: Bool = false, databaseName: String = "collection.anki2", invalidNote: Bool = false,
-                         image: Data = Data("image".utf8)) throws -> URL {
+                         wal: Bool = false, image: Data = Data("image".utf8)) throws -> URL {
         let databaseURL = directory.appendingPathComponent("source.sqlite")
         var database: OpaquePointer?
         XCTAssertEqual(sqlite3_open(databaseURL.path, &database), SQLITE_OK)
@@ -177,6 +195,13 @@ final class AnkiImportTests: XCTestCase {
             try sql("CREATE TABLE col(models TEXT, decks TEXT)")
             let model = #"{"20":{"id":20,"name":"Basic","type":0,"css":".card { color: red; }","flds":[{"name":"Front","ord":0},{"name":"Back","ord":1},{"name":"Extra","ord":2}],"tmpls":[{"name":"Card","ord":0,"qfmt":"{{Front}}","afmt":"{{FrontSide}}<hr>{{Back}}"},{"name":"Reverse","ord":1,"qfmt":"{{Back}}","afmt":"{{Front}}"}]}}"#
             try sql("INSERT INTO col VALUES(\(quote(model)),\(quote(#"{"40":{"id":40,"name":"Japanese::Animals"}}"#)))")
+        }
+        if wal {
+            // Leave the header in WAL mode with all data checkpointed into the
+            // main file — the exact state of a modern Anki export.
+            try sql("PRAGMA journal_mode=WAL")
+            sqlite3_close(database)
+            database = nil
         }
         let url = directory.appendingPathComponent("test.apkg")
         let archive = try Archive(url: url, accessMode: .create)

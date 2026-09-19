@@ -5,21 +5,72 @@ final class AnkiDatabase {
     private var database: OpaquePointer?
 
     init(url: URL) throws {
+        try Self.stripCheckPointedWALMode(at: url)
         guard sqlite3_open_v2(url.path, &database, SQLITE_OPEN_READONLY | SQLITE_OPEN_NOMUTEX, nil) == SQLITE_OK else {
             sqlite3_close(database)
             database = nil
             throw AnkiImportError.invalid("не удалось открыть базу SQLite")
         }
         sqlite3_limit(database, SQLITE_LIMIT_LENGTH, 16 * 1024 * 1024)
+        registerUnicaseCollation()
         try rows("PRAGMA trusted_schema = OFF") { _ in }
+    }
+
+    /// Anki's schema declares indexes and column collations with the
+    /// app-defined "unicase" collation. On some SQLite builds (iOS) the query
+    /// planner reports "no query solution" for tables whose usable indexes
+    /// depend on a collation that is not registered, so a read-only connection
+    /// cannot scan them. Register a case-insensitive comparison — close enough
+    /// for import: our queries never order by the collated columns, the
+    /// callback exists only to keep the planner satisfied.
+    private func registerUnicaseCollation() {
+        sqlite3_create_collation(database, "unicase", SQLITE_UTF8, nil, { _, leftCount, left, rightCount, right in
+            let left = UnsafeRawBufferPointer(start: left, count: Int(leftCount))
+            let right = UnsafeRawBufferPointer(start: right, count: Int(rightCount))
+            var index = 0
+            while index < left.count && index < right.count {
+                let a = left[index], b = right[index]
+                if a != b {
+                    // ASCII case-fold: enough for a collation that only exists
+                    // to satisfy the planner, never to order our results.
+                    let folded = a >= 65 && a <= 90 ? a + 32 : a
+                    let foldedB = b >= 65 && b <= 90 ? b + 32 : b
+                    return folded < foldedB ? -1 : (folded > foldedB ? 1 : 0)
+                }
+                index += 1
+            }
+            if left.count != right.count { return left.count < right.count ? -1 : 1 }
+            return 0
+        })
     }
 
     deinit { sqlite3_close(database) }
 
+    /// Modern Anki exports leave the SQLite header in WAL mode after the final
+    /// checkpoint: the extracted file carries write/read version 2 without a
+    /// companion `-wal` file, and SQLITE_OPEN_READONLY cannot open such a
+    /// database ("unable to open database file"). On our own extracted copy we
+    /// flip the header back to rollback-journal mode — the same two-byte change
+    /// SQLite itself performs when converting a checkpointed WAL database to
+    /// journal_mode=DELETE.
+    private static func stripCheckPointedWALMode(at url: URL) throws {
+        let reader = try FileHandle(forReadingFrom: url)
+        defer { try? reader.close() }
+        guard let header = try reader.read(upToCount: 20), header.count == 20,
+              header.starts(with: Array("SQLite format 3\u{0}".utf8)),
+              header[18] == 2, header[19] == 2,
+              !FileManager.default.fileExists(atPath: url.path + "-wal") else { return }
+        let writer = try FileHandle(forUpdating: url)
+        defer { try? writer.close() }
+        try writer.seek(toOffset: 18)
+        try writer.write(contentsOf: [1, 1])
+    }
+
     func rows(_ sql: String, _ visit: (OpaquePointer) throws -> Void) throws {
         var statement: OpaquePointer?
         guard sqlite3_prepare_v2(database, sql, -1, &statement, nil) == SQLITE_OK, let statement else {
-            throw AnkiImportError.invalid("неподдерживаемая или повреждённая структура SQLite")
+            let snippet = sql.prefix(60)
+            throw AnkiImportError.invalid("неподдерживаемая или повреждённая структура SQLite [\(snippet)]: \(String(cString: sqlite3_errmsg(database)))")
         }
         defer { sqlite3_finalize(statement) }
         while true {
