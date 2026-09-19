@@ -133,9 +133,9 @@ extension View {
 struct BottomScrollMask: View {
     var body: some View {
         VStack(spacing: 0) {
-            Color.white
+            AppPalette.background
             LinearGradient(
-                colors: [.white, .clear],
+                colors: [AppPalette.background, .clear],
                 startPoint: .top,
                 endPoint: .bottom
             )
