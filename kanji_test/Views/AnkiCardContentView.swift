@@ -113,28 +113,10 @@ struct AnkiCardContentView: View {
                             set: { ordinal in updateFieldOptions { $0.titleOrdinal = ordinal } })) {
                             ForEach(Array(card.noteType.fields.enumerated()), id: \.offset) { ordinal, name in Text(name).tag(ordinal) }
                         }
-                        Text("Поля можно скрыть и расположить в нужном порядке для каждой стороны.")
+                        Text("Перетаскивайте поля между списками и меняйте их порядок.")
                             .font(.caption).foregroundStyle(AppPalette.secondaryText)
-                        ForEach(displayedOrdinals, id: \.self) { ordinal in
-                            let name = card.noteType.fields[ordinal]
-                            VStack(alignment: .leading, spacing: 6) {
-                                HStack {
-                                    Toggle(name, isOn: Binding(
-                                        get: { isVisible(ordinal) },
-                                        set: { setVisible($0, ordinal: ordinal) }))
-                                    Button { moveField(ordinal, direction: -1) } label: { Image(systemName: "chevron.up") }
-                                        .disabled(!canMove(ordinal, direction: -1))
-                                    Button { moveField(ordinal, direction: 1) } label: { Image(systemName: "chevron.down") }
-                                        .disabled(!canMove(ordinal, direction: 1))
-                                }
-                                if let content = card.note.parsedFields?[safe: ordinal] {
-                                    AnkiNativeContentView(blocks: content.blocks, mediaDirectory: card.mediaDirectory)
-                                }
-                                DisclosureGroup("Исходное поле Anki") {
-                                    Text(card.note.fields[safe: ordinal] ?? "").font(.caption).textSelection(.enabled)
-                                }
-                            }.frame(maxWidth: .infinity, alignment: .leading).padding(12).appSurfaceCard()
-                        }
+                        fieldList(title: "Показываются", ordinals: visibleFieldOrdinals, isVisible: true)
+                        fieldList(title: "Скрыты", ordinals: hiddenFieldOrdinals, isVisible: false)
                         if !card.note.tags.isEmpty { Text(card.note.tags.joined(separator: ", ")).font(.footnote) }
                     }.padding(20)
                 }.background(AppPalette.background).foregroundStyle(AppPalette.text)
@@ -153,29 +135,80 @@ struct AnkiCardContentView: View {
         fieldSide == .front ? fieldOptions.frontVisible : fieldOptions.backVisible
     }
 
-    private func isVisible(_ ordinal: Int) -> Bool { visibleOrdinals.contains(ordinal) }
+    private var visibleFieldOrdinals: [Int] {
+        displayedOrdinals.filter { visibleOrdinals.contains($0) }
+    }
 
-    private func setVisible(_ visible: Bool, ordinal: Int) {
-        updateFieldOptions { options in
-            if fieldSide == .front {
-                if visible { options.frontVisible.insert(ordinal) } else { options.frontVisible.remove(ordinal) }
+    private var hiddenFieldOrdinals: [Int] {
+        displayedOrdinals.filter { !visibleOrdinals.contains($0) }
+    }
+
+    @ViewBuilder
+    private func fieldList(title: String, ordinals: [Int], isVisible: Bool) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title).font(.subheadline.weight(.semibold))
+            if ordinals.isEmpty {
+                Text("Перетащите поле сюда")
+                    .font(.caption).foregroundStyle(AppPalette.secondaryText)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(12).appSurfaceCard()
+                    .dropDestination(for: String.self) { items, _ in
+                        dropField(items.first, before: nil, intoVisibleList: isVisible)
+                    }
             } else {
-                if visible { options.backVisible.insert(ordinal) } else { options.backVisible.remove(ordinal) }
+                ForEach(ordinals, id: \.self) { ordinal in
+                    fieldRow(ordinal, intoVisibleList: isVisible)
+                }
             }
         }
-    }
-
-    private func canMove(_ ordinal: Int, direction: Int) -> Bool {
-        guard let index = displayedOrdinals.firstIndex(of: ordinal) else { return false }
-        return displayedOrdinals.indices.contains(index + direction)
-    }
-
-    private func moveField(_ ordinal: Int, direction: Int) {
-        guard let index = displayedOrdinals.firstIndex(of: ordinal), displayedOrdinals.indices.contains(index + direction) else { return }
-        updateFieldOptions { options in
-            if fieldSide == .front { options.frontOrder.swapAt(index, index + direction) }
-            else { options.backOrder.swapAt(index, index + direction) }
+        .dropDestination(for: String.self) { items, _ in
+            dropField(items.first, before: nil, intoVisibleList: isVisible)
         }
+    }
+
+    @ViewBuilder
+    private func fieldRow(_ ordinal: Int, intoVisibleList isVisible: Bool) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 8) {
+                Image(systemName: "line.3.horizontal")
+                    .foregroundStyle(AppPalette.secondaryText)
+                Text(card.noteType.fields[ordinal]).font(.body.weight(.medium))
+                Spacer()
+            }
+            if let content = card.note.parsedFields?[safe: ordinal] {
+                AnkiNativeContentView(blocks: content.blocks, mediaDirectory: card.mediaDirectory)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading).padding(12).appSurfaceCard()
+        .draggable(String(ordinal))
+        .dropDestination(for: String.self) { items, _ in
+            dropField(items.first, before: ordinal, intoVisibleList: isVisible)
+        }
+    }
+
+    private func dropField(_ value: String?, before destination: Int?, intoVisibleList: Bool) -> Bool {
+        guard let value, let ordinal = Int(value), displayedOrdinals.contains(ordinal) else { return false }
+        var visible = visibleFieldOrdinals
+        var hidden = hiddenFieldOrdinals
+        visible.removeAll { $0 == ordinal }
+        hidden.removeAll { $0 == ordinal }
+        var target = intoVisibleList ? visible : hidden
+        if let destination, let index = target.firstIndex(of: destination) {
+            target.insert(ordinal, at: index)
+        } else {
+            target.append(ordinal)
+        }
+        if intoVisibleList { visible = target } else { hidden = target }
+        updateFieldOptions { options in
+            if fieldSide == .front {
+                options.frontOrder = visible + hidden
+                options.frontVisible = Set(visible)
+            } else {
+                options.backOrder = visible + hidden
+                options.backVisible = Set(visible)
+            }
+        }
+        return true
     }
 
     private func updateFieldOptions(_ change: (inout AnkiFieldDisplayOptions) -> Void) {
