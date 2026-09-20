@@ -11,6 +11,14 @@ extension DeckPreviewView {
             VStack(alignment: .leading, spacing: 14) {
                 previewHeader(title: deck.title, subtitle: deckPreviewStatus, onBack: closeDeckPreview) {
                     Button {
+                        isSearchPresented = true
+                    } label: {
+                        Image(systemName: "magnifyingglass")
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(AppPalette.accent)
+
+                    Button {
                         coordinator.isDeckSchedulePresented = true
                     } label: {
                         Image(systemName: "info.circle")
@@ -51,6 +59,9 @@ extension DeckPreviewView {
             if let card = coordinator.catalog.kanji(presentedPreview.cardID) {
                 kanjiPreviewDetail(for: coordinator.selectedPreviewCard ?? card)
             }
+        }
+        .sheet(isPresented: $isSearchPresented) {
+            cardSearchSheet(scope: .kanji)
         }
         .sheet(isPresented: $coordinator.isDeckSchedulePresented) {
             deckScheduleInfoView(for: deck)

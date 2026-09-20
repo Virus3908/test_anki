@@ -9,7 +9,15 @@ extension DeckPreviewView {
                 .ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 14) {
-                previewHeader(title: deck.title, subtitle: wordPreviewStatus, onBack: closeWordPreview)
+                previewHeader(title: deck.title, subtitle: wordPreviewStatus, onBack: closeWordPreview) {
+                    Button {
+                        isSearchPresented = true
+                    } label: {
+                        Image(systemName: "magnifyingglass")
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(AppPalette.accent)
+                }
 
                 previewStartButton(count: deckState.previewWordCards.count, isDisabled: deckState.previewWordCards.isEmpty) {
                     onPractice(.words(deckState.previewWordCards, guided: false))
@@ -47,6 +55,9 @@ extension DeckPreviewView {
             if let card = coordinator.catalog.word(presentedPreview.cardID) {
                 wordPreviewDetail(for: coordinator.selectedWordPreviewCard ?? card, deck: deck)
             }
+        }
+        .sheet(isPresented: $isSearchPresented) {
+            cardSearchSheet(scope: .words)
         }
     }
 

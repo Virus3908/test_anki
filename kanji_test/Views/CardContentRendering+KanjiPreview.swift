@@ -1,9 +1,15 @@
 import SwiftUI
 
 extension CardContentRendering {
-    func kanjiPreviewTile(for card: KanjiCard) -> some View {
+    /// `action` переопределяет нажатие — например, поиск открывает
+    /// linked-превью вместо обычного превью колоды.
+    func kanjiPreviewTile(for card: KanjiCard, action: (() -> Void)? = nil) -> some View {
         Button {
-            openKanjiPreviewCard(card)
+            if let action {
+                action()
+            } else {
+                openKanjiPreviewCard(card)
+            }
         } label: {
             VStack(spacing: 6) {
                 Text(card.kanji)

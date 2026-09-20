@@ -1,9 +1,15 @@
 import SwiftUI
 
 extension CardContentRendering {
-    func wordPreviewTile(for card: WordStudyCard) -> some View {
+    /// `action` переопределяет нажатие — например, поиск открывает
+    /// linked-превью вместо обычного превью колоды.
+    func wordPreviewTile(for card: WordStudyCard, action: (() -> Void)? = nil) -> some View {
         Button {
-            openWordPreviewCard(card)
+            if let action {
+                action()
+            } else {
+                openWordPreviewCard(card)
+            }
         } label: {
             VStack(alignment: .leading, spacing: 6) {
                 Text(card.reading)
