@@ -1,19 +1,29 @@
 import SwiftUI
 
 extension CardContentRendering {
-    func wordComponentsBlock(for card: WordStudyCard) -> some View {
+    func wordComponentsBlock(
+        for card: WordStudyCard,
+        onOpenKanji: ((KanjiCard) -> Void)? = nil
+    ) -> some View {
         detailBlock("Состав") {
             VStack(alignment: .leading, spacing: 6) {
                 ForEach(card.kanjiCards, id: \.kanji) { kanjiCard in
-                    wordComponentLink(for: kanjiCard)
+                    wordComponentLink(for: kanjiCard, onOpenKanji: onOpenKanji)
                 }
             }
         }
     }
 
-    func wordComponentLink(for card: KanjiCard) -> some View {
+    func wordComponentLink(
+        for card: KanjiCard,
+        onOpenKanji: ((KanjiCard) -> Void)? = nil
+    ) -> some View {
         Button {
-            coordinator.openLinkedKanjiPreview(card)
+            if let onOpenKanji {
+                onOpenKanji(card)
+            } else {
+                coordinator.openLinkedKanjiPreview(card)
+            }
         } label: {
             HStack(spacing: 6) {
                 Text(card.kanji)

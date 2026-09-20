@@ -28,14 +28,16 @@ extension CardContentRendering {
     }
 
     func kanjiPreviewDetail(for card: KanjiCard) -> some View {
-        NavigationStack {
+        @Bindable var coordinator = coordinator
+
+        return NavigationStack {
             ZStack {
                 AppPalette.background
                     .ignoresSafeArea()
 
                 ScrollView(.vertical) {
                     VStack(alignment: .leading, spacing: 16) {
-                        cardBackContent(for: card)
+                        cardBackContent(for: card, fields: BuiltInCardField.available(for: .kanji))
                             .padding(18)
                             .appSurfaceCard()
 
@@ -52,6 +54,38 @@ extension CardContentRendering {
             .background(AppPalette.background)
             .foregroundStyle(AppPalette.text)
             .simultaneousGesture(previewCardSwipeGesture(for: card))
+        }
+        .background(AppPalette.background.ignoresSafeArea())
+        .sheet(item: $coordinator.selectedLinkedWordCard, onDismiss: {
+            coordinator.closeLinkedWordPreview()
+        }) { word in
+            linkedWordPreviewDetail(for: word)
+        }
+        .sheet(item: $coordinator.selectedRelatedWordsKanjiCard, onDismiss: {
+            coordinator.closeRelatedWordsList()
+        }) { selectedCard in
+            allRelatedWordsList(for: selectedCard)
+        }
+    }
+
+    func linkedWordKanjiPreviewDetail(for card: KanjiCard) -> some View {
+        NavigationStack {
+            ZStack {
+                AppPalette.background
+                    .ignoresSafeArea()
+
+                ScrollView(.vertical) {
+                    cardBackContent(
+                        for: card,
+                        fields: BuiltInCardField.available(for: .kanji).filter { $0 != .relatedWords }
+                    )
+                    .padding(18)
+                    .appSurfaceCard()
+                    .padding(20)
+                }
+            }
+            .background(AppPalette.background)
+            .foregroundStyle(AppPalette.text)
         }
         .background(AppPalette.background.ignoresSafeArea())
     }

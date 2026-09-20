@@ -47,8 +47,8 @@ final class DrawingSessionViewModel {
         return guidedExpectedStrokes(for: card)
     }
 
-    func expectedWordStrokes(for card: KanjiCard) -> [KanjiStroke] {
-        isAnswerVisible ? card.strokes : []
+    func expectedWordStrokes(for card: KanjiCard, isGuided: Bool) -> [KanjiStroke] {
+        expectedStrokes(for: card, isGuided: isGuided)
     }
 
     func nextGuidedStrokeLimit(for card: KanjiCard) -> Int {
@@ -136,6 +136,28 @@ final class DrawingSessionViewModel {
         wordFeedbackByKanji = evaluateWordParts(wordCard)
         feedback = flattenedWordFeedback(for: wordCard)
         return true
+    }
+
+    func handleGuidedWordStrokeFinished(_ wordCard: WordStudyCard, isGuided: Bool) -> Bool {
+        guard let currentKanji = wordCard.kanjiCards[safe: currentWordKanjiIndex] else {
+            return false
+        }
+
+        let didFinishKanji = handleGuidedStrokeFinished(currentKanji, isGuided: isGuided)
+        guard isGuided else {
+            return false
+        }
+
+        storeCurrentWordFeedback(feedback, in: wordCard)
+        guard didFinishKanji else {
+            return false
+        }
+
+        let shouldReveal = advanceWordKanjiOrCheck(wordCard)
+        if !shouldReveal {
+            feedback = flattenedWordFeedback(for: wordCard)
+        }
+        return shouldReveal
     }
 
     func selectWordKanji(at index: Int, in wordCard: WordStudyCard) {

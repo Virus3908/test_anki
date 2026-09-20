@@ -32,9 +32,8 @@ extension DeckPreviewView {
                     Button("Повторить") { deckState.openWordPreview(deck) }
                 }
                 if deckState.isLoadingDeck {
-                    ProgressView("Загружаю слова")
-                        .foregroundStyle(AppPalette.secondaryText)
-                        .tint(AppPalette.accent)
+                    CenteredLoadingIndicator(title: "Загружаю слова")
+                        .padding(.vertical, 10)
                 }
             }
             .padding(.horizontal, 12)

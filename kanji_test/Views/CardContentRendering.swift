@@ -22,10 +22,9 @@ extension CardContentRendering {
     var previewKanaCards: [KanaStudyCard] { [] }
     var displayOptions: DeckOptions { settings.options(for: deckID) }
     var meaningLanguage: MeaningLanguage { displayOptions.meaningLanguage }
-    var frontFieldOrder: [FrontFieldKind] { displayOptions.frontFieldOrder }
-    var showsPromptCharacters: Bool { displayOptions.showsPromptCharacters }
-    var showsPromptReading: Bool { displayOptions.showsPromptReading }
-    var showsPromptMeaning: Bool { displayOptions.showsPromptMeaning }
+    func cardFields(for mode: PracticeMode, side: BuiltInCardSide) -> [BuiltInCardField] {
+        displayOptions.builtInCardFields(for: mode, side: side).displayedFields
+    }
     var selectedDeck: KanjiDeck { coordinator.selectedDeck }
     var selectedWordDeck: WordFrequencyDeck { coordinator.selectedWordDeck }
     var selectedKanaDeck: KanaDeck { coordinator.selectedKanaDeck }

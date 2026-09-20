@@ -5,7 +5,9 @@ extension TrainingView {
         trainingCardShell {
             kanaCardFront(for: kanaCard)
         } back: {
-            kanaCardBackContent(for: kanaCard)
+            kanaCardBackContent(for: kanaCard) {
+                presentCardFieldSettings(side: .back)
+            }
         }
     }
 
@@ -16,16 +18,8 @@ extension TrainingView {
             reviewKey: kanaCard.reviewKey,
             isTextSelectable: false
         ) {
-            ForEach(frontFieldOrder) { field in
-                if field == .readings && showsPromptReading {
-                    detailBlock("Чтение") {
-                        Text(kanaCard.reading).font(.largeTitle.weight(.bold))
-                    }
-                } else if field == .character && showsPromptCharacters {
-                    detailBlock("Знак") {
-                        Text(kanaCard.character).font(.system(size: 58, design: .serif))
-                    }
-                }
+            ForEach(cardFields(for: .kana, side: .front)) { field in
+                kanaCardField(field, for: kanaCard)
             }
         }
     }

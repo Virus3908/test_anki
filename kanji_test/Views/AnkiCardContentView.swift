@@ -13,6 +13,9 @@ struct AnkiCardContentView: View {
     @State private var fieldSide = FieldSide.front
     @State private var prepared: PreparedAnkiCard?
     @State private var translatedHTML: String?
+    @State private var fieldDropTarget: FieldDropTarget?
+    @State private var draggedFieldOrdinal: Int?
+    @State private var clearDropTargetTask: Task<Void, Never>?
     private let renderer = AnkiCardRenderer()
 
     private let fieldPreferences = AnkiFieldDisplayPreferences.shared
@@ -21,6 +24,18 @@ struct AnkiCardContentView: View {
         case front, back
         var id: String { rawValue }
         var title: String { self == .front ? "Лицевая сторона" : "Задняя сторона" }
+    }
+
+    private enum FieldDropPlacement: Equatable {
+        case before
+        case after
+        case emptyList
+    }
+
+    private struct FieldDropTarget: Equatable {
+        let ordinal: Int?
+        let placement: FieldDropPlacement
+        let intoVisibleList: Bool
     }
 
     private var translationKey: TranslationBlockKey { .ankiContent("\(card.id):\(answer ? "answer" : "question")") }
@@ -52,7 +67,10 @@ struct AnkiCardContentView: View {
                 Text(answer ? "Ответ" : "Задание")
                     .font(.caption.weight(.bold)).textCase(.uppercase)
                 Spacer()
-                Button("Все поля", systemImage: "list.bullet.rectangle") { showFields = true }
+                Button("Все поля", systemImage: "list.bullet.rectangle") {
+                    fieldSide = answer ? .back : .front
+                    showFields = true
+                }
                     .font(.caption)
             }.foregroundStyle(AppPalette.secondaryText)
             if let prepared {
@@ -113,28 +131,10 @@ struct AnkiCardContentView: View {
                             set: { ordinal in updateFieldOptions { $0.titleOrdinal = ordinal } })) {
                             ForEach(Array(card.noteType.fields.enumerated()), id: \.offset) { ordinal, name in Text(name).tag(ordinal) }
                         }
-                        Text("Поля можно скрыть и расположить в нужном порядке для каждой стороны.")
+                        Text("Перетаскивайте поля между списками и меняйте их порядок.")
                             .font(.caption).foregroundStyle(AppPalette.secondaryText)
-                        ForEach(displayedOrdinals, id: \.self) { ordinal in
-                            let name = card.noteType.fields[ordinal]
-                            VStack(alignment: .leading, spacing: 6) {
-                                HStack {
-                                    Toggle(name, isOn: Binding(
-                                        get: { isVisible(ordinal) },
-                                        set: { setVisible($0, ordinal: ordinal) }))
-                                    Button { moveField(ordinal, direction: -1) } label: { Image(systemName: "chevron.up") }
-                                        .disabled(!canMove(ordinal, direction: -1))
-                                    Button { moveField(ordinal, direction: 1) } label: { Image(systemName: "chevron.down") }
-                                        .disabled(!canMove(ordinal, direction: 1))
-                                }
-                                if let content = card.note.parsedFields?[safe: ordinal] {
-                                    AnkiNativeContentView(blocks: content.blocks, mediaDirectory: card.mediaDirectory)
-                                }
-                                DisclosureGroup("Исходное поле Anki") {
-                                    Text(card.note.fields[safe: ordinal] ?? "").font(.caption).textSelection(.enabled)
-                                }
-                            }.frame(maxWidth: .infinity, alignment: .leading).padding(12).appSurfaceCard()
-                        }
+                        fieldList(title: "Показываются", ordinals: visibleFieldOrdinals, isVisible: true)
+                        fieldList(title: "Скрыты", ordinals: hiddenFieldOrdinals, isVisible: false)
                         if !card.note.tags.isEmpty { Text(card.note.tags.joined(separator: ", ")).font(.footnote) }
                     }.padding(20)
                 }.background(AppPalette.background).foregroundStyle(AppPalette.text)
@@ -153,28 +153,212 @@ struct AnkiCardContentView: View {
         fieldSide == .front ? fieldOptions.frontVisible : fieldOptions.backVisible
     }
 
-    private func isVisible(_ ordinal: Int) -> Bool { visibleOrdinals.contains(ordinal) }
+    private var visibleFieldOrdinals: [Int] {
+        displayedOrdinals.filter { visibleOrdinals.contains($0) }
+    }
 
-    private func setVisible(_ visible: Bool, ordinal: Int) {
-        updateFieldOptions { options in
-            if fieldSide == .front {
-                if visible { options.frontVisible.insert(ordinal) } else { options.frontVisible.remove(ordinal) }
+    private var hiddenFieldOrdinals: [Int] {
+        displayedOrdinals.filter { !visibleOrdinals.contains($0) }
+    }
+
+    @ViewBuilder
+    private func fieldList(title: String, ordinals: [Int], isVisible: Bool) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if ordinals.isEmpty {
+                emptyFieldListHeader(title: title, intoVisibleList: isVisible)
             } else {
-                if visible { options.backVisible.insert(ordinal) } else { options.backVisible.remove(ordinal) }
+                Text(title).font(.subheadline.weight(.semibold))
+                ForEach(ordinals, id: \.self) { ordinal in
+                    fieldRow(ordinal, intoVisibleList: isVisible)
+                }
             }
         }
     }
 
-    private func canMove(_ ordinal: Int, direction: Int) -> Bool {
-        guard let index = displayedOrdinals.firstIndex(of: ordinal) else { return false }
-        return displayedOrdinals.indices.contains(index + direction)
+    @ViewBuilder
+    private func emptyFieldListHeader(title: String, intoVisibleList isVisible: Bool) -> some View {
+        let target = FieldDropTarget(ordinal: nil, placement: .emptyList, intoVisibleList: isVisible)
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title).font(.subheadline.weight(.semibold))
+            Label("Перетащите поле сюда", systemImage: "arrow.down.circle")
+                .font(.caption.weight(.medium))
+                .foregroundStyle(AppPalette.accent)
+                .opacity(fieldDropTarget == target ? 1 : 0)
+        }
+            .frame(maxWidth: .infinity, minHeight: 64, alignment: .topLeading)
+            .padding(10)
+            .background {
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(fieldDropTarget == target ? AppPalette.accent.opacity(0.14) : .clear)
+            }
+            .overlay {
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .stroke(fieldDropTarget == target ? AppPalette.accent : .clear,
+                            style: StrokeStyle(lineWidth: 2, dash: [6, 4]))
+            }
+            .contentShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .dropDestination(for: String.self,
+                             action: { items, _ in
+                                 applyFieldDrop(items.first, relativeTo: nil, placement: .emptyList,
+                                                intoVisibleList: isVisible)
+                                 return true
+                             },
+                             isTargeted: { targeted in
+                                 updateDropTarget(targeted, target: target)
+                             })
     }
 
-    private func moveField(_ ordinal: Int, direction: Int) {
-        guard let index = displayedOrdinals.firstIndex(of: ordinal), displayedOrdinals.indices.contains(index + direction) else { return }
+    @ViewBuilder
+    private func fieldDragPreview(_ ordinal: Int) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: "line.3.horizontal")
+            Text(card.noteType.fields[ordinal]).font(.body.weight(.semibold))
+            Spacer()
+        }
+        .foregroundStyle(AppPalette.text)
+        .padding(18)
+        .frame(width: 340, alignment: .leading)
+        .background(AppPalette.background, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay { RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(AppPalette.accent, lineWidth: 2) }
+        .shadow(color: .black.opacity(0.2), radius: 12, y: 6)
+    }
+
+    @ViewBuilder
+    private func fieldRow(_ ordinal: Int, intoVisibleList isVisible: Bool) -> some View {
+        let beforeTarget = FieldDropTarget(ordinal: ordinal, placement: .before, intoVisibleList: isVisible)
+        let afterTarget = FieldDropTarget(ordinal: ordinal, placement: .after, intoVisibleList: isVisible)
+        VStack(spacing: 8) {
+            if fieldDropTarget == beforeTarget {
+                fieldInsertionPreview(target: beforeTarget)
+            }
+            fieldCard(ordinal, beforeTarget: beforeTarget, afterTarget: afterTarget)
+            if fieldDropTarget == afterTarget {
+                fieldInsertionPreview(target: afterTarget)
+            }
+        }
+        .transaction { $0.animation = nil }
+    }
+
+    @ViewBuilder
+    private func fieldCard(_ ordinal: Int, beforeTarget: FieldDropTarget, afterTarget: FieldDropTarget) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 8) {
+                Image(systemName: "line.3.horizontal")
+                    .foregroundStyle(AppPalette.secondaryText)
+                Text(card.noteType.fields[ordinal]).font(.body.weight(.medium))
+                Spacer()
+            }
+            if let content = card.note.parsedFields?[safe: ordinal] {
+                AnkiNativeContentView(blocks: content.blocks, mediaDirectory: card.mediaDirectory)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading).padding(12).appSurfaceCard()
+        .overlay {
+            VStack(spacing: 0) {
+                fieldDropHalf(sourceOrdinal: ordinal, target: beforeTarget)
+                fieldDropHalf(sourceOrdinal: ordinal, target: afterTarget)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func fieldInsertionPreview(target: FieldDropTarget) -> some View {
+        fieldPlacementPreview
+            .dropDestination(for: String.self,
+                             action: { items, _ in
+                                 applyFieldDrop(items.first, relativeTo: target.ordinal, placement: target.placement,
+                                                intoVisibleList: target.intoVisibleList)
+                                 return true
+                             },
+                             isTargeted: { targeted in
+                                 updateDropTarget(targeted, target: target)
+                             })
+    }
+    @ViewBuilder
+    private func fieldDropHalf(sourceOrdinal: Int, target: FieldDropTarget) -> some View {
+        Color.clear
+            .contentShape(Rectangle())
+            .onDrag({
+                draggedFieldOrdinal = sourceOrdinal
+                return NSItemProvider(object: String(sourceOrdinal) as NSString)
+            }) {
+                fieldDragPreview(sourceOrdinal)
+            }
+            .dropDestination(for: String.self,
+                             action: { items, _ in
+                                 applyFieldDrop(items.first, relativeTo: target.ordinal, placement: target.placement,
+                                                intoVisibleList: target.intoVisibleList)
+                                 return true
+                             },
+                             isTargeted: { targeted in
+                                 updateDropTarget(targeted, target: target)
+                             })
+    }
+
+    @ViewBuilder
+    private var fieldPlacementPreview: some View {
+        HStack(spacing: 7) {
+            Image(systemName: "line.3.horizontal")
+            Text(draggedFieldOrdinal.flatMap { card.noteType.fields[safe: $0] } ?? "Переместить сюда")
+                .lineLimit(1)
+            Spacer()
+        }
+        .font(.caption.weight(.semibold))
+        .foregroundStyle(AppPalette.accent)
+        .padding(10)
+        .frame(maxWidth: .infinity)
+        .background(AppPalette.background.opacity(0.96), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(AppPalette.accent, style: StrokeStyle(lineWidth: 2, dash: [6, 4]))
+        }
+        .padding(.horizontal, 4)
+        .shadow(color: .black.opacity(0.12), radius: 8, y: 3)
+    }
+
+    private func updateDropTarget(_ targeted: Bool, target: FieldDropTarget) {
+        if targeted {
+            clearDropTargetTask?.cancel()
+            clearDropTargetTask = nil
+            fieldDropTarget = target
+        } else if fieldDropTarget == target {
+            clearDropTargetTask?.cancel()
+            clearDropTargetTask = Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(100))
+                guard !Task.isCancelled, fieldDropTarget == target else { return }
+                fieldDropTarget = nil
+            }
+        }
+    }
+
+    private func applyFieldDrop(_ value: String?, relativeTo destination: Int?, placement: FieldDropPlacement,
+                                intoVisibleList: Bool) {
+        clearDropTargetTask?.cancel()
+        clearDropTargetTask = nil
+        fieldDropTarget = nil
+        draggedFieldOrdinal = nil
+        guard let value, let ordinal = Int(value), displayedOrdinals.contains(ordinal) else { return }
+        guard destination != ordinal else { return }
+        var visible = visibleFieldOrdinals
+        var hidden = hiddenFieldOrdinals
+        visible.removeAll { $0 == ordinal }
+        hidden.removeAll { $0 == ordinal }
+        var target = intoVisibleList ? visible : hidden
+        if let destination, let index = target.firstIndex(of: destination) {
+            let insertionIndex = placement == .after ? index + 1 : index
+            target.insert(ordinal, at: insertionIndex)
+        } else {
+            target.append(ordinal)
+        }
+        if intoVisibleList { visible = target } else { hidden = target }
         updateFieldOptions { options in
-            if fieldSide == .front { options.frontOrder.swapAt(index, index + direction) }
-            else { options.backOrder.swapAt(index, index + direction) }
+            if fieldSide == .front {
+                options.frontOrder = visible + hidden
+                options.frontVisible = Set(visible)
+            } else {
+                options.backOrder = visible + hidden
+                options.backVisible = Set(visible)
+            }
         }
     }
 

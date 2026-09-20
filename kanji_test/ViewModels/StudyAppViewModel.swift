@@ -47,7 +47,7 @@ final class StudyAppViewModel {
         self.navigation = navigation
         self.trainingSession = TrainingSessionViewModel(repository: reviewRepository ?? ReviewRepository(), catalog: catalog, settings: settings, errors: errors)
         self.deckState = DeckPreviewViewModel(catalog: catalog, navigation: navigation, kanjiProvider: kanjiProvider)
-        self.coordinator = StudyCoordinator(catalog: catalog, navigation: navigation)
+        self.coordinator = StudyCoordinator(catalog: catalog, navigation: navigation, kanjiProvider: kanjiProvider)
         self.ankiLibrary = AnkiLibraryViewModel(repository: ankiRepository)
         self.translationState = TranslationViewModel(repository: translationRepository ?? TranslationRepository(), translator: translator,
             kanjiProvider: kanjiProvider, wordProvider: wordProvider, errors: errors)

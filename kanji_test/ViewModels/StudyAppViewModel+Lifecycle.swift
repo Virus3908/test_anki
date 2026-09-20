@@ -46,6 +46,7 @@ extension StudyAppViewModel {
         translationState.clearLoadedExamples()
         deckState.clearCacheState()
         coordinator.resetPreviewSelection()
+        coordinator.clearRelatedWordState()
         catalog.clear()
         deckState.isLoadingDeck = true
         defer { deckState.isLoadingDeck = false }

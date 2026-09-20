@@ -21,7 +21,9 @@ extension TrainingView {
                     currentStroke: $drawingSession.currentStroke,
                     expectedStrokes: expectedStrokesForCurrentWordKanji(currentKanji),
                     feedback: currentWordFeedback,
-                    onStrokeFinished: nil
+                    onStrokeFinished: {
+                        handleGuidedWordStrokeFinished(wordCard)
+                    }
                 )
                 .frame(width: boardSide, height: boardSide)
 

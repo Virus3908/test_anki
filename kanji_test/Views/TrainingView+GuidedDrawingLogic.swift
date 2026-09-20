@@ -10,7 +10,10 @@ extension TrainingView {
     }
 
     func expectedStrokesForCurrentWordKanji(_ card: KanjiCard) -> [KanjiStroke] {
-        drawingSession.expectedWordStrokes(for: card)
+        drawingSession.expectedWordStrokes(
+            for: card,
+            isGuided: trainingSession.isGuidedSingleKanjiPractice
+        )
     }
 
     func nextGuidedStrokeLimit(for card: KanjiCard) -> Int {
@@ -20,6 +23,16 @@ extension TrainingView {
     func handleGuidedStrokeFinished(_ card: KanjiCard) {
         let shouldReveal = drawingSession.handleGuidedStrokeFinished(
             card,
+            isGuided: trainingSession.isGuidedSingleKanjiPractice
+        )
+        if shouldReveal {
+            revealDrawingAnswer()
+        }
+    }
+
+    func handleGuidedWordStrokeFinished(_ wordCard: WordStudyCard) {
+        let shouldReveal = drawingSession.handleGuidedWordStrokeFinished(
+            wordCard,
             isGuided: trainingSession.isGuidedSingleKanjiPractice
         )
         if shouldReveal {
