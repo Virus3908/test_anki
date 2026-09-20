@@ -15,6 +15,15 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
     @State private var deckPendingDeletion: AnkiDeckReference?
 
     private var cards: [AnkiStudyCard] { model.previewDeck == deck ? model.previewCards : [] }
+    private var plan: StudyQueuePlan {
+        TrainingSessionEngine.plan(
+            sourceIDs: cards.map(\.id),
+            mode: .anki,
+            deckID: deck.id,
+            progress: reviewStore,
+            options: settings.options(for: deck.id)
+        )
+    }
     private let fieldPreferences = AnkiFieldDisplayPreferences.shared
 
     var body: some View {
@@ -33,7 +42,7 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
                     .buttonStyle(.borderless)
                     .disabled(model.isOpeningDeck || model.isDeletingDeck)
                 }
-                previewStartButton(count: cards.count, isDisabled: cards.isEmpty || model.isOpeningDeck) {
+                previewStartButton(plan: plan, isDisabled: cards.isEmpty || model.isOpeningDeck) {
                     onPractice(.anki(deck, cards, guided: false))
                 }
                 ScrollView {
@@ -45,7 +54,10 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
                                         .font(.headline).lineLimit(3)
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                     Text(card.templateName).font(.caption).foregroundStyle(AppPalette.secondaryText).lineLimit(1)
-                                    Text(StudyProgressStatus(record: reviewStore.record(for: card.reviewKey), now: reviewStore.studyDate()).title)
+                                    Text(StudyProgressStatus(
+                                        record: reviewStore.record(for: card.reviewKey),
+                                        isExcluded: reviewStore.isExcluded(card.reviewKey)
+                                    ).title)
                                         .font(.caption2).foregroundStyle(AppPalette.secondaryText)
                                 }.padding(12).frame(maxWidth: .infinity, minHeight: 120, alignment: .topLeading).appSurfaceCard()
                             }.buttonStyle(.plain)

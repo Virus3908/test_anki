@@ -43,7 +43,10 @@ extension CardContentRendering {
     }
 
     func learningStatusText(forReviewKey key: String) -> String {
-        StudyProgressStatus(record: reviewStore.record(for: key), now: reviewStore.studyDate()).title
+        StudyProgressStatus(
+            record: reviewStore.record(for: key),
+            isExcluded: reviewStore.isExcluded(key)
+        ).title
     }
 }
 

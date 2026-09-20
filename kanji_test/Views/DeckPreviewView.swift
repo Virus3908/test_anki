@@ -11,6 +11,15 @@ struct DeckPreviewView: View, CardContentRendering {
     var previewKanjiCards: [KanjiCard] { deckState.previewCards }
     var previewWordCards: [WordStudyCard] { deckState.previewWordCards }
     var previewKanaCards: [KanaStudyCard] { deckState.previewKanaCards }
+    func previewPlan(sourceIDs: [String], deck: StudyDeck) -> StudyQueuePlan {
+        TrainingSessionEngine.plan(
+            sourceIDs: sourceIDs,
+            mode: deck.mode,
+            deckID: deck.id,
+            progress: reviewStore,
+            options: settings.options(for: deck.id)
+        )
+    }
     var body: some View {
         Group {
             if let deck = deckState.previewDeck { deckPreviewView(for: deck) }

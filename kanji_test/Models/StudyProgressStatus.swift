@@ -1,52 +1,43 @@
-import Foundation
-
 enum StudyProgressStatus {
-    case notStarted
+    case new
     case learning
+    case review
     case relearning
-    case due
-    case studying
-    case wellLearned
+    case excluded
 
     var title: String {
         switch self {
-        case .notStarted:
+        case .new:
             return "Не изучена"
         case .learning:
             return "Изучается"
+        case .review:
+            return "Изучена"
         case .relearning:
             return "Переучивается"
-        case .due:
-            return "На повторении"
-        case .studying:
-            return "Изучается"
-        case .wellLearned:
-            return "Хорошо изучена"
+        case .excluded:
+            return "Исключена"
         }
     }
 
-    init(record: StudyReviewRecord?, now: Date = Date()) {
+    init(record: StudyReviewRecord?, isExcluded: Bool) {
+        if isExcluded {
+            self = .excluded
+            return
+        }
+
         guard let record else {
-            self = .notStarted
+            self = .new
             return
         }
 
-        guard record.state == .review else {
-            self = record.state == .relearning ? .relearning : .learning
-            return
-        }
-
-        let calendar = Calendar.current
-        let today = calendar.startOfDay(for: now)
-        let dueDay = calendar.startOfDay(for: record.dueDate)
-        let daysUntilReview = calendar.dateComponents([.day], from: today, to: dueDay).day ?? 0
-
-        if daysUntilReview > 7 {
-            self = .wellLearned
-        } else if daysUntilReview > 0 {
-            self = .studying
-        } else {
-            self = .due
+        switch record.state {
+        case .learning:
+            self = .learning
+        case .review:
+            self = .review
+        case .relearning:
+            self = .relearning
         }
     }
 }
