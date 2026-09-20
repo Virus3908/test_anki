@@ -15,6 +15,15 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
     @State private var deckPendingDeletion: AnkiDeckReference?
 
     private var cards: [AnkiStudyCard] { model.previewDeck == deck ? model.previewCards : [] }
+    private var plan: StudyQueuePlan {
+        TrainingSessionEngine.plan(
+            sourceIDs: cards.map(\.id),
+            mode: .anki,
+            deckID: deck.id,
+            progress: reviewStore,
+            options: settings.options(for: deck.id)
+        )
+    }
     private let fieldPreferences = AnkiFieldDisplayPreferences.shared
 
     var body: some View {
@@ -33,7 +42,7 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
                     .buttonStyle(.borderless)
                     .disabled(model.isOpeningDeck || model.isDeletingDeck)
                 }
-                previewStartButton(count: cards.count, isDisabled: cards.isEmpty || model.isOpeningDeck) {
+                previewStartButton(plan: plan, isDisabled: cards.isEmpty || model.isOpeningDeck) {
                     onPractice(.anki(deck, cards, guided: false))
                 }
                 ScrollView {

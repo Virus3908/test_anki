@@ -17,6 +17,9 @@ nonisolated struct StudyQueuePlan {
     /// All cards still assigned to this study day, including cards waiting for
     /// their next intraday learning step.
     let todayIDs: [String]
+    let newCount: Int
+    let learningCount: Int
+    let reviewCount: Int
     let nextLearningDate: Date?
     let hiddenReviews: Int
 }
@@ -74,7 +77,14 @@ nonisolated enum TrainingSessionEngine {
         // this fallback is used only after they are exhausted.
         let display = ready.isEmpty ? Array(waitingLearning.prefix(1)) : ready
         let today = learning + waitingLearning + reviews + started + selectedNew
-        return StudyQueuePlan(readyIDs: display.map(\.id), todayIDs: today.map(\.id),
-                              nextLearningDate: nextLearning, hiddenReviews: max(0, reviews.count - selectedReviews.count))
+        return StudyQueuePlan(
+            readyIDs: display.map(\.id),
+            todayIDs: today.map(\.id),
+            newCount: selectedNew.count,
+            learningCount: learning.count + waitingLearning.count + started.count,
+            reviewCount: selectedReviews.count,
+            nextLearningDate: nextLearning,
+            hiddenReviews: max(0, reviews.count - selectedReviews.count)
+        )
     }
 }
