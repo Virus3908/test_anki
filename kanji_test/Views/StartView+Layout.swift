@@ -7,8 +7,26 @@ extension StartView {
                 .ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 18) {
-                Text("Выбери набор")
-                    .font(.largeTitle.weight(.bold))
+                HStack(alignment: .firstTextBaseline) {
+                    Text("Выбери набор")
+                        .font(.largeTitle.weight(.bold))
+
+                    Spacer()
+
+                    if searchScope != nil {
+                        Button {
+                            isSearchPresented = true
+                        } label: {
+                            Image(systemName: "magnifyingglass")
+                                .font(.title3.weight(.semibold))
+                                .padding(12)
+                                .appSurfaceCard()
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(isLoading)
+                        .accessibilityLabel("Поиск по карточкам")
+                    }
+                }
 
                 Picker("Раздел", selection: $selectedSection) {
                     ForEach(StartMenuSection.allCases) { section in
@@ -76,6 +94,11 @@ extension StartView {
                     BottomScrollMask()
                 }
                 .frame(maxHeight: .infinity)
+                .sheet(isPresented: $isSearchPresented) {
+                    if let scope = searchScope {
+                        cardSearchSheet(scope: scope)
+                    }
+                }
 
                 if isLoading {
                     CenteredLoadingIndicator(title: "Загружаю карточки")

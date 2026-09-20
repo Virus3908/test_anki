@@ -57,7 +57,9 @@ struct ContentView: View {
         case .start:
             StartView(practiceMode: Binding(get: { appModel.practiceMode }, set: { appModel.practiceMode = $0 }),
                       isLoading: appModel.deckState.isLoadingDeck, onOpen: appModel.openDeck,
-                      settings: appModel.settings, ankiModel: appModel.ankiLibrary)
+                      settings: appModel.settings, ankiModel: appModel.ankiLibrary,
+                      coordinator: appModel.coordinator, translationState: appModel.translationState,
+                      reviewStore: appModel.trainingSession.reviewStore, onPractice: appModel.practice)
         case .ankiDeck(let deck):
             AnkiDeckPreviewView(deck: deck, model: appModel.ankiLibrary, settings: appModel.settings,
                 translationState: appModel.translationState,
