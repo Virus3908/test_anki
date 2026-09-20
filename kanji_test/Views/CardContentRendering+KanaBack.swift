@@ -2,14 +2,22 @@ import SwiftUI
 
 extension CardContentRendering {
     func kanaPreviewCardContent(for kanaCard: KanaStudyCard) -> some View {
-        kanaCardBackContent(for: kanaCard)
+        kanaCardBackContent(for: kanaCard, fields: BuiltInCardField.available(for: .kana))
             .padding(18)
             .appSurfaceCard()
     }
 
-    func kanaCardBackContent(for kanaCard: KanaStudyCard) -> some View {
-        studyCardBackShell(reviewKey: kanaCard.reviewKey, isTextSelectable: false) {
-            ForEach(cardFields(for: .kana, side: .back)) { field in
+    func kanaCardBackContent(
+        for kanaCard: KanaStudyCard,
+        fields: [BuiltInCardField]? = nil,
+        onShowAllFields: (() -> Void)? = nil
+    ) -> some View {
+        studyCardBackShell(
+            reviewKey: kanaCard.reviewKey,
+            isTextSelectable: false,
+            onShowAllFields: onShowAllFields
+        ) {
+            ForEach(fields ?? cardFields(for: .kana, side: .back)) { field in
                 kanaCardField(field, for: kanaCard)
             }
         }

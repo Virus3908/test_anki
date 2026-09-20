@@ -64,15 +64,19 @@ extension CardContentRendering {
     }
 
     func wordFullCard(for card: WordStudyCard) -> some View {
-        wordFullCardContent(for: card)
+        wordFullCardContent(for: card, fields: BuiltInCardField.available(for: .words))
             .padding(18)
             .appSurfaceCard()
     }
 
-    func wordFullCardContent(for card: WordStudyCard) -> some View {
+    func wordFullCardContent(
+        for card: WordStudyCard,
+        fields: [BuiltInCardField]? = nil,
+        onOpenKanji: ((KanjiCard) -> Void)? = nil
+    ) -> some View {
         VStack(alignment: .leading, spacing: 16) {
-            ForEach(cardFields(for: .words, side: .back)) { field in
-                wordCardField(field, for: card)
+            ForEach(fields ?? cardFields(for: .words, side: .back)) { field in
+                wordCardField(field, for: card, onOpenKanji: onOpenKanji)
             }
         }
         .textSelection(.enabled)
@@ -81,8 +85,42 @@ extension CardContentRendering {
         }
     }
 
+    func linkedWordPreviewDetail(for card: WordStudyCard) -> some View {
+        @Bindable var coordinator = coordinator
+
+        return NavigationStack {
+            ZStack {
+                AppPalette.background
+                    .ignoresSafeArea()
+
+                ScrollView(.vertical) {
+                    wordFullCardContent(
+                        for: card,
+                        fields: BuiltInCardField.available(for: .words),
+                        onOpenKanji: coordinator.openLinkedWordKanjiPreview
+                    )
+                        .padding(18)
+                        .appSurfaceCard()
+                        .padding(20)
+                }
+            }
+            .background(AppPalette.background)
+            .foregroundStyle(AppPalette.text)
+        }
+        .background(AppPalette.background.ignoresSafeArea())
+        .sheet(item: $coordinator.selectedLinkedWordKanjiCard, onDismiss: {
+            coordinator.closeLinkedWordKanjiPreview()
+        }) { kanji in
+            linkedWordKanjiPreviewDetail(for: kanji)
+        }
+    }
+
     @ViewBuilder
-    func wordCardField(_ field: BuiltInCardField, for card: WordStudyCard) -> some View {
+    func wordCardField(
+        _ field: BuiltInCardField,
+        for card: WordStudyCard,
+        onOpenKanji: ((KanjiCard) -> Void)? = nil
+    ) -> some View {
         switch field {
         case .word:
             detailBlock("Слово") {
@@ -107,7 +145,7 @@ extension CardContentRendering {
                 retranslateWordButton(for: card)
             }
         case .components:
-            wordComponentsBlock(for: card)
+            wordComponentsBlock(for: card, onOpenKanji: onOpenKanji)
         case .examples:
             wordExamplesBlock(for: card)
         default:

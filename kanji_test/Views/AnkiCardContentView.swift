@@ -67,7 +67,10 @@ struct AnkiCardContentView: View {
                 Text(answer ? "Ответ" : "Задание")
                     .font(.caption.weight(.bold)).textCase(.uppercase)
                 Spacer()
-                Button("Все поля", systemImage: "list.bullet.rectangle") { showFields = true }
+                Button("Все поля", systemImage: "list.bullet.rectangle") {
+                    fieldSide = answer ? .back : .front
+                    showFields = true
+                }
                     .font(.caption)
             }.foregroundStyle(AppPalette.secondaryText)
             if let prepared {

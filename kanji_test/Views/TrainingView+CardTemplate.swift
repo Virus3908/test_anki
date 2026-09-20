@@ -46,7 +46,7 @@ extension TrainingView {
                     .textCase(.uppercase)
                 Spacer()
                 Button("Все поля", systemImage: "list.bullet.rectangle") {
-                    isCardFieldSettingsPresented = true
+                    presentCardFieldSettings(side: .front)
                 }
                 .font(.caption)
             }
@@ -70,8 +70,18 @@ extension TrainingView {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .modifier(TextSelectionModeModifier(isEnabled: isTextSelectable))
         .sheet(isPresented: $isCardFieldSettingsPresented) {
-            BuiltInCardFieldSettingsView(settings: settings, deckID: deckID, mode: practiceMode)
+            BuiltInCardFieldSettingsView(
+                settings: settings,
+                deckID: deckID,
+                mode: practiceMode,
+                initialSide: cardFieldSettingsSide
+            )
         }
+    }
+
+    func presentCardFieldSettings(side: BuiltInCardSide) {
+        cardFieldSettingsSide = side
+        isCardFieldSettingsPresented = true
     }
 
 }

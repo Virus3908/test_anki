@@ -5,7 +5,9 @@ extension TrainingView {
         trainingCardShell {
             kanaCardFront(for: kanaCard)
         } back: {
-            kanaCardBackContent(for: kanaCard)
+            kanaCardBackContent(for: kanaCard) {
+                presentCardFieldSettings(side: .back)
+            }
         }
     }
 

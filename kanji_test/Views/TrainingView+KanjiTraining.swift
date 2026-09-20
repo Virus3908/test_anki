@@ -17,9 +17,7 @@ extension TrainingView {
 
     @ViewBuilder
     func frontFields(for card: KanjiCard) -> some View {
-        ForEach(cardFields(for: .kanji, side: .front)) { field in
-            kanjiCardField(field, for: card)
-        }
+        kanjiCardFields(cardFields(for: .kanji, side: .front), for: card)
     }
 }
 
@@ -31,7 +29,9 @@ private struct KanjiTrainingCardView: View {
         training.trainingCardShell {
             training.cardFront(for: card)
         } back: {
-            training.cardBackContent(for: card)
+            training.cardBackContent(for: card) {
+                training.presentCardFieldSettings(side: .back)
+            }
         }
         .task(id: "back-\(card.id)-\(training.meaningLanguage.rawValue)") {
             await training.translateKanjiMeaningsIfNeeded(for: card, deck: training.selectedDeck)
