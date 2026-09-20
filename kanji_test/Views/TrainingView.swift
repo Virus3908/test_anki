@@ -11,6 +11,7 @@ struct TrainingView: View, CardContentRendering {
     let onPractice: (PracticeSelection) -> Void
     var reviewStore: StudyProgressStore { trainingSession.reviewStore }
     var drawingSession: DrawingSessionViewModel { trainingSession.drawingSession }
+    @State var speech = SpeechService()
     var practiceMode: PracticeMode { trainingSession.mode ?? .kanji }
     var cards: [KanjiCard] { trainingSession.cards }
     var wordCards: [WordStudyCard] { trainingSession.wordCards }
@@ -26,6 +27,10 @@ struct TrainingView: View, CardContentRendering {
                 catch { return }
                 await trainingSession.refreshForNewDay()
             }
+            .onAppear(perform: applySpeechSettings)
+            .onChange(of: settings.speechVoiceIdentifier) { _, _ in applySpeechSettings() }
+            .onChange(of: settings.speechRate) { _, _ in applySpeechSettings() }
+            .onDisappear { speech.stop() }
     }
     func sessionWaitingView() -> some View {
         VStack(spacing: 18) {
@@ -75,5 +80,25 @@ struct TrainingView: View, CardContentRendering {
     }
     func updateFeedback(for card: KanjiCard, reveal: Bool) {
         if trainingSession.evaluateFeedback(for: card, reveal: reveal) { revealDrawingAnswer() }
+    }
+}
+
+extension TrainingView {
+    func applySpeechSettings() {
+        speech.voiceIdentifier = settings.speechVoiceIdentifier.isEmpty ? nil : settings.speechVoiceIdentifier
+        speech.rate = settings.speechRate
+    }
+
+    func speakButton(for text: String) -> some View {
+        Button {
+            speech.speak(text)
+        } label: {
+            Image(systemName: "speaker.wave.2.fill")
+                .font(.title3)
+                .foregroundStyle(AppPalette.secondaryText)
+                .padding(6)
+        }
+        .opacity(0.75)
+        .accessibilityLabel("Озвучить")
     }
 }

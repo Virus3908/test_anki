@@ -1,3 +1,4 @@
+import AVFoundation
 import SwiftUI
 
 extension SettingsView {
@@ -5,6 +6,7 @@ extension SettingsView {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
+                    speechSettingsView()
                     deckSelectionView()
                     translationSettingsView()
                     learningSettingsView()
@@ -30,6 +32,37 @@ extension SettingsView {
             .sheet(isPresented: $isAboutPresented) {
                 AboutView()
             }
+        }
+    }
+
+    func speechSettingsView() -> some View {
+        settingsSection("Озвучивание") {
+            Toggle("Озвучивать карточки", isOn: $settings.speechEnabled)
+            Picker("Голос", selection: $settings.speechVoiceIdentifier) {
+                Text("Авто (лучший доступный)").tag("")
+                ForEach(SpeechService.japaneseVoices(), id: \.identifier) { voice in
+                    Text("\(voice.name) — \(voice.quality.title)").tag(voice.identifier)
+                }
+            }
+            HStack {
+                Text("Скорость")
+                Slider(value: $settings.speechRate, in: 0.1...1.0)
+                Text("\(Int(settings.speechRate * 100)) %")
+                    .font(.caption)
+                    .monospacedDigit()
+                    .foregroundStyle(AppPalette.secondaryText)
+            }
+            Button {
+                sample.voiceIdentifier = settings.speechVoiceIdentifier.isEmpty ? nil : settings.speechVoiceIdentifier
+                sample.rate = settings.speechRate
+                sample.speak("こんにちは、これは音声のテストです。")
+            } label: {
+                Label("Проверить голос", systemImage: "speaker.wave.2.fill")
+            }
+            Text("Автоматически произносить кандзи и слова при показе карточки.")
+                .font(.caption)
+                .foregroundStyle(AppPalette.secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 
@@ -398,6 +431,17 @@ extension SettingsView {
         .disabled(isBusy)
     }
 
+}
+
+private extension AVSpeechSynthesisVoiceQuality {
+    var title: String {
+        switch self {
+        case .premium: return "Премиум"
+        case .enhanced: return "Улучшенный"
+        case .default: return "Базовый"
+        @unknown default: return "Системный"
+        }
+    }
 }
 
 extension View {

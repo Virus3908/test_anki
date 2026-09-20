@@ -28,6 +28,11 @@ private struct KanjiTrainingCardView: View {
     var body: some View {
         training.trainingCardShell {
             training.cardFront(for: card)
+                .overlay(alignment: .topTrailing) {
+                    training.speakButton(for: card.kanji)
+                        .padding(.top, 32)
+                        .padding(.trailing, 6)
+                }
         } back: {
             training.cardBackContent(for: card) {
                 training.presentCardFieldSettings(side: .back)
@@ -35,6 +40,10 @@ private struct KanjiTrainingCardView: View {
         }
         .task(id: "back-\(card.id)-\(training.meaningLanguage.rawValue)") {
             await training.translateKanjiMeaningsIfNeeded(for: card, deck: training.selectedDeck)
+        }
+        .task(id: card.id) {
+            guard training.settings.speechEnabled else { return }
+            training.speech.speak(card.kanji)
         }
     }
 }
