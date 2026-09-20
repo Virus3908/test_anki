@@ -158,6 +158,77 @@ final class AnkiStudyIntegrationTests: XCTestCase {
         XCTAssertNil(afterPractice.record(for: cards[0].reviewKey))
     }
 
+    func testSchedulingMigrationFailureDoesNotBlockLibrary() async {
+        let repository = MemoryAnkiLibrary(summaries: [migrationSummary()],
+            collectionError: AnkiImportError.invalid("коллекция повреждена"))
+        let model = AnkiLibraryViewModel(repository: repository)
+        model.bootstrapScheduling = { _, _ in 0 }
+        await model.load()
+        XCTAssertTrue(model.isLoaded)
+        XCTAssertFalse(model.decks.isEmpty)
+        XCTAssertTrue(model.message?.contains("Не удалось перенести расписание") == true)
+        let marked = await repository.markedVersions
+        XCTAssertTrue(marked.isEmpty)
+    }
+
+    func testBootstrapSkippedBeforeProgressIsNotMarkedAndRetriedAfter() async throws {
+        let suite = "AnkiMigration-\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suite)!
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let errors = StorageStatus()
+        let settings = StudyPreferences(defaults: defaults, errors: errors)
+        let session = TrainingSessionViewModel(repository: MemoryReviews(), catalog: StudyCardCatalog(),
+            settings: settings, errors: errors)
+        let collection = migrationCollection(type: 2, queue: 2, due: 0, interval: 10,
+            reps: 5, history: ratingHistory())
+        let repository = MemoryAnkiLibrary(summaries: [migrationSummary()], collections: ["fixture": collection])
+        let model = AnkiLibraryViewModel(repository: repository)
+        model.bootstrapScheduling = { collection, importID in
+            try await session.bootstrapAnkiHistory(collection, importID: importID)
+        }
+        await model.load()
+        XCTAssertTrue(model.isLoaded)
+        XCTAssertFalse(model.decks.isEmpty)
+        XCTAssertNil(model.message)
+        let markedEarly = await repository.markedVersions
+        XCTAssertTrue(markedEarly.isEmpty)
+        XCTAssertNil(session.reviewStore.record(for: migrationKey))
+        try await session.loadProgress()
+        await model.load()
+        let markedLate = await repository.markedVersions
+        XCTAssertEqual(markedLate["fixture"], AnkiSchedulingMigrator.version)
+        XCTAssertNotNil(session.reviewStore.record(for: migrationKey))
+    }
+
+    func testBootstrapAnkiHistoryWaitsForProgressAndMigratesAfterwards() async throws {
+        let suite = "AnkiMigration-\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suite)!
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let errors = StorageStatus()
+        let settings = StudyPreferences(defaults: defaults, errors: errors)
+        let repository = MemoryReviews()
+        let session = TrainingSessionViewModel(repository: repository, catalog: StudyCardCatalog(),
+            settings: settings, errors: errors)
+        let collection = migrationCollection(type: 2, queue: 2, due: 0, interval: 10,
+            reps: 5, history: ratingHistory())
+        let skipped = try await session.bootstrapAnkiHistory(collection, importID: "fixture")
+        XCTAssertNil(skipped)
+        let before = try await repository.load()
+        XCTAssertNil(before.record(for: migrationKey))
+        XCTAssertTrue(before.reviewLog.isEmpty)
+        try await session.loadProgress()
+        let migrated = try await session.bootstrapAnkiHistory(collection, importID: "fixture")
+        XCTAssertEqual(migrated, 1)
+        let after = try await repository.load()
+        XCTAssertNotNil(after.record(for: migrationKey))
+    }
+
+    private func migrationSummary() -> AnkiImportSummary {
+        AnkiImportSummary(id: "fixture", directory: UUID().uuidString, filename: "sched.apkg",
+            importedAt: Date(), decks: [.init(id: 40, name: "Deck")], cardCount: 1, noteCount: 1,
+            mediaCount: 0, warnings: [], deckCardCounts: ["40": 1])
+    }
+
     private func cards() throws -> [AnkiStudyCard] {
         let value = try fixture()
         return value.cards.filter { $0.deckID == 10 }.map {
@@ -203,4 +274,30 @@ final class AnkiStudyIntegrationTests: XCTestCase {
     func save(_ value: StudyProgressStore) async throws { progress = value }
     func hasRecoverableBackup() async -> Bool { false }
     func restoreBackup() async throws -> StudyProgressStore { progress }
+}
+
+private actor MemoryAnkiLibrary: AnkiLibraryPersisting {
+    private let summaries: [AnkiImportSummary]
+    private let collections: [String: AnkiCollection]
+    private let collectionError: Error?
+    private(set) var markedVersions: [String: String] = [:]
+
+    init(summaries: [AnkiImportSummary], collections: [String: AnkiCollection] = [:], collectionError: Error? = nil) {
+        self.summaries = summaries
+        self.collections = collections
+        self.collectionError = collectionError
+    }
+
+    func load() async throws -> [AnkiImportSummary] { summaries }
+    func hasRecoverableBackup() async -> Bool { false }
+    func restoreBackup() async throws -> [AnkiImportSummary] { summaries }
+    func importPackage(_ url: URL) async throws -> AnkiImportResult { throw AnkiImportError.invalid("не поддерживается") }
+    func deleteImport(id: String) async throws {}
+    func markSchedulingMigration(importID: String, version: String) async throws { markedVersions[importID] = version }
+    func collection(_ summary: AnkiImportSummary) async throws -> AnkiCollection {
+        if let collectionError { throw collectionError }
+        guard let collection = collections[summary.id] else { throw AnkiImportError.invalid("коллекция отсутствует") }
+        return collection
+    }
+    func mediaDirectory(_ summary: AnkiImportSummary) async throws -> URL { FileManager.default.temporaryDirectory }
 }

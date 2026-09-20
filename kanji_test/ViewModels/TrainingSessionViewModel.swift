@@ -61,8 +61,10 @@ final class TrainingSessionViewModel {
             throw error
         }
     }
-    func bootstrapAnkiHistory(_ collection: AnkiCollection, importID: String) async throws -> Int {
-        guard hasLoadedProgress, !isPreparingCard else { return 0 }
+    /// Returns `nil` when review progress is not loaded yet (or a save is in flight) so the
+    /// caller leaves the migration unmarked and retries later; `0` means nothing to migrate.
+    func bootstrapAnkiHistory(_ collection: AnkiCollection, importID: String) async throws -> Int? {
+        guard hasLoadedProgress, !isPreparingCard else { return nil }
         let options = Dictionary(uniqueKeysWithValues: collection.decks.map {
             ($0.id, settings.options(for: "anki:\(importID):deck:\($0.id)"))
         })

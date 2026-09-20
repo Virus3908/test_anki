@@ -52,7 +52,7 @@ final class StudyAppViewModel {
         self.translationState = TranslationViewModel(repository: translationRepository ?? TranslationRepository(), translator: translator,
             kanjiProvider: kanjiProvider, wordProvider: wordProvider, errors: errors)
         self.ankiLibrary.bootstrapScheduling = { [weak trainingSession] collection, importID in
-            try await trainingSession?.bootstrapAnkiHistory(collection, importID: importID) ?? 0
+            try await trainingSession?.bootstrapAnkiHistory(collection, importID: importID)
         }
     }
 
