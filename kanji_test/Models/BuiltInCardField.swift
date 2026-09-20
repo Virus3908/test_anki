@@ -18,6 +18,7 @@ nonisolated enum BuiltInCardField: String, Identifiable, Codable, Sendable {
     case strokeCount
     case strokeOrder
     case components
+    case relatedWords
     case examples
 
     var id: String { rawValue }
@@ -33,13 +34,14 @@ nonisolated enum BuiltInCardField: String, Identifiable, Codable, Sendable {
         case .strokeCount: "Число штрихов"
         case .strokeOrder: "Порядок штрихов"
         case .components: "Состав"
+        case .relatedWords: "Слова с этим кандзи"
         case .examples: "Примеры"
         }
     }
 
     static func available(for mode: PracticeMode) -> [Self] {
         switch mode {
-        case .kanji: [.character, .onyomi, .kunyomi, .meanings, .strokeOrder, .examples]
+        case .kanji: [.character, .onyomi, .kunyomi, .meanings, .strokeOrder, .relatedWords, .examples]
         case .words: [.word, .reading, .meanings, .components, .examples]
         case .kana: [.character, .reading, .strokeCount, .strokeOrder]
         case .anki: []

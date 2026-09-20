@@ -69,9 +69,12 @@ extension CardContentRendering {
             .appSurfaceCard()
     }
 
-    func wordFullCardContent(for card: WordStudyCard) -> some View {
+    func wordFullCardContent(
+        for card: WordStudyCard,
+        fields: [BuiltInCardField]? = nil
+    ) -> some View {
         VStack(alignment: .leading, spacing: 16) {
-            ForEach(cardFields(for: .words, side: .back)) { field in
+            ForEach(fields ?? cardFields(for: .words, side: .back)) { field in
                 wordCardField(field, for: card)
             }
         }
@@ -79,6 +82,28 @@ extension CardContentRendering {
         .task(id: "\(card.id)-\(meaningLanguage.rawValue)") {
             await translateWordMeaningIfNeeded(for: card)
         }
+    }
+
+    func linkedWordPreviewDetail(for card: WordStudyCard) -> some View {
+        NavigationStack {
+            ZStack {
+                AppPalette.background
+                    .ignoresSafeArea()
+
+                ScrollView(.vertical) {
+                    wordFullCardContent(
+                        for: card,
+                        fields: BuiltInCardField.available(for: .words).filter { $0 != .components }
+                    )
+                        .padding(18)
+                        .appSurfaceCard()
+                        .padding(20)
+                }
+            }
+            .background(AppPalette.background)
+            .foregroundStyle(AppPalette.text)
+        }
+        .background(AppPalette.background.ignoresSafeArea())
     }
 
     @ViewBuilder

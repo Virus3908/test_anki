@@ -21,10 +21,19 @@ struct PresentedWordPreview: Identifiable {
 final class StudyCoordinator {
     let catalog: StudyCardCatalog
     let navigation: StudyNavigation
+    let kanjiProvider: any KanjiProviding
+    var loadingRelatedWords: Set<String> = []
+    var loadedRelatedWords: Set<String> = []
+    var relatedWordLoadErrors: Set<String> = []
 
-    init(catalog: StudyCardCatalog, navigation: StudyNavigation) {
+    init(
+        catalog: StudyCardCatalog,
+        navigation: StudyNavigation,
+        kanjiProvider: any KanjiProviding = KanjiAPIProvider()
+    ) {
         self.catalog = catalog
         self.navigation = navigation
+        self.kanjiProvider = kanjiProvider
     }
 
     var hasStartedTraining: Bool {
@@ -70,6 +79,14 @@ final class StudyCoordinator {
         set {
             if let newValue { catalog.register([newValue]) }
             selectedLinkedKanjiCardID = newValue?.id
+        }
+    }
+    private var selectedLinkedWordCardID: String?
+    var selectedLinkedWordCard: WordStudyCard? {
+        get { selectedLinkedWordCardID.flatMap { catalog.word($0) } }
+        set {
+            if let newValue { catalog.register([newValue]) }
+            selectedLinkedWordCardID = newValue?.id
         }
     }
     var presentedKanjiPreview: PresentedKanjiPreview?

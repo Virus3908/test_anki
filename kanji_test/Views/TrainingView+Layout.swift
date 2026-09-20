@@ -35,6 +35,11 @@ extension TrainingView {
         }) { card in
             kanjiPreviewDetail(for: card)
         }
+        .sheet(item: $coordinator.selectedLinkedWordCard, onDismiss: {
+            coordinator.closeLinkedWordPreview()
+        }) { card in
+            linkedWordPreviewDetail(for: card)
+        }
     }
 
     func trainingView(for card: KanjiCard) -> some View {

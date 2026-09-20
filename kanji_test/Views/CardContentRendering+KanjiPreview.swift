@@ -28,7 +28,9 @@ extension CardContentRendering {
     }
 
     func kanjiPreviewDetail(for card: KanjiCard) -> some View {
-        NavigationStack {
+        @Bindable var coordinator = coordinator
+
+        return NavigationStack {
             ZStack {
                 AppPalette.background
                     .ignoresSafeArea()
@@ -54,6 +56,11 @@ extension CardContentRendering {
             .simultaneousGesture(previewCardSwipeGesture(for: card))
         }
         .background(AppPalette.background.ignoresSafeArea())
+        .sheet(item: $coordinator.selectedLinkedWordCard, onDismiss: {
+            coordinator.closeLinkedWordPreview()
+        }) { word in
+            linkedWordPreviewDetail(for: word)
+        }
     }
 
 }

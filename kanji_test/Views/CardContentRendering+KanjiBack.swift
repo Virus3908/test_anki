@@ -39,6 +39,8 @@ extension CardContentRendering {
                     StrokeStepStrip(strokes: card.strokes, spacing: 0)
                 }
             }
+        case .relatedWords:
+            kanjiRelatedWordsBlock(for: card)
         case .examples:
             detailBlock("Примеры") {
                 let key = TranslationBlockKey.kanjiExamples(card.kanji)

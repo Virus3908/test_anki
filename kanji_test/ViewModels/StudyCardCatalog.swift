@@ -6,6 +6,7 @@ import Observation
 final class StudyCardCatalog {
     private var kanjiByID: [String: KanjiCard] = [:]
     private var wordsByID: [String: WordRecord] = [:]
+    private var wordIDsByCharacter: [String: [String]] = [:]
     private var kanaByID: [String: KanaStudyCard] = [:]
     private var ankiByID: [String: AnkiStudyCard] = [:]
 
@@ -32,6 +33,10 @@ final class StudyCardCatalog {
                              examples: record.examples, kanjiCards: record.characterIDs.compactMap { kanjiByID[$0] })
     }
 
+    func words(containing character: String, limit: Int = 3) -> [WordStudyCard] {
+        Array((wordIDsByCharacter[character] ?? []).prefix(limit)).compactMap(word)
+    }
+
     @discardableResult
     func register(_ cards: [KanjiCard]) -> [String] {
         for original in cards {
@@ -49,8 +54,18 @@ final class StudyCardCatalog {
     @discardableResult
     func register(_ cards: [WordStudyCard]) -> [String] {
         for card in cards {
+            if let previous = wordsByID[card.id] {
+                for characterID in Set(previous.characterIDs) {
+                    wordIDsByCharacter[characterID]?.removeAll { $0 == card.id }
+                }
+            }
+
+            let characterIDs = card.kanjiCards.map(\.kanji)
             wordsByID[card.id] = WordRecord(word: card.word, reading: card.reading, meaning: card.meaning,
                 examples: card.examples, characterIDs: register(card.kanjiCards))
+            for characterID in Set(characterIDs) {
+                wordIDsByCharacter[characterID, default: []].append(card.id)
+            }
         }
         return cards.map(\.id)
     }
@@ -68,6 +83,7 @@ final class StudyCardCatalog {
     func clear() {
         kanjiByID.removeAll()
         wordsByID.removeAll()
+        wordIDsByCharacter.removeAll()
         kanaByID.removeAll()
         ankiByID.removeAll()
     }
