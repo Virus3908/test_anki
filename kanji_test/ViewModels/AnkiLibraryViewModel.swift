@@ -18,7 +18,9 @@ final class AnkiLibraryViewModel {
     private let request = LoadRequest()
     private var openToken: UUID { request.id }
     private var isLoading = false
-    @ObservationIgnored var bootstrapScheduling: ((AnkiCollection, String) async throws -> Int)?
+    /// `nil` means the bootstrap could not run yet (e.g. review progress is not loaded);
+    /// the migration must then stay unmarked so it is retried later.
+    @ObservationIgnored var bootstrapScheduling: ((AnkiCollection, String) async throws -> Int?)?
 
     init(repository: any AnkiLibraryPersisting = AnkiRepository()) {
         self.repository = repository
@@ -37,16 +39,19 @@ final class AnkiLibraryViewModel {
     }
 
     func load() async {
-        guard !isLoaded, !isLoading else { return }
+        guard !isLoading else { return }
         isLoading = true
         defer { isLoading = false }
-        do {
-            imports = try await repository.load()
-            try await migratePendingScheduling()
-            imports = try await repository.load()
+        if !isLoaded {
+            do { imports = try await repository.load() }
+            catch {
+                message = error.localizedDescription
+                canRestoreBackup = await repository.hasRecoverableBackup()
+                return
+            }
             isLoaded = true
         }
-        catch { message = error.localizedDescription; canRestoreBackup = await repository.hasRecoverableBackup() }
+        await runPendingSchedulingMigrations()
     }
 
     func restoreBackup() async {
@@ -84,18 +89,27 @@ final class AnkiLibraryViewModel {
         }
     }
 
-    private func migratePendingScheduling() async throws {
+    private func runPendingSchedulingMigrations() async {
+        guard bootstrapScheduling != nil else { return }
+        var failures: [String] = []
         for summary in imports where summary.schedulingMigrationVersion != AnkiSchedulingMigrator.version {
-            _ = try await migrateScheduling(summary)
+            do { _ = try await migrateScheduling(summary) }
+            catch { failures.append("\(summary.filename): \(error.localizedDescription)") }
         }
+        guard !failures.isEmpty else { return }
+        message = "Не удалось перенести расписание:\n" + failures.joined(separator: "\n")
+            + "\nКолоды доступны, перенос повторится при следующей загрузке."
     }
 
     private func migrateScheduling(_ summary: AnkiImportSummary) async throws -> Int {
         guard summary.schedulingMigrationVersion != AnkiSchedulingMigrator.version,
               let bootstrapScheduling else { return 0 }
         let collection = try await repository.collection(summary)
-        let count = try await bootstrapScheduling(collection, summary.id)
+        guard let count = try await bootstrapScheduling(collection, summary.id) else { return 0 }
         try await repository.markSchedulingMigration(importID: summary.id, version: AnkiSchedulingMigrator.version)
+        if let index = imports.firstIndex(where: { $0.id == summary.id }) {
+            imports[index].schedulingMigrationVersion = AnkiSchedulingMigrator.version
+        }
         return count
     }
 
