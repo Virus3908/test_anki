@@ -40,18 +40,23 @@ extension StudyViewStyling {
         }
     }
 
-    func previewStartButton(count: Int, isDisabled: Bool, action: @escaping () -> Void) -> some View {
+    func previewStartButton(plan: StudyQueuePlan, isDisabled: Bool, action: @escaping () -> Void) -> some View {
         primaryActionButton(title: "Начать тренировку", systemImage: "shuffle", action: action) {
             HStack {
                 Image(systemName: "shuffle")
                 Text("Начать тренировку")
                     .fontWeight(.semibold)
                 Spacer()
-                Text("\(count)")
+                Text("\(plan.newCount)/\(plan.learningCount)/\(plan.reviewCount)")
                     .fontWeight(.semibold)
+                    .monospacedDigit()
             }
         }
         .disabled(isDisabled)
+        .accessibilityLabel(
+            "Начать тренировку. Новые: \(plan.newCount). "
+                + "Повторяемые: \(plan.learningCount). К просмотру: \(plan.reviewCount)"
+        )
     }
 
     func primaryActionButton<Label: View>(

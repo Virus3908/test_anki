@@ -3,6 +3,7 @@ import SwiftUI
 extension DeckPreviewView {
     func kanaPreviewView(for deck: KanaDeck) -> some View {
         @Bindable var coordinator = coordinator
+        let plan = previewPlan(sourceIDs: deckState.previewKanaCards.map(\.id), deck: .kana(deck))
 
         return ZStack {
             AppPalette.background
@@ -11,7 +12,7 @@ extension DeckPreviewView {
             VStack(alignment: .leading, spacing: 14) {
                 previewHeader(title: deck.title, subtitle: kanaPreviewStatus(for: deck), onBack: closeKanaPreview)
 
-                previewStartButton(count: deckState.previewKanaCards.count, isDisabled: deckState.previewKanaCards.isEmpty) {
+                previewStartButton(plan: plan, isDisabled: deckState.previewKanaCards.isEmpty) {
                     onPractice(.kana(deck, deckState.previewKanaCards, guided: false))
                 }
 

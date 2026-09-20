@@ -3,6 +3,7 @@ import SwiftUI
 extension DeckPreviewView {
     func wordPreviewView(for deck: WordFrequencyDeck) -> some View {
         @Bindable var coordinator = coordinator
+        let plan = previewPlan(sourceIDs: deckState.previewWordCards.map(\.id), deck: .words(deck))
 
         return ZStack {
             AppPalette.background
@@ -19,7 +20,7 @@ extension DeckPreviewView {
                     .tint(AppPalette.accent)
                 }
 
-                previewStartButton(count: deckState.previewWordCards.count, isDisabled: deckState.previewWordCards.isEmpty) {
+                previewStartButton(plan: plan, isDisabled: deckState.previewWordCards.isEmpty) {
                     onPractice(.words(deckState.previewWordCards, guided: false))
                 }
 

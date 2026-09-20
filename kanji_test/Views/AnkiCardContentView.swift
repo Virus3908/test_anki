@@ -126,10 +126,39 @@ struct AnkiCardContentView: View {
                         Picker("Сторона", selection: $fieldSide) {
                             ForEach(FieldSide.allCases) { side in Text(side.title).tag(side) }
                         }.pickerStyle(.segmented)
-                        Picker("Заголовок карточки", selection: Binding(
-                            get: { fieldOptions.titleOrdinal },
-                            set: { ordinal in updateFieldOptions { $0.titleOrdinal = ordinal } })) {
-                            ForEach(Array(card.noteType.fields.enumerated()), id: \.offset) { ordinal, name in Text(name).tag(ordinal) }
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Основное поле")
+                                .font(.subheadline.weight(.semibold))
+
+                            Menu {
+                                Picker("Основное поле", selection: Binding(
+                                    get: { fieldOptions.titleOrdinal },
+                                    set: { ordinal in updateFieldOptions { $0.titleOrdinal = ordinal } })) {
+                                    ForEach(Array(card.noteType.fields.enumerated()), id: \.offset) { ordinal, name in
+                                        Text(name).tag(ordinal)
+                                    }
+                                }
+                            } label: {
+                                HStack(spacing: 10) {
+                                    Image(systemName: "star.fill")
+                                        .foregroundStyle(AppPalette.accent)
+                                    Text(card.noteType.fields[safe: fieldOptions.titleOrdinal] ?? "Выберите поле")
+                                        .foregroundStyle(AppPalette.text)
+                                        .lineLimit(2)
+                                        .multilineTextAlignment(.leading)
+                                    Spacer(minLength: 8)
+                                    Image(systemName: "chevron.up.chevron.down")
+                                        .font(.caption.weight(.semibold))
+                                        .foregroundStyle(AppPalette.secondaryText)
+                                }
+                                .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                            .settingsInputField()
+
+                            Text("Значение этого поля используется как заголовок карточки.")
+                                .font(.caption)
+                                .foregroundStyle(AppPalette.secondaryText)
                         }
                         Text("Перетаскивайте поля между списками и меняйте их порядок.")
                             .font(.caption).foregroundStyle(AppPalette.secondaryText)

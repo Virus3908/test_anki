@@ -2,7 +2,9 @@ import Foundation
 
 nonisolated struct DeckOptions: Codable, Equatable, Sendable {
     var dailyNewCardLimit = 10
-    /// nil means unlimited; 0 pauses new review cards without interrupting intraday learning.
+    /// Shared daily limit for review and new cards. The persisted property name
+    /// is retained for Codable compatibility. nil means unlimited; 0 pauses
+    /// both categories without interrupting intraday learning.
     var dailyReviewLimit: Int? = nil
     var desiredRetention = 0.9
     var maximumInterval = 36500

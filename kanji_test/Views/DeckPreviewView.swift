@@ -14,6 +14,15 @@ struct DeckPreviewView: View, CardContentRendering {
     /// Открыт ли экран поиска (лупа в шапке колоды). Внутренний уровень
     /// доступа: расширения в соседних файлах используют это состояние.
     @State var isSearchPresented = false
+    func previewPlan(sourceIDs: [String], deck: StudyDeck) -> StudyQueuePlan {
+        TrainingSessionEngine.plan(
+            sourceIDs: sourceIDs,
+            mode: deck.mode,
+            deckID: deck.id,
+            progress: reviewStore,
+            options: settings.options(for: deck.id)
+        )
+    }
     var body: some View {
         Group {
             if let deck = deckState.previewDeck { deckPreviewView(for: deck) }

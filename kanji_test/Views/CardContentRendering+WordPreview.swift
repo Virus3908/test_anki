@@ -70,7 +70,10 @@ extension CardContentRendering {
     }
 
     func wordFullCard(for card: WordStudyCard) -> some View {
-        wordFullCardContent(for: card, fields: BuiltInCardField.available(for: .words))
+        VStack(alignment: .leading, spacing: 16) {
+            wordFullCardContent(for: card, fields: BuiltInCardField.available(for: .words))
+            learningStatusLabel(forReviewKey: card.reviewKey)
+        }
             .padding(18)
             .appSurfaceCard()
     }

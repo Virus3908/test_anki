@@ -3,6 +3,7 @@ import SwiftUI
 extension DeckPreviewView {
     func deckPreviewView(for deck: KanjiDeck) -> some View {
         @Bindable var coordinator = coordinator
+        let plan = previewPlan(sourceIDs: deckState.previewCards.map(\.id), deck: .kanji(deck))
 
         return ZStack {
             AppPalette.background
@@ -27,7 +28,7 @@ extension DeckPreviewView {
                     .tint(AppPalette.accent)
                 }
 
-                previewStartButton(count: deckState.previewCards.count, isDisabled: deckState.previewCards.isEmpty) {
+                previewStartButton(plan: plan, isDisabled: deckState.previewCards.isEmpty) {
                     onPractice(.kanji(deckState.previewCards, guided: false))
                 }
 
