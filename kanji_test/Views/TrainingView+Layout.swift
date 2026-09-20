@@ -73,7 +73,7 @@ extension TrainingView {
         return GeometryReader { proxy in
             let panelHeight = drawingPanelHeight(for: proxy.size)
 
-            ZStack {
+            ZStack(alignment: .bottom) {
             AppPalette.background
                 .ignoresSafeArea()
 
@@ -82,7 +82,6 @@ extension TrainingView {
                 VStack(alignment: .leading, spacing: 16) {
                     headerControls()
                     wordStudyCard(for: wordCard)
-                    completedWordStrip(for: wordCard)
                 }
                 .padding(20)
                 .padding(.bottom, 12)
@@ -103,6 +102,13 @@ extension TrainingView {
                         .padding(16)
                         .background(AppPalette.surface)
                     }
+                }
+
+                if currentKanji != nil {
+                    completedWordStrip(for: wordCard)
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, panelHeight + 10)
+                        .zIndex(2)
                 }
         }
         }

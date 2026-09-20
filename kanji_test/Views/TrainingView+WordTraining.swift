@@ -32,6 +32,27 @@ extension TrainingView {
     }
 
     func completedWordStrip(for wordCard: WordStudyCard) -> some View {
+        ViewThatFits(in: .horizontal) {
+            completedWordItems(for: wordCard)
+
+            ScrollView(.horizontal) {
+                completedWordItems(for: wordCard)
+            }
+            .scrollIndicators(.hidden)
+        }
+        .padding(8)
+        .background(
+            AppPalette.surface,
+            in: RoundedRectangle(cornerRadius: 10, style: .continuous)
+        )
+        .overlay {
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .stroke(AppPalette.border.opacity(0.55), lineWidth: 1)
+        }
+        .shadow(color: AppPalette.text.opacity(0.12), radius: 8, y: 3)
+    }
+
+    func completedWordItems(for wordCard: WordStudyCard) -> some View {
         HStack(spacing: 8) {
             ForEach(wordCard.kanjiCards.enumerated(), id: \.offset) { index, kanjiCard in
                 let isSelected = index == drawingSession.currentWordKanjiIndex
