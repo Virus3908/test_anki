@@ -17,9 +17,7 @@ extension TrainingView {
 
     @ViewBuilder
     func frontFields(for card: KanjiCard) -> some View {
-        ForEach(cardFields(for: .kanji, side: .front)) { field in
-            kanjiCardField(field, for: card)
-        }
+        kanjiCardFields(cardFields(for: .kanji, side: .front), for: card)
     }
 }
 

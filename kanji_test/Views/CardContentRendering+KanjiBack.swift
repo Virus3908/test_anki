@@ -7,7 +7,29 @@ extension CardContentRendering {
         onShowAllFields: (() -> Void)? = nil
     ) -> some View {
         studyCardBackShell(reviewKey: card.reviewKey, onShowAllFields: onShowAllFields) {
-            ForEach(fields ?? cardFields(for: .kanji, side: .back)) { field in
+            kanjiCardFields(fields ?? cardFields(for: .kanji, side: .back), for: card)
+        }
+    }
+
+    @ViewBuilder
+    func kanjiCardFields(_ fields: [BuiltInCardField], for card: KanjiCard) -> some View {
+        let showsCharacter = fields.contains(.character)
+        let showsStrokeOrder = fields.contains(.strokeOrder) && !card.strokes.isEmpty
+        let combinedField = fields.first { $0 == .character || $0 == .strokeOrder }
+
+        ForEach(fields) { field in
+            if showsCharacter && showsStrokeOrder && field == combinedField {
+                HStack(alignment: .top, spacing: 16) {
+                    kanjiCardField(.character, for: card)
+                        .frame(width: 82, alignment: .topLeading)
+
+                    kanjiCardField(.strokeOrder, for: card)
+                        .frame(maxWidth: .infinity, alignment: .topLeading)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            } else if field != .character && field != .strokeOrder {
+                kanjiCardField(field, for: card)
+            } else if !showsCharacter || !showsStrokeOrder {
                 kanjiCardField(field, for: card)
             }
         }
