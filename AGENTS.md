@@ -172,6 +172,20 @@ existing app-owned record for the same card.
 Stable app review keys are namespaced with `anki:` so they do not
 collide with built-in content.
 
+## Speech / TTS
+
+-   `Services/Speech/SpeechService.swift` --- self-contained
+    `@MainActor @Observable` wrapper around `AVSpeechSynthesizer`.
+    Feed Japanese text via `speak(_:)` / `stop()`; it picks the
+    highest-quality available `ja` voice (optional
+    `voiceIdentifier`/`rate` overrides) and mixes with other audio.
+-   Wired into training: built-in kanji/word/kana and Anki card fronts
+    auto-speak when `StudyPreferences.speechEnabled` is on (toggle in
+    Settings, section «Озвучивание», which also holds voice/rate
+    settings), with a manual speaker button on each card front.
+-   Keep this module free of UI and persistence dependencies; settings
+    live in `StudyPreferences`, views sync values onto the service.
+
 ## Anki storage and safety
 
 `AnkiRepository` stores its index in `anki-library.json` through

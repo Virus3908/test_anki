@@ -4,6 +4,11 @@ extension TrainingView {
     func wordStudyCard(for wordCard: WordStudyCard) -> some View {
         trainingCardShell {
             wordCardFront(for: wordCard)
+                .overlay(alignment: .topTrailing) {
+                    speakButton(for: wordCard.word)
+                        .padding(.top, 32)
+                        .padding(.trailing, 6)
+                }
         } back: {
             studyCardBackShell(
                 reviewKey: wordCard.reviewKey,
@@ -14,6 +19,10 @@ extension TrainingView {
         }
         .task(id: "\(wordCard.id)-\(meaningLanguage.rawValue)") {
             await translateWordMeaningIfNeeded(for: wordCard)
+        }
+        .task(id: "speech-\(wordCard.id)") {
+            guard settings.speechEnabled else { return }
+            speech.speak(wordCard.word)
         }
     }
 

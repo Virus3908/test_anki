@@ -1,3 +1,4 @@
+import AVFoundation
 import Foundation
 import Observation
 
@@ -5,6 +6,9 @@ import Observation
 @Observable
 final class StudyPreferences {
     private static let hiddenKanjiDeckIDsKey = "hiddenKanjiDeckIDs"
+    private static let speechEnabledKey = "speechEnabled"
+    private static let speechVoiceIdentifierKey = "speechVoiceIdentifier"
+    private static let speechRateKey = "speechRate"
     private struct StoredOptions: Codable {
         var version = 1
         var defaults: DeckOptions
@@ -15,12 +19,24 @@ final class StudyPreferences {
     private var stored: StoredOptions
     private var canSave = true
     private(set) var hiddenKanjiDeckIDs: Set<String>
+    var speechEnabled: Bool {
+        didSet { defaults.set(speechEnabled, forKey: Self.speechEnabledKey) }
+    }
+    var speechVoiceIdentifier: String {
+        didSet { defaults.set(speechVoiceIdentifier, forKey: Self.speechVoiceIdentifierKey) }
+    }
+    var speechRate: Float {
+        didSet { defaults.set(speechRate, forKey: Self.speechRateKey) }
+    }
 
     init(defaults: UserDefaults = .standard, errors: StorageStatus) {
         self.defaults = defaults
         self.errors = errors
         stored = StoredOptions(defaults: DeckOptions(), decks: [:])
         hiddenKanjiDeckIDs = Set(defaults.stringArray(forKey: Self.hiddenKanjiDeckIDsKey) ?? [])
+        speechEnabled = defaults.object(forKey: Self.speechEnabledKey) as? Bool ?? true
+        speechVoiceIdentifier = defaults.string(forKey: Self.speechVoiceIdentifierKey) ?? ""
+        speechRate = defaults.object(forKey: Self.speechRateKey) as? Float ?? AVSpeechUtteranceDefaultSpeechRate
         if let data = defaults.data(forKey: "studyDeckOptions") {
             do {
                 let decoded = try JSONDecoder().decode(StoredOptions.self, from: data)

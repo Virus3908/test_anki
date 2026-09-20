@@ -4,10 +4,19 @@ extension TrainingView {
     func kanaStudyCard(for kanaCard: KanaStudyCard) -> some View {
         trainingCardShell {
             kanaCardFront(for: kanaCard)
+                .overlay(alignment: .topTrailing) {
+                    speakButton(for: kanaCard.character)
+                        .padding(.top, 32)
+                        .padding(.trailing, 6)
+                }
         } back: {
             kanaCardBackContent(for: kanaCard) {
                 presentCardFieldSettings(side: .back)
             }
+        }
+        .task(id: "speech-\(kanaCard.id)") {
+            guard settings.speechEnabled else { return }
+            speech.speak(kanaCard.character)
         }
     }
 
