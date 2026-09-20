@@ -25,6 +25,10 @@ final class StudyCoordinator {
     var loadingRelatedWords: Set<String> = []
     var loadedRelatedWords: Set<String> = []
     var relatedWordLoadErrors: Set<String> = []
+    var loadingAllRelatedWords: Set<String> = []
+    var loadedAllRelatedWords: Set<String> = []
+    var allRelatedWordLoadErrors: Set<String> = []
+    var allRelatedWordIDsByKanji: [String: [String]] = [:]
 
     init(
         catalog: StudyCardCatalog,
@@ -87,6 +91,30 @@ final class StudyCoordinator {
         set {
             if let newValue { catalog.register([newValue]) }
             selectedLinkedWordCardID = newValue?.id
+        }
+    }
+    private var selectedLinkedWordKanjiCardID: String?
+    var selectedLinkedWordKanjiCard: KanjiCard? {
+        get { selectedLinkedWordKanjiCardID.flatMap { catalog.kanji($0) } }
+        set {
+            if let newValue { catalog.register([newValue]) }
+            selectedLinkedWordKanjiCardID = newValue?.id
+        }
+    }
+    private var selectedRelatedWordsKanjiCardID: String?
+    var selectedRelatedWordsKanjiCard: KanjiCard? {
+        get { selectedRelatedWordsKanjiCardID.flatMap { catalog.kanji($0) } }
+        set {
+            if let newValue { catalog.register([newValue]) }
+            selectedRelatedWordsKanjiCardID = newValue?.id
+        }
+    }
+    private var selectedRelatedWordsListWordCardID: String?
+    var selectedRelatedWordsListWordCard: WordStudyCard? {
+        get { selectedRelatedWordsListWordCardID.flatMap { catalog.word($0) } }
+        set {
+            if let newValue { catalog.register([newValue]) }
+            selectedRelatedWordsListWordCardID = newValue?.id
         }
     }
     var presentedKanjiPreview: PresentedKanjiPreview?

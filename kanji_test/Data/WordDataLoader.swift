@@ -11,11 +11,12 @@ enum WordDataLoader {
 
     static func loadWords(
         containing kanji: String,
-        limit: Int = 3,
+        limit: Int? = 3,
         provider: any KanjiProviding = KanjiAPIProvider()
     ) async throws -> [WordStudyCard] {
         let entries = try await loadDictionaryEntries()
-        let matchingEntries = Array(entries.lazy.filter { $0.word.contains(kanji) }.prefix(limit))
+        let matches = entries.lazy.filter { $0.word.contains(kanji) }
+        let matchingEntries = limit.map { Array(matches.prefix($0)) } ?? Array(matches)
         let kanjiCards = await loadKanjiCards(for: matchingEntries, provider: provider)
         let cardsByCharacter = Dictionary(kanjiCards.map { ($0.kanji, $0) }, uniquingKeysWith: { current, _ in current })
 

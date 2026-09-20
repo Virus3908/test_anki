@@ -5,7 +5,10 @@ extension TrainingView {
         trainingCardShell {
             wordCardFront(for: wordCard)
         } back: {
-            studyCardBackShell(reviewKey: wordCard.reviewKey) {
+            studyCardBackShell(
+                reviewKey: wordCard.reviewKey,
+                onShowAllFields: { presentCardFieldSettings(side: .back) }
+            ) {
                 wordFullCardContent(for: wordCard)
             }
         }

@@ -1,9 +1,13 @@
 import SwiftUI
 
 extension CardContentRendering {
-    func cardBackContent(for card: KanjiCard) -> some View {
-        studyCardBackShell(reviewKey: card.reviewKey) {
-            ForEach(cardFields(for: .kanji, side: .back)) { field in
+    func cardBackContent(
+        for card: KanjiCard,
+        fields: [BuiltInCardField]? = nil,
+        onShowAllFields: (() -> Void)? = nil
+    ) -> some View {
+        studyCardBackShell(reviewKey: card.reviewKey, onShowAllFields: onShowAllFields) {
+            ForEach(fields ?? cardFields(for: .kanji, side: .back)) { field in
                 kanjiCardField(field, for: card)
             }
         }

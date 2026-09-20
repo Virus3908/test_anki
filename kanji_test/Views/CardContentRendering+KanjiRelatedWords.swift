@@ -6,7 +6,20 @@ extension CardContentRendering {
         let isLoading = coordinator.loadingRelatedWords.contains(card.id)
         let hasError = coordinator.relatedWordLoadErrors.contains(card.id)
 
-        return detailBlock("Слова с этим кандзи") {
+        return VStack(alignment: .leading, spacing: 2) {
+            HStack {
+                Text("Слова с этим кандзи")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(AppPalette.secondaryText)
+
+                Spacer()
+
+                Button("Все", systemImage: "list.bullet") {
+                    coordinator.openRelatedWordsList(for: card)
+                }
+                .font(.caption.weight(.semibold))
+            }
+
             VStack(alignment: .leading, spacing: 6) {
                 ForEach(words) { word in
                     relatedWordLink(word)
@@ -33,18 +46,26 @@ extension CardContentRendering {
                 } else if coordinator.loadedRelatedWords.contains(card.id) && words.isEmpty {
                     Text("Подходящих слов в словаре нет")
                         .font(.caption)
-                        .foregroundStyle(AppPalette.secondaryText)
+                    .foregroundStyle(AppPalette.secondaryText)
                 }
             }
+            .fixedSize(horizontal: false, vertical: true)
         }
         .task(id: "related-words-\(card.id)") {
             await coordinator.loadRelatedWords(for: card)
         }
     }
 
-    func relatedWordLink(_ card: WordStudyCard) -> some View {
+    func relatedWordLink(
+        _ card: WordStudyCard,
+        action: (() -> Void)? = nil
+    ) -> some View {
         Button {
-            coordinator.openLinkedWordPreview(card)
+            if let action {
+                action()
+            } else {
+                coordinator.openLinkedWordPreview(card)
+            }
         } label: {
             HStack(spacing: 8) {
                 Text(card.word)
@@ -73,5 +94,63 @@ extension CardContentRendering {
             }
         }
         .buttonStyle(.plain)
+    }
+
+    func allRelatedWordsList(for card: KanjiCard) -> some View {
+        @Bindable var coordinator = coordinator
+        let words = coordinator.allRelatedWords(for: card)
+        let isLoading = coordinator.loadingAllRelatedWords.contains(card.id)
+        let hasError = coordinator.allRelatedWordLoadErrors.contains(card.id)
+
+        return NavigationStack {
+            ZStack {
+                AppPalette.background
+                    .ignoresSafeArea()
+
+                if isLoading && words.isEmpty {
+                    ProgressView("Загружаю все слова")
+                } else if hasError && words.isEmpty {
+                    VStack(spacing: 12) {
+                        Text("Не удалось загрузить список слов")
+                            .foregroundStyle(AppPalette.secondaryText)
+                        Button("Повторить") {
+                            Task { await coordinator.loadAllRelatedWords(for: card, force: true) }
+                        }
+                        .buttonStyle(.borderedProminent)
+                    }
+                    .padding(24)
+                } else {
+                    ScrollView(.vertical) {
+                        LazyVStack(alignment: .leading, spacing: 8) {
+                            Text("Найдено: \(words.count)")
+                                .font(.caption)
+                                .foregroundStyle(AppPalette.secondaryText)
+
+                            ForEach(words) { word in
+                                relatedWordLink(word) {
+                                    coordinator.openRelatedWordsListWord(word)
+                                }
+                            }
+                        }
+                        .padding(20)
+                    }
+                }
+            }
+            .background(AppPalette.background)
+            .foregroundStyle(AppPalette.text)
+            .navigationTitle("\(card.kanji): все слова")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                Button("Готово") { coordinator.closeRelatedWordsList() }
+            }
+        }
+        .task(id: "all-related-words-\(card.id)") {
+            await coordinator.loadAllRelatedWords(for: card)
+        }
+        .sheet(item: $coordinator.selectedRelatedWordsListWordCard, onDismiss: {
+            coordinator.closeRelatedWordsListWord()
+        }) { word in
+            linkedWordPreviewDetail(for: word)
+        }
     }
 }

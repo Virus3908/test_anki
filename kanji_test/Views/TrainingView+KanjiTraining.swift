@@ -31,7 +31,9 @@ private struct KanjiTrainingCardView: View {
         training.trainingCardShell {
             training.cardFront(for: card)
         } back: {
-            training.cardBackContent(for: card)
+            training.cardBackContent(for: card) {
+                training.presentCardFieldSettings(side: .back)
+            }
         }
         .task(id: "back-\(card.id)-\(training.meaningLanguage.rawValue)") {
             await training.translateKanjiMeaningsIfNeeded(for: card, deck: training.selectedDeck)

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct TrainingView: View, CardContentRendering {
     @State var isCardFieldSettingsPresented = false
+    @State var cardFieldSettingsSide = BuiltInCardSide.front
     var deckID: String? { trainingSession.deck?.id }
     let trainingSession: TrainingSessionViewModel
     let settings: StudyPreferences

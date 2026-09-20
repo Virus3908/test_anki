@@ -4,9 +4,22 @@ extension CardContentRendering {
     func studyCardBackShell<Content: View>(
         reviewKey: String,
         isTextSelectable: Bool = true,
+        onShowAllFields: (() -> Void)? = nil,
         @ViewBuilder content: () -> Content
     ) -> some View {
         VStack(alignment: .leading, spacing: 16) {
+            if let onShowAllFields {
+                HStack {
+                    Text("Ответ")
+                        .font(.caption.weight(.bold))
+                        .textCase(.uppercase)
+                    Spacer()
+                    Button("Все поля", systemImage: "list.bullet.rectangle", action: onShowAllFields)
+                        .font(.caption)
+                }
+                .foregroundStyle(AppPalette.secondaryText)
+            }
+
             content()
             learningStatusLabel(forReviewKey: reviewKey)
         }

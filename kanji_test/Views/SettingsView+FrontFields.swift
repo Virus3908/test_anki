@@ -12,6 +12,18 @@ struct BuiltInCardFieldSettingsView: View {
     @State private var side = BuiltInCardSide.front
     @State private var clearDropTargetTask: Task<Void, Never>?
 
+    init(
+        settings: StudyPreferences,
+        deckID: String?,
+        mode: PracticeMode,
+        initialSide: BuiltInCardSide = .front
+    ) {
+        self.settings = settings
+        self.deckID = deckID
+        self.mode = mode
+        _side = State(initialValue: initialSide)
+    }
+
     private enum Placement: Equatable {
         case before
         case after

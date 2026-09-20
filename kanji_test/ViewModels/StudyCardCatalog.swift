@@ -54,17 +54,19 @@ final class StudyCardCatalog {
     @discardableResult
     func register(_ cards: [WordStudyCard]) -> [String] {
         for card in cards {
-            if let previous = wordsByID[card.id] {
-                for characterID in Set(previous.characterIDs) {
-                    wordIDsByCharacter[characterID]?.removeAll { $0 == card.id }
-                }
-            }
-
-            let characterIDs = card.kanjiCards.map(\.kanji)
+            let previousCharacterIDs = Set(wordsByID[card.id]?.characterIDs ?? [])
+            let characterIDs = register(card.kanjiCards)
+            let currentCharacterIDs = Set(characterIDs)
             wordsByID[card.id] = WordRecord(word: card.word, reading: card.reading, meaning: card.meaning,
-                examples: card.examples, characterIDs: register(card.kanjiCards))
-            for characterID in Set(characterIDs) {
-                wordIDsByCharacter[characterID, default: []].append(card.id)
+                examples: card.examples, characterIDs: characterIDs)
+
+            for characterID in previousCharacterIDs.subtracting(currentCharacterIDs) {
+                wordIDsByCharacter[characterID]?.removeAll { $0 == card.id }
+            }
+            for characterID in currentCharacterIDs.subtracting(previousCharacterIDs) {
+                if !(wordIDsByCharacter[characterID]?.contains(card.id) ?? false) {
+                    wordIDsByCharacter[characterID, default: []].append(card.id)
+                }
             }
         }
         return cards.map(\.id)
