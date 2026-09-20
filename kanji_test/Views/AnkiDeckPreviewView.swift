@@ -54,7 +54,10 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
                                         .font(.headline).lineLimit(3)
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                     Text(card.templateName).font(.caption).foregroundStyle(AppPalette.secondaryText).lineLimit(1)
-                                    Text(StudyProgressStatus(record: reviewStore.record(for: card.reviewKey), now: reviewStore.studyDate()).title)
+                                    Text(StudyProgressStatus(
+                                        record: reviewStore.record(for: card.reviewKey),
+                                        isExcluded: reviewStore.isExcluded(card.reviewKey)
+                                    ).title)
                                         .font(.caption2).foregroundStyle(AppPalette.secondaryText)
                                 }.padding(12).frame(maxWidth: .infinity, minHeight: 120, alignment: .topLeading).appSurfaceCard()
                             }.buttonStyle(.plain)
