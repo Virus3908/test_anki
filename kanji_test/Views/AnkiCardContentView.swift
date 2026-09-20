@@ -175,14 +175,25 @@ struct AnkiCardContentView: View {
     @ViewBuilder
     private func emptyFieldListHeader(title: String, intoVisibleList isVisible: Bool) -> some View {
         let target = FieldDropTarget(ordinal: nil, placement: .emptyList, intoVisibleList: isVisible)
-        Text(title)
-            .font(.subheadline.weight(.semibold))
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.vertical, 8)
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title).font(.subheadline.weight(.semibold))
+            Label("Перетащите поле сюда", systemImage: "arrow.down.circle")
+                .font(.caption.weight(.medium))
+                .foregroundStyle(AppPalette.accent)
+                .opacity(fieldDropTarget == target ? 1 : 0)
+        }
+            .frame(maxWidth: .infinity, minHeight: 64, alignment: .topLeading)
+            .padding(10)
             .background {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
                     .fill(fieldDropTarget == target ? AppPalette.accent.opacity(0.14) : .clear)
             }
+            .overlay {
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .stroke(fieldDropTarget == target ? AppPalette.accent : .clear,
+                            style: StrokeStyle(lineWidth: 2, dash: [6, 4]))
+            }
+            .contentShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
             .dropDestination(for: String.self,
                              action: { items, _ in
                                  applyFieldDrop(items.first, relativeTo: nil, placement: .emptyList,

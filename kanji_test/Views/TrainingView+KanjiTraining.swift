@@ -17,53 +17,10 @@ extension TrainingView {
 
     @ViewBuilder
     func frontFields(for card: KanjiCard) -> some View {
-        ForEach(frontFieldOrder) { field in
-            switch field {
-            case .readings:
-                frontReadings(for: card)
-            case .meanings:
-                frontMeanings(for: card)
-            case .character:
-                frontCharacter(for: card)
-            }
+        ForEach(cardFields(for: .kanji, side: .front)) { field in
+            kanjiCardField(field, for: card)
         }
     }
-
-    @ViewBuilder
-    func frontCharacter(for card: KanjiCard) -> some View {
-        if showsPromptCharacters {
-            detailBlock("Кандзи") {
-                Text(card.kanji)
-                    .font(.system(size: 58, weight: .regular, design: .serif))
-            }
-        }
-    }
-
-    @ViewBuilder
-    func frontReadings(for card: KanjiCard) -> some View {
-        if showsPromptReading {
-            detailBlock("Онъёми") {
-                Text(readingsText(card.onyomi))
-            }
-
-            detailBlock("Кунъёми") {
-                Text(kunyomiText(for: card.kunyomi))
-            }
-        }
-    }
-
-    @ViewBuilder
-    func frontMeanings(for card: KanjiCard) -> some View {
-        if showsPromptMeaning {
-            translatableTextBlock("Значения", text: displayedKanjiMeanings(for: card).joined(separator: ", ")) {
-                retranslateKanjiMeaningsButton(for: card)
-            }
-            .task(id: "front-meaning-\(card.id)-\(meaningLanguage.rawValue)") {
-                await translateKanjiMeaningsIfNeeded(for: card, deck: selectedDeck)
-            }
-        }
-    }
-
 }
 
 private struct KanjiTrainingCardView: View {

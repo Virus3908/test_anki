@@ -26,43 +26,8 @@ extension TrainingView {
 
     @ViewBuilder
     func wordFrontFields(for wordCard: WordStudyCard) -> some View {
-        ForEach(frontFieldOrder) { field in
-            switch field {
-            case .readings:
-                wordReadingField(for: wordCard)
-            case .meanings:
-                wordMeaningField(for: wordCard)
-            case .character:
-                wordCharacterField(for: wordCard)
-            }
-        }
-    }
-
-    @ViewBuilder
-    func wordCharacterField(for wordCard: WordStudyCard) -> some View {
-        if drawingSession.isAnswerVisible || showsPromptCharacters {
-            detailBlock("Слово") {
-                Text(wordCard.word)
-                    .font(.system(size: 42, weight: .regular, design: .serif))
-            }
-        }
-    }
-
-    @ViewBuilder
-    func wordReadingField(for wordCard: WordStudyCard) -> some View {
-        if drawingSession.isAnswerVisible || showsPromptReading {
-            detailBlock("Чтение") {
-                Text(wordCard.reading)
-            }
-        }
-    }
-
-    @ViewBuilder
-    func wordMeaningField(for wordCard: WordStudyCard) -> some View {
-        if drawingSession.isAnswerVisible || showsPromptMeaning {
-            translatableTextBlock("Значения", text: displayedWordMeaning(for: wordCard)) {
-                retranslateWordButton(for: wordCard)
-            }
+        ForEach(cardFields(for: .words, side: .front)) { field in
+            wordCardField(field, for: wordCard)
         }
     }
 
@@ -75,7 +40,7 @@ extension TrainingView {
                         UserStrokePreview(strokes: drawingSession.drawnStrokes)
                     } else if index < drawingSession.completedWordDrawings.count {
                         UserStrokePreview(strokes: drawingSession.completedWordDrawings[index])
-                    } else if drawingSession.isAnswerVisible || showsPromptCharacters {
+                    } else if drawingSession.isAnswerVisible || cardFields(for: .words, side: .front).contains(.word) {
                         Text(kanjiCard.kanji)
                             .font(.title3.weight(.semibold))
                             .foregroundStyle(drawingSession.isAnswerVisible ? AppPalette.text : AppPalette.secondaryText)
