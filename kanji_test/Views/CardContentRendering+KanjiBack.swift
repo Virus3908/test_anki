@@ -3,39 +3,43 @@ import SwiftUI
 extension CardContentRendering {
     func cardBackContent(for card: KanjiCard) -> some View {
         studyCardBackShell(reviewKey: card.reviewKey) {
-            HStack(alignment: .top, spacing: 10) {
-                largeCharacterPanel(card.kanji)
+            ForEach(cardFields(for: .kanji, side: .back)) { field in
+                kanjiCardField(field, for: card)
+            }
+        }
+    }
 
+    @ViewBuilder
+    func kanjiCardField(_ field: BuiltInCardField, for card: KanjiCard) -> some View {
+        switch field {
+        case .character:
+            detailBlock("Кандзи") {
+                Text(card.kanji)
+                    .font(.system(size: 58, weight: .regular, design: .serif))
+                    .foregroundStyle(AppPalette.text)
+            }
+        case .onyomi:
+            detailBlock("Онъёми") {
+                Text(readingsText(card.onyomi)).foregroundStyle(AppPalette.text)
+            }
+        case .kunyomi:
+            detailBlock("Кунъёми") {
+                Text(kunyomiText(for: card.kunyomi)).foregroundStyle(AppPalette.text)
+            }
+        case .meanings:
+            translatableTextBlock("Значения", text: displayedKanjiMeanings(for: card).joined(separator: ", ")) {
+                retranslateKanjiMeaningsButton(for: card)
+            }
+            .task(id: "kanji-meaning-\(card.id)-\(meaningLanguage.rawValue)") {
+                await translateKanjiMeaningsIfNeeded(for: card, deck: selectedDeck)
+            }
+        case .strokeOrder:
+            if !card.strokes.isEmpty {
                 detailBlock("Порядок черт") {
                     StrokeStepStrip(strokes: card.strokes, spacing: 0)
                 }
             }
-
-            HStack(alignment: .top, spacing: 18) {
-                VStack(alignment: .leading, spacing: 8) {
-                    detailBlock("Кандзи") {
-                        Text(card.kanji)
-                            .font(.title2.weight(.bold))
-                            .foregroundStyle(AppPalette.text)
-                    }
-
-                    detailBlock("Онъёми") {
-                        Text(readingsText(card.onyomi))
-                            .foregroundStyle(AppPalette.text)
-                    }
-
-                    detailBlock("Кунъёми") {
-                        Text(kunyomiText(for: card.kunyomi))
-                            .foregroundStyle(AppPalette.text)
-                    }
-
-                    translatableTextBlock("Значения", text: displayedKanjiMeanings(for: card).joined(separator: ", ")) {
-                        retranslateKanjiMeaningsButton(for: card)
-                    }
-                }
-                .fixedSize(horizontal: false, vertical: true)
-            }
-
+        case .examples:
             detailBlock("Примеры") {
                 let key = TranslationBlockKey.kanjiExamples(card.kanji)
                 StudyExamplesContent(
@@ -55,7 +59,8 @@ extension CardContentRendering {
                     await loadKanjiExamplesIfNeeded(for: card)
                 }
             }
+        default:
+            EmptyView()
         }
     }
-
 }

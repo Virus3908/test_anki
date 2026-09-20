@@ -71,30 +71,9 @@ extension CardContentRendering {
 
     func wordFullCardContent(for card: WordStudyCard) -> some View {
         VStack(alignment: .leading, spacing: 16) {
-            VStack(spacing: 6) {
-                Text(card.word)
-                    .font(.system(size: 64, weight: .regular, design: .serif))
-                    .foregroundStyle(AppPalette.text)
-                    .minimumScaleFactor(0.42)
-                    .lineLimit(1)
-                    .frame(maxWidth: .infinity)
-
-                Text(card.reading)
-                    .font(.title3.weight(.semibold))
-                    .foregroundStyle(AppPalette.secondaryText)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.75)
-                    .frame(maxWidth: .infinity)
+            ForEach(cardFields(for: .words, side: .back)) { field in
+                wordCardField(field, for: card)
             }
-            .frame(maxWidth: .infinity)
-
-            translatableTextBlock("Перевод", text: displayedWordMeaning(for: card)) {
-                retranslateWordButton(for: card)
-            }
-
-            wordComponentsBlock(for: card)
-
-            wordExamplesBlock(for: card)
         }
         .textSelection(.enabled)
         .task(id: "\(card.id)-\(meaningLanguage.rawValue)") {
@@ -102,4 +81,37 @@ extension CardContentRendering {
         }
     }
 
+    @ViewBuilder
+    func wordCardField(_ field: BuiltInCardField, for card: WordStudyCard) -> some View {
+        switch field {
+        case .word:
+            detailBlock("Слово") {
+                Text(card.word)
+                    .font(.system(size: 48, weight: .regular, design: .serif))
+                    .foregroundStyle(AppPalette.text)
+                    .minimumScaleFactor(0.42)
+                    .lineLimit(1)
+                    .frame(maxWidth: .infinity)
+            }
+        case .reading:
+            detailBlock("Чтение") {
+                Text(card.reading)
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(AppPalette.secondaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+                    .frame(maxWidth: .infinity)
+            }
+        case .meanings:
+            translatableTextBlock("Перевод", text: displayedWordMeaning(for: card)) {
+                retranslateWordButton(for: card)
+            }
+        case .components:
+            wordComponentsBlock(for: card)
+        case .examples:
+            wordExamplesBlock(for: card)
+        default:
+            EmptyView()
+        }
+    }
 }

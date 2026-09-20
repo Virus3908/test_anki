@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct TrainingView: View, CardContentRendering {
+    @State var isCardFieldSettingsPresented = false
     var deckID: String? { trainingSession.deck?.id }
     let trainingSession: TrainingSessionViewModel
     let settings: StudyPreferences

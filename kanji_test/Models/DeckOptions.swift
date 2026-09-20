@@ -13,6 +13,10 @@ nonisolated struct DeckOptions: Codable, Equatable, Sendable {
     var showsPromptReading = true
     var showsPromptMeaning = false
     var frontFieldOrder: [FrontFieldKind] = [.readings, .meanings, .character]
+    var builtInFrontFieldOrder: [BuiltInCardField]? = nil
+    var builtInBackFieldOrder: [BuiltInCardField]? = nil
+    var builtInFrontVisibleFields: Set<BuiltInCardField>? = nil
+    var builtInBackVisibleFields: Set<BuiltInCardField>? = nil
 
     var validated: Self {
         var copy = self

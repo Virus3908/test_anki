@@ -8,7 +8,6 @@ extension SettingsView {
                     deckSelectionView()
                     translationSettingsView()
                     learningSettingsView()
-                    if !isAnkiDeck { frontSettingsView() }
                     ankiDisplaySettingsView()
                     storageSettingsView()
                     aboutSettingsView()
@@ -101,8 +100,6 @@ extension SettingsView {
             }
         }
     }
-
-    private var isAnkiDeck: Bool { selectedDeckID.hasPrefix("anki:") }
 
     private func ankiDisplaySettingsView() -> some View {
         settingsSection("Вид карточек Anki") {

@@ -26,47 +26,33 @@ extension TrainingView {
 
     @ViewBuilder
     func wordFrontFields(for wordCard: WordStudyCard) -> some View {
-        ForEach(frontFieldOrder) { field in
-            switch field {
-            case .readings:
-                wordReadingField(for: wordCard)
-            case .meanings:
-                wordMeaningField(for: wordCard)
-            case .character:
-                wordCharacterField(for: wordCard)
-            }
-        }
-    }
-
-    @ViewBuilder
-    func wordCharacterField(for wordCard: WordStudyCard) -> some View {
-        if drawingSession.isAnswerVisible || showsPromptCharacters {
-            detailBlock("Слово") {
-                Text(wordCard.word)
-                    .font(.system(size: 42, weight: .regular, design: .serif))
-            }
-        }
-    }
-
-    @ViewBuilder
-    func wordReadingField(for wordCard: WordStudyCard) -> some View {
-        if drawingSession.isAnswerVisible || showsPromptReading {
-            detailBlock("Чтение") {
-                Text(wordCard.reading)
-            }
-        }
-    }
-
-    @ViewBuilder
-    func wordMeaningField(for wordCard: WordStudyCard) -> some View {
-        if drawingSession.isAnswerVisible || showsPromptMeaning {
-            translatableTextBlock("Значения", text: displayedWordMeaning(for: wordCard)) {
-                retranslateWordButton(for: wordCard)
-            }
+        ForEach(cardFields(for: .words, side: .front)) { field in
+            wordCardField(field, for: wordCard)
         }
     }
 
     func completedWordStrip(for wordCard: WordStudyCard) -> some View {
+        ViewThatFits(in: .horizontal) {
+            completedWordItems(for: wordCard)
+
+            ScrollView(.horizontal) {
+                completedWordItems(for: wordCard)
+            }
+            .scrollIndicators(.hidden)
+        }
+        .padding(8)
+        .background(
+            AppPalette.surface,
+            in: RoundedRectangle(cornerRadius: 10, style: .continuous)
+        )
+        .overlay {
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .stroke(AppPalette.border.opacity(0.55), lineWidth: 1)
+        }
+        .shadow(color: AppPalette.text.opacity(0.12), radius: 8, y: 3)
+    }
+
+    func completedWordItems(for wordCard: WordStudyCard) -> some View {
         HStack(spacing: 8) {
             ForEach(wordCard.kanjiCards.enumerated(), id: \.offset) { index, kanjiCard in
                 let isSelected = index == drawingSession.currentWordKanjiIndex
@@ -75,7 +61,7 @@ extension TrainingView {
                         UserStrokePreview(strokes: drawingSession.drawnStrokes)
                     } else if index < drawingSession.completedWordDrawings.count {
                         UserStrokePreview(strokes: drawingSession.completedWordDrawings[index])
-                    } else if drawingSession.isAnswerVisible || showsPromptCharacters {
+                    } else if drawingSession.isAnswerVisible || cardFields(for: .words, side: .front).contains(.word) {
                         Text(kanjiCard.kanji)
                             .font(.title3.weight(.semibold))
                             .foregroundStyle(drawingSession.isAnswerVisible ? AppPalette.text : AppPalette.secondaryText)

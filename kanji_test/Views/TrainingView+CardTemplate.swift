@@ -6,9 +6,12 @@ extension TrainingView {
         @ViewBuilder back: () -> Back
     ) -> some View {
         ZStack {
-            front()
-                .opacity(drawingSession.isAnswerVisible ? 0 : 1)
-                .rotation3DEffect(.degrees(drawingSession.isAnswerVisible ? 180 : 0), axis: (x: 0, y: 1, z: 0))
+            ScrollView {
+                front()
+            }
+            .scrollIndicators(.hidden)
+            .opacity(drawingSession.isAnswerVisible ? 0 : 1)
+            .rotation3DEffect(.degrees(drawingSession.isAnswerVisible ? 180 : 0), axis: (x: 0, y: 1, z: 0))
 
             ScrollView {
                 back()
@@ -37,14 +40,21 @@ extension TrainingView {
         @ViewBuilder fields: () -> Fields
     ) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Задание")
-                .font(.caption.weight(.bold))
-                .foregroundStyle(AppPalette.secondaryText)
-                .textCase(.uppercase)
+            HStack {
+                Text("Задание")
+                    .font(.caption.weight(.bold))
+                    .textCase(.uppercase)
+                Spacer()
+                Button("Все поля", systemImage: "list.bullet.rectangle") {
+                    isCardFieldSettingsPresented = true
+                }
+                .font(.caption)
+            }
+            .foregroundStyle(AppPalette.secondaryText)
 
             fields()
 
-            if !showsPromptCharacters && !showsPromptReading && (practiceMode == .kana || !showsPromptMeaning) {
+            if cardFields(for: practiceMode, side: .front).isEmpty {
                 Text(fallbackPrompt)
                     .font(.title2.weight(.semibold))
                     .foregroundStyle(AppPalette.text)
@@ -59,6 +69,9 @@ extension TrainingView {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .modifier(TextSelectionModeModifier(isEnabled: isTextSelectable))
+        .sheet(isPresented: $isCardFieldSettingsPresented) {
+            BuiltInCardFieldSettingsView(settings: settings, deckID: deckID, mode: practiceMode)
+        }
     }
 
 }
