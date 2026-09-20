@@ -25,13 +25,16 @@ nonisolated struct StudyProgressStore: Codable, Sendable {
         let introduced = firstShownAt.filter { keys.contains($0.key) && Calendar.current.isDate($0.value, inSameDayAs: today) }.count
         return max(0, limit - introduced)
     }
-    func remainingReviews(limit: Int?, deckID: String, now: Date = Date()) -> Int {
+    func remainingDailyCards(limit: Int?, deckID: String, keys: Set<String>, now: Date = Date()) -> Int {
         guard let limit else { return Int.max }
         let today = studyDate(now: now)
-        let count = reviewLog.filter {
+        let reviewed = reviewLog.filter {
             $0.deckID == deckID && $0.countsTowardReviewLimit && Calendar.current.isDate($0.reviewedAt, inSameDayAs: today)
         }.count
-        return max(0, limit - count)
+        let introduced = firstShownAt.filter {
+            keys.contains($0.key) && Calendar.current.isDate($0.value, inSameDayAs: today)
+        }.count
+        return max(0, limit - reviewed - introduced)
     }
     mutating func markShown(_ key: String, now: Date = Date()) {
         guard firstShownAt[key] == nil, records[key] == nil else { return }

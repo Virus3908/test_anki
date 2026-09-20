@@ -37,7 +37,12 @@ nonisolated enum TrainingSessionEngine {
             .filter { !progress.isExcluded($0.reviewKey) }
         let keys = Set(items.map(\.reviewKey))
         let newLimit = progress.remainingNewCards(limit: options.dailyNewCardLimit, keys: keys, now: now)
-        let reviewLimit = progress.remainingReviews(limit: options.dailyReviewLimit, deckID: deckID, now: now)
+        let dailyLimit = progress.remainingDailyCards(
+            limit: options.dailyReviewLimit,
+            deckID: deckID,
+            keys: keys,
+            now: now
+        )
         var learning: [ReviewItem] = []
         var reviews: [ReviewItem] = []
         var started: [ReviewItem] = []
@@ -67,10 +72,14 @@ nonisolated enum TrainingSessionEngine {
         learning.sort(by: byDue)
         reviews.sort(by: byDue)
         waitingLearning.sort(by: byDue)
-        let selectedReviews = Array(reviews.prefix(reviewLimit))
-        // As in Anki's default: reaching the review cap pauses introductions,
-        // while cards already being learned today can complete their steps.
-        let selectedNew = reviewLimit > 0 ? Array(fresh.prefix(newLimit)) : []
+        // Reviews have priority within the shared daily budget. New cards use
+        // only the slots left after all selected reviews, and also keep their
+        // own introduction limit.
+        let selectedReviews = Array(reviews.prefix(dailyLimit))
+        let remainingSlots = dailyLimit == Int.max
+            ? newLimit
+            : min(newLimit, max(0, dailyLimit - selectedReviews.count))
+        let selectedNew = Array(fresh.prefix(remainingSlots))
         let ready = learning + selectedReviews + started + selectedNew
         // Do not leave a study session empty just because the next learning
         // step is a few minutes away. New and due cards still take priority;

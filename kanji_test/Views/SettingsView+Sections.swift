@@ -97,7 +97,7 @@ extension SettingsView {
                     ), in: 0...9999)
                     .labelsHidden()
                 }
-                Toggle("Все повторения без лимита", isOn: Binding(
+                Toggle("Без общего дневного лимита", isOn: Binding(
                     get: { options.dailyReviewLimit == nil },
                     set: { enabled in
                         settings.updateOptions(for: deckID) { $0.dailyReviewLimit = enabled ? nil : 200 }
@@ -105,8 +105,8 @@ extension SettingsView {
                     }
                 ))
                 if options.dailyReviewLimit != nil {
-                    dailyLimitInput(title: "Повторений", text: dailyReviewLimitBinding(), field: .dailyReviewLimit) {
-                        Stepper("Повторений", value: Binding(
+                    dailyLimitInput(title: "Всего карточек", text: dailyReviewLimitBinding(), field: .dailyReviewLimit) {
+                        Stepper("Всего карточек", value: Binding(
                             get: { options.dailyReviewLimit ?? 200 },
                             set: { value in
                                 dailyReviewLimitText = String(value)
@@ -116,7 +116,7 @@ extension SettingsView {
                         .labelsHidden()
                     }
                 }
-                Text("Лимиты действуют на выбранную колоду и сохраняются между запусками. Достигнутый лимит повторений приостанавливает новые карточки. Шаги обучения внутри дня завершаются без ограничения.")
+                Text("Общий лимит делят повторения и новые карточки. Сначала в него входят все доступные повторения, а новые карточки занимают оставшиеся места с учётом своего лимита. Шаги обучения внутри дня завершаются без ограничения.")
                     .font(.caption).foregroundStyle(AppPalette.secondaryText)
             }
             settingsSection("Интервальное повторение · FSRS-6") {
