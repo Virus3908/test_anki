@@ -2,29 +2,56 @@ import Foundation
 
 extension KanjiDataLoader {
     static func loadBundledMasterCards() async -> [KanjiCard] {
-        (try? await BundledStudyData.shared.kanjiCards(resource: "kanji-all")) ?? []
+        let metadata = (try? await BundledStudyData.shared.bundledKanjiMetadata()) ?? []
+        return metadata.sorted(by: canonicalKanjiOrder).map { $0.makeCard() }
     }
 
-    static func loadAvailableCards(deck: KanjiDeck, cache: KanjiDeckCacheRepository = .shared) async -> [KanjiCard] {
-        let masterCards = await loadBundledMasterCards()
-        let cachedCards = (try? await cache.loadCards(for: .all)) ?? []
-        // Downloaded resources augment the bundle instead of being hidden by it.
-        var cards = Dictionary(masterCards.map { ($0.kanji, $0) }, uniquingKeysWith: { first, _ in first })
-        for card in cachedCards { cards[card.kanji] = card }
-        let filtered = cards.values.filter(deck.masterFilter).sorted { $0.kanji < $1.kanji }
-        if !filtered.isEmpty { return filtered.map(\.withoutTranslations) }
-        if let cached = try? await cache.loadCards(for: deck), !cached.isEmpty {
-            return await prepareLoadedCards(cached)
-        }
-        return []
+    static func loadAvailableCards(deck: KanjiDeck) async -> [KanjiCard] {
+        let metadata = (try? await BundledStudyData.shared.bundledKanjiMetadata()) ?? []
+        return metadata
+            .filter { metadata in
+                switch deck {
+                case .joyo:
+                    metadata.joyo
+                case .jinmeiyo:
+                    metadata.jinmeiyo
+                case .all:
+                    true
+                default:
+                    metadata.makeCardFilter(deck)
+                }
+            }
+            .sorted(by: canonicalKanjiOrder)
+            .map { $0.makeCard() }
     }
 
     static func loadLocalCards() async -> [KanjiCard] {
-        let cards = (try? await BundledStudyData.shared.kanjiCards(resource: "kanji-data")) ?? []
-        return cards.map(\.withoutTranslations)
+        await loadBundledMasterCards()
     }
+}
 
-    static func prepareLoadedCards(_ cards: [KanjiCard]) async -> [KanjiCard] {
-        return cards.map(\.withoutTranslations)
+private func canonicalKanjiOrder(_ left: BundledKanjiMetadata, _ right: BundledKanjiMetadata) -> Bool {
+    let leftScalar = left.kanji.unicodeScalars.first?.value ?? UInt32.max
+    let rightScalar = right.kanji.unicodeScalars.first?.value ?? UInt32.max
+    return leftScalar == rightScalar ? left.kanji < right.kanji : leftScalar < rightScalar
+}
+
+private extension BundledKanjiMetadata {
+    func makeCardFilter(_ deck: KanjiDeck) -> Bool {
+        switch deck {
+        case .jlpt5: jlpt == 5
+        case .jlpt4: jlpt == 4
+        case .jlpt3: jlpt == 3
+        case .jlpt2: jlpt == 2
+        case .jlpt1: jlpt == 1
+        case .grade1: grade == 1
+        case .grade2: grade == 2
+        case .grade3: grade == 3
+        case .grade4: grade == 4
+        case .grade5: grade == 5
+        case .grade6: grade == 6
+        case .grade8: grade == 8
+        case .joyo, .jinmeiyo, .all: false
+        }
     }
 }

@@ -1,0 +1,11 @@
+KanjiVG bundled stroke data
+
+Source: https://github.com/KanjiVG/kanjivg
+Release: r20250816 (kanjivg-20250816-main.zip)
+Copyright: Ulrich Apel and KanjiVG contributors
+License: Creative Commons Attribution-Share Alike 3.0
+
+The bundled binary is a space-efficient adaptation of the upstream SVG
+collection. It retains the ordered SVG path data used by this application and
+omits SVG metadata and presentation elements that the application does not
+read. See KanjiVG-LICENSE.txt for the complete license text.

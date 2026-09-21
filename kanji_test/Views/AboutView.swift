@@ -70,7 +70,7 @@ struct AboutView: View {
 
                     licenseCard(
                         title: "kanjiapi.dev",
-                        subtitle: "Удаленная загрузка списков, деталей кандзи и слов-примеров",
+                        subtitle: "Источник локального снимка метаданных кандзи",
                         license: "API/project source is open; dictionary/stroke data keeps original source licences",
                         links: [
                             ("kanjiapi.dev", "https://kanjiapi.dev/"),

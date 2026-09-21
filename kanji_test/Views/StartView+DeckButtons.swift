@@ -13,7 +13,7 @@ extension StartView {
     func deckButton(for deck: KanjiDeck) -> some View {
         deckSelectionButton(
             title: deck.title,
-            subtitle: deck.endpointPath,
+            subtitle: deck.subtitle,
             isDisabled: isLoading
         ) {
             onOpen(.kanjiDeck(deck))
