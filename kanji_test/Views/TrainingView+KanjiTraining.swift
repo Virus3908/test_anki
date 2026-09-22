@@ -7,8 +7,12 @@ extension TrainingView {
 
     func cardFront(for card: KanjiCard) -> some View {
         studyCardFrontShell(
-            fallbackPrompt: "Нарисуй кандзи по памяти.",
-            footerText: "Проверка покажет оригинал и сравнение штрихов.",
+            fallbackPrompt: card.strokes.isEmpty
+                ? "Вспомни кандзи по памяти."
+                : "Нарисуй кандзи по памяти.",
+            footerText: card.strokes.isEmpty
+                ? "Для этого кандзи нет локального образца черт."
+                : "Проверка покажет оригинал и сравнение штрихов.",
             reviewKey: card.reviewKey
         ) {
             frontFields(for: card)

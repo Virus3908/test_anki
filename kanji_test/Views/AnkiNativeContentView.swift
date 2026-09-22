@@ -85,13 +85,48 @@ private struct AnkiNativeImage: View {
 private struct AnkiNativeAudio: View {
     let url: URL
     @State private var playback = AnkiAudioPlayback()
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Button { playback.toggle(url) } label: {
-                Label(playback.isPlaying ? "Остановить" : "Воспроизвести", systemImage: playback.isPlaying ? "stop.fill" : "play.fill")
-            }.buttonStyle(.bordered).tint(AppPalette.accent)
-            if let error = playback.error { Text(error).font(.caption).foregroundStyle(AppPalette.correction) }
+        VStack(alignment: .leading, spacing: 6) {
+            Button {
+                playback.toggle(url)
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: playback.isPlaying ? "stop.fill" : "play.fill")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(Color.white)
+                        .frame(width: 30, height: 30)
+                        .background(AppPalette.accent, in: Circle())
+
+                    Text(playback.isPlaying ? "Остановить аудио" : "Проиграть аудио")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(AppPalette.text)
+                }
+                .padding(.vertical, 7)
+                .padding(.leading, 7)
+                .padding(.trailing, 14)
+                .background(AppPalette.surface)
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .stroke(
+                            playback.isPlaying ? AppPalette.accent : AppPalette.border.opacity(0.55),
+                            lineWidth: 1
+                        )
+                }
+                .shadow(color: AppPalette.text.opacity(0.08), radius: 6, y: 2)
+            }
+            .buttonStyle(.plain)
+            .contentShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .accessibilityLabel(playback.isPlaying ? "Остановить аудио" : "Проиграть аудио")
+
+            if let error = playback.error {
+                Text(error)
+                    .font(.caption)
+                    .foregroundStyle(AppPalette.correction)
+            }
         }
+        .animation(.easeInOut(duration: 0.18), value: playback.isPlaying)
         .onChange(of: url) { playback.stop() }
         .onDisappear { playback.stop() }
     }

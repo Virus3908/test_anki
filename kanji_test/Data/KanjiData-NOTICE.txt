@@ -1,0 +1,14 @@
+Bundled kanji metadata
+
+Source snapshot: https://kanjiapi.dev/kanjiapi_full.zip
+Snapshot date: 2026-09-09
+Project source: https://github.com/onlyskin/kanjiapi.dev
+
+This application bundles all 13,108 kanji records as a reduced offline extract
+containing the character, English meanings, on/kun readings, school grade,
+legacy JLPT level, and Joyo / Jinmeiyo membership. Word and reading indexes
+from the full download are not included in this extract.
+
+The underlying dictionary data comes from KANJIDIC2, maintained by the
+Electronic Dictionary Research and Development Group (EDRDG). See:
+https://www.edrdg.org/edrdg/licence.html

@@ -118,7 +118,7 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
     }
 }
 
-private struct AnkiCardPreviewView: View, StudyViewStyling {
+struct AnkiCardPreviewView: View, StudyViewStyling {
     let cards: [AnkiStudyCard]
     let onPractice: (AnkiStudyCard) -> Void
     let translationState: TranslationViewModel

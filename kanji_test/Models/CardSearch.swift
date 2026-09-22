@@ -1,4 +1,5 @@
 import Foundation
+import AnkiImport
 
 /// Одна карточка в поисковом индексе.
 ///
@@ -23,7 +24,7 @@ struct CardSearchIndex<Record: CardSearchRecord>: Sendable {
     /// Нормализованные строки одной записи, собранные в одну строку для
     /// быстрого `contains`. Термы разделяются пробелом (пробел не встречается
     /// внутри нормализованных термов, потому что запрос делится по пробелам).
-    private struct Prepared {
+    nonisolated private struct Prepared {
         let record: Record
         let haystack: String
     }
@@ -32,6 +33,13 @@ struct CardSearchIndex<Record: CardSearchRecord>: Sendable {
         prepared = records.map { record in
             let joined = record.searchTerms.joined(separator: " ").lowercased()
             return Prepared(record: record, haystack: joined)
+        }
+    }
+
+    /// Вариант для фоновой нормализации уже извлечённых поисковых термов.
+    nonisolated init(records: [Record], haystacks: [String]) {
+        prepared = zip(records, haystacks).map { record, haystack in
+            Prepared(record: record, haystack: haystack)
         }
     }
 
@@ -111,6 +119,30 @@ struct WordSearchRecord: CardSearchRecord {
             terms.append(KanaRomaji.compact(romaji))
         }
 
+        return terms
+    }
+}
+
+/// Кана в поиске: знак и его чтение в ромадзи.
+struct KanaSearchRecord: CardSearchRecord {
+    let card: KanaStudyCard
+
+    var searchTerms: [String] {
+        [card.character, card.reading]
+    }
+}
+
+/// Импортированная карточка Anki ищется по содержимому всех полей, тегам,
+/// названию колоды, типу заметки и шаблону карточки.
+struct AnkiSearchRecord: CardSearchRecord {
+    let card: AnkiStudyCard
+
+    var searchTerms: [String] {
+        var terms = card.note.parsedFields?.map(\.plainText) ?? card.note.fields
+        terms.append(contentsOf: card.note.tags)
+        terms.append(card.deckName)
+        terms.append(card.noteType.name)
+        terms.append(card.templateName)
         return terms
     }
 }

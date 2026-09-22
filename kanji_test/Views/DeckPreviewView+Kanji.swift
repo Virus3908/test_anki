@@ -45,7 +45,7 @@ extension DeckPreviewView {
                 .frame(maxHeight: .infinity)
 
                 if deckState.isLoadingDeck {
-                    CenteredLoadingIndicator(title: "Загружаю карточки")
+                    CenteredLoadingIndicator(title: "Подготавливаю карточки")
                         .padding(.vertical, 10)
                 }
             }
@@ -75,9 +75,9 @@ extension DeckPreviewView {
 
     var deckPreviewStatus: String {
         if let previewExpectedCount = deckState.previewExpectedCount {
-            return "\(deckState.previewCards.count) / \(previewExpectedCount) загружено"
+            return "\(deckState.previewCards.count) / \(previewExpectedCount) карточек"
         }
 
-        return "\(deckState.previewCards.count) загружено"
+        return "\(deckState.previewCards.count) карточек"
     }
 }

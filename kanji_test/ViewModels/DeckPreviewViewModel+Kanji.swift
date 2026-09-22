@@ -1,7 +1,7 @@
 import Foundation
 
 extension DeckPreviewViewModel {
-    func openKanjiPreview(_ deck: KanjiDeck, reviewStore: StudyProgressStore) {
+    func openKanjiPreview(_ deck: KanjiDeck) {
         cancelPreviewTask()
         navigation.open(.kanjiDeck(deck))
         loadError = nil
@@ -19,8 +19,7 @@ extension DeckPreviewViewModel {
                     loadedCards,
                     expectedCount: expectedCount,
                     deck: deck,
-                    requestID: requestID,
-                    reviewStore: reviewStore
+                    requestID: requestID
                 )
             }
 
@@ -40,29 +39,30 @@ extension DeckPreviewViewModel {
         _ loadedCards: [KanjiCard],
         expectedCount: Int?,
         deck: KanjiDeck,
-        requestID: UUID,
-        reviewStore: StudyProgressStore
+        requestID: UUID
     ) {
         guard previewDeck == deck, previewRequestID == requestID, !Task.isCancelled else {
             return
         }
 
-        previewCards = reviewStore.orderedCards(uniqueCards(loadedCards))
+        previewCards = uniqueCards(loadedCards)
         previewExpectedCount = expectedCount
         isLoadingDeck = previewExpectedCount.map { previewCards.count < $0 } ?? false
     }
 
     private func uniqueCards(_ cards: [KanjiCard]) -> [KanjiCard] {
-        var cardsByKanji: [String: KanjiCard] = [:]
+        var indexesByKanji: [String: Int] = [:]
+        var uniqueCards: [KanjiCard] = []
         for card in cards {
-            if let existingCard = cardsByKanji[card.kanji] {
-                cardsByKanji[card.kanji] = existingCard.mergedForDisplay(with: card)
+            if let index = indexesByKanji[card.kanji] {
+                uniqueCards[index] = uniqueCards[index].mergedForDisplay(with: card)
             } else {
-                cardsByKanji[card.kanji] = card
+                indexesByKanji[card.kanji] = uniqueCards.count
+                uniqueCards.append(card)
             }
         }
 
-        return cardsByKanji.values.sorted { $0.kanji < $1.kanji }
+        return uniqueCards
     }
 
     private func finishKanjiPreviewLoad(for deck: KanjiDeck, requestID: UUID) {

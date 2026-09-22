@@ -95,6 +95,40 @@ final class AnkiStudyIntegrationTests: XCTestCase {
         XCTAssertNotEqual(card.reviewKey, other.reviewKey)
     }
 
+    func testCardsWithoutMeaningAndExamplesMoveToEndStably() {
+        let type = AnkiNoteType(id: 1, name: "Vocabulary", isCloze: false,
+            fields: ["Word", "Meaning", "Example sentence"], templates: [], css: "")
+        let values = [
+            (1, ["猫", "cat", "I have a cat."]),
+            (2, ["犬", "", ""]),
+            (3, ["鳥", "bird", ""]),
+            (4, ["魚", "<br>", "&nbsp;"]),
+            (5, ["馬", "", "A horse runs."])
+        ]
+        let cards = values.map { id, fields in
+            AnkiStudyCard(importID: "fixture",
+                card: AnkiCard(id: Int64(id), noteID: Int64(id), deckID: 10, ordinal: 0, scheduling: [:]),
+                note: AnkiNote(id: Int64(id), guid: "\(id)", noteTypeID: type.id, fields: fields, tags: []),
+                noteType: type, deckName: "Deck", mediaDirectory: FileManager.default.temporaryDirectory)
+        }
+
+        XCTAssertEqual(AnkiStudyCard.orderedWithContentlessCardsLast(cards).map(\.card.id), [1, 3, 5, 2, 4])
+    }
+
+    func testUnknownAnkiFieldsKeepOriginalOrder() {
+        let type = AnkiNoteType(id: 1, name: "Custom", isCloze: false,
+            fields: ["Expression", "Explanation"], templates: [], css: "")
+        let cards = (1...2).map { id in
+            AnkiStudyCard(importID: "fixture",
+                card: AnkiCard(id: Int64(id), noteID: Int64(id), deckID: 10, ordinal: 0, scheduling: [:]),
+                note: AnkiNote(id: Int64(id), guid: "\(id)", noteTypeID: type.id,
+                    fields: id == 1 ? ["猫", ""] : ["犬", "dog"], tags: []),
+                noteType: type, deckName: "Deck", mediaDirectory: FileManager.default.temporaryDirectory)
+        }
+
+        XCTAssertEqual(AnkiStudyCard.orderedWithContentlessCardsLast(cards).map(\.card.id), [1, 2])
+    }
+
     func testSharedSRSReviewPersistenceUndoAndDeckLimits() async throws {
         let repository = MemoryReviews()
         let catalog = StudyCardCatalog()

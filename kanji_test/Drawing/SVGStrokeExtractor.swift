@@ -1,9 +1,13 @@
 import Foundation
 import CoreGraphics
 
-enum SVGStrokeExtractor {
+nonisolated enum SVGStrokeExtractor {
     static func strokes(from svgText: String) -> [KanjiStroke] {
-        pathDataValues(in: svgText).enumerated().compactMap { index, pathData in
+        strokes(fromPathData: pathDataValues(in: svgText))
+    }
+
+    static func strokes(fromPathData pathDataValues: [String]) -> [KanjiStroke] {
+        pathDataValues.enumerated().compactMap { index, pathData in
             guard let summary = summarize(pathData: pathData) else {
                 return nil
             }
