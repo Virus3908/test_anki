@@ -66,3 +66,43 @@ struct TextSelectionModeModifier: ViewModifier {
         }
     }
 }
+
+struct BuiltInCardPreviewActions: View {
+    let speechText: String
+    let settings: StudyPreferences
+    let deckID: String?
+    let mode: PracticeMode
+
+    @State private var speech = SpeechService()
+    @State private var isFieldSettingsPresented = false
+
+    var body: some View {
+        HStack {
+            Button("Озвучить", systemImage: "speaker.wave.2.fill") {
+                speech.voiceIdentifier = settings.speechVoiceIdentifier.isEmpty
+                    ? nil
+                    : settings.speechVoiceIdentifier
+                speech.rate = settings.speechRate
+                speech.speak(speechText)
+            }
+            .font(.caption)
+
+            Spacer()
+
+            Button("Все поля", systemImage: "list.bullet.rectangle") {
+                isFieldSettingsPresented = true
+            }
+            .font(.caption)
+        }
+        .foregroundStyle(AppPalette.secondaryText)
+        .sheet(isPresented: $isFieldSettingsPresented) {
+            BuiltInCardFieldSettingsView(
+                settings: settings,
+                deckID: deckID,
+                mode: mode,
+                initialSide: .back
+            )
+        }
+        .onDisappear { speech.stop() }
+    }
+}

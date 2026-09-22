@@ -36,6 +36,8 @@ Terms of use: https://tatoeba.org/en/terms_of_use
 Using Tatoeba data: https://en.wiki.tatoeba.org/articles/show/terms-of-use
 
 Example sentence data may be cached locally by the app after being loaded.
+Each displayed remote sentence includes a link to its Tatoeba page, sentence
+ID, owner username when required by its license, and the sentence's license.
 
 ## Kanji API
 

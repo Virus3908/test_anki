@@ -2,7 +2,15 @@ import SwiftUI
 
 extension CardContentRendering {
     func kanaPreviewCardContent(for kanaCard: KanaStudyCard) -> some View {
-        kanaCardBackContent(for: kanaCard, fields: BuiltInCardField.available(for: .kana))
+        VStack(alignment: .leading, spacing: 14) {
+            BuiltInCardPreviewActions(
+                speechText: kanaCard.character,
+                settings: settings,
+                deckID: deckID,
+                mode: .kana
+            )
+            kanaCardBackContent(for: kanaCard, fields: BuiltInCardField.available(for: .kana))
+        }
             .padding(18)
             .appSurfaceCard()
     }
