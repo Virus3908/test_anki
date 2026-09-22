@@ -24,7 +24,7 @@ struct CardSearchIndex<Record: CardSearchRecord>: Sendable {
     /// Нормализованные строки одной записи, собранные в одну строку для
     /// быстрого `contains`. Термы разделяются пробелом (пробел не встречается
     /// внутри нормализованных термов, потому что запрос делится по пробелам).
-    private struct Prepared {
+    nonisolated private struct Prepared {
         let record: Record
         let haystack: String
     }
@@ -33,6 +33,13 @@ struct CardSearchIndex<Record: CardSearchRecord>: Sendable {
         prepared = records.map { record in
             let joined = record.searchTerms.joined(separator: " ").lowercased()
             return Prepared(record: record, haystack: joined)
+        }
+    }
+
+    /// Вариант для фоновой нормализации уже извлечённых поисковых термов.
+    nonisolated init(records: [Record], haystacks: [String]) {
+        prepared = zip(records, haystacks).map { record, haystack in
+            Prepared(record: record, haystack: haystack)
         }
     }
 

@@ -13,6 +13,7 @@ struct CardSearchView: View, CardContentRendering {
     let translationState: TranslationViewModel
     let reviewStore: StudyProgressStore
     let onPractice: (PracticeSelection) -> Void
+    private let fieldPreferences = AnkiFieldDisplayPreferences.shared
 
     @State private var model: CardSearchViewModel
     @State private var query = ""
@@ -224,7 +225,12 @@ struct CardSearchView: View, CardContentRendering {
     private func ankiResultTile(for card: AnkiStudyCard) -> some View {
         Button { selectedAnkiCard = card } label: {
             VStack(alignment: .leading, spacing: 6) {
-                Text(card.displayTitle).font(.headline).lineLimit(3)
+                Text(card.displayTitle(using: fieldPreferences.options(
+                    for: card.fieldPreferencesKey,
+                    fieldCount: card.noteType.fields.count
+                )))
+                    .font(.headline)
+                    .lineLimit(3)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 Text(card.deckName).font(.caption).foregroundStyle(AppPalette.secondaryText).lineLimit(1)
             }

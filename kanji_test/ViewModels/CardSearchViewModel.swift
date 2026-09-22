@@ -112,10 +112,13 @@ final class CardSearchViewModel {
         kanaIndex = await Self.buildIndex(records: cards.map(KanaSearchRecord.init))
     }
 
-    /// Тяжёлая часть подготовки (склейка и lowercase всех термов) — в фоне.
+    /// Извлечение термов соблюдает isolation моделей, а тяжёлая склейка и
+    /// lowercase выполняются в фоне.
     private static func buildIndex<Record: CardSearchRecord>(records: [Record]) async -> CardSearchIndex<Record> {
-        await Task.detached(priority: .userInitiated) {
-            CardSearchIndex(records: records)
+        let terms = records.map(\.searchTerms)
+        return await Task.detached(priority: .userInitiated) {
+            let haystacks = terms.map { $0.joined(separator: " ").lowercased() }
+            return CardSearchIndex(records: records, haystacks: haystacks)
         }.value
     }
 
