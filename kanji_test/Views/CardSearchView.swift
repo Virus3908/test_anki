@@ -74,6 +74,7 @@ struct CardSearchView: View, CardContentRendering {
                     .frame(maxHeight: .infinity)
                 }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             .padding(.horizontal, 12)
             .padding(.top, 20)
             .padding(.bottom, 4)

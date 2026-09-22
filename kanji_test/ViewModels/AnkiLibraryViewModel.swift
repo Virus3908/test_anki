@@ -139,10 +139,11 @@ final class AnkiLibraryViewModel {
             let cards = await Task.detached(priority: .userInitiated) {
                 let notes = Dictionary(uniqueKeysWithValues: collection.notes.map { ($0.id, $0) })
                 let types = Dictionary(uniqueKeysWithValues: collection.noteTypes.map { ($0.id, $0) })
-                return collection.cards.filter { $0.deckID == deck.sourceDeckID }.compactMap { card -> AnkiStudyCard? in
+                let deckCards = collection.cards.filter { $0.deckID == deck.sourceDeckID }.compactMap { card -> AnkiStudyCard? in
                     guard let note = notes[card.noteID], let type = types[note.noteTypeID] else { return nil }
                     return AnkiStudyCard(importID: deck.importID, card: card, note: note, noteType: type, deckName: deck.title, mediaDirectory: media)
                 }
+                return AnkiStudyCard.orderedWithContentlessCardsLast(deckCards)
             }.value
             guard openToken == token, !Task.isCancelled else { return }
             previewCards = cards
