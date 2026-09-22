@@ -115,8 +115,40 @@ final class AnkiLibraryViewModel {
 
     func open(_ summary: AnkiImportSummary) async throws -> (AnkiCollection, URL) {
         let collection = try await repository.collection(summary)
-            let media = try await repository.mediaDirectory(summary)
+        let media = try await repository.mediaDirectory(summary)
         return (collection, media)
+    }
+
+    /// Загружает карточки всех импортов для глобального поиска, не меняя
+    /// состояние открытой в интерфейсе колоды.
+    func cardsForSearch() async throws -> [AnkiStudyCard] {
+        if !isLoaded {
+            await load()
+        }
+
+        var result: [AnkiStudyCard] = []
+        for summary in imports {
+            let (collection, media) = try await open(summary)
+            let importCards = await Task.detached(priority: .userInitiated) {
+                let notes = Dictionary(uniqueKeysWithValues: collection.notes.map { ($0.id, $0) })
+                let types = Dictionary(uniqueKeysWithValues: collection.noteTypes.map { ($0.id, $0) })
+                let deckNames = Dictionary(uniqueKeysWithValues: collection.decks.map { ($0.id, $0.name) })
+
+                return collection.cards.compactMap { card -> AnkiStudyCard? in
+                    guard let note = notes[card.noteID], let type = types[note.noteTypeID] else { return nil }
+                    return AnkiStudyCard(
+                        importID: summary.id,
+                        card: card,
+                        note: note,
+                        noteType: type,
+                        deckName: deckNames[card.deckID] ?? summary.filename,
+                        mediaDirectory: media
+                    )
+                }
+            }.value
+            result.append(contentsOf: importCards)
+        }
+        return result
     }
 
     func openDeck(_ deck: AnkiDeckReference) async {

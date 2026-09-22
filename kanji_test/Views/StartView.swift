@@ -42,24 +42,15 @@ struct StartView: View, StudyViewStyling {
     /// Открыт ли экран поиска (лупа рядом с заголовком).
     @State var isSearchPresented = false
 
-    /// Что можно искать на активной вкладке: кандзи и слова — да,
-    /// кана и Anki — пока нет.
-    var searchScope: CardSearchViewModel.Scope? {
-        switch selectedSection {
-        case .kanji: .kanji
-        case .words: .words
-        case .kana, .anki: nil
-        }
-    }
-
-    /// Лист поиска: вкладка кандзи ищет по всем кандзи, вкладка слов — по всем словам.
-    func cardSearchSheet(scope: CardSearchViewModel.Scope) -> some View {
+    /// Поиск из главного меню охватывает встроенные и импортированные карточки.
+    func cardSearchSheet() -> some View {
         CardSearchView(
-            scope: scope,
+            scope: .all,
             coordinator: coordinator,
             settings: settings,
             translationState: translationState,
             reviewStore: reviewStore,
+            ankiModel: ankiModel,
             onPractice: onPractice
         )
     }

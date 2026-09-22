@@ -1,4 +1,5 @@
 import Foundation
+import AnkiImport
 
 /// Одна карточка в поисковом индексе.
 ///
@@ -111,6 +112,30 @@ struct WordSearchRecord: CardSearchRecord {
             terms.append(KanaRomaji.compact(romaji))
         }
 
+        return terms
+    }
+}
+
+/// Кана в поиске: знак и его чтение в ромадзи.
+struct KanaSearchRecord: CardSearchRecord {
+    let card: KanaStudyCard
+
+    var searchTerms: [String] {
+        [card.character, card.reading]
+    }
+}
+
+/// Импортированная карточка Anki ищется по содержимому всех полей, тегам,
+/// названию колоды, типу заметки и шаблону карточки.
+struct AnkiSearchRecord: CardSearchRecord {
+    let card: AnkiStudyCard
+
+    var searchTerms: [String] {
+        var terms = card.note.parsedFields?.map(\.plainText) ?? card.note.fields
+        terms.append(contentsOf: card.note.tags)
+        terms.append(card.deckName)
+        terms.append(card.noteType.name)
+        terms.append(card.templateName)
         return terms
     }
 }
