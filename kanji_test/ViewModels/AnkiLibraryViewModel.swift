@@ -175,7 +175,7 @@ final class AnkiLibraryViewModel {
                     guard let note = notes[card.noteID], let type = types[note.noteTypeID] else { return nil }
                     return AnkiStudyCard(importID: deck.importID, card: card, note: note, noteType: type, deckName: deck.title, mediaDirectory: media)
                 }
-                return AnkiStudyCard.orderedWithContentlessCardsLast(deckCards)
+                return AnkiStudyCard.orderedByAnkiPosition(deckCards)
             }.value
             guard openToken == token, !Task.isCancelled else { return }
             previewCards = cards
