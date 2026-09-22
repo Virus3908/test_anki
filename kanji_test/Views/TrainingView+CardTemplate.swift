@@ -47,15 +47,13 @@ extension TrainingView {
                     .textCase(.uppercase)
                 Spacer()
                 if let speechText, !speechText.isEmpty {
-                    Button("Озвучить", systemImage: "speaker.wave.2.fill") {
+                    CardHeaderActionButton(title: "Озвучить", systemImage: "speaker.wave.2.fill") {
                         speech.speak(speechText)
                     }
-                    .font(.caption)
                 }
-                Button("Все поля", systemImage: "list.bullet.rectangle") {
+                CardHeaderActionButton(title: "Все поля", systemImage: "list.bullet.rectangle") {
                     presentCardFieldSettings(side: .front)
                 }
-                .font(.caption)
             }
             .foregroundStyle(AppPalette.secondaryText)
 

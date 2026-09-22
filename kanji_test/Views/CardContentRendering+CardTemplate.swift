@@ -16,11 +16,17 @@ extension CardContentRendering {
                         .textCase(.uppercase)
                     Spacer()
                     if let onSpeak {
-                        Button("Озвучить", systemImage: "speaker.wave.2.fill", action: onSpeak)
-                            .font(.caption)
+                        CardHeaderActionButton(
+                            title: "Озвучить",
+                            systemImage: "speaker.wave.2.fill",
+                            action: onSpeak
+                        )
                     }
-                    Button("Все поля", systemImage: "list.bullet.rectangle", action: onShowAllFields)
-                        .font(.caption)
+                    CardHeaderActionButton(
+                        title: "Все поля",
+                        systemImage: "list.bullet.rectangle",
+                        action: onShowAllFields
+                    )
                 }
                 .foregroundStyle(AppPalette.secondaryText)
             }
@@ -78,21 +84,25 @@ struct BuiltInCardPreviewActions: View {
 
     var body: some View {
         HStack {
-            Button("Озвучить", systemImage: "speaker.wave.2.fill") {
+            Spacer()
+
+            CardHeaderActionButton(
+                title: "Озвучить",
+                systemImage: "speaker.wave.2.fill"
+            ) {
                 speech.voiceIdentifier = settings.speechVoiceIdentifier.isEmpty
                     ? nil
                     : settings.speechVoiceIdentifier
                 speech.rate = settings.speechRate
                 speech.speak(speechText)
             }
-            .font(.caption)
 
-            Spacer()
-
-            Button("Все поля", systemImage: "list.bullet.rectangle") {
+            CardHeaderActionButton(
+                title: "Все поля",
+                systemImage: "list.bullet.rectangle"
+            ) {
                 isFieldSettingsPresented = true
             }
-            .font(.caption)
         }
         .foregroundStyle(AppPalette.secondaryText)
         .sheet(isPresented: $isFieldSettingsPresented) {
@@ -104,5 +114,29 @@ struct BuiltInCardPreviewActions: View {
             )
         }
         .onDisappear { speech.stop() }
+    }
+}
+
+struct CardHeaderActionButton: View {
+    let title: String
+    let systemImage: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Label(title, systemImage: systemImage)
+        }
+        .buttonStyle(CardHeaderActionButtonStyle())
+    }
+}
+
+private struct CardHeaderActionButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.caption)
+            .foregroundStyle(AppPalette.secondaryText.opacity(0.75))
+            .padding(.vertical, 4)
+            .contentShape(Rectangle())
+            .opacity(configuration.isPressed ? 0.6 : 1)
     }
 }
