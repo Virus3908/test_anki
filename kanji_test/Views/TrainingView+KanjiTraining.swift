@@ -13,7 +13,8 @@ extension TrainingView {
             footerText: card.strokes.isEmpty
                 ? "Для этого кандзи нет локального образца черт."
                 : "Проверка покажет оригинал и сравнение штрихов.",
-            reviewKey: card.reviewKey
+            reviewKey: card.reviewKey,
+            speechText: card.kanji
         ) {
             frontFields(for: card)
         }
@@ -32,11 +33,6 @@ private struct KanjiTrainingCardView: View {
     var body: some View {
         training.trainingCardShell {
             training.cardFront(for: card)
-                .overlay(alignment: .topTrailing) {
-                    training.speakButton(for: card.kanji)
-                        .padding(.top, 32)
-                        .padding(.trailing, 6)
-                }
         } back: {
             training.cardBackContent(for: card) {
                 training.presentCardFieldSettings(side: .back)
