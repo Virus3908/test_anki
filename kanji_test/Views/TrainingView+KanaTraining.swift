@@ -12,6 +12,8 @@ extension TrainingView {
         } back: {
             kanaCardBackContent(for: kanaCard) {
                 presentCardFieldSettings(side: .back)
+            } onSpeak: {
+                speech.speak(kanaCard.character)
             }
         }
         .task(id: "speech-\(kanaCard.id)") {

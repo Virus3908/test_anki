@@ -20,8 +20,9 @@ extension TatoebaWordExampleProvider {
                     WordUsageExample(
                         sentence: sentence.text,
                         reading: Self.fallbackReading(for: card, in: sentence.text),
-                        meaning: sentence.preferredEnglishTranslation,
-                        attribution: sentence.attribution
+                        meaning: sentence.preferredEnglishTranslation?.text,
+                        attribution: sentence.attribution,
+                        translationAttribution: sentence.preferredEnglishTranslation?.attribution
                     )
                 }
         } catch {
@@ -56,8 +57,9 @@ extension TatoebaWordExampleProvider {
                     KanjiExample(
                         word: sentence.text,
                         reading: "",
-                        meaning: sentence.preferredEnglishTranslation ?? "",
-                        attribution: sentence.attribution
+                        meaning: sentence.preferredEnglishTranslation?.text ?? "",
+                        attribution: sentence.attribution,
+                        translationAttribution: sentence.preferredEnglishTranslation?.attribution
                     )
                 }
         } catch {

@@ -10,7 +10,10 @@ extension KanjiDataLoader {
         }
 
         if let cachedExamples = await KanjiExampleCacheRepository.loadExamples(for: card.kanji),
-           !cachedExamples.isEmpty, cachedExamples.allSatisfy({ $0.attribution != nil }) {
+           !cachedExamples.isEmpty,
+           cachedExamples.allSatisfy({
+               $0.attribution != nil && ($0.meaning.isEmpty || $0.translationAttribution != nil)
+           }) {
             return card.withEnglishExamples(cachedExamples)
         }
 

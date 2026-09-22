@@ -112,9 +112,13 @@ private struct StudyExampleRow: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
-            Text(example.text)
-                .foregroundStyle(AppPalette.text)
-                .fixedSize(horizontal: false, vertical: true)
+            HStack(alignment: .firstTextBaseline, spacing: 6) {
+                Text(example.text)
+                    .foregroundStyle(AppPalette.text)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                attributionButton
+            }
 
             if let reading = example.reading {
                 Text(reading)
@@ -124,18 +128,32 @@ private struct StudyExampleRow: View {
             }
 
             if let meaning = example.meaning {
-                Text(meaning)
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    Text(meaning)
+                        .font(.caption)
+                        .foregroundStyle(AppPalette.secondaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    attributionButton
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var attributionButton: some View {
+        if !example.sources.isEmpty {
+            Menu {
+                ForEach(example.sources) { source in
+                    Link(source.title, destination: source.url)
+                }
+            } label: {
+                Image(systemName: "info.circle")
                     .font(.caption)
                     .foregroundStyle(AppPalette.secondaryText)
-                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityLabel("Источник и лицензия")
             }
-
-            if let attributionText = example.attributionText, let attributionURL = example.attributionURL {
-                Link(attributionText, destination: attributionURL)
-                    .font(.caption2)
-                    .foregroundStyle(AppPalette.secondaryText)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
+            .fixedSize()
         }
     }
 }

@@ -25,7 +25,8 @@ struct TatoebaWordExampleProvider: WordExampleProviding {
         }
 
         if let cachedExamples = await WordExampleCacheRepository.loadExamples(for: card.id),
-           !cachedExamples.isEmpty, cachedExamples.allSatisfy({ $0.attribution != nil }) {
+           !cachedExamples.isEmpty,
+           cachedExamples.allSatisfy({ $0.attribution != nil && ($0.meaning == nil || $0.translationAttribution != nil) }) {
             return Array(cachedExamples.prefix(limit))
         }
 

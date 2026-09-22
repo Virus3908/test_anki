@@ -36,6 +36,8 @@ private struct KanjiTrainingCardView: View {
         } back: {
             training.cardBackContent(for: card) {
                 training.presentCardFieldSettings(side: .back)
+            } onSpeak: {
+                training.speech.speak(card.kanji)
             }
         }
         .task(id: "back-\(card.id)-\(training.meaningLanguage.rawValue)") {

@@ -5,6 +5,7 @@ extension CardContentRendering {
         reviewKey: String,
         isTextSelectable: Bool = true,
         onShowAllFields: (() -> Void)? = nil,
+        onSpeak: (() -> Void)? = nil,
         @ViewBuilder content: () -> Content
     ) -> some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -14,6 +15,10 @@ extension CardContentRendering {
                         .font(.caption.weight(.bold))
                         .textCase(.uppercase)
                     Spacer()
+                    if let onSpeak {
+                        Button("Озвучить", systemImage: "speaker.wave.2.fill", action: onSpeak)
+                            .font(.caption)
+                    }
                     Button("Все поля", systemImage: "list.bullet.rectangle", action: onShowAllFields)
                         .font(.caption)
                 }

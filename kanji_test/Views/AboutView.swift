@@ -47,8 +47,8 @@ struct AboutView: View {
 
                     licenseCard(
                         title: "KanjiVG",
-                        subtitle: "SVG-порядок черт для кандзи и каны",
-                        license: "Creative Commons Attribution-ShareAlike 3.0",
+                        subtitle: "Адаптированная офлайн-выборка SVG-порядка черт для кандзи и каны",
+                        license: "Copyright Ulrich Apel and KanjiVG contributors · Creative Commons Attribution-ShareAlike 3.0",
                         links: [
                             ("KanjiVG", "https://github.com/KanjiVG/kanjivg"),
                             ("CC BY-SA 3.0", "https://creativecommons.org/licenses/by-sa/3.0/")

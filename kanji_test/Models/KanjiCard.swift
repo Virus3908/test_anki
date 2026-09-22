@@ -59,11 +59,14 @@ nonisolated struct KanjiExample: Codable, Identifiable, Sendable {
     let reading: String
     let meaning: String
     let attribution: TatoebaAttribution?
+    let translationAttribution: TatoebaAttribution?
 
-    init(word: String, reading: String, meaning: String, attribution: TatoebaAttribution? = nil) {
+    init(word: String, reading: String, meaning: String, attribution: TatoebaAttribution? = nil,
+         translationAttribution: TatoebaAttribution? = nil) {
         self.word = word
         self.reading = reading
         self.meaning = meaning
         self.attribution = attribution
+        self.translationAttribution = translationAttribution
     }
 }
