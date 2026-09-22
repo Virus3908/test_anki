@@ -129,6 +129,13 @@ private struct StudyExampleRow: View {
                     .foregroundStyle(AppPalette.secondaryText)
                     .fixedSize(horizontal: false, vertical: true)
             }
+
+            if let attributionText = example.attributionText, let attributionURL = example.attributionURL {
+                Link(attributionText, destination: attributionURL)
+                    .font(.caption2)
+                    .foregroundStyle(AppPalette.secondaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
     }
 }

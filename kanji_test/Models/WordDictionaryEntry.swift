@@ -37,11 +37,13 @@ nonisolated struct WordUsageExample: Codable, Identifiable, Sendable {
     let sentence: String
     let reading: String?
     let meaning: String?
+    let attribution: TatoebaAttribution?
 
-    init(sentence: String, reading: String? = nil, meaning: String? = nil) {
+    init(sentence: String, reading: String? = nil, meaning: String? = nil, attribution: TatoebaAttribution? = nil) {
         self.sentence = sentence
         self.reading = reading
         self.meaning = meaning
+        self.attribution = attribution
     }
 
     enum CodingKeys: String, CodingKey {
@@ -50,6 +52,7 @@ nonisolated struct WordUsageExample: Codable, Identifiable, Sendable {
         case reading
         case meaning
         case translation
+        case attribution
     }
 
     init(from decoder: Decoder) throws {
@@ -60,6 +63,7 @@ nonisolated struct WordUsageExample: Codable, Identifiable, Sendable {
         reading = try container.decodeIfPresent(String.self, forKey: .reading)
         meaning = try container.decodeIfPresent(String.self, forKey: .meaning)
             ?? container.decodeIfPresent(String.self, forKey: .translation)
+        attribution = try container.decodeIfPresent(TatoebaAttribution.self, forKey: .attribution)
     }
 
     func encode(to encoder: Encoder) throws {
@@ -67,6 +71,7 @@ nonisolated struct WordUsageExample: Codable, Identifiable, Sendable {
         try container.encode(sentence, forKey: .sentence)
         try container.encodeIfPresent(reading, forKey: .reading)
         try container.encodeIfPresent(meaning, forKey: .meaning)
+        try container.encodeIfPresent(attribution, forKey: .attribution)
     }
 }
 
@@ -75,12 +80,17 @@ nonisolated struct StudyExample: Identifiable, Sendable, Hashable {
     let text: String
     let reading: String?
     let meaning: String?
+    let attributionText: String?
+    let attributionURL: URL?
 
-    init(id: String, text: String, reading: String? = nil, meaning: String? = nil) {
+    init(id: String, text: String, reading: String? = nil, meaning: String? = nil,
+         attributionText: String? = nil, attributionURL: URL? = nil) {
         self.id = id
         self.text = text
         self.reading = reading?.nilIfBlank
         self.meaning = meaning?.nilIfBlank
+        self.attributionText = attributionText
+        self.attributionURL = attributionURL
     }
 
     init(wordExample example: WordUsageExample, reading: String? = nil) {
@@ -88,7 +98,9 @@ nonisolated struct StudyExample: Identifiable, Sendable, Hashable {
             id: "word-\(example.id)",
             text: example.sentence,
             reading: reading ?? example.reading,
-            meaning: example.meaning
+            meaning: example.meaning,
+            attributionText: example.attribution?.displayText,
+            attributionURL: example.attribution?.sentenceURL
         )
     }
 
@@ -97,7 +109,9 @@ nonisolated struct StudyExample: Identifiable, Sendable, Hashable {
             id: "kanji-\(example.id)",
             text: example.word,
             reading: example.reading,
-            meaning: example.meaning
+            meaning: example.meaning,
+            attributionText: example.attribution?.displayText,
+            attributionURL: example.attribution?.sentenceURL
         )
     }
 }
