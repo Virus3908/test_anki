@@ -83,6 +83,13 @@ nonisolated struct StudyProgressStore: Codable, Sendable {
     }
     func isExcluded(_ key: String) -> Bool { excludedReviewKeys.contains(key) }
     mutating func exclude(_ key: String) { excludedReviewKeys.insert(key) }
+    mutating func resetProgress(for keys: Set<String>) {
+        guard !keys.isEmpty else { return }
+        records = records.filter { !keys.contains($0.key) }
+        firstShownAt = firstShownAt.filter { !keys.contains($0.key) }
+        reviewLog.removeAll { keys.contains($0.cardID) }
+        excludedReviewKeys.subtract(keys)
+    }
     mutating func undo(logID: UUID, record: StudyReviewRecord?, key: String) {
         records[key] = record
         reviewLog.removeAll { $0.id == logID }

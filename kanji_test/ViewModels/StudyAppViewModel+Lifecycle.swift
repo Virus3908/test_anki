@@ -1,6 +1,42 @@
 import Foundation
+import AnkiImport
 
 extension StudyAppViewModel {
+    func resetDeckProgress(_ deck: StudyDeck) async {
+        guard hasLoadedSavedState, !isSavingReview else { return }
+        isResettingDeckProgress = true
+        defer { isResettingDeckProgress = false }
+        do {
+            let keys: Set<String>
+            switch deck.mode {
+            case .kanji:
+                guard let selected = KanjiDeck(rawValue: String(deck.id.dropFirst("kanji:".count))) else { return }
+                keys = Set(await KanjiDataLoader.loadAvailableCards(deck: selected).map(\.reviewKey))
+            case .words:
+                guard let selected = WordFrequencyDeck(rawValue: String(deck.id.dropFirst("words:".count))) else { return }
+                let entries = try await WordDataLoader.loadDictionaryEntries()
+                keys = Set(entries[selected.bounds.clamped(to: entries.indices)].map { "word:\($0.word)-\($0.reading)" })
+            case .kana:
+                guard let selected = KanaDeck(rawValue: String(deck.id.dropFirst("kana:".count))) else { return }
+                keys = Set(selected.baseCards.map(\.reviewKey))
+            case .anki:
+                guard let reference = ankiLibrary.decks.first(where: { $0.id == deck.id }),
+                      let summary = ankiLibrary.imports.first(where: { $0.id == reference.importID }) else { return }
+                let (collection, _) = try await ankiLibrary.open(summary)
+                keys = Set(collection.cards.filter { $0.deckID == reference.sourceDeckID }
+                    .map { "anki:\(reference.importID):card:\($0.id)" })
+            }
+            guard !keys.isEmpty else {
+                errors.message = "Не удалось найти карточки выбранной колоды. Прогресс не изменён."
+                return
+            }
+            try await trainingSession.resetProgress(for: keys)
+            synchronizeTrainingRoute()
+        } catch {
+            errors.report("Не удалось сбросить прогресс колоды. Данные не изменены.", error: error)
+        }
+    }
+
     func loadSavedState() async {
         guard !hasLoadedSavedState, !isLoadingSavedState else { return }
         isLoadingSavedState = true

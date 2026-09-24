@@ -65,6 +65,8 @@ final class TrainingSessionViewModel {
     /// caller leaves the migration unmarked and retries later; `0` means nothing to migrate.
     func bootstrapAnkiHistory(_ collection: AnkiCollection, importID: String) async throws -> Int? {
         guard hasLoadedProgress, !isPreparingCard else { return nil }
+        isPreparingCard = true
+        defer { isPreparingCard = false }
         let options = Dictionary(uniqueKeysWithValues: collection.decks.map {
             ($0.id, settings.options(for: "anki:\(importID):deck:\($0.id)"))
         })
@@ -88,6 +90,19 @@ final class TrainingSessionViewModel {
         hasLoadedProgress = true
         canRestoreBackup = false
         publish(TrainingSessionState())
+    }
+    func resetProgress(for keys: Set<String>) async throws {
+        guard hasLoadedProgress, !isPreparingCard else { throw CancellationError() }
+        isPreparingCard = true
+        defer { isPreparingCard = false }
+        var progress = reviewStore
+        progress.resetProgress(for: keys)
+        try await repository.save(progress)
+        reviewStore = progress
+        if let mode, state.queue.value?.sourceIDs.contains(where: { keys.contains(ReviewItem(id: $0, mode: mode).reviewKey) }) == true {
+            didCompleteToday = false
+            publish(TrainingSessionState())
+        }
     }
     func start(deck: StudyDeck, sourceIDs: [String], guided: Bool = false) async -> Bool {
         guard hasLoadedProgress, !isPreparingCard else { return false }
