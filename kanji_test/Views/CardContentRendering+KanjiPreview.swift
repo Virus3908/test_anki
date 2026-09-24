@@ -43,7 +43,15 @@ extension CardContentRendering {
 
                 ScrollView(.vertical) {
                     VStack(alignment: .leading, spacing: 16) {
-                        cardBackContent(for: card, fields: BuiltInCardField.available(for: .kanji))
+                        VStack(alignment: .leading, spacing: 14) {
+                            BuiltInCardPreviewActions(
+                                speechText: card.kanji,
+                                settings: settings,
+                                deckID: deckID,
+                                mode: .kanji
+                            )
+                            cardBackContent(for: card, fields: BuiltInCardField.available(for: .kanji))
+                        }
                             .padding(18)
                             .appSurfaceCard()
 
@@ -81,10 +89,18 @@ extension CardContentRendering {
                     .ignoresSafeArea()
 
                 ScrollView(.vertical) {
-                    cardBackContent(
-                        for: card,
-                        fields: BuiltInCardField.available(for: .kanji).filter { $0 != .relatedWords }
-                    )
+                    VStack(alignment: .leading, spacing: 14) {
+                        BuiltInCardPreviewActions(
+                            speechText: card.kanji,
+                            settings: settings,
+                            deckID: deckID,
+                            mode: .kanji
+                        )
+                        cardBackContent(
+                            for: card,
+                            fields: BuiltInCardField.available(for: .kanji).filter { $0 != .relatedWords }
+                        )
+                    }
                     .padding(18)
                     .appSurfaceCard()
                     .padding(20)

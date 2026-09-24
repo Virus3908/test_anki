@@ -17,6 +17,7 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "5BD24D2B30583E9F00F23D33"
                BuildableName = "kanji_test.app"
+               BlueprintName = "kanji_test"
                ReferencedContainer = "container:kanji_test.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -58,6 +59,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "5BD24D2B30583E9F00F23D33"
             BuildableName = "kanji_test.app"
+            BlueprintName = "kanji_test"
             ReferencedContainer = "container:kanji_test.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -74,6 +76,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "5BD24D2B30583E9F00F23D33"
             BuildableName = "kanji_test.app"
+            BlueprintName = "kanji_test"
             ReferencedContainer = "container:kanji_test.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

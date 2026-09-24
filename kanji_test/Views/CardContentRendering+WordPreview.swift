@@ -71,6 +71,12 @@ extension CardContentRendering {
 
     func wordFullCard(for card: WordStudyCard) -> some View {
         VStack(alignment: .leading, spacing: 16) {
+            BuiltInCardPreviewActions(
+                speechText: card.word,
+                settings: settings,
+                deckID: deckID,
+                mode: .words
+            )
             wordFullCardContent(for: card, fields: BuiltInCardField.available(for: .words))
             learningStatusLabel(forReviewKey: card.reviewKey)
         }
@@ -103,11 +109,19 @@ extension CardContentRendering {
                     .ignoresSafeArea()
 
                 ScrollView(.vertical) {
-                    wordFullCardContent(
-                        for: card,
-                        fields: BuiltInCardField.available(for: .words),
-                        onOpenKanji: coordinator.openLinkedWordKanjiPreview
-                    )
+                    VStack(alignment: .leading, spacing: 14) {
+                        BuiltInCardPreviewActions(
+                            speechText: card.word,
+                            settings: settings,
+                            deckID: deckID,
+                            mode: .words
+                        )
+                        wordFullCardContent(
+                            for: card,
+                            fields: BuiltInCardField.available(for: .words),
+                            onOpenKanji: coordinator.openLinkedWordKanjiPreview
+                        )
+                    }
                         .padding(18)
                         .appSurfaceCard()
                         .padding(20)

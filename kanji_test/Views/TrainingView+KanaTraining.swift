@@ -4,14 +4,11 @@ extension TrainingView {
     func kanaStudyCard(for kanaCard: KanaStudyCard) -> some View {
         trainingCardShell {
             kanaCardFront(for: kanaCard)
-                .overlay(alignment: .topTrailing) {
-                    speakButton(for: kanaCard.character)
-                        .padding(.top, 32)
-                        .padding(.trailing, 6)
-                }
         } back: {
             kanaCardBackContent(for: kanaCard) {
                 presentCardFieldSettings(side: .back)
+            } onSpeak: {
+                speech.speak(kanaCard.character)
             }
         }
         .task(id: "speech-\(kanaCard.id)") {
@@ -25,6 +22,7 @@ extension TrainingView {
             fallbackPrompt: "Нарисуй знак каны по памяти.",
             footerText: "Проверка покажет оригинал и сравнение штрихов.",
             reviewKey: kanaCard.reviewKey,
+            speechText: kanaCard.character,
             isTextSelectable: false
         ) {
             ForEach(cardFields(for: .kana, side: .front)) { field in

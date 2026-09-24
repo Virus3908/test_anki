@@ -37,11 +37,16 @@ nonisolated struct WordUsageExample: Codable, Identifiable, Sendable {
     let sentence: String
     let reading: String?
     let meaning: String?
+    let attribution: TatoebaAttribution?
+    let translationAttribution: TatoebaAttribution?
 
-    init(sentence: String, reading: String? = nil, meaning: String? = nil) {
+    init(sentence: String, reading: String? = nil, meaning: String? = nil,
+         attribution: TatoebaAttribution? = nil, translationAttribution: TatoebaAttribution? = nil) {
         self.sentence = sentence
         self.reading = reading
         self.meaning = meaning
+        self.attribution = attribution
+        self.translationAttribution = translationAttribution
     }
 
     enum CodingKeys: String, CodingKey {
@@ -50,6 +55,8 @@ nonisolated struct WordUsageExample: Codable, Identifiable, Sendable {
         case reading
         case meaning
         case translation
+        case attribution
+        case translationAttribution
     }
 
     init(from decoder: Decoder) throws {
@@ -60,6 +67,8 @@ nonisolated struct WordUsageExample: Codable, Identifiable, Sendable {
         reading = try container.decodeIfPresent(String.self, forKey: .reading)
         meaning = try container.decodeIfPresent(String.self, forKey: .meaning)
             ?? container.decodeIfPresent(String.self, forKey: .translation)
+        attribution = try container.decodeIfPresent(TatoebaAttribution.self, forKey: .attribution)
+        translationAttribution = try container.decodeIfPresent(TatoebaAttribution.self, forKey: .translationAttribution)
     }
 
     func encode(to encoder: Encoder) throws {
@@ -67,6 +76,8 @@ nonisolated struct WordUsageExample: Codable, Identifiable, Sendable {
         try container.encode(sentence, forKey: .sentence)
         try container.encodeIfPresent(reading, forKey: .reading)
         try container.encodeIfPresent(meaning, forKey: .meaning)
+        try container.encodeIfPresent(attribution, forKey: .attribution)
+        try container.encodeIfPresent(translationAttribution, forKey: .translationAttribution)
     }
 }
 
@@ -75,12 +86,15 @@ nonisolated struct StudyExample: Identifiable, Sendable, Hashable {
     let text: String
     let reading: String?
     let meaning: String?
+    let sources: [StudyExampleSource]
 
-    init(id: String, text: String, reading: String? = nil, meaning: String? = nil) {
+    init(id: String, text: String, reading: String? = nil, meaning: String? = nil,
+         sources: [StudyExampleSource] = []) {
         self.id = id
         self.text = text
         self.reading = reading?.nilIfBlank
         self.meaning = meaning?.nilIfBlank
+        self.sources = sources
     }
 
     init(wordExample example: WordUsageExample, reading: String? = nil) {
@@ -88,7 +102,8 @@ nonisolated struct StudyExample: Identifiable, Sendable, Hashable {
             id: "word-\(example.id)",
             text: example.sentence,
             reading: reading ?? example.reading,
-            meaning: example.meaning
+            meaning: example.meaning,
+            sources: [example.attribution, example.translationAttribution].compactMap(StudyExampleSource.init)
         )
     }
 
@@ -97,8 +112,22 @@ nonisolated struct StudyExample: Identifiable, Sendable, Hashable {
             id: "kanji-\(example.id)",
             text: example.word,
             reading: example.reading,
-            meaning: example.meaning
+            meaning: example.meaning,
+            sources: [example.attribution, example.translationAttribution].compactMap(StudyExampleSource.init)
         )
+    }
+}
+
+nonisolated struct StudyExampleSource: Identifiable, Sendable, Hashable {
+    let id: String
+    let title: String
+    let url: URL
+
+    init?(_ attribution: TatoebaAttribution?) {
+        guard let attribution, let url = attribution.sentenceURL else { return nil }
+        self.id = "tatoeba-\(attribution.sentenceID)"
+        self.title = attribution.displayText
+        self.url = url
     }
 }
 

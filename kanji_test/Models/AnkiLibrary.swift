@@ -47,82 +47,24 @@ nonisolated struct AnkiStudyCard: Identifiable, Sendable, StudyItem {
         noteType.isCloze ? "Пропуск \(card.ordinal + 1)" : noteType.templates.first(where: { $0.ordinal == card.ordinal })?.name ?? noteType.name
     }
 
-    /// Keeps incomplete vocabulary notes available without letting them occupy the
-    /// beginning of a deck. The partition is stable, so Anki's order is preserved
-    /// within both groups.
-    static func orderedWithContentlessCardsLast(_ cards: [Self]) -> [Self] {
-        var regular: [Self] = []
-        var contentless: [Self] = []
-        regular.reserveCapacity(cards.count)
-        contentless.reserveCapacity(cards.count)
-
-        for card in cards {
-            if card.hasNeitherMeaningNorExamples {
-                contentless.append(card)
-            } else {
-                regular.append(card)
+    /// Anki stores the position of new cards in `cards.due`. Reorder only the
+    /// new-card slots by that position, keeping all other cards in source order.
+    static func orderedByAnkiPosition(_ cards: [Self]) -> [Self] {
+        let newCards = cards
+            .filter { $0.card.scheduling["type"] == 0 }
+            .sorted {
+                let left = $0.card.scheduling["due", default: 0]
+                let right = $1.card.scheduling["due", default: 0]
+                return left == right ? $0.card.id < $1.card.id : left < right
             }
-        }
-        return regular + contentless
-    }
 
-    private var hasNeitherMeaningNorExamples: Bool {
-        let meaningFields = semanticFieldOrdinals(matching: Self.meaningFieldNames)
-        let exampleFields = semanticFieldOrdinals(matching: Self.exampleFieldNames)
-
-        // Unknown note types should retain their original order: their fields may
-        // carry the same information under names we cannot classify safely.
-        guard !meaningFields.isEmpty || !exampleFields.isEmpty else { return false }
-        return !meaningFields.contains(where: fieldHasContent)
-            && !exampleFields.contains(where: fieldHasContent)
-    }
-
-    private func semanticFieldOrdinals(matching names: Set<String>) -> [Int] {
-        noteType.fields.indices.filter { ordinal in
-            let fieldName = noteType.fields[ordinal]
-                .folding(options: [.caseInsensitive, .diacriticInsensitive, .widthInsensitive], locale: nil)
-            let words = fieldName.components(separatedBy: CharacterSet.alphanumerics.inverted)
-                .filter { !$0.isEmpty }
-            return words.contains(where: names.contains)
-                || (names == Self.meaningFieldNames && fieldName.contains("意味"))
-                || (names == Self.exampleFieldNames && (fieldName.contains("例文") || fieldName.contains("用例")))
+        var nextNewCard = 0
+        return cards.map { card in
+            guard card.card.scheduling["type"] == 0, nextNewCard < newCards.count else { return card }
+            defer { nextNewCard += 1 }
+            return newCards[nextNewCard]
         }
     }
-
-    private func fieldHasContent(_ ordinal: Int) -> Bool {
-        if let parsed = note.parsedFields?[safe: ordinal] {
-            return parsed.blocks.contains(where: Self.blockHasContent)
-        }
-        guard let raw = note.fields[safe: ordinal] else { return false }
-        let text = raw
-            .replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
-            .replacingOccurrences(of: "&nbsp;", with: " ", options: .caseInsensitive)
-            .replacingOccurrences(of: "\u{00a0}", with: " ")
-        return !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-    }
-
-    private static func blockHasContent(_ block: AnkiContentBlock) -> Bool {
-        switch block.kind {
-        case .text:
-            block.runs.contains { !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
-        case .image, .audio, .video:
-            true
-        case .hint:
-            block.children.contains(where: blockHasContent)
-        case .divider, .input:
-            false
-        }
-    }
-
-    private static let meaningFieldNames: Set<String> = [
-        "meaning", "meanings", "definition", "definitions", "translation", "translations", "gloss",
-        "answer", "back", "значение", "значения", "перевод", "переводы"
-    ]
-
-    private static let exampleFieldNames: Set<String> = [
-        "example", "examples", "sentence", "sentences", "usage", "context",
-        "пример", "примеры", "предложение", "предложения"
-    ]
 }
 
 nonisolated struct AnkiImportResult: Sendable {

@@ -127,20 +127,22 @@ struct BuiltInCardFieldSettingsView: View {
         let afterTarget = DropTarget(field: field, placement: .after, isVisibleList: isVisibleList)
         VStack(spacing: 8) {
             if dropTarget == beforeTarget { insertionPreview(target: beforeTarget) }
-            fieldCard(field, beforeTarget: beforeTarget, afterTarget: afterTarget)
+            fieldCard(field, isVisibleList: isVisibleList, beforeTarget: beforeTarget, afterTarget: afterTarget)
             if dropTarget == afterTarget { insertionPreview(target: afterTarget) }
         }
         .transaction { $0.animation = nil }
     }
 
     @ViewBuilder
-    private func fieldCard(_ field: BuiltInCardField, beforeTarget: DropTarget, afterTarget: DropTarget) -> some View {
+    private func fieldCard(_ field: BuiltInCardField, isVisibleList: Bool,
+                           beforeTarget: DropTarget, afterTarget: DropTarget) -> some View {
         HStack(spacing: 10) {
             Image(systemName: "line.3.horizontal")
                 .foregroundStyle(AppPalette.secondaryText)
             Text(field.title(for: mode)).font(.body.weight(.medium))
             Spacer()
         }
+        .padding(.trailing, 44)
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
         .appSurfaceCard()
@@ -149,6 +151,21 @@ struct BuiltInCardFieldSettingsView: View {
                 fieldDropHalf(source: field, target: beforeTarget)
                 fieldDropHalf(source: field, target: afterTarget)
             }
+        }
+        .overlay(alignment: .trailing) {
+            Button {
+                applyDrop(field.rawValue, relativeTo: nil, placement: .emptyList,
+                          isVisibleList: !isVisibleList)
+            } label: {
+                Image(systemName: isVisibleList ? "minus.circle" : "plus.circle")
+                    .font(.title3)
+                    .foregroundStyle(AppPalette.accent)
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(isVisibleList ? "Скрыть поле" : "Показать поле")
+            .padding(.trailing, 4)
         }
     }
 

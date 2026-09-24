@@ -10,7 +10,10 @@ extension TranslationViewModel {
         let examples = originalKanjiExamples(for: card)
         guard language == .russian, let meanings = cached(.kanjiExamples(card.id), source: kanjiExampleSource(examples)),
               meanings.count == examples.count else { return examples }
-        return zip(examples, meanings).map { KanjiExample(word: $0.word, reading: $0.reading, meaning: $1) }
+        return zip(examples, meanings).map {
+            KanjiExample(word: $0.word, reading: $0.reading, meaning: $1, attribution: $0.attribution,
+                         translationAttribution: $0.translationAttribution)
+        }
     }
     func translateKanjiMeaningsIfNeeded(for card: KanjiCard, deck: KanjiDeck, language: MeaningLanguage) async {
         guard language == .russian else { return }

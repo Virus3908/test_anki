@@ -74,13 +74,15 @@ final class AnkiLibraryViewModel {
         } catch { message = error.localizedDescription }
     }
 
-    func deleteDeck(_ deck: AnkiDeckReference) async -> Bool {
+    func deleteImport(_ deck: AnkiDeckReference, trainingSession: TrainingSessionViewModel) async -> Bool {
         guard !isDeletingDeck, !isImporting else { return false }
         isDeletingDeck = true
         defer { isDeletingDeck = false }
         do {
-            try await repository.deleteImport(id: deck.importID)
-            imports = try await repository.load()
+            try await trainingSession.deleteAnkiImportProgress(importID: deck.importID) {
+                try await repository.deleteImport(id: deck.importID)
+            }
+            imports.removeAll { $0.id == deck.importID }
             closeDeck()
             return true
         } catch {
@@ -175,7 +177,7 @@ final class AnkiLibraryViewModel {
                     guard let note = notes[card.noteID], let type = types[note.noteTypeID] else { return nil }
                     return AnkiStudyCard(importID: deck.importID, card: card, note: note, noteType: type, deckName: deck.title, mediaDirectory: media)
                 }
-                return AnkiStudyCard.orderedWithContentlessCardsLast(deckCards)
+                return AnkiStudyCard.orderedByAnkiPosition(deckCards)
             }.value
             guard openToken == token, !Task.isCancelled else { return }
             previewCards = cards

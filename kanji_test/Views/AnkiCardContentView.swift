@@ -260,7 +260,7 @@ struct AnkiCardContentView: View {
             if fieldDropTarget == beforeTarget {
                 fieldInsertionPreview(target: beforeTarget)
             }
-            fieldCard(ordinal, beforeTarget: beforeTarget, afterTarget: afterTarget)
+            fieldCard(ordinal, isVisible: isVisible, beforeTarget: beforeTarget, afterTarget: afterTarget)
             if fieldDropTarget == afterTarget {
                 fieldInsertionPreview(target: afterTarget)
             }
@@ -269,7 +269,8 @@ struct AnkiCardContentView: View {
     }
 
     @ViewBuilder
-    private func fieldCard(_ ordinal: Int, beforeTarget: FieldDropTarget, afterTarget: FieldDropTarget) -> some View {
+    private func fieldCard(_ ordinal: Int, isVisible: Bool,
+                           beforeTarget: FieldDropTarget, afterTarget: FieldDropTarget) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 8) {
                 Image(systemName: "line.3.horizontal")
@@ -277,6 +278,7 @@ struct AnkiCardContentView: View {
                 Text(card.noteType.fields[ordinal]).font(.body.weight(.medium))
                 Spacer()
             }
+            .padding(.trailing, 44)
             if let content = card.note.parsedFields?[safe: ordinal] {
                 AnkiNativeContentView(blocks: content.blocks, mediaDirectory: card.mediaDirectory)
             }
@@ -287,6 +289,21 @@ struct AnkiCardContentView: View {
                 fieldDropHalf(sourceOrdinal: ordinal, target: beforeTarget)
                 fieldDropHalf(sourceOrdinal: ordinal, target: afterTarget)
             }
+        }
+        .overlay(alignment: .topTrailing) {
+            Button {
+                applyFieldDrop(String(ordinal), relativeTo: nil, placement: .emptyList,
+                               intoVisibleList: !isVisible)
+            } label: {
+                Image(systemName: isVisible ? "minus.circle" : "plus.circle")
+                    .font(.title3)
+                    .foregroundStyle(AppPalette.accent)
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(isVisible ? "Скрыть поле" : "Показать поле")
+            .padding(4)
         }
     }
 

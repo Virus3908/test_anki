@@ -95,7 +95,7 @@ final class AnkiStudyIntegrationTests: XCTestCase {
         XCTAssertNotEqual(card.reviewKey, other.reviewKey)
     }
 
-    func testCardsWithoutMeaningAndExamplesMoveToEndStably() {
+    func testCardsWithoutAnkiPositionKeepSourceOrder() {
         let type = AnkiNoteType(id: 1, name: "Vocabulary", isCloze: false,
             fields: ["Word", "Meaning", "Example sentence"], templates: [], css: "")
         let values = [
@@ -112,7 +112,7 @@ final class AnkiStudyIntegrationTests: XCTestCase {
                 noteType: type, deckName: "Deck", mediaDirectory: FileManager.default.temporaryDirectory)
         }
 
-        XCTAssertEqual(AnkiStudyCard.orderedWithContentlessCardsLast(cards).map(\.card.id), [1, 3, 5, 2, 4])
+        XCTAssertEqual(AnkiStudyCard.orderedByAnkiPosition(cards).map(\.card.id), [1, 2, 3, 4, 5])
     }
 
     func testUnknownAnkiFieldsKeepOriginalOrder() {
@@ -126,7 +126,7 @@ final class AnkiStudyIntegrationTests: XCTestCase {
                 noteType: type, deckName: "Deck", mediaDirectory: FileManager.default.temporaryDirectory)
         }
 
-        XCTAssertEqual(AnkiStudyCard.orderedWithContentlessCardsLast(cards).map(\.card.id), [1, 2])
+        XCTAssertEqual(AnkiStudyCard.orderedByAnkiPosition(cards).map(\.card.id), [1, 2])
     }
 
     func testSharedSRSReviewPersistenceUndoAndDeckLimits() async throws {
