@@ -64,6 +64,7 @@ struct ContentView: View {
         case .ankiDeck(let deck):
             AnkiDeckPreviewView(deck: deck, model: appModel.ankiLibrary, settings: appModel.settings,
                 translationState: appModel.translationState,
+                trainingSession: appModel.trainingSession,
                 reviewStore: appModel.trainingSession.reviewStore,
                 onBack: appModel.closeAnkiDeck,
                 onPractice: appModel.practice)

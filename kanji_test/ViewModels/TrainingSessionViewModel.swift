@@ -104,6 +104,23 @@ final class TrainingSessionViewModel {
             publish(TrainingSessionState())
         }
     }
+    func deleteAnkiImportProgress(importID: String, deleteImport: () async throws -> Void) async throws {
+        guard hasLoadedProgress, !isPreparingCard else { throw CancellationError() }
+        isPreparingCard = true
+        defer { isPreparingCard = false }
+        let original = reviewStore
+        var progress = original
+        progress.removeAnkiImportProgress(importID: importID)
+        try await repository.save(progress)
+        do {
+            try await deleteImport()
+        } catch {
+            try await repository.save(original)
+            throw error
+        }
+        reviewStore = progress
+        if mode == .anki { publish(TrainingSessionState()) }
+    }
     func start(deck: StudyDeck, sourceIDs: [String], guided: Bool = false) async -> Bool {
         guard hasLoadedProgress, !isPreparingCard else { return false }
         didCompleteToday = false

@@ -85,7 +85,7 @@ nonisolated enum TrainingSessionEngine {
         // step is a few minutes away. New and due cards still take priority;
         // this fallback is used only after they are exhausted.
         let display = ready.isEmpty ? Array(waitingLearning.prefix(1)) : ready
-        let today = learning + waitingLearning + reviews + started + selectedNew
+        let today = learning + waitingLearning + selectedReviews + started + selectedNew
         return StudyQueuePlan(
             readyIDs: display.map(\.id),
             todayIDs: today.map(\.id),
