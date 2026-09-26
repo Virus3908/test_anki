@@ -11,27 +11,14 @@ extension DeckPreviewView {
 
             VStack(alignment: .leading, spacing: 14) {
                 previewHeader(title: deck.title, subtitle: wordPreviewStatus, onBack: closeWordPreview) {
-                    Button {
-                        isSearchPresented = true
-                    } label: {
-                        Image(systemName: "magnifyingglass")
-                    }
-                    .buttonStyle(.bordered)
-                    .tint(AppPalette.accent)
+                    GlassIconButton(systemImage: "gearshape",
+                                    accessibilityLabel: "Настройки",
+                                    action: onOpenSettings)
                 }
 
                 if session.isSelecting {
                     CustomSelectionToolbar(session: session, cardIDs: deckState.previewWordCards.map(\.id))
                         .frame(maxWidth: .infinity, alignment: .trailing)
-                }
-
-                if !session.isSelecting {
-                    previewStartButton(
-                        plan: plan,
-                        isDisabled: deckState.previewWordCards.isEmpty,
-                        action: { onPractice(.words(deckState.previewWordCards, guided: false)) },
-                        onCustomTraining: onCustomTraining
-                    )
                 }
 
                 ScrollView(.vertical) {
@@ -57,15 +44,31 @@ extension DeckPreviewView {
                     CenteredLoadingIndicator(title: "Загружаю слова")
                         .padding(.vertical, 10)
                 }
+
             }
             .padding(.horizontal, 12)
-            .padding(.top, 20)
-            .padding(.bottom, 4)
+            .padding(.top, 8)
             .foregroundStyle(AppPalette.text)
         }
         .safeAreaInset(edge: .bottom) {
+            // Единая нижняя панель: старт колоды или режим выбора карточек
+            // занимают одно и то же место с одной и той же геометрией.
             if session.isSelecting {
-                CustomSelectionBar(session: session, onStart: onStartCustomTraining)
+                CustomSelectionBar(session: session, onStart: onStartCustomTraining, onSearch: { isSearchPresented = true })
+            } else {
+                BottomActionBar {
+                    previewStartButton(
+                        plan: plan,
+                        isDisabled: deckState.previewWordCards.isEmpty,
+                        action: { onPractice(.words(deckState.previewWordCards, guided: false)) },
+                        onCustomTraining: onCustomTraining
+                    )
+
+                    GlassIconButton(systemImage: "magnifyingglass",
+                                    accessibilityLabel: "Поиск по колоде",
+                                    diameter: 52,
+                                    action: { isSearchPresented = true })
+                }
             }
         }
         .sheet(item: $coordinator.presentedWordPreview, onDismiss: {

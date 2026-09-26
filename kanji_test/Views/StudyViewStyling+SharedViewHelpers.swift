@@ -164,6 +164,80 @@ extension View {
     }
 }
 
+/// Круглая иконка-кнопка в стиле liquid glass; единый вид кнопки поиска
+/// и угловых элементов управления (настройки, инфо, исключение карточки).
+struct GlassIconButton: View {
+    let systemImage: String
+    let accessibilityLabel: String
+    var diameter: CGFloat = 44
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: systemImage)
+                .font(.system(size: diameter * 0.42, weight: .semibold))
+                .frame(width: diameter, height: diameter)
+        }
+        .buttonStyle(.plain)
+        .tint(AppPalette.text)
+        .glassEffect(in: Circle())
+        .accessibilityLabel(accessibilityLabel)
+    }
+}
+
+/// Единая нижняя панель приложения: одинаковые поля и привязка к нижнему краю
+/// на главном экране, в колоде и в кастом-тренировке; меняется только начинка.
+struct BottomActionBar<Content: View>: View {
+    let content: Content
+
+    init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
+
+    var body: some View {
+        HStack(spacing: 10) {
+            content
+        }
+        .padding(.horizontal, 10)
+        .padding(.top, 10)
+        .padding(.bottom, 6)
+    }
+}
+
+extension View {
+    /// Круглые glass-кнопки, закреплённые в правом верхнем углу экрана.
+    /// Последняя — всегда настройки: одна и та же позиция и стиль на всех экранах.
+    func cornerGlassControls<Leading: View>(
+        onOpenSettings: @escaping () -> Void,
+        @ViewBuilder leading: () -> Leading
+    ) -> some View {
+        overlay(alignment: .topTrailing) {
+            HStack(spacing: 10) {
+                leading()
+                GlassIconButton(systemImage: "gearshape",
+                                accessibilityLabel: "Настройки",
+                                action: onOpenSettings)
+            }
+            .padding(.top, 8)
+            .padding(.trailing, 12)
+        }
+    }
+
+    /// Свайп от левого края вправо — «назад», как системный жест поп-навигации.
+    /// Подключается только к экранам, где случайный выход безопасен (колоды).
+    func edgeBackSwipe(action: @escaping () -> Void) -> some View {
+        simultaneousGesture(
+            DragGesture(minimumDistance: 24)
+                .onEnded { value in
+                    guard value.startLocation.x < 32,
+                          value.translation.width > 50,
+                          abs(value.translation.height) < 90 else { return }
+                    action()
+                }
+        )
+    }
+}
+
 struct BottomScrollMask: View {
     var body: some View {
         VStack(spacing: 0) {

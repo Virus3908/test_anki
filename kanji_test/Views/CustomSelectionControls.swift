@@ -6,23 +6,46 @@ import SwiftUI
 struct CustomSelectionBar: View, StudyViewStyling {
     let session: CustomTrainingSession
     let onStart: () -> Void
+    /// Поиск справа от стартовой кнопки — то же место экрана, что у поиска
+    /// колоды и главного экрана. `nil` — поиск этому режиму недоступен.
+    var onSearch: (() -> Void)? = nil
 
     private var selection: Set<String> { session.selectedIDs }
 
     var body: some View {
-        primaryActionButton(
-            title: selection.isEmpty
-                ? "Выбери карточки"
-                : "Начать · \(selection.count) \(customSelectionPluralCards(selection.count))",
-            systemImage: selection.isEmpty ? "hand.tap" : "play.fill",
-            action: onStart
-        )
+        BottomActionBar {
+            selectionStartButton
+
+            if let onSearch {
+                GlassIconButton(systemImage: "magnifyingglass",
+                                accessibilityLabel: "Поиск по колоде",
+                                diameter: 52,
+                                action: onSearch)
+            }
+        }
+    }
+
+    /// Стартовая кнопка режима выбора — та же акцентная капсула высотой 52,
+    /// что и обычный старт тренировки, чтобы нижние панели экранов
+    /// выглядели одинаково.
+    private var selectionStartButton: some View {
+        Button(action: onStart) {
+            HStack {
+                Image(systemName: selection.isEmpty ? "hand.tap" : "play.fill")
+                Text(selection.isEmpty
+                     ? "Выбери карточки"
+                     : "Начать · \(selection.count) \(customSelectionPluralCards(selection.count))")
+                    .fontWeight(.semibold)
+            }
+            .padding(.horizontal, 18)
+            .frame(maxWidth: .infinity, minHeight: 52, alignment: .leading)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
         .disabled(selection.isEmpty)
         .opacity(selection.isEmpty ? 0.55 : 1)
-        .padding(.horizontal, 18)
-        .padding(.top, 10)
-        .padding(.bottom, 6)
-        .background(.ultraThinMaterial, ignoresSafeAreaEdges: .bottom)
+        .foregroundStyle(Color.white)
+        .background(AppPalette.accent, in: Capsule())
     }
 }
 

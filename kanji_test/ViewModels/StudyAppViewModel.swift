@@ -58,13 +58,4 @@ final class StudyAppViewModel {
             try await trainingSession?.bootstrapAnkiHistory(collection, importID: importID)
         }
     }
-
-    var navigationTitle: String {
-        switch navigation.route {
-        case .start: return "Набор карточек"
-        case .training: return "Kanji Trainer"
-        case .customTraining: return "Кастом-тренировка"
-        default: return "Колода"
-        }
-    }
 }

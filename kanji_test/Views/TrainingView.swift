@@ -9,6 +9,7 @@ struct TrainingView: View, CardContentRendering {
     let translationState: TranslationViewModel
     let coordinator: StudyCoordinator
     let onPractice: (PracticeSelection) -> Void
+    var onOpenSettings: () -> Void = {}
     var reviewStore: StudyProgressStore { trainingSession.reviewStore }
     var drawingSession: DrawingSessionViewModel { trainingSession.drawingSession }
     @State var speech = SpeechService()
@@ -19,6 +20,14 @@ struct TrainingView: View, CardContentRendering {
     var body: some View {
         activeTrainingView()
             .disabled(trainingSession.isPreparingCard)
+            .toolbar(.hidden, for: .navigationBar)
+            .cornerGlassControls(onOpenSettings: onOpenSettings) {
+                if !trainingSession.isGuidedSingleKanjiPractice {
+                    GlassIconButton(systemImage: "xmark.circle",
+                                    accessibilityLabel: "Исключить карточку из тренировок",
+                                    action: { excludeCurrentCard() })
+                }
+            }
             .onChange(of: trainingSession.options) { Task { await trainingSession.refreshForNewDay() } }
             .task(id: trainingSession.state.nextLearningDate) {
                 guard let date = trainingSession.state.nextLearningDate else { return }

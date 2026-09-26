@@ -8,16 +8,7 @@ struct ContentView: View {
         @Bindable var model = appModel
         NavigationStack {
             screen
-                .navigationTitle(appModel.navigationTitle)
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbarBackground(AppPalette.background, for: .navigationBar)
-                .toolbarBackground(.visible, for: .navigationBar)
-                .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button { appModel.isSettingsPresented = true } label: { Image(systemName: "gearshape") }
-                            .disabled(appModel.deckState.isLoadingDeck)
-                    }
-                }
+                .animation(.easeInOut(duration: 0.3), value: appModel.navigation.route)
                 .sheet(isPresented: $model.isSettingsPresented) {
                     SettingsView(settings: appModel.settings,
                         isBusy: appModel.isSavingReview || appModel.deckState.isLoadingDeck,
@@ -60,7 +51,9 @@ struct ContentView: View {
                       isLoading: appModel.deckState.isLoadingDeck, onOpen: appModel.openDeck,
                       settings: appModel.settings, ankiModel: appModel.ankiLibrary,
                       coordinator: appModel.coordinator, translationState: appModel.translationState,
-                      reviewStore: appModel.trainingSession.reviewStore, onPractice: appModel.practice)
+                      reviewStore: appModel.trainingSession.reviewStore, onPractice: appModel.practice,
+                      onOpenSettings: { appModel.isSettingsPresented = true })
+                .transition(routeTransition)
         case .ankiDeck(let deck):
             AnkiDeckPreviewView(deck: deck, model: appModel.ankiLibrary, settings: appModel.settings,
                 translationState: appModel.translationState,
@@ -70,22 +63,42 @@ struct ContentView: View {
                 onBack: appModel.closeAnkiDeck,
                 onPractice: appModel.practice,
                 onCustomTraining: appModel.beginCustomSelection,
-                onStartCustomTraining: appModel.startCustomTraining)
+                onStartCustomTraining: appModel.startCustomTraining,
+                onOpenSettings: { appModel.isSettingsPresented = true })
+                .transition(routeTransition)
         case .training:
             TrainingView(trainingSession: appModel.trainingSession, settings: appModel.settings,
-                         translationState: appModel.translationState, coordinator: appModel.coordinator, onPractice: appModel.practice)
+                         translationState: appModel.translationState, coordinator: appModel.coordinator, onPractice: appModel.practice,
+                         onOpenSettings: { appModel.isSettingsPresented = true })
+                .transition(routeTransition)
         case .customTraining:
             CustomTrainingView(session: appModel.customTraining, settings: appModel.settings,
                                translationState: appModel.translationState, coordinator: appModel.coordinator,
                                reviewStore: appModel.trainingSession.reviewStore,
-                               onExit: appModel.finishCustomTraining)
+                               onExit: appModel.finishCustomTraining,
+                               onOpenSettings: { appModel.isSettingsPresented = true })
+                .transition(routeTransition)
         default:
             DeckPreviewView(deckState: appModel.deckState, coordinator: appModel.coordinator, settings: appModel.settings,
                             translationState: appModel.translationState, reviewStore: appModel.trainingSession.reviewStore,
                             session: appModel.customTraining,
                             onPractice: appModel.practice,
                             onCustomTraining: appModel.beginCustomSelection,
-                            onStartCustomTraining: appModel.startCustomTraining)
+                            onStartCustomTraining: appModel.startCustomTraining,
+                            onOpenSettings: { appModel.isSettingsPresented = true })
+                .transition(routeTransition)
+        }
+    }
+
+    /// Направленный переход между экранами: «вперёд» — новая страница
+    /// въезжает справа (как системный push), «назад» — текущая уезжает
+    /// вправо (как pop в настройках iOS). Нижняя панель уезжает вместе
+    /// со своей страницей — без мигания на месте.
+    private var routeTransition: AnyTransition {
+        if appModel.navigation.isMovingBack {
+            .asymmetric(insertion: .move(edge: .leading), removal: .move(edge: .trailing))
+        } else {
+            .asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading))
         }
     }
 

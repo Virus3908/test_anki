@@ -11,37 +11,20 @@ extension DeckPreviewView {
 
             VStack(alignment: .leading, spacing: 14) {
                 previewHeader(title: deck.title, subtitle: deckPreviewStatus, onBack: closeDeckPreview) {
-                    Button {
-                        isSearchPresented = true
-                    } label: {
-                        Image(systemName: "magnifyingglass")
-                    }
-                    .buttonStyle(.bordered)
-                    .tint(AppPalette.accent)
-
                     if !session.isSelecting {
-                        Button {
-                            coordinator.isDeckSchedulePresented = true
-                        } label: {
-                            Image(systemName: "info.circle")
-                        }
-                        .buttonStyle(.bordered)
-                        .tint(AppPalette.accent)
+                        GlassIconButton(systemImage: "info.circle",
+                                        accessibilityLabel: "Расписание повторений",
+                                        action: { coordinator.isDeckSchedulePresented = true })
                     }
+
+                    GlassIconButton(systemImage: "gearshape",
+                                    accessibilityLabel: "Настройки",
+                                    action: onOpenSettings)
                 }
 
                 if session.isSelecting {
                     CustomSelectionToolbar(session: session, cardIDs: deckState.previewCards.map(\.id))
                         .frame(maxWidth: .infinity, alignment: .trailing)
-                }
-
-                if !session.isSelecting {
-                    previewStartButton(
-                        plan: plan,
-                        isDisabled: deckState.previewCards.isEmpty,
-                        action: { onPractice(.kanji(deckState.previewCards, guided: false)) },
-                        onCustomTraining: onCustomTraining
-                    )
                 }
 
                 ScrollView(.vertical) {
@@ -63,15 +46,31 @@ extension DeckPreviewView {
                     CenteredLoadingIndicator(title: "Подготавливаю карточки")
                         .padding(.vertical, 10)
                 }
+
             }
             .padding(.horizontal, 12)
-            .padding(.top, 20)
-            .padding(.bottom, 4)
+            .padding(.top, 8)
             .foregroundStyle(AppPalette.text)
         }
         .safeAreaInset(edge: .bottom) {
+            // Единая нижняя панель: старт колоды или режим выбора карточек
+            // занимают одно и то же место с одной и той же геометрией.
             if session.isSelecting {
-                CustomSelectionBar(session: session, onStart: onStartCustomTraining)
+                CustomSelectionBar(session: session, onStart: onStartCustomTraining, onSearch: { isSearchPresented = true })
+            } else {
+                BottomActionBar {
+                    previewStartButton(
+                        plan: plan,
+                        isDisabled: deckState.previewCards.isEmpty,
+                        action: { onPractice(.kanji(deckState.previewCards, guided: false)) },
+                        onCustomTraining: onCustomTraining
+                    )
+
+                    GlassIconButton(systemImage: "magnifyingglass",
+                                    accessibilityLabel: "Поиск по колоде",
+                                    diameter: 52,
+                                    action: { isSearchPresented = true })
+                }
             }
         }
         .sheet(item: $coordinator.presentedKanjiPreview, onDismiss: {

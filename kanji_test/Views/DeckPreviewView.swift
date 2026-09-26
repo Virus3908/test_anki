@@ -11,6 +11,7 @@ struct DeckPreviewView: View, CardContentRendering {
     let onPractice: (PracticeSelection) -> Void
     var onCustomTraining: () -> Void = {}
     var onStartCustomTraining: () -> Void = {}
+    var onOpenSettings: () -> Void = {}
     var previewKanjiCards: [KanjiCard] { deckState.previewCards }
     var previewWordCards: [WordStudyCard] { deckState.previewWordCards }
     var previewKanaCards: [KanaStudyCard] { deckState.previewKanaCards }
@@ -38,6 +39,16 @@ struct DeckPreviewView: View, CardContentRendering {
             else if let deck = deckState.previewWordDeck { wordPreviewView(for: deck) }
             else if let deck = deckState.previewKanaDeck { kanaPreviewView(for: deck) }
         }
+        .toolbar(.hidden, for: .navigationBar)
+        .edgeBackSwipe(action: closeOpenPreview)
+    }
+
+    /// Свайп от левого края возвращает из открытой колоды на главный экран;
+    /// в режиме выбора сначала выходит из выбора — как и кнопка «назад».
+    func closeOpenPreview() {
+        if deckState.previewDeck != nil { closeDeckPreview() }
+        else if deckState.previewWordDeck != nil { closeWordPreview() }
+        else if deckState.previewKanaDeck != nil { closeKanaPreview() }
     }
     /// В режиме выбора карточек кнопка «назад» сначала выходит из выбора,
     /// а закрывает колоду только при повторном нажатии.

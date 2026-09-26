@@ -15,6 +15,7 @@ struct CustomTrainingView: View, CardContentRendering {
     let onExit: () -> Void
 
     var onPractice: (PracticeSelection) -> Void = { _ in }
+    var onOpenSettings: () -> Void = {}
     var deckID: String? { session.deck?.id }
     var practiceMode: PracticeMode { session.deck?.mode ?? .kanji }
 
@@ -46,6 +47,8 @@ struct CustomTrainingView: View, CardContentRendering {
                 stoppedView
             }
         }
+        .toolbar(.hidden, for: .navigationBar)
+        .cornerGlassControls(onOpenSettings: onOpenSettings) { }
         .sheet(isPresented: $isFieldSettingsPresented) {
             BuiltInCardFieldSettingsView(
                 settings: settings,
