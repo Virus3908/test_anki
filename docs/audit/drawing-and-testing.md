@@ -1,317 +1,317 @@
-# Audit: Drawing subsystem, tests and configuration
+# Аудит: подсистема рисования, тесты и конфигурация
 
-Phase 2 (AUDIT) findings. Read-only pass; no source was modified.
-Baseline verified: `swift test --package-path Packages/AnkiImport` passes
-(14 XCTest cases + 1 swift-testing suite with 0 tests).
+Находки фазы 2 (AUDIT). Проход только на чтение; исходники не менялись.
+Базовая линия проверена: `swift test --package-path Packages/AnkiImport` проходит
+(14 XCTest-кейсов + 1 swift-testing suite с 0 тестами).
 
-Line numbers verified by reading at audit time.
+Номера строк проверены чтением на момент аудита.
 
 ---
 
 # Drawing
 
-## DRAW-01 — unchecked array subscripts on network-sourced stroke data
+## DRAW-01 — непроверяемые индексы массива на данных штрихов, полученных из сети
 **critical** — `kanji_test/Models/KanjiStroke.swift:28,32`
 
-`startPoint`/`endPoint` index `start[0]`, `start[1]`, `end[0]`, `end[1]`
-directly. `KanjiStroke` is `Codable` and stroke geometry reaches the app
-through `KanjiAPIProvider+Mapping.swift:10` and the on-disk cache decoded at
+`startPoint`/`endPoint` обращаются к `start[0]`, `start[1]`, `end[0]`, `end[1]`
+напрямую. `KanjiStroke` — `Codable`, и геометрия штрихов попадает в приложение
+через `KanjiAPIProvider+Mapping.swift:10` и дисковый кэш, декодируемый в
 `kanji_test/Data/KanjiDeckCacheRepository.swift:15`. `kanji_test/Data/kanji-data.json`
-is 3 bytes (`[]`), so **all** kanji stroke content is remote or cached —
-there is no bundled fallback. A short `start`/`end` array from a changed API
-response or a truncated cache file traps at runtime.
+весит 3 байта (`[]`), поэтому **все** данные о штрихах кандзи приходят с сети
+или из кэша — бандлед-фолбэка нет. Короткий массив `start`/`end` из изменившегося
+ответа API или обрезанного файла кэша уронит приложение в рантайме.
 
-Cost: **correctness** (crash on untrusted input) and **security** (remote
-input controls an index). The decode boundary does not validate arity.
+Цена: **корректность** (падение на недоверенном вводе) и **безопасность** (индекс
+управляется удалённым вводом). Граница декодирования не проверяет размерность.
 
-## DRAW-02 — `StrokeEvaluator` has zero tests despite owning all matching policy
+## DRAW-02 — у `StrokeEvaluator` нет ни одного теста, хотя он владеет всей политикой сопоставления
 **critical** — `kanji_test/Drawing/StrokeFeedback.swift:4`
 
-`StrokeEvaluator` is the entire correctness core of the drawing feature and is
-referenced from three places (`DrawingSessionViewModel.swift:81,90,194`). No
-test file instantiates it (verified: `StrokeEvaluator` appears nowhere in
-`kanji_testHostedTests/`). Every tolerance below could be changed to an
-arbitrary value and the suite would stay green.
+`StrokeEvaluator` — это целиком ядро корректности функции рисования, на него
+ссылаются из трёх мест (`DrawingSessionViewModel.swift:81,90,194`). Ни один
+тестовый файл его не создаёт (проверено: `StrokeEvaluator` не встречается в
+`kanji_testHostedTests/` нигде). Любой из допусков ниже можно поменять на
+произвольное значение, и набор тестов останется зелёным.
 
-Cost: **testability** and **correctness** — the tuning constants in DRAW-03
-are unprotected, so any future adjustment is unfalsifiable.
+Цена: **тестируемость** и **корректность** — настроечные константы из DRAW-03
+ничем не защищены, поэтому любая будущая правка неопровержима.
 
-## DRAW-03 — unnamed tuning constants scattered through stroke matching
+## DRAW-03 — безымянные настроечные константы разбросаны по логике сопоставления штрихов
 **major** — `kanji_test/Drawing/StrokeFeedback.swift:113,117,131`
 
-The scoring thresholds are bare literals inside the comparison logic:
-`34` (good/degraded distance cutoff, `:113`), `54` (minor-vs-major cutoff,
-`:117`), and `18`/`24` (the width/height gate that classifies a stroke's
-axis, `:131`). They are in canonical stroke units — `DrawingBoard.swift:15` scales by
-`size.width / canonicalSize`, so the numbers only make sense relative to
-`canonicalSize`, which is not stated at the point of use.
+Пороги оценки — голые литералы внутри логики сравнения:
+`34` (порог good/degraded по расстоянию, `:113`), `54` (порог minor против major,
+`:117`) и `18`/`24` (гейт по ширине/высоте, классифицирующий ось штриха, `:131`).
+Они заданы в канонических единицах штриха — `DrawingBoard.swift:15` масштабирует
+через `size.width / canonicalSize`, поэтому числа имеют смысл только относительно
+`canonicalSize`, который в месте использования не указан.
 
-These are a coherent set of tuning parameters for one algorithm and belong in
-one named place next to the evaluator.
+Это связный набор настроечных параметров одного алгоритма, и его место — в одном
+именованном месте рядом с оценщиком.
 
-Cost: **maintainability** — tuning requires reading the whole function to find
-every coupled literal; **correctness** — the implicit coordinate-space
-contract is undocumented, so a change to `canonicalSize` silently invalidates
-all four values.
+Цена: **поддерживаемость** — для настройки надо прочитать всю функцию, чтобы найти
+каждый связанный литерал; **корректность** — неявный контракт системы координат
+не описан, поэтому изменение `canonicalSize` молча обесценивает все четыре значения.
 
-## DRAW-04 — kanji and kana drawing panels are byte-identical
-**major** — `kanji_test/Views/TrainingView+KanjiDrawingPanel.swift` vs
+## DRAW-04 — панели рисования кандзи и каны побайтово идентичны
+**major** — `kanji_test/Views/TrainingView+KanjiDrawingPanel.swift` против
 `kanji_test/Views/TrainingView+KanaDrawingPanel.swift`
 
-`diff` of the two files differs only in the card parameter type and
-indentation; the view bodies are otherwise the same. `TrainingView+WordDrawingPanel.swift`
-is a third near-copy with word-specific index handling.
+`diff` двух файлов отличается только типом параметра карточки и отступами;
+тела вью в остальном совпадают. `TrainingView+WordDrawingPanel.swift` — третья
+почти-копия с обработкой индексов, специфичной для слов.
 
-Cost: **maintainability** — a fix to the drawing panel must be applied two to
-three times, and drift between them is invisible without diffing.
+Цена: **поддерживаемость** — правку панели рисования надо применять два-три раза,
+а расхождение между ними невидимо без diff.
 
-## DRAW-05 — verbatim duplicated SVG tokenizer
-**major** — `kanji_test/Drawing/SVGPathParser.swift:76` and
+## DRAW-05 — дословно продублированный SVG-токенизатор
+**major** — `kanji_test/Drawing/SVGPathParser.swift:76` и
 `kanji_test/Drawing/SVGStrokeExtractor.swift`
 
-The `segments(in:)` tokenizer, the number scanner and the token-append helper
-exist in identical form in both files. Two copies of the same hand-rolled
-parser will diverge.
+Токенизатор `segments(in:)`, сканер чисел и хелпер добавления токена существуют
+в идентичном виде в обоих файлах. Две копии одного самописного парсера разъедутся.
 
-Cost: **maintainability**, and **correctness** if only one copy is fixed.
+Цена: **поддерживаемость**, и **корректность**, если исправят только одну копию.
 
-## DRAW-06 — SVG parser silently drops unsupported path commands
+## DRAW-06 — SVG-парсер молча отбрасывает неподдерживаемые команды пути
 **major** — `kanji_test/Drawing/SVGPathParser.swift:68`
 
-The `switch` at `:33` handles only `M m L l C c`. The `default` case at `:68`
-discards anything else with no diagnostic. Real KanjiVG-style path data uses
-`S`, `s`, `Q`, `q`, `T`, `t`, `A`, `a`, `H`, `h`, `V`, `v` and `Z`. Malformed
-or merely unsupported input produces a silently incomplete path rather than an
-error, and `summarize(pathData:)` at `SVGStrokeExtractor.swift:36` returns
-`nil` on failure with the reason discarded.
+`switch` на `:33` обрабатывает только `M m L l C c`. Ветка `default` на `:68`
+отбрасывает всё остальное без диагностики. Реальные пути в стиле KanjiVG
+используют `S`, `s`, `Q`, `q`, `T`, `t`, `A`, `a`, `H`, `h`, `V`, `v` и `Z`.
+Некорректный или просто неподдерживаемый ввод даёт молча неполный путь вместо
+ошибки, а `summarize(pathData:)` в `SVGStrokeExtractor.swift:36` возвращает
+`nil` при сбое, теряя причину.
 
-Cost: **correctness** — strokes render and are scored against geometry that
-partially parsed; **maintainability** — a swallowed error gives no signal
-about which glyph failed.
+Цена: **корректность** — штрихи рисуются и оцениваются по геометрии, разобранной
+частично; **поддерживаемость** — проглоченная ошибка не даёт сигнала, какой
+глиф не разобрался.
 
-## DRAW-07 — six dead forwarding functions
+## DRAW-07 — шесть мёртвых функций-переадресаций
 **minor** — `kanji_test/Views/TrainingView+GuidedDrawingLogic.swift:4,19`;
 `kanji_test/Views/TrainingView+WordDrawingLogic.swift:19,23,27,39`
 
-`guidedExpectedStrokes(for:)`, `nextGuidedStrokeLimit(for:)`,
+На `guidedExpectedStrokes(for:)`, `nextGuidedStrokeLimit(for:)`,
 `saveCurrentWordDrawing()`, `evaluateWordParts(_:)`,
-`flattenedWordFeedback(for:)` and `storeCurrentWordFeedback(_:in:)` have no
-references outside their own definitions. Each is a one-line forward to
+`flattenedWordFeedback(for:)` и `storeCurrentWordFeedback(_:in:)` нет ссылок
+вне их собственных определений. Каждая — однострочная переадресация в
 `DrawingSessionViewModel`.
 
-(`selectWordKanji(at:in:)` at `TrainingView+WordDrawingLogic.swift:11` is
-still referenced and is not dead.)
+(`selectWordKanji(at:in:)` в `TrainingView+WordDrawingLogic.swift:11` ещё
+используется и мёртвым не является.)
 
-Cost: **maintainability** — dead indirection inflates the apparent API of the
-view layer and misleads readers about where drawing logic lives.
+Цена: **поддерживаемость** — мёртвая косвенность раздувает видимый API слоя
+вью и вводит читателя в заблуждение насчёт того, где живёт логика рисования.
 
-## DRAW-08 — `drawGuides` duplicated across two Canvas views
-**minor** — `kanji_test/Drawing/DrawingBoard.swift:126` and
+## DRAW-08 — `drawGuides` продублирован в двух Canvas-вью
+**minor** — `kanji_test/Drawing/DrawingBoard.swift:126` и
 `kanji_test/Drawing/StrokeStepStrip.swift:52`
 
-Two private copies of the same guide-drawing routine.
+Две приватные копии одной и той же процедуры рисования направляющих.
 
-Cost: **maintainability** — guide appearance can drift between the main board
-and the step strip.
+Цена: **поддерживаемость** — вид направляющих может разъехаться между основной
+доской и полосой шагов.
 
-## DRAW-09 — repeated unnamed layout literals in the step strip
+## DRAW-09 — повторяющиеся безымянные литералы вёрстки в полосе шагов
 **minor** — `kanji_test/Drawing/StrokeStepStrip.swift:9,17`
 
-The cell size `41` is repeated three times across `GridItem(.adaptive(minimum:maximum:))`
-and `.frame(width:height:)`, with `2.2`/`2.4` line widths duplicated between
-`StrokeStepStrip.swift:38` and `DrawingBoard.swift:27,31`.
+Размер ячейки `41` повторяется трижды в `GridItem(.adaptive(minimum:maximum:))`
+и `.frame(width:height:)`, а толщины линий `2.2`/`2.4` дублируются между
+`StrokeStepStrip.swift:38` и `DrawingBoard.swift:27,31`.
 
-Cost: **maintainability** — a sizing change must be made in several places to
-stay consistent.
+Цена: **поддерживаемость** — изменение размеров надо вносить в нескольких местах,
+чтобы сохранить согласованность.
 
 ---
 
 # Tests-and-Config
 
-## CFG-01 — no CI whatsoever
-**critical** — repository root
+## CFG-01 — CI нет вообще
+**critical** — корень репозитория
 
-No `.github/`, no `fastlane/`, no `Makefile`, no `scripts/`, no
-`.gitlab-ci.yml`. Nothing runs the build or either test suite
-automatically. The documented commands in `AGENTS.md` are manual-only.
+Нет ни `.github/`, ни `fastlane/`, ни `Makefile`, ни `scripts/`, ни
+`.gitlab-ci.yml`. Ничто не запускает сборку или любой из наборов тестов
+автоматически. Задокументированные в `AGENTS.md` команды — только для ручного
+запуска.
 
-Cost: **correctness** — regressions reach `main` undetected; the existing
-good tests (see CFG-06) provide value only when someone remembers to run
-them. This is the single highest-leverage gap in the whole audit.
+Цена: **корректность** — регрессии попадают в `main` незамеченными; существующие
+хорошие тесты (см. CFG-06) приносят пользу только тогда, когда кто-то вспомнит
+их запустить. Это самый рычажный пробел во всём аудите.
 
-## CFG-02 — app test suite covers a small slice of ~12.7k lines of app Swift
+## CFG-02 — набор тестов приложения покрывает малую долю ~12.7k строк Swift приложения
 **critical** — `kanji_testHostedTests/`
 
-Four files, 28 test functions, 110 assertions total. By types actually
-instantiated, the tests reach `StudyProgressStore`, `AnkiSchedulingMigrator`,
+Четыре файла, 28 тестовых функций, 110 проверок суммарно. По фактически
+создаваемым типам тесты доходят до `StudyProgressStore`, `AnkiSchedulingMigrator`,
 `TrainingSessionViewModel`, `StudyCardCatalog`, `TrainingSessionEngine`,
-`DrawingSessionViewModel`, `AnkiLibraryViewModel` and `StudyScheduler` (once).
-Everything else is untested — see the coverage table.
+`DrawingSessionViewModel`, `AnkiLibraryViewModel` и `StudyScheduler` (однажды).
+Всё остальное без тестов — см. таблицу покрытия.
 
-Cost: **testability** and **correctness** — whole subsystems including all
-persistence, all networking, translation and TTS can break silently.
+Цена: **тестируемость** и **корректность** — целые подсистемы, включая всю
+персистентность, всю сеть, перевод и TTS, могут ломаться молча.
 
-## CFG-03 — shared scheme references a target that does not exist
+## CFG-03 — общая схема ссылается на несуществующий таргет
 **major** — `kanji_test.xcodeproj/xcshareddata/xcschemes/kanji_testUnitTests.xcscheme:23`
 
-The scheme declares a testable `kanji_testUnitTests.xctest`. The string
-`kanji_testUnitTests` appears **zero** times in `project.pbxproj` and no
-`kanji_testUnitTests/` directory exists. The scheme is stale and will fail if
-selected.
+Схема объявляет тестируемый `kanji_testUnitTests.xctest`. Строка
+`kanji_testUnitTests` встречается в `project.pbxproj` **ноль** раз, и каталога
+`kanji_testUnitTests/` не существует. Схема устарела и упадёт, если её выбрать.
 
-Cost: **maintainability** — a broken checked-in scheme is a trap for CI setup
-(CFG-01) and for new contributors.
+Цена: **поддерживаемость** — сломанная схема в репозитории — ловушка при настройке
+CI (CFG-01) и для новых участников.
 
-## CFG-04 — two conflicting DEVELOPMENT_TEAM values in one project file
-**major** — `kanji_test.xcodeproj/project.pbxproj:247,313` (`56X328PYCN`) vs
+## CFG-04 — два конфликтующих значения DEVELOPMENT_TEAM в одном файле проекта
+**major** — `kanji_test.xcodeproj/project.pbxproj:247,313` (`56X328PYCN`) против
 `:343,376` (`A24JC9X7D2`)
 
-The app target and the test target are signed against different teams.
-Bundle identifiers also diverge in style: `com.sashapin.kanjI-test` (`:357`,
-note the stray capital `I`) versus `com.lomach.kanji-test.integration-tests`
-(`:407`) — two unrelated reverse-domain prefixes.
+Таргет приложения и таргет тестов подписываются разными командами. Bundle
+identifier тоже расходятся по стилю: `com.sashapin.kanjI-test` (`:357`,
+обратите внимание на случайную заглавную `I`) против
+`com.lomach.kanji-test.integration-tests` (`:407`) — два несвязанных
+reverse-domain префикса.
 
-Cost: **maintainability** — signing breaks per-machine depending on which
-team the developer belongs to; the typo'd identifier is baked into the
-shipping app.
+Цена: **поддерживаемость** — подпись ломается по-разному на каждой машине
+в зависимости от того, в какой команде состоит разработчик; идентификатор
+с опечаткой зашит в выпускаемое приложение.
 
-## CFG-05 — contradictory orientation configuration
-**major** — `kanji_test/App/kanji_testApp.swift` (AppDelegate orientation lock)
-vs `project.pbxproj:350,351,383,384`
+## CFG-05 — противоречивая конфигурация ориентации
+**major** — `kanji_test/App/kanji_testApp.swift` (блокировка ориентации в AppDelegate)
+против `project.pbxproj:350,351,383,384`
 
-The `AppDelegate` pins supported orientations to portrait while
-`INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone` and `_iPad` declare
-landscape variants. Two sources of truth disagree; the code wins at runtime
-and the declared capability is a lie.
+`AppDelegate` фиксирует поддерживаемые ориентации на портретной, тогда как
+`INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone` и `_iPad` объявляют
+и ландшафтные варианты. Два источника истины не согласуются; в рантайме побеждает
+код, а объявленная возможность — фикция.
 
-Cost: **maintainability** — the build setting suggests landscape is
-supported, so a future change to the AppDelegate silently ships an untested
-landscape layout.
+Цена: **поддерживаемость** — настройка сборки говорит, что ландшафт поддержан,
+поэтому будущее изменение в AppDelegate молча выпустит непротестированную
+ландшафтную вёрстку.
 
-## CFG-06 — `SWIFT_VERSION = 5.0` on all app targets while the package is on tools 6.0
-**major** — `project.pbxproj:364,397,409,422` vs
+## CFG-06 — `SWIFT_VERSION = 5.0` на всех таргетах приложения, тогда как пакет на tools 6.0
+**major** — `project.pbxproj:364,397,409,422` против
 `Packages/AnkiImport/Package.swift:1`
 
-The app compiles in Swift 5 language mode; the local package declares
-`swift-tools-version: 6.0`. `SWIFT_STRICT_CONCURRENCY` is not set anywhere in
-the project file. `AGENTS.md` documents careful `@MainActor`/actor boundaries,
-but nothing enforces them on the app side — only
-`SWIFT_APPROACHABLE_CONCURRENCY = YES` (`:360`) and
-`SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY` (`:363`) are enabled, and
-only on one configuration pair.
+Приложение компилируется в языковом режиме Swift 5; локальный пакет объявляет
+`swift-tools-version: 6.0`. `SWIFT_STRICT_CONCURRENCY` в файле проекта не задан
+нигде. `AGENTS.md` описывает аккуратные границы `@MainActor`/акторов, но на стороне
+приложения их ничто не проверяет — включены только
+`SWIFT_APPROACHABLE_CONCURRENCY = YES` (`:360`) и
+`SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY` (`:363`), и только на одной
+паре конфигураций.
 
-Cost: **correctness** — the concurrency invariants the architecture depends on
-are unchecked by the compiler; **maintainability** — the app/package language
-split means package code cannot be moved into the app without new errors.
+Цена: **корректность** — инварианты конкурентности, на которые опирается
+архитектура, компилятором не проверяются; **поддерживаемость** — разъезд языковых
+версий приложения и пакета означает, что код пакета нельзя перенести в приложение
+без новых ошибок.
 
-## CFG-07 — warnings are not errors anywhere
-**minor** — `project.pbxproj` (no `SWIFT_TREAT_WARNINGS_AS_ERRORS`, no
+## CFG-07 — предупреждения нигде не считаются ошибками
+**minor** — `project.pbxproj` (нет `SWIFT_TREAT_WARNINGS_AS_ERRORS`, нет
 `GCC_TREAT_WARNINGS_AS_ERRORS`)
 
-Neither setting appears in the file. Combined with no CI (CFG-01), warnings
-accumulate unobserved.
+Ни одна из настроек в файле не встречается. В сочетании с отсутствием CI (CFG-01)
+предупреждения накапливаются незаметно.
 
-Cost: **maintainability** — the compiler's own dead-code and unused-value
-diagnostics, which would have flagged DRAW-07, are advisory only.
+Цена: **поддерживаемость** — собственные диагностики компилятора про мёртвый код
+и неиспользуемые значения, которые указали бы на DRAW-07, носят лишь
+рекомендательный характер.
 
-## CFG-08 — `IPHONEOS_DEPLOYMENT_TARGET = 26.5` excludes the package's stated floor
-**minor** — `project.pbxproj:265,325` vs `Packages/AnkiImport/Package.swift:5`
+## CFG-08 — `IPHONEOS_DEPLOYMENT_TARGET = 26.5` исключает заявленный минимум пакета
+**minor** — `project.pbxproj:265,325` против `Packages/AnkiImport/Package.swift:5`
 
-The app requires iOS 26.5 while the package advertises `.iOS(.v17)`. The
-package's platform floor is therefore untested and misleading.
+Приложение требует iOS 26.5, тогда как пакет заявляет `.iOS(.v17)`. Нижняя
+платформенная граница пакета, таким образом, не проверяется и вводит в заблуждение.
 
-Cost: **maintainability** — the package manifest implies portability the app
-never exercises.
+Цена: **поддерживаемость** — манифест пакета подразумевает переносимость, которую
+приложение никогда не использует.
 
-## CFG-09 — `.build` is correctly ignored (no defect)
-**minor / informational** — `.gitignore`
+## CFG-09 — `.build` корректно игнорируется (дефекта нет)
+**minor / информационно** — `.gitignore`
 
-`git check-ignore` confirms `Packages/AnkiImport/.build/` is matched, and
-`git ls-files` reports zero tracked paths under `.build/`. The vendored
-checkouts on disk are local artifacts only. **No action needed** — recorded
-because it was explicitly in scope.
+`git check-ignore` подтверждает, что `Packages/AnkiImport/.build/` попадает под
+правило, а `git ls-files` показывает ноль отслеживаемых путей под `.build/`.
+Вендорные чекауты на диске — только локальные артефакты. **Действий не требуется** —
+зафиксировано потому, что это явно входило в область аудита.
 
-## Coverage table
+## Таблица покрытия
 
-| Subsystem | ~Lines | Test files touching it | Verdict |
+| Подсистема | ~Строк | Тестовые файлы, затрагивающие её | Вердикт |
 |---|---|---|---|
-| Anki import/parsing (`Packages/AnkiImport`) | ~3.6k | `AnkiImportTests.swift`, `AnkiWebRenderingTests.swift` (335 lines, 14 cases) | adequate |
-| Anki study/SRS integration | ~1.5k | `AnkiStudyIntegrationTests.swift` (11 cases, 62 asserts) | adequate |
-| Card search | — | `CardSearchTests.swift` (12 cases, 31 asserts) | adequate |
-| Training queue/engine | ~800 | `TrainingSessionEngineTests.swift` (2 cases, 8 asserts) | thin |
-| Drawing session orchestration | ~235 | `DrawingSessionViewModelTests.swift` (3 cases, 9 asserts) | thin |
-| `StrokeEvaluator` / stroke scoring | ~150 | — | **none** |
-| SVG parsing + stroke extraction | ~284 | — | **none** |
-| Kana stroke presets | ~263 | — | **none** |
-| `StudyScheduler` (FSRS adapter) | — | referenced once, incidentally | **none** (no direct interval tests) |
-| Persistence: `JSONFileStore`, `ReviewRepository` | — | — | **none** |
-| Translation subsystem + `TranslationRepository` | ~600 | — | **none** |
-| Remote kanji provider / API mapping | ~400 | — | **none** |
-| Caches (`KanjiDeckCache`, `KanaSVGCache`, `WordExampleCache`) | — | — | **none** |
-| Speech / TTS (`SpeechService`) | — | — | **none** |
-| `AnkiCardRenderer`, `AnkiMediaService`, `AnkiAudioPlayback` | — | — | **none** |
-| Word/kanji/kana data loaders | — | — | **none** |
-| All SwiftUI views | ~4k | — | none (acceptable) |
+| Anki import/parsing (`Packages/AnkiImport`) | ~3.6k | `AnkiImportTests.swift`, `AnkiWebRenderingTests.swift` (335 строк, 14 кейсов) | достаточно |
+| Anki study/SRS интеграция | ~1.5k | `AnkiStudyIntegrationTests.swift` (11 кейсов, 62 проверки) | достаточно |
+| Поиск карточек | — | `CardSearchTests.swift` (12 кейсов, 31 проверка) | достаточно |
+| Очередь/движок тренировки | ~800 | `TrainingSessionEngineTests.swift` (2 кейса, 8 проверок) | тонко |
+| Оркестрация сессии рисования | ~235 | `DrawingSessionViewModelTests.swift` (3 кейса, 9 проверок) | тонко |
+| `StrokeEvaluator` / оценка штрихов | ~150 | — | **нет** |
+| Разбор SVG + извлечение штрихов | ~284 | — | **нет** |
+| Пресеты штрихов каны | ~263 | — | **нет** |
+| `StudyScheduler` (адаптер FSRS) | — | упомянут один раз, попутно | **нет** (прямых тестов интервалов нет) |
+| Персистентность: `JSONFileStore`, `ReviewRepository` | — | — | **нет** |
+| Подсистема перевода + `TranslationRepository` | ~600 | — | **нет** |
+| Удалённый провайдер кандзи / маппинг API | ~400 | — | **нет** |
+| Кэши (`KanjiDeckCache`, `KanaSVGCache`, `WordExampleCache`) | — | — | **нет** |
+| Речь / TTS (`SpeechService`) | — | — | **нет** |
+| `AnkiCardRenderer`, `AnkiMediaService`, `AnkiAudioPlayback` | — | — | **нет** |
+| Загрузчики данных слов/кандзи/каны | — | — | **нет** |
+| Все SwiftUI-вью | ~4k | — | нет (допустимо) |
 
-### Subsystems with literally zero coverage
+### Подсистемы с буквально нулевым покрытием
 
-`StrokeEvaluator`; SVG parsing/extraction; kana stroke presets;
-`StudyScheduler` intervals; `JSONFileStore`; `ReviewRepository`; translation
+`StrokeEvaluator`; разбор/извлечение SVG; пресеты штрихов каны;
+интервалы `StudyScheduler`; `JSONFileStore`; `ReviewRepository`; перевод
 (`TranslationViewModel`, `TranslationRepository`,
-`RussianMeaningTranslator`, `SystemTranslationClient`); remote kanji
-(`RemoteKanjiProvider`, `KanjiAPIProvider+Loading/+Mapping`); all three cache
-repositories; `SpeechService`; `AnkiCardRenderer`; `AnkiMediaService`;
-`AnkiAudioPlayback`; `AnkiSchedulingMigrator` beyond its integration path;
-data loaders.
+`RussianMeaningTranslator`, `SystemTranslationClient`); удалённые кандзи
+(`RemoteKanjiProvider`, `KanjiAPIProvider+Loading/+Mapping`); все три кэш-репозитория;
+`SpeechService`; `AnkiCardRenderer`; `AnkiMediaService`;
+`AnkiAudioPlayback`; `AnkiSchedulingMigrator` за пределами его интеграционного
+пути; загрузчики данных.
 
-## Test quality note
+## Замечание о качестве тестов
 
-The tests that exist are **good** and this should be said plainly: they are
-behavioral, not smoke tests. `DrawingSessionViewModelTests` asserts
-progressive stroke reveal and kanji advancement with real expected values;
-`AnkiStudyIntegrationTests` averages ~5.6 assertions per case. No `sleep`
-calls, no assertion-free tests, no obvious order dependence or shared mutable
-fixtures were found. They would fail if the code under test were deleted.
+Существующие тесты **хороши**, и это стоит сказать прямо: они поведенческие,
+а не smoke-тесты. `DrawingSessionViewModelTests` проверяет постепенное раскрытие
+штрихов и переход к следующему кандзи с реальными ожидаемыми значениями;
+у `AnkiStudyIntegrationTests` в среднем ~5.6 проверок на кейс. Ни вызовов `sleep`,
+ни тестов без проверок, ни явной зависимости от порядка или общих изменяемых
+фикстур не найдено. Они упали бы, если удалить тестируемый код.
 
-The problem is **breadth, not depth**. The existing suite is a good template
-to extend, not something to rewrite.
+Проблема в **широте, не в глубине**. Существующий набор — хороший шаблон для
+расширения, а не то, что надо переписывать.
 
-## Uncommitted `project.pbxproj` change
+## Незакоммиченное изменение `project.pbxproj`
 
-`git diff --stat` shows the working-tree modification is confined to
-`project.pbxproj`. It registers the new speech files
-(`Services/Speech/SpeechService.swift` and the related training/settings wiring)
-into the app target's build phase and file references — the membership
-bookkeeping for the already-committed speech feature described in `AGENTS.md`.
-It changes no build settings, no signing, no deployment target. It should be
-committed as-is; leaving it uncommitted means the speech feature's target
-membership exists only on this machine.
+`git diff --stat` показывает, что модификация в рабочем дереве ограничена
+`project.pbxproj`. Она регистрирует новые файлы речи
+(`Services/Speech/SpeechService.swift` и связанную обвязку тренировки/настроек)
+в build phase и file references таргета приложения — учёт принадлежности файлов
+для уже закоммиченной функции речи, описанной в `AGENTS.md`.
+Она не меняет ни настроек сборки, ни подписи, ни deployment target. Её стоит
+закоммитить как есть; оставить её незакоммиченной означает, что принадлежность
+файлов речи таргету существует только на этой машине.
 
-## What good looks like here
+## Как здесь выглядит «хорошо»
 
-This is a single-developer hobby-scale app. Full TDD would be wrong. A
-realistic minimum:
+Это приложение уровня хобби с одним разработчиком. Полноценный TDD был бы
+неуместен. Реалистичный минимум:
 
-1. **CI that runs what already exists.** One GitHub Actions workflow on push:
-   `swift test --package-path Packages/AnkiImport` plus the documented
-   `xcodebuild` build. That alone converts the existing 28 app tests and 14
-   package tests from "run when remembered" to a real gate. Highest value,
-   near-zero risk.
-2. **Pure-logic tests only, and only where a bug would be silent.** Stroke
-   scoring, SVG parsing, and FSRS interval calculation are deterministic
-   functions with no UI or I/O — they are cheap to test and currently
-   unprotected. Characterization tests here (pin current behavior, including
-   quirks) are the prerequisite for touching DRAW-03.
-3. **No view tests.** Snapshot/UI testing at this scale costs more than it
-   returns. The ~4k lines of SwiftUI views are acceptably untested provided
-   logic keeps moving out of them (DRAW-07 shows the pattern is already
-   understood).
-4. **Warnings as errors, once the existing warnings are cleared.** Cheap
-   permanent guard against the dead-code class of defect.
-5. **One source of truth per setting.** Resolve CFG-04 and CFG-05 rather than
-   documenting the contradiction.
+1. **CI, который запускает то, что уже есть.** Один workflow GitHub Actions
+   на push: `swift test --package-path Packages/AnkiImport` плюс
+   задокументированная сборка `xcodebuild`. Только это переводит существующие
+   28 тестов приложения и 14 тестов пакета из «запускаем, когда вспомним»
+   в настоящий гейт. Максимальная польза, риск близок к нулю.
+2. **Только тесты чистой логики и только там, где баг был бы молчаливым.**
+   Оценка штрихов, разбор SVG и расчёт интервалов FSRS — детерминированные
+   функции без UI и I/O: тестировать их дёшево, и сейчас они не защищены.
+   Характеризационные тесты здесь (запинить текущее поведение, включая
+   странности) — предпосылка для того, чтобы трогать DRAW-03.
+3. **Никаких тестов вью.** Snapshot/UI-тестирование на таком масштабе стоит
+   дороже, чем даёт. ~4k строк SwiftUI-вью допустимо оставить без тестов при
+   условии, что логика продолжает из них выноситься (DRAW-07 показывает, что
+   паттерн уже понят).
+4. **Предупреждения как ошибки, после того как текущие предупреждения разобраны.**
+   Дешёвая постоянная защита от класса дефектов «мёртвый код».
+5. **Один источник истины на настройку.** Решить CFG-04 и CFG-05, а не
+   документировать противоречие.
 
-Explicitly *not* recommended for this project: dependency-injection
-frameworks, mocking libraries, coverage thresholds, or a test-per-file
-convention. The architecture in `AGENTS.md` is already sound; the gap is
-enforcement, not design.
+Явно *не* рекомендуется для этого проекта: фреймворки внедрения зависимостей,
+библиотеки моков, пороги покрытия или конвенция «один тест на файл».
+Архитектура в `AGENTS.md` уже здравая; пробел в принуждении, а не в дизайне.
