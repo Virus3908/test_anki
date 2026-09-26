@@ -27,7 +27,7 @@ struct DeckPreviewView: View, CardContentRendering {
         )
     }
     /// Насколько хорошо карточка знается — по прогрессу основного обучения колоды;
-    /// режим выбора подсвечивает проблемные и освоенные карточки.
+    /// подсвечивает проблемные и освоенные карточки в сетке превью.
     func cardMastery(forReviewKey reviewKey: String) -> CardMastery {
         CardMastery(record: reviewStore.record(for: reviewKey),
                     isExcluded: reviewStore.isExcluded(reviewKey))

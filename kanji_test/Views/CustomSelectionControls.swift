@@ -92,7 +92,7 @@ extension View {
 /// проблемные заливаются красным с ростом проблем, худшие дополнительно
 /// получают красную рамку. Чем хуже/лучше знается — тем сильнее выражен эффект.
 struct CardMasteryChrome: ViewModifier {
-    /// `nil` (вне режима выбора) — модификатор ничего не меняет.
+    /// `nil` — подсветка выключена.
     let mastery: CardMastery?
 
     func body(content: Content) -> some View {

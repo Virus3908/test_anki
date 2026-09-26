@@ -30,7 +30,7 @@ extension DeckPreviewView {
                     LazyVGrid(columns: kanaPreviewColumns, spacing: 10) {
                         ForEach(deckState.previewKanaCards) { card in
                             kanaPreviewTile(for: card, action: session.isSelecting ? { session.toggle(card.id) } : nil)
-                                .cardMasteryChrome(session.isSelecting ? cardMastery(forReviewKey: card.reviewKey) : nil)
+                                .cardMasteryChrome(cardMastery(forReviewKey: card.reviewKey))
                                 .customSelectionChrome(isSelecting: session.isSelecting,
                                                        isSelected: session.selectedIDs.contains(card.id))
                         }
