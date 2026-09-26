@@ -54,6 +54,10 @@ enum AppPalette {
         light: (0.78, 0.58, 0.10),
         dark: (0.84, 0.64, 0.30)
     )
+    static let newCard = dynamic(
+        light: (0.30, 0.44, 0.72),
+        dark: (0.46, 0.60, 0.88)
+    )
     static let expectedCorrection = dynamic(
         light: (1.00, 0.35, 0.32),
         dark: (1.00, 0.42, 0.38)
