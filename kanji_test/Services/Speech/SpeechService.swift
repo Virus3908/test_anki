@@ -7,14 +7,28 @@ final class SpeechService {
     private let synthesizer = AVSpeechSynthesizer()
     @ObservationIgnored private var delegate: SpeechDelegate?
     private var generation = 0
+    private var isWarmedUp = false
     private(set) var isSpeaking = false
     private(set) var lastError: String?
-    var voiceIdentifier: String?
+    var voiceIdentifier: String? {
+        didSet { isWarmedUp = false }
+    }
     var rate: Float?
 
+    /// Preloads the speech engine and the chosen voice with an inaudible
+    /// utterance, so the first audible card doesn't pay the cold-start cost.
+    func warmUp() {
+        guard !isWarmedUp, generation == 0 else { return }
+        isWarmedUp = true
+        speak("あ", volume: 0)
+    }
+
     func speak(_ text: String) {
+        speak(text, volume: 1)
+    }
+
+    private func speak(_ text: String, volume: Float) {
         guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
-        let previousGeneration = generation
         generation += 1
         let current = generation
         synthesizer.stopSpeaking(at: .immediate)
@@ -24,9 +38,6 @@ final class SpeechService {
         Task { [weak self] in
             guard let self else { return }
             do {
-                if previousGeneration > 0 {
-                    await SpeechAudioSession.shared.deactivate(request: previousGeneration)
-                }
                 try await SpeechAudioSession.shared.activate(request: current)
             } catch {
                 guard generation == current else { return }
@@ -42,6 +53,7 @@ final class SpeechService {
             let utterance = AVSpeechUtterance(string: text)
             utterance.voice = resolvedVoice()
             utterance.rate = rate ?? AVSpeechUtteranceDefaultSpeechRate
+            utterance.volume = volume
             let completion = SpeechDelegate { [weak self] in
                 Task { await SpeechAudioSession.shared.deactivate(request: current) }
                 guard let self, self.generation == current else { return }
@@ -60,7 +72,7 @@ final class SpeechService {
             synthesizer.stopSpeaking(at: .immediate)
         }
         isSpeaking = false
-        Task { await SpeechAudioSession.shared.deactivate(request: current) }
+        Task { await SpeechAudioSession.shared.deactivateNow(request: current) }
     }
 
     static func japaneseVoices() -> [AVSpeechSynthesisVoice] {
@@ -78,39 +90,73 @@ final class SpeechService {
            let voice = AVSpeechSynthesisVoice(identifier: voiceIdentifier) {
             return voice
         }
-        return Self.japaneseVoice()
+        return Self.defaultJapaneseVoice
     }
+
+    private static let defaultJapaneseVoice: AVSpeechSynthesisVoice? = japaneseVoice()
 
     private static func japaneseVoice() -> AVSpeechSynthesisVoice? {
         japaneseVoices().first ?? AVSpeechSynthesisVoice(language: "ja-JP")
     }
 }
 
+/// Owns the shared audio session. `setActive` round-trips to the audio server
+/// and can cost hundreds of milliseconds, so the session is kept active while
+/// cards keep arriving and is released only after an idle period (or on
+/// `stop()`), instead of churning deactivate/activate per utterance.
 private actor SpeechAudioSession {
     static let shared = SpeechAudioSession()
 
+    private static let idleDeactivationDelay: Duration = .seconds(30)
+
     private var isConfigured = false
     private var activeRequest: Int?
+    private var pendingDeactivation: Task<Void, Never>?
 
     func activate(request: Int) throws {
+        cancelPendingDeactivation()
         let session = AVAudioSession.sharedInstance()
         if !isConfigured {
             try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
             isConfigured = true
         }
-        try session.setActive(true)
+        if activeRequest == nil {
+            try session.setActive(true)
+        }
         activeRequest = request
     }
 
+    /// Releases the session after the idle delay. A no-op if a newer request
+    /// already took ownership.
     func deactivate(request: Int) {
         guard activeRequest == request else { return }
+        cancelPendingDeactivation()
+        pendingDeactivation = Task {
+            try? await Task.sleep(for: Self.idleDeactivationDelay)
+            guard !Task.isCancelled, activeRequest == request else { return }
+            try? AVAudioSession.sharedInstance().setActive(
+                false,
+                options: [.notifyOthersOnDeactivation]
+            )
+            if activeRequest == request {
+                activeRequest = nil
+            }
+        }
+    }
+
+    func deactivateNow(request: Int) {
+        guard activeRequest == request else { return }
+        cancelPendingDeactivation()
         try? AVAudioSession.sharedInstance().setActive(
             false,
             options: [.notifyOthersOnDeactivation]
         )
-        if activeRequest == request {
-            activeRequest = nil
-        }
+        activeRequest = nil
+    }
+
+    private func cancelPendingDeactivation() {
+        pendingDeactivation?.cancel()
+        pendingDeactivation = nil
     }
 }
 
