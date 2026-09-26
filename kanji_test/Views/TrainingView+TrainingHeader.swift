@@ -20,59 +20,17 @@ extension TrainingView {
     }
 
     func headerControls() -> some View {
-        TrainingHeaderView(
+        let isPractice = trainingSession.isGuidedSingleKanjiPractice
+        let subtitle = isPractice
+            ? "Практика"
+            : "Ответов: \(trainingSession.sessionCompletedCards) · Осталось: \(trainingSession.sessionTotalCards)"
+
+        return TrainingHeaderView(
             title: trainingTitle,
-            isPractice: trainingSession.isGuidedSingleKanjiPractice,
-            completedCards: trainingSession.sessionCompletedCards,
-            remainingCards: trainingSession.sessionTotalCards,
-            onFinish: finishTraining,
-            onExclude: excludeCurrentCard
+            subtitle: subtitle,
+            onFinish: { finishTraining() },
+            onExclude: isPractice ? nil : { excludeCurrentCard() }
         )
-    }
-
-}
-
-private struct TrainingHeaderView: View {
-    let title: String
-    let isPractice: Bool
-    let completedCards: Int
-    let remainingCards: Int
-    let onFinish: () -> Void
-    let onExclude: () -> Void
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 5) {
-            HStack(spacing: 12) {
-                Button {
-                    onFinish()
-                } label: {
-                    Image(systemName: "square.grid.2x2")
-                        .frame(width: 34, height: 30)
-                }
-
-                Text(title)
-                    .font(.headline)
-                    .lineLimit(1)
-
-                Spacer()
-
-                if !isPractice {
-                    Button {
-                        onExclude()
-                    } label: {
-                        Image(systemName: "xmark.circle")
-                    }
-                    .accessibilityLabel("Исключить карточку из тренировок")
-                }
-            }
-
-            Text(isPractice ? "Практика" : "Ответов: \(completedCards) · Осталось: \(remainingCards)")
-                .font(.footnote.weight(.semibold))
-                .foregroundStyle(AppPalette.secondaryText)
-                .frame(maxWidth: .infinity, alignment: .trailing)
-        }
-        .buttonStyle(.bordered)
-        .tint(AppPalette.accent)
     }
 
 }

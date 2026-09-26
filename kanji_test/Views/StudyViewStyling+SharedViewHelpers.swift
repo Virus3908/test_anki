@@ -40,23 +40,52 @@ extension StudyViewStyling {
         }
     }
 
-    func previewStartButton(plan: StudyQueuePlan, isDisabled: Bool, action: @escaping () -> Void) -> some View {
-        primaryActionButton(title: "Начать тренировку", systemImage: "shuffle", action: action) {
-            HStack {
-                Image(systemName: "shuffle")
-                Text("Начать тренировку")
-                    .fontWeight(.semibold)
-                Spacer()
-                Text("\(plan.newCount)/\(plan.learningCount)/\(plan.reviewCount)")
-                    .fontWeight(.semibold)
-                    .monospacedDigit()
+    /// One capsule with two zones: the big left part starts normal training,
+    /// the small right part opens the custom card picker.
+    func previewStartButton(
+        plan: StudyQueuePlan,
+        isDisabled: Bool,
+        action: @escaping () -> Void,
+        onCustomTraining: @escaping () -> Void
+    ) -> some View {
+        HStack(spacing: 0) {
+            Button(action: action) {
+                HStack {
+                    Image(systemName: "shuffle")
+                    Text("Начать тренировку")
+                        .fontWeight(.semibold)
+                    Spacer()
+                    Text("\(plan.newCount)/\(plan.learningCount)/\(plan.reviewCount)")
+                        .fontWeight(.semibold)
+                        .monospacedDigit()
+                }
+                .padding(.horizontal, 18)
+                .frame(maxWidth: .infinity, minHeight: 52, alignment: .leading)
+                .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
+            .accessibilityLabel(
+                "Начать тренировку. Новые: \(plan.newCount). "
+                    + "Повторяемые: \(plan.learningCount). К просмотру: \(plan.reviewCount)"
+            )
+
+            Rectangle()
+                .fill(Color.white.opacity(0.35))
+                .frame(width: 1, height: 30)
+
+            Button(action: onCustomTraining) {
+                Image(systemName: "checklist")
+                    .font(.title3.weight(.semibold))
+                    .frame(minWidth: 58, minHeight: 52)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Кастом-тренировка: выбрать карточки")
         }
+        .foregroundStyle(Color.white)
+        .background(AppPalette.accent, in: Capsule())
+        .opacity(isDisabled ? 0.5 : 1)
         .disabled(isDisabled)
-        .accessibilityLabel(
-            "Начать тренировку. Новые: \(plan.newCount). "
-                + "Повторяемые: \(plan.learningCount). К просмотру: \(plan.reviewCount)"
-        )
     }
 
     func primaryActionButton<Label: View>(

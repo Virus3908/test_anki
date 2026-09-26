@@ -1,9 +1,15 @@
 import SwiftUI
 
 extension CardContentRendering {
-    func kanaPreviewTile(for card: KanaStudyCard) -> some View {
+    /// `action` переопределяет нажатие — например, выбор карточки
+    /// для кастом-тренировки вместо открытия превью.
+    func kanaPreviewTile(for card: KanaStudyCard, action: (() -> Void)? = nil) -> some View {
         Button {
-            openKanaPreviewCard(card)
+            if let action {
+                action()
+            } else {
+                openKanaPreviewCard(card)
+            }
         } label: {
             VStack(spacing: 4) {
                 Text(card.character)

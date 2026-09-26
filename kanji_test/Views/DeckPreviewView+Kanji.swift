@@ -19,23 +19,37 @@ extension DeckPreviewView {
                     .buttonStyle(.bordered)
                     .tint(AppPalette.accent)
 
-                    Button {
-                        coordinator.isDeckSchedulePresented = true
-                    } label: {
-                        Image(systemName: "info.circle")
+                    if !session.isSelecting {
+                        Button {
+                            coordinator.isDeckSchedulePresented = true
+                        } label: {
+                            Image(systemName: "info.circle")
+                        }
+                        .buttonStyle(.bordered)
+                        .tint(AppPalette.accent)
                     }
-                    .buttonStyle(.bordered)
-                    .tint(AppPalette.accent)
                 }
 
-                previewStartButton(plan: plan, isDisabled: deckState.previewCards.isEmpty) {
-                    onPractice(.kanji(deckState.previewCards, guided: false))
+                if session.isSelecting {
+                    CustomSelectionToolbar(session: session, cardIDs: deckState.previewCards.map(\.id))
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                }
+
+                if !session.isSelecting {
+                    previewStartButton(
+                        plan: plan,
+                        isDisabled: deckState.previewCards.isEmpty,
+                        action: { onPractice(.kanji(deckState.previewCards, guided: false)) },
+                        onCustomTraining: onCustomTraining
+                    )
                 }
 
                 ScrollView(.vertical) {
                     LazyVGrid(columns: kanjiPreviewColumns, spacing: 10) {
                         ForEach(deckState.previewCards) { card in
-                            kanjiPreviewTile(for: card)
+                            kanjiPreviewTile(for: card, action: session.isSelecting ? { session.toggle(card.id) } : nil)
+                                .customSelectionChrome(isSelecting: session.isSelecting,
+                                                       isSelected: session.selectedIDs.contains(card.id))
                         }
                     }
                     .padding(.horizontal, 4)
@@ -53,6 +67,11 @@ extension DeckPreviewView {
             .padding(.top, 20)
             .padding(.bottom, 4)
             .foregroundStyle(AppPalette.text)
+        }
+        .safeAreaInset(edge: .bottom) {
+            if session.isSelecting {
+                CustomSelectionBar(session: session, onStart: onStartCustomTraining)
+            }
         }
         .sheet(item: $coordinator.presentedKanjiPreview, onDismiss: {
             coordinator.closeKanjiPreview()

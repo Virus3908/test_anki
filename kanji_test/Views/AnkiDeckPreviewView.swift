@@ -9,8 +9,11 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
     let translationState: TranslationViewModel
     let trainingSession: TrainingSessionViewModel
     let reviewStore: StudyProgressStore
+    let session: CustomTrainingSession
     let onBack: () -> Void
     let onPractice: (PracticeSelection) -> Void
+    var onCustomTraining: () -> Void = {}
+    var onStartCustomTraining: () -> Void = {}
     @State private var selectedCard: AnkiStudyCard?
     @State private var showSchedule = false
     @State private var deckPendingDeletion: AnkiDeckReference?
@@ -27,13 +30,21 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
     }
     private let fieldPreferences = AnkiFieldDisplayPreferences.shared
 
+    /// В режиме выбора карточек кнопка «назад» сначала выходит из выбора,
+    /// а закрывает колоду только при повторном нажатии.
+    private func exitSelectionOrClose() {
+        if session.isSelecting { session.cancelSelection() } else { onBack() }
+    }
+
     var body: some View {
         ZStack {
             AppPalette.background.ignoresSafeArea()
             VStack(alignment: .leading, spacing: 14) {
-                previewHeader(title: deck.title, subtitle: "\(cards.count) карточек", onBack: onBack) {
-                    Button { showSchedule = true } label: { Image(systemName: "calendar") }
-                        .buttonStyle(.bordered).tint(AppPalette.accent).accessibilityLabel("Расписание повторений")
+                previewHeader(title: deck.title, subtitle: "\(cards.count) карточек", onBack: exitSelectionOrClose) {
+                    if !session.isSelecting {
+                        Button { showSchedule = true } label: { Image(systemName: "calendar") }
+                            .buttonStyle(.bordered).tint(AppPalette.accent).accessibilityLabel("Расписание повторений")
+                    }
                     Button(role: .destructive) {
                         deckPendingDeletion = deck
                     } label: {
@@ -43,13 +54,25 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
                     .buttonStyle(.borderless)
                     .disabled(model.isOpeningDeck || model.isDeletingDeck)
                 }
-                previewStartButton(plan: plan, isDisabled: cards.isEmpty || model.isOpeningDeck) {
-                    onPractice(.anki(deck, cards, guided: false))
+
+                if session.isSelecting {
+                    CustomSelectionToolbar(session: session, cardIDs: cards.map(\.id))
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                }
+                if !session.isSelecting {
+                    previewStartButton(
+                        plan: plan,
+                        isDisabled: cards.isEmpty || model.isOpeningDeck,
+                        action: { onPractice(.anki(deck, cards, guided: false)) },
+                        onCustomTraining: onCustomTraining
+                    )
                 }
                 ScrollView {
                     LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
                         ForEach(cards) { card in
-                            Button { selectedCard = card } label: {
+                            Button {
+                                if session.isSelecting { session.toggle(card.id) } else { selectedCard = card }
+                            } label: {
                                 VStack(alignment: .leading, spacing: 8) {
                                     Text(card.displayTitle(using: fieldPreferences.options(for: card.fieldPreferencesKey, fieldCount: card.noteType.fields.count)))
                                         .font(.headline).lineLimit(3)
@@ -62,6 +85,8 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
                                         .font(.caption2).foregroundStyle(AppPalette.secondaryText)
                                 }.padding(12).frame(maxWidth: .infinity, minHeight: 120, alignment: .topLeading).appSurfaceCard()
                             }.buttonStyle(.plain)
+                            .customSelectionChrome(isSelecting: session.isSelecting,
+                                                   isSelected: session.selectedIDs.contains(card.id))
                         }
                     }.padding(.horizontal, 4).padding(.bottom, 44)
                 }.mask { BottomScrollMask() }.frame(maxHeight: .infinity)
@@ -72,6 +97,11 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
                 }
             }
             .padding(.horizontal, 12).padding(.top, 20).padding(.bottom, 4).foregroundStyle(AppPalette.text)
+        }
+        .safeAreaInset(edge: .bottom) {
+            if session.isSelecting {
+                CustomSelectionBar(session: session, onStart: onStartCustomTraining)
+            }
         }
         .sheet(item: $selectedCard) { card in
             AnkiCardPreviewView(cards: cards, initialCard: card, translationState: translationState,

@@ -19,28 +19,17 @@ extension TrainingView {
                         .disabled(!trainingSession.canGoForward)
                 }
             }
-            HStack(spacing: 6) {
-                ForEach(ReviewRating.allCases) { rating in
-                    Button {
-                        switch practiceMode {
-                        case .kanji:
-                            if let card = cards[safe: trainingSession.currentIndex] { applyReview(rating, to: card) }
-                        case .words: applyWordReview(rating)
-                        case .kana: applyKanaReview(rating)
-                        case .anki: applyAnkiReview(rating)
-                        }
-                    } label: {
-                        VStack(spacing: 3) {
-                            Text(rating.title).font(.caption.weight(.bold))
-                            let interval = trainingSession.intervalLabel(for: rating)
-                            if !interval.isEmpty { Text(interval).font(.caption2) }
-                        }
-                        .frame(maxWidth: .infinity, minHeight: 30)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.small)
-                    .tint(ratingButtonColor(for: rating, hasFeedback: true, isAnswered: true))
-                    .disabled(!drawingSession.isAnswerVisible || trainingSession.isPreparingCard)
+            TrainingRatingBar(
+                isAnswerVisible: drawingSession.isAnswerVisible,
+                isPreparingCard: trainingSession.isPreparingCard,
+                intervalLabel: { trainingSession.intervalLabel(for: $0) }
+            ) { rating in
+                switch practiceMode {
+                case .kanji:
+                    if let card = cards[safe: trainingSession.currentIndex] { applyReview(rating, to: card) }
+                case .words: applyWordReview(rating)
+                case .kana: applyKanaReview(rating)
+                case .anki: applyAnkiReview(rating)
                 }
             }
         }
@@ -59,16 +48,7 @@ extension TrainingView {
             return AppPalette.mutedText
         }
 
-        switch rating {
-        case .again:
-            return AppPalette.correction
-        case .hard:
-            return AppPalette.warning
-        case .good:
-            return AppPalette.success
-        case .easy:
-            return AppPalette.accent
-        }
+        return TrainingRatingBar.buttonColor(for: rating)
     }
 
     @ViewBuilder
@@ -78,50 +58,6 @@ extension TrainingView {
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(ratingButtonColor(for: rating, hasFeedback: true, isAnswered: true))
         }
-    }
-
-    func feedbackInfoButton(items: [StrokeFeedback]) -> some View {
-        @Bindable var session = drawingSession
-
-        return Button {
-            drawingSession.showsFeedbackInfo = true
-        } label: {
-            Image(systemName: "info.circle")
-        }
-        .popover(isPresented: $session.showsFeedbackInfo, arrowEdge: .bottom) {
-            feedbackInfoPopover(items: items)
-                .presentationCompactAdaptation(.popover)
-        }
-    }
-
-    func feedbackInfoPopover(items: [StrokeFeedback]) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("Проверка")
-                .font(.headline)
-
-            ScrollView(.vertical) {
-                VStack(alignment: .leading, spacing: 8) {
-                    ForEach(items) { item in
-                        Text(item.message)
-                            .font(.footnote)
-                            .foregroundStyle(item.severity.textColor)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                }
-            }
-            .frame(maxHeight: 260)
-        }
-        .padding(14)
-        .frame(width: 300, alignment: .leading)
-        .background(AppPalette.surface)
-    }
-
-    func drawingPanelHeight(for size: CGSize) -> CGFloat {
-        min(max(size.height * 0.42, 310), 355)
-    }
-
-    func drawingBoardSide(for panelHeight: CGFloat) -> CGFloat {
-        min(max(panelHeight - 132, 160), 205)
     }
 
 }
