@@ -20,14 +20,26 @@ extension DeckPreviewView {
                     .tint(AppPalette.accent)
                 }
 
-                previewStartButton(plan: plan, isDisabled: deckState.previewWordCards.isEmpty) {
-                    onPractice(.words(deckState.previewWordCards, guided: false))
+                if session.isSelecting {
+                    CustomSelectionToolbar(session: session, cardIDs: deckState.previewWordCards.map(\.id))
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                }
+
+                if !session.isSelecting {
+                    previewStartButton(
+                        plan: plan,
+                        isDisabled: deckState.previewWordCards.isEmpty,
+                        action: { onPractice(.words(deckState.previewWordCards, guided: false)) },
+                        onCustomTraining: onCustomTraining
+                    )
                 }
 
                 ScrollView(.vertical) {
                     LazyVGrid(columns: wordPreviewColumns, spacing: 10) {
                         ForEach(deckState.previewWordCards) { card in
-                            wordPreviewTile(for: card)
+                            wordPreviewTile(for: card, action: session.isSelecting ? { session.toggle(card.id) } : nil)
+                                .customSelectionChrome(isSelecting: session.isSelecting,
+                                                       isSelected: session.selectedIDs.contains(card.id))
                         }
                     }
                     .padding(.horizontal, 4)
@@ -49,6 +61,11 @@ extension DeckPreviewView {
             .padding(.top, 20)
             .padding(.bottom, 4)
             .foregroundStyle(AppPalette.text)
+        }
+        .safeAreaInset(edge: .bottom) {
+            if session.isSelecting {
+                CustomSelectionBar(session: session, onStart: onStartCustomTraining)
+            }
         }
         .sheet(item: $coordinator.presentedWordPreview, onDismiss: {
             coordinator.closeWordPreview()

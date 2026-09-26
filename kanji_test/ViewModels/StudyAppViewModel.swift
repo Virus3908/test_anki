@@ -18,6 +18,7 @@ final class StudyAppViewModel {
     let trainingSession: TrainingSessionViewModel
     let translationState: TranslationViewModel
     let ankiLibrary: AnkiLibraryViewModel
+    let customTraining: CustomTrainingSession
     var isSettingsPresented = false
     var isTodayCompletionPresented = false
     var isLoadingSavedState = false
@@ -50,6 +51,7 @@ final class StudyAppViewModel {
         self.deckState = DeckPreviewViewModel(catalog: catalog, navigation: navigation, kanjiProvider: kanjiProvider)
         self.coordinator = StudyCoordinator(catalog: catalog, navigation: navigation, kanjiProvider: kanjiProvider)
         self.ankiLibrary = AnkiLibraryViewModel(repository: ankiRepository)
+        self.customTraining = CustomTrainingSession(catalog: catalog)
         self.translationState = TranslationViewModel(repository: translationRepository ?? TranslationRepository(), translator: translator,
             kanjiProvider: kanjiProvider, wordProvider: wordProvider, errors: errors)
         self.ankiLibrary.bootstrapScheduling = { [weak trainingSession] collection, importID in
@@ -61,6 +63,7 @@ final class StudyAppViewModel {
         switch navigation.route {
         case .start: return "Набор карточек"
         case .training: return "Kanji Trainer"
+        case .customTraining: return "Кастом-тренировка"
         default: return "Колода"
         }
     }

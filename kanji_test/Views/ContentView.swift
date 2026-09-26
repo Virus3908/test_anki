@@ -66,15 +66,26 @@ struct ContentView: View {
                 translationState: appModel.translationState,
                 trainingSession: appModel.trainingSession,
                 reviewStore: appModel.trainingSession.reviewStore,
+                session: appModel.customTraining,
                 onBack: appModel.closeAnkiDeck,
-                onPractice: appModel.practice)
+                onPractice: appModel.practice,
+                onCustomTraining: appModel.beginCustomSelection,
+                onStartCustomTraining: appModel.startCustomTraining)
         case .training:
             TrainingView(trainingSession: appModel.trainingSession, settings: appModel.settings,
                          translationState: appModel.translationState, coordinator: appModel.coordinator, onPractice: appModel.practice)
+        case .customTraining:
+            CustomTrainingView(session: appModel.customTraining, settings: appModel.settings,
+                               translationState: appModel.translationState, coordinator: appModel.coordinator,
+                               reviewStore: appModel.trainingSession.reviewStore,
+                               onExit: appModel.finishCustomTraining)
         default:
             DeckPreviewView(deckState: appModel.deckState, coordinator: appModel.coordinator, settings: appModel.settings,
                             translationState: appModel.translationState, reviewStore: appModel.trainingSession.reviewStore,
-                            onPractice: appModel.practice)
+                            session: appModel.customTraining,
+                            onPractice: appModel.practice,
+                            onCustomTraining: appModel.beginCustomSelection,
+                            onStartCustomTraining: appModel.startCustomTraining)
         }
     }
 

@@ -12,14 +12,26 @@ extension DeckPreviewView {
             VStack(alignment: .leading, spacing: 14) {
                 previewHeader(title: deck.title, subtitle: kanaPreviewStatus(for: deck), onBack: closeKanaPreview)
 
-                previewStartButton(plan: plan, isDisabled: deckState.previewKanaCards.isEmpty) {
-                    onPractice(.kana(deck, deckState.previewKanaCards, guided: false))
+                if session.isSelecting {
+                    CustomSelectionToolbar(session: session, cardIDs: deckState.previewKanaCards.map(\.id))
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                }
+
+                if !session.isSelecting {
+                    previewStartButton(
+                        plan: plan,
+                        isDisabled: deckState.previewKanaCards.isEmpty,
+                        action: { onPractice(.kana(deck, deckState.previewKanaCards, guided: false)) },
+                        onCustomTraining: onCustomTraining
+                    )
                 }
 
                 ScrollView(.vertical) {
                     LazyVGrid(columns: kanaPreviewColumns, spacing: 10) {
                         ForEach(deckState.previewKanaCards) { card in
-                            kanaPreviewTile(for: card)
+                            kanaPreviewTile(for: card, action: session.isSelecting ? { session.toggle(card.id) } : nil)
+                                .customSelectionChrome(isSelecting: session.isSelecting,
+                                                       isSelected: session.selectedIDs.contains(card.id))
                         }
                     }
                     .padding(.horizontal, 4)
@@ -38,6 +50,11 @@ extension DeckPreviewView {
             .padding(.top, 20)
             .padding(.bottom, 4)
             .foregroundStyle(AppPalette.text)
+        }
+        .safeAreaInset(edge: .bottom) {
+            if session.isSelecting {
+                CustomSelectionBar(session: session, onStart: onStartCustomTraining)
+            }
         }
         .sheet(item: $coordinator.presentedKanaPreview, onDismiss: {
             coordinator.closeKanaPreview()

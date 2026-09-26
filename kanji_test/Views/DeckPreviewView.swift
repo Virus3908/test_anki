@@ -7,7 +7,10 @@ struct DeckPreviewView: View, CardContentRendering {
     let settings: StudyPreferences
     let translationState: TranslationViewModel
     let reviewStore: StudyProgressStore
+    let session: CustomTrainingSession
     let onPractice: (PracticeSelection) -> Void
+    var onCustomTraining: () -> Void = {}
+    var onStartCustomTraining: () -> Void = {}
     var previewKanjiCards: [KanjiCard] { deckState.previewCards }
     var previewWordCards: [WordStudyCard] { deckState.previewWordCards }
     var previewKanaCards: [KanaStudyCard] { deckState.previewKanaCards }
@@ -30,9 +33,15 @@ struct DeckPreviewView: View, CardContentRendering {
             else if let deck = deckState.previewKanaDeck { kanaPreviewView(for: deck) }
         }
     }
-    func closeDeckPreview() { coordinator.closeDeckPreview(deckState: deckState) }
-    func closeWordPreview() { coordinator.closeWordPreview(deckState: deckState) }
-    func closeKanaPreview() { coordinator.closeKanaPreview(deckState: deckState) }
+    /// В режиме выбора карточек кнопка «назад» сначала выходит из выбора,
+    /// а закрывает колоду только при повторном нажатии.
+    func closeDeckPreview() { exitSelection { coordinator.closeDeckPreview(deckState: deckState) } }
+    func closeWordPreview() { exitSelection { coordinator.closeWordPreview(deckState: deckState) } }
+    func closeKanaPreview() { exitSelection { coordinator.closeKanaPreview(deckState: deckState) } }
+
+    private func exitSelection(then close: () -> Void) {
+        if session.isSelecting { session.cancelSelection() } else { close() }
+    }
 
     /// Лист поиска: кандзи-колода ищет по всем кандзи, словарная — по всем словам.
     func cardSearchSheet(scope: CardSearchViewModel.Scope) -> some View {

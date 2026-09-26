@@ -49,7 +49,7 @@ extension TrainingView {
 
     func trainingView(for card: KanjiCard) -> some View {
         GeometryReader { proxy in
-            let panelHeight = drawingPanelHeight(for: proxy.size)
+            let panelHeight = TrainingDrawingPanelMetrics.drawingPanelHeight(for: proxy.size)
 
             ZStack {
             AppPalette.background
@@ -81,7 +81,7 @@ extension TrainingView {
         let currentKanji = currentWordKanjiCard(for: wordCard)
 
         return GeometryReader { proxy in
-            let panelHeight = drawingPanelHeight(for: proxy.size)
+            let panelHeight = TrainingDrawingPanelMetrics.drawingPanelHeight(for: proxy.size)
 
             ZStack(alignment: .bottom) {
             AppPalette.background
@@ -126,7 +126,7 @@ extension TrainingView {
 
     func kanaTrainingView(for kanaCard: KanaStudyCard) -> some View {
         GeometryReader { proxy in
-            let panelHeight = drawingPanelHeight(for: proxy.size)
+            let panelHeight = TrainingDrawingPanelMetrics.drawingPanelHeight(for: proxy.size)
 
             ZStack {
             AppPalette.background
