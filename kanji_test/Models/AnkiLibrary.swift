@@ -46,6 +46,25 @@ nonisolated struct AnkiStudyCard: Identifiable, Sendable, StudyItem {
     var templateName: String {
         noteType.isCloze ? "Пропуск \(card.ordinal + 1)" : noteType.templates.first(where: { $0.ordinal == card.ordinal })?.name ?? noteType.name
     }
+
+    /// Anki stores the position of new cards in `cards.due`. Reorder only the
+    /// new-card slots by that position, keeping all other cards in source order.
+    static func orderedByAnkiPosition(_ cards: [Self]) -> [Self] {
+        let newCards = cards
+            .filter { $0.card.scheduling["type"] == 0 }
+            .sorted {
+                let left = $0.card.scheduling["due", default: 0]
+                let right = $1.card.scheduling["due", default: 0]
+                return left == right ? $0.card.id < $1.card.id : left < right
+            }
+
+        var nextNewCard = 0
+        return cards.map { card in
+            guard card.card.scheduling["type"] == 0, nextNewCard < newCards.count else { return card }
+            defer { nextNewCard += 1 }
+            return newCards[nextNewCard]
+        }
+    }
 }
 
 nonisolated struct AnkiImportResult: Sendable {

@@ -7,9 +7,14 @@ extension TrainingView {
 
     func cardFront(for card: KanjiCard) -> some View {
         studyCardFrontShell(
-            fallbackPrompt: "Нарисуй кандзи по памяти.",
-            footerText: "Проверка покажет оригинал и сравнение штрихов.",
-            reviewKey: card.reviewKey
+            fallbackPrompt: card.strokes.isEmpty
+                ? "Вспомни кандзи по памяти."
+                : "Нарисуй кандзи по памяти.",
+            footerText: card.strokes.isEmpty
+                ? "Для этого кандзи нет локального образца черт."
+                : "Проверка покажет оригинал и сравнение штрихов.",
+            reviewKey: card.reviewKey,
+            speechText: card.kanji
         ) {
             frontFields(for: card)
         }
@@ -28,14 +33,11 @@ private struct KanjiTrainingCardView: View {
     var body: some View {
         training.trainingCardShell {
             training.cardFront(for: card)
-                .overlay(alignment: .topTrailing) {
-                    training.speakButton(for: card.kanji)
-                        .padding(.top, 32)
-                        .padding(.trailing, 6)
-                }
         } back: {
             training.cardBackContent(for: card) {
                 training.presentCardFieldSettings(side: .back)
+            } onSpeak: {
+                training.speech.speak(card.kanji)
             }
         }
         .task(id: "back-\(card.id)-\(training.meaningLanguage.rawValue)") {

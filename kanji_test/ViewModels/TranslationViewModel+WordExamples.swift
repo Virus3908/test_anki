@@ -10,7 +10,9 @@ extension TranslationViewModel {
         guard language == .russian, let meanings = cached(.wordExamples(card.id), source: wordExampleSource(examples)),
               meanings.count == examples.count else { return examples }
         return zip(examples, meanings).map { example, meaning in
-            WordUsageExample(sentence: example.sentence, reading: example.reading, meaning: meaning.isEmpty ? nil : meaning)
+            WordUsageExample(sentence: example.sentence, reading: example.reading,
+                             meaning: meaning.isEmpty ? nil : meaning, attribution: example.attribution,
+                             translationAttribution: example.translationAttribution)
         }
     }
     func loadAndTranslateWordExamples(for card: WordStudyCard, language: MeaningLanguage) async {

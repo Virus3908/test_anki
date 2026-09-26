@@ -3,9 +3,18 @@ import SwiftUI
 extension TrainingView {
     func drawingPanel(for card: KanjiCard, panelHeight: CGFloat) -> some View {
         @Bindable var drawingSession = trainingSession.drawingSession
-        let boardSide = drawingBoardSide(for: panelHeight)
+        let hasStrokeOrder = !card.strokes.isEmpty
+        let boardSide = drawingBoardSide(for: panelHeight - (hasStrokeOrder ? 0 : 48))
 
         return VStack(spacing: 8) {
+            if !hasStrokeOrder {
+                HStack {
+                    Text("Для этого кандзи нет образца черт. Оцените ответ самостоятельно.")
+                        .font(.caption)
+                        .lineLimit(2)
+                    Button("Ответ") { revealDrawingAnswer() }
+                }
+            }
 
             ZStack {
                 DrawingBoard(

@@ -14,13 +14,15 @@ extension TatoebaWordExampleProvider {
 
             let payload = try JSONDecoder().decode(TatoebaSentenceResponse.self, from: data)
             return payload.data
-                .filter { !$0.isUnapproved && $0.text.contains(card.word) }
+                .filter { !$0.isUnapproved && $0.text.contains(card.word) && $0.attribution != nil }
                 .prefix(limit)
                 .map { sentence in
                     WordUsageExample(
                         sentence: sentence.text,
                         reading: Self.fallbackReading(for: card, in: sentence.text),
-                        meaning: sentence.preferredEnglishTranslation
+                        meaning: sentence.preferredEnglishTranslation?.text,
+                        attribution: sentence.attribution,
+                        translationAttribution: sentence.preferredEnglishTranslation?.attribution
                     )
                 }
         } catch {
@@ -49,13 +51,15 @@ extension TatoebaWordExampleProvider {
 
             let payload = try JSONDecoder().decode(TatoebaSentenceResponse.self, from: data)
             return payload.data
-                .filter { !$0.isUnapproved && $0.text.contains(kanji) }
+                .filter { !$0.isUnapproved && $0.text.contains(kanji) && $0.attribution != nil }
                 .prefix(limit)
                 .map { sentence in
                     KanjiExample(
                         word: sentence.text,
                         reading: "",
-                        meaning: sentence.preferredEnglishTranslation ?? ""
+                        meaning: sentence.preferredEnglishTranslation?.text ?? "",
+                        attribution: sentence.attribution,
+                        translationAttribution: sentence.preferredEnglishTranslation?.attribution
                     )
                 }
         } catch {

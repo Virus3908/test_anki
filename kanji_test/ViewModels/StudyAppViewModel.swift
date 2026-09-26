@@ -21,8 +21,9 @@ final class StudyAppViewModel {
     var isSettingsPresented = false
     var isTodayCompletionPresented = false
     var isLoadingSavedState = false
+    var isResettingDeckProgress = false
     var hasLoadedSavedState = false
-    var isSavingReview: Bool { trainingSession.isPreparingCard }
+    var isSavingReview: Bool { trainingSession.isPreparingCard || isResettingDeckProgress }
     @ObservationIgnored var trainingStartTask: Task<Void, Never>?
     @ObservationIgnored var supplementalLoadTask: Task<Void, Never>?
 

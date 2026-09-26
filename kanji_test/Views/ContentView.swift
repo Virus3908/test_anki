@@ -25,6 +25,7 @@ struct ContentView: View {
                         onNextDay: { Task { await appModel.advanceReviewDay() } },
                         onClearCache: { Task { await appModel.clearDeckCache() } },
                         onRestoreTranslations: { Task { await appModel.translationState.restoreBackup() } },
+                        onResetDeckProgress: { deck in Task { await appModel.resetDeckProgress(deck) } },
                         initialDeck: appModel.trainingSession.deck ?? appModel.navigation.route.deck,
                         importedDecks: appModel.ankiLibrary.decks.map(\.studyDeck))
                 }
@@ -63,6 +64,7 @@ struct ContentView: View {
         case .ankiDeck(let deck):
             AnkiDeckPreviewView(deck: deck, model: appModel.ankiLibrary, settings: appModel.settings,
                 translationState: appModel.translationState,
+                trainingSession: appModel.trainingSession,
                 reviewStore: appModel.trainingSession.reviewStore,
                 onBack: appModel.closeAnkiDeck,
                 onPractice: appModel.practice)

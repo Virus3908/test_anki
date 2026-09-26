@@ -3,7 +3,7 @@ import Foundation
 actor BundledStudyData {
     static let shared = BundledStudyData()
     private var words: [WordDictionaryEntry]?
-    private var kanji: [String: [KanjiCard]] = [:]
+    private var kanjiMetadata: [BundledKanjiMetadata]?
 
     func wordEntries() throws -> [WordDictionaryEntry] {
         if let words { return words }
@@ -12,10 +12,10 @@ actor BundledStudyData {
         return loaded
     }
 
-    func kanjiCards(resource: String) throws -> [KanjiCard] {
-        if let cached = kanji[resource] { return cached }
-        let loaded: [KanjiCard] = try decode(resource)
-        kanji[resource] = loaded
+    func bundledKanjiMetadata() throws -> [BundledKanjiMetadata] {
+        if let kanjiMetadata { return kanjiMetadata }
+        let loaded: [BundledKanjiMetadata] = try decode("kanji-metadata")
+        kanjiMetadata = loaded
         return loaded
     }
 

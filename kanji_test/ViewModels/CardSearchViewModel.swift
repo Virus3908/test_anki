@@ -1,7 +1,7 @@
 import Foundation
 import Observation
 
-/// Экран поиска карточек: по всем кандзи или по всем словам.
+/// Экран поиска карточек: по отдельному типу или по всему каталогу приложения.
 ///
 /// Индексы строятся один раз при первом открытии экрана (prepare); сам поиск
 /// по готовому индексу — синхронный линейный проход, его можно звать на каждый
@@ -12,6 +12,7 @@ final class CardSearchViewModel {
     /// Что ищем. Задаётся снаружи — тем местом, которое открыло поиск:
     /// шапка колоды кандзи → .kanji, шапка колоды слов → .words.
     enum Scope {
+        case all
         case kanji
         case words
     }
@@ -27,6 +28,8 @@ final class CardSearchViewModel {
     /// Результаты последнего запроса (заполняется массив активного scope).
     private(set) var kanjiResults: [KanjiCard] = []
     private(set) var wordResults: [WordStudyCard] = []
+    private(set) var kanaResults: [KanaStudyCard] = []
+    private(set) var ankiResults: [AnkiStudyCard] = []
     /// Сколько всего нашлось (до капа на показ).
     private(set) var totalFound = 0
 
@@ -37,15 +40,19 @@ final class CardSearchViewModel {
     private var isPrepared = false
     private var kanjiIndex: CardSearchIndex<KanjiSearchRecord>?
     private var wordIndex: CardSearchIndex<WordSearchRecord>?
+    private var kanaIndex: CardSearchIndex<KanaSearchRecord>?
+    private var ankiIndex: CardSearchIndex<AnkiSearchRecord>?
     /// Кандзи по символу — для сборки карточек слов из найденных записей.
     private var cardsByCharacter: [String: KanjiCard] = [:]
 
     /// Переводы: из них берутся сохранённые рус. значения кандзи.
     private let translationState: TranslationViewModel
+    private let ankiModel: AnkiLibraryViewModel?
 
-    init(scope: Scope, translationState: TranslationViewModel) {
+    init(scope: Scope, translationState: TranslationViewModel, ankiModel: AnkiLibraryViewModel? = nil) {
         self.scope = scope
         self.translationState = translationState
+        self.ankiModel = ankiModel
     }
 
     // MARK: Подготовка
@@ -54,31 +61,23 @@ final class CardSearchViewModel {
     func prepare() async {
         guard !isPrepared, !isPreparing else { return }
         isPreparing = true
+        loadError = nil
         defer { isPreparing = false }
 
         do {
             switch scope {
-            case .kanji:
-                // .all — супермножество всех колод, порядок — сортировка по кандзи.
-                let cards = await KanjiDataLoader.loadAvailableCards(deck: .all)
-                let records = cards.map { card in
-                    // Рус. значения — из сохранённых переводов (без сети);
-                    // если перевода ещё нет, вернутся англ. (дубли в haystack не мешают).
-                    KanjiSearchRecord(
-                        card: card,
-                        russianMeanings: translationState.displayedKanjiMeanings(for: card, language: .russian)
-                    )
+            case .all:
+                try await prepareKanji()
+                try await prepareWords()
+                await prepareKana()
+                if let ankiModel {
+                    let cards = try await ankiModel.cardsForSearch()
+                    ankiIndex = await Self.buildIndex(records: cards.map(AnkiSearchRecord.init))
                 }
-                kanjiIndex = await Self.buildIndex(records: records)
+            case .kanji:
+                try await prepareKanji()
             case .words:
-                // Все слова всех сабсетов частотности — это весь словарь.
-                let entries = try await WordDataLoader.loadDictionaryEntries()
-                let kanjiCards = await KanjiDataLoader.loadAvailableCards(deck: .all)
-                cardsByCharacter = Dictionary(
-                    kanjiCards.map { ($0.kanji, $0) },
-                    uniquingKeysWith: { current, _ in current }
-                )
-                wordIndex = await Self.buildIndex(records: entries.map(WordSearchRecord.init))
+                try await prepareWords()
             }
 
             isPrepared = true
@@ -87,10 +86,39 @@ final class CardSearchViewModel {
         }
     }
 
-    /// Тяжёлая часть подготовки (склейка и lowercase всех термов) — в фоне.
+    private func prepareKanji() async throws {
+        let cards = await KanjiDataLoader.loadAvailableCards(deck: .all)
+        let records = cards.map { card in
+            KanjiSearchRecord(
+                card: card,
+                russianMeanings: translationState.displayedKanjiMeanings(for: card, language: .russian)
+            )
+        }
+        kanjiIndex = await Self.buildIndex(records: records)
+    }
+
+    private func prepareWords() async throws {
+        let entries = try await WordDataLoader.loadDictionaryEntries()
+        let kanjiCards = await KanjiDataLoader.loadAvailableCards(deck: .all)
+        cardsByCharacter = Dictionary(
+            kanjiCards.map { ($0.kanji, $0) },
+            uniquingKeysWith: { current, _ in current }
+        )
+        wordIndex = await Self.buildIndex(records: entries.map(WordSearchRecord.init))
+    }
+
+    private func prepareKana() async {
+        let cards = KanaDeck.allCases.flatMap(\.baseCards)
+        kanaIndex = await Self.buildIndex(records: cards.map(KanaSearchRecord.init))
+    }
+
+    /// Извлечение термов соблюдает isolation моделей, а тяжёлая склейка и
+    /// lowercase выполняются в фоне.
     private static func buildIndex<Record: CardSearchRecord>(records: [Record]) async -> CardSearchIndex<Record> {
-        await Task.detached(priority: .userInitiated) {
-            CardSearchIndex(records: records)
+        let terms = records.map(\.searchTerms)
+        return await Task.detached(priority: .userInitiated) {
+            let haystacks = terms.map { $0.joined(separator: " ").lowercased() }
+            return CardSearchIndex(records: records, haystacks: haystacks)
         }.value
     }
 
@@ -101,6 +129,19 @@ final class CardSearchViewModel {
         guard isPrepared else { return }
 
         switch scope {
+        case .all:
+            let foundKanji = kanjiIndex?.search(query).map(\.card) ?? []
+            let foundEntries = wordIndex?.search(query).map(\.entry) ?? []
+            let foundKana = kanaIndex?.search(query).map(\.card) ?? []
+            let foundAnki = ankiIndex?.search(query).map(\.card) ?? []
+            totalFound = foundKanji.count + foundEntries.count + foundKana.count + foundAnki.count
+            kanjiResults = Array(foundKanji.prefix(Self.resultLimit))
+            wordResults = WordDataLoader.buildWords(
+                from: Array(foundEntries.prefix(Self.resultLimit)),
+                cardsByCharacter: cardsByCharacter
+            )
+            kanaResults = Array(foundKana.prefix(Self.resultLimit))
+            ankiResults = Array(foundAnki.prefix(Self.resultLimit))
         case .kanji:
             guard let index = kanjiIndex else { return }
             let found = index.search(query).map(\.card)

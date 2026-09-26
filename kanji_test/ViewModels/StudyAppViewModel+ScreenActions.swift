@@ -4,7 +4,7 @@ extension StudyAppViewModel {
     func openDeck(_ route: StudyRoute) {
         guard !isSavingReview, !deckState.isLoadingDeck else { return }
         switch route {
-        case .kanjiDeck(let deck): coordinator.openDeckPreview(deck, deckState: deckState, reviewStore: trainingSession.reviewStore)
+        case .kanjiDeck(let deck): coordinator.openDeckPreview(deck, deckState: deckState)
         case .wordDeck(let deck): coordinator.openWordPreview(deck, deckState: deckState)
         case .kanaDeck(let deck): coordinator.openKanaPreview(deck, deckState: deckState)
         case .ankiDeck(let deck):

@@ -74,13 +74,15 @@ final class AnkiLibraryViewModel {
         } catch { message = error.localizedDescription }
     }
 
-    func deleteDeck(_ deck: AnkiDeckReference) async -> Bool {
+    func deleteImport(_ deck: AnkiDeckReference, trainingSession: TrainingSessionViewModel) async -> Bool {
         guard !isDeletingDeck, !isImporting else { return false }
         isDeletingDeck = true
         defer { isDeletingDeck = false }
         do {
-            try await repository.deleteImport(id: deck.importID)
-            imports = try await repository.load()
+            try await trainingSession.deleteAnkiImportProgress(importID: deck.importID) {
+                try await repository.deleteImport(id: deck.importID)
+            }
+            imports.removeAll { $0.id == deck.importID }
             closeDeck()
             return true
         } catch {
@@ -115,8 +117,40 @@ final class AnkiLibraryViewModel {
 
     func open(_ summary: AnkiImportSummary) async throws -> (AnkiCollection, URL) {
         let collection = try await repository.collection(summary)
-            let media = try await repository.mediaDirectory(summary)
+        let media = try await repository.mediaDirectory(summary)
         return (collection, media)
+    }
+
+    /// Загружает карточки всех импортов для глобального поиска, не меняя
+    /// состояние открытой в интерфейсе колоды.
+    func cardsForSearch() async throws -> [AnkiStudyCard] {
+        if !isLoaded {
+            await load()
+        }
+
+        var result: [AnkiStudyCard] = []
+        for summary in imports {
+            let (collection, media) = try await open(summary)
+            let importCards = await Task.detached(priority: .userInitiated) {
+                let notes = Dictionary(uniqueKeysWithValues: collection.notes.map { ($0.id, $0) })
+                let types = Dictionary(uniqueKeysWithValues: collection.noteTypes.map { ($0.id, $0) })
+                let deckNames = Dictionary(uniqueKeysWithValues: collection.decks.map { ($0.id, $0.name) })
+
+                return collection.cards.compactMap { card -> AnkiStudyCard? in
+                    guard let note = notes[card.noteID], let type = types[note.noteTypeID] else { return nil }
+                    return AnkiStudyCard(
+                        importID: summary.id,
+                        card: card,
+                        note: note,
+                        noteType: type,
+                        deckName: deckNames[card.deckID] ?? summary.filename,
+                        mediaDirectory: media
+                    )
+                }
+            }.value
+            result.append(contentsOf: importCards)
+        }
+        return result
     }
 
     func openDeck(_ deck: AnkiDeckReference) async {
@@ -139,10 +173,11 @@ final class AnkiLibraryViewModel {
             let cards = await Task.detached(priority: .userInitiated) {
                 let notes = Dictionary(uniqueKeysWithValues: collection.notes.map { ($0.id, $0) })
                 let types = Dictionary(uniqueKeysWithValues: collection.noteTypes.map { ($0.id, $0) })
-                return collection.cards.filter { $0.deckID == deck.sourceDeckID }.compactMap { card -> AnkiStudyCard? in
+                let deckCards = collection.cards.filter { $0.deckID == deck.sourceDeckID }.compactMap { card -> AnkiStudyCard? in
                     guard let note = notes[card.noteID], let type = types[note.noteTypeID] else { return nil }
                     return AnkiStudyCard(importID: deck.importID, card: card, note: note, noteType: type, deckName: deck.title, mediaDirectory: media)
                 }
+                return AnkiStudyCard.orderedByAnkiPosition(deckCards)
             }.value
             guard openToken == token, !Task.isCancelled else { return }
             previewCards = cards

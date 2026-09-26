@@ -7,6 +7,7 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
     let model: AnkiLibraryViewModel
     let settings: StudyPreferences
     let translationState: TranslationViewModel
+    let trainingSession: TrainingSessionViewModel
     let reviewStore: StudyProgressStore
     let onBack: () -> Void
     let onPractice: (PracticeSelection) -> Void
@@ -37,7 +38,7 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
                         deckPendingDeletion = deck
                     } label: {
                         Image(systemName: "trash")
-                            .accessibilityLabel("Удалить колоду \(deck.title)")
+                            .accessibilityLabel("Удалить импорт с колодой \(deck.title)")
                     }
                     .buttonStyle(.borderless)
                     .disabled(model.isOpeningDeck || model.isDeletingDeck)
@@ -97,14 +98,14 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
                     .toolbar { Button("Готово") { showSchedule = false } }
             }
         }
-        .alert("Удалить колоду?", isPresented: Binding(
+        .alert("Удалить весь импорт?", isPresented: Binding(
             get: { deckPendingDeletion != nil },
             set: { if !$0 { deckPendingDeletion = nil } }
         ), presenting: deckPendingDeletion) { deck in
             Button("Удалить", role: .destructive) {
                 deckPendingDeletion = nil
                 Task {
-                    if await model.deleteDeck(deck) {
+                    if await model.deleteImport(deck, trainingSession: trainingSession) {
                         onBack()
                     }
                 }
@@ -113,12 +114,13 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
                 deckPendingDeletion = nil
             }
         } message: { deck in
-            Text("«\(deck.title)» будет удалена из библиотеки вместе с импортированными карточками и медиафайлами.")
+            let summary = model.imports.first { $0.id == deck.importID }
+            Text("Файл «\(summary?.filename ?? deck.title)» и все его колоды (\(summary?.decks.count ?? 1)) будут удалены вместе с карточками, медиа и прогрессом.")
         }
     }
 }
 
-private struct AnkiCardPreviewView: View, StudyViewStyling {
+struct AnkiCardPreviewView: View, StudyViewStyling {
     let cards: [AnkiStudyCard]
     let onPractice: (AnkiStudyCard) -> Void
     let translationState: TranslationViewModel

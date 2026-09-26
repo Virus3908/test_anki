@@ -13,19 +13,17 @@ extension StartView {
 
                     Spacer()
 
-                    if searchScope != nil {
-                        Button {
-                            isSearchPresented = true
-                        } label: {
-                            Image(systemName: "magnifyingglass")
-                                .font(.title3.weight(.semibold))
-                                .padding(12)
-                                .appSurfaceCard()
-                        }
-                        .buttonStyle(.plain)
-                        .disabled(isLoading)
-                        .accessibilityLabel("Поиск по карточкам")
+                    Button {
+                        isSearchPresented = true
+                    } label: {
+                        Image(systemName: "magnifyingglass")
+                            .font(.title3.weight(.semibold))
+                            .padding(12)
+                            .appSurfaceCard()
                     }
+                    .buttonStyle(.plain)
+                    .disabled(isLoading)
+                    .accessibilityLabel("Поиск по всем карточкам")
                 }
 
                 Picker("Раздел", selection: $selectedSection) {
@@ -95,9 +93,7 @@ extension StartView {
                 }
                 .frame(maxHeight: .infinity)
                 .sheet(isPresented: $isSearchPresented) {
-                    if let scope = searchScope {
-                        cardSearchSheet(scope: scope)
-                    }
+                    cardSearchSheet()
                 }
 
                 if isLoading {

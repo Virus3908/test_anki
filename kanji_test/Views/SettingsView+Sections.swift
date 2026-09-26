@@ -32,12 +32,19 @@ extension SettingsView {
             .sheet(isPresented: $isAboutPresented) {
                 AboutView()
             }
+            .confirmationDialog("Сбросить прогресс колоды?", isPresented: $isResetConfirmationPresented, titleVisibility: .visible) {
+                Button("Сбросить прогресс", role: .destructive) {
+                    if let selectedDeck { onResetDeckProgress(selectedDeck) }
+                }
+            } message: {
+                Text("Будут удалены ответы, расписание и исключения для карточек колоды «\(selectedDeck?.title ?? "")». Общие карточки других колод тоже начнутся заново.")
+            }
         }
     }
 
     func speechSettingsView() -> some View {
         settingsSection("Озвучивание") {
-            Toggle("Озвучивать карточки", isOn: $settings.speechEnabled)
+            Toggle("Озвучивать встроенные карточки", isOn: $settings.speechEnabled)
             Picker("Голос", selection: $settings.speechVoiceIdentifier) {
                 Text("Авто (лучший доступный)").tag("")
                 ForEach(SpeechService.japaneseVoices(), id: \.identifier) { voice in
@@ -59,7 +66,7 @@ extension SettingsView {
             } label: {
                 Label("Проверить голос", systemImage: "speaker.wave.2.fill")
             }
-            Text("Автоматически произносить кандзи и слова при показе карточки.")
+            Text("Автоматически произносить кандзи, кану и слова при показе карточки.")
                 .font(.caption)
                 .foregroundStyle(AppPalette.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
@@ -114,6 +121,15 @@ extension SettingsView {
 
             Text(deckID == nil ? "Эти настройки используют колоды, у которых ещё нет собственных параметров." : "Изменения применяются только к выбранной колоде.")
                 .font(.caption).foregroundStyle(AppPalette.secondaryText)
+            if selectedDeck != nil {
+                Button(role: .destructive) { isResetConfirmationPresented = true } label: {
+                    Label("Сбросить прогресс колоды", systemImage: "arrow.counterclockwise")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .tint(AppPalette.correction)
+                .disabled(isBusy)
+            }
         }
     }
 

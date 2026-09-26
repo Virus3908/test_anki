@@ -12,6 +12,8 @@ License: https://www.edrdg.org/edrdg/licence.html
 
 JMdict project: https://www.edrdg.org/wiki/index.php/JMdict-EDICT_Dictionary_Project
 
+KANJIDIC project: https://www.edrdg.org/wiki/index.php/KANJIDIC_Project
+
 The JMdict-derived files in this project include:
 
 - `kanji_test/Data/word-data.json`
@@ -22,7 +24,10 @@ This project may load Japanese example sentences and translations from Tatoeba.
 
 Tatoeba sentence data is provided by the Tatoeba community.
 
-Tatoeba textual sentence data is generally licensed under Creative Commons Attribution 2.0 France, with some content under CC0.
+Tatoeba uses Creative Commons Attribution 2.0 France as the default license for
+textual sentences. Individual sentences may use CC0 or another compatible
+license. Reuse must preserve the license and author attribution applicable to
+each sentence.
 
 Project website: https://tatoeba.org/
 
@@ -31,6 +36,8 @@ Terms of use: https://tatoeba.org/en/terms_of_use
 Using Tatoeba data: https://en.wiki.tatoeba.org/articles/show/terms-of-use
 
 Example sentence data may be cached locally by the app after being loaded.
+Each displayed remote sentence includes a link to its Tatoeba page, sentence
+ID, owner username when required by its license, and the sentence's license.
 
 ## Kanji API
 
@@ -55,6 +62,18 @@ and displayed in the application's Sources screen.
 
 - https://github.com/weichsel/ZIPFoundation
 - https://github.com/facebook/zstd
+
+## Scheduling Library
+
+The application uses swift-fsrs for FSRS scheduling. The dependency is pinned
+to revision `4fbaf20184d62f82a9f44f343337c61a2c5483e9` and is licensed under the
+MIT License, Copyright (c) 2023 Ben Smiley.
+
+The complete, unmodified notice from that dependency revision is bundled in
+`kanji_test/Data/FSRS-LICENSE.txt` and displayed in the application's Sources
+and Licenses screen.
+
+Source repository: https://github.com/open-spaced-repetition/swift-fsrs
 
 ## System Translation
 

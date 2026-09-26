@@ -36,6 +36,7 @@ extension TrainingView {
         fallbackPrompt: String,
         footerText: String,
         reviewKey: String,
+        speechText: String? = nil,
         isTextSelectable: Bool = true,
         @ViewBuilder fields: () -> Fields
     ) -> some View {
@@ -45,10 +46,14 @@ extension TrainingView {
                     .font(.caption.weight(.bold))
                     .textCase(.uppercase)
                 Spacer()
-                Button("Все поля", systemImage: "list.bullet.rectangle") {
+                if let speechText, !speechText.isEmpty {
+                    CardHeaderActionButton(title: "Озвучить", systemImage: "speaker.wave.2.fill") {
+                        speech.speak(speechText)
+                    }
+                }
+                CardHeaderActionButton(title: "Все поля", systemImage: "list.bullet.rectangle") {
                     presentCardFieldSettings(side: .front)
                 }
-                .font(.caption)
             }
             .foregroundStyle(AppPalette.secondaryText)
 

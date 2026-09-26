@@ -6,7 +6,6 @@ import Observation
 final class SpeechService {
     private let synthesizer = AVSpeechSynthesizer()
     @ObservationIgnored private var delegate: SpeechDelegate?
-    private var sessionConfigured = false
     private var generation = 0
     private(set) var isSpeaking = false
     private(set) var lastError: String?
@@ -15,40 +14,53 @@ final class SpeechService {
 
     func speak(_ text: String) {
         guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
-        if !sessionConfigured {
-            do {
-                let session = AVAudioSession.sharedInstance()
-                try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
-                try session.setActive(true)
-                sessionConfigured = true
-            } catch {
-                lastError = "Не удалось настроить звук: \(error.localizedDescription)"
-                return
-            }
-        }
-        lastError = nil
-        synthesizer.stopSpeaking(at: .immediate)
-        let utterance = AVSpeechUtterance(string: text)
-        utterance.voice = resolvedVoice()
-        utterance.rate = rate ?? AVSpeechUtteranceDefaultSpeechRate
+        let previousGeneration = generation
         generation += 1
         let current = generation
-        let completion = SpeechDelegate { [weak self] in
-            guard let self, self.generation == current else { return }
-            self.isSpeaking = false
-            try? AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
-        }
-        delegate = completion
-        synthesizer.delegate = completion
+        synthesizer.stopSpeaking(at: .immediate)
         isSpeaking = true
-        synthesizer.speak(utterance)
+        lastError = nil
+
+        Task { [weak self] in
+            guard let self else { return }
+            do {
+                if previousGeneration > 0 {
+                    await SpeechAudioSession.shared.deactivate(request: previousGeneration)
+                }
+                try await SpeechAudioSession.shared.activate(request: current)
+            } catch {
+                guard generation == current else { return }
+                lastError = "Не удалось настроить звук: \(error.localizedDescription)"
+                isSpeaking = false
+                return
+            }
+
+            guard generation == current else {
+                await SpeechAudioSession.shared.deactivate(request: current)
+                return
+            }
+            let utterance = AVSpeechUtterance(string: text)
+            utterance.voice = resolvedVoice()
+            utterance.rate = rate ?? AVSpeechUtteranceDefaultSpeechRate
+            let completion = SpeechDelegate { [weak self] in
+                Task { await SpeechAudioSession.shared.deactivate(request: current) }
+                guard let self, self.generation == current else { return }
+                self.isSpeaking = false
+            }
+            delegate = completion
+            synthesizer.delegate = completion
+            synthesizer.speak(utterance)
+        }
     }
 
     func stop() {
+        let current = generation
         generation += 1
-        guard synthesizer.isSpeaking || isSpeaking else { return }
-        synthesizer.stopSpeaking(at: .immediate)
+        if synthesizer.isSpeaking || isSpeaking {
+            synthesizer.stopSpeaking(at: .immediate)
+        }
         isSpeaking = false
+        Task { await SpeechAudioSession.shared.deactivate(request: current) }
     }
 
     static func japaneseVoices() -> [AVSpeechSynthesisVoice] {
@@ -71,6 +83,34 @@ final class SpeechService {
 
     private static func japaneseVoice() -> AVSpeechSynthesisVoice? {
         japaneseVoices().first ?? AVSpeechSynthesisVoice(language: "ja-JP")
+    }
+}
+
+private actor SpeechAudioSession {
+    static let shared = SpeechAudioSession()
+
+    private var isConfigured = false
+    private var activeRequest: Int?
+
+    func activate(request: Int) throws {
+        let session = AVAudioSession.sharedInstance()
+        if !isConfigured {
+            try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
+            isConfigured = true
+        }
+        try session.setActive(true)
+        activeRequest = request
+    }
+
+    func deactivate(request: Int) {
+        guard activeRequest == request else { return }
+        try? AVAudioSession.sharedInstance().setActive(
+            false,
+            options: [.notifyOthersOnDeactivation]
+        )
+        if activeRequest == request {
+            activeRequest = nil
+        }
     }
 }
 

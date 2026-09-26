@@ -4,15 +4,11 @@ extension TrainingView {
     func wordStudyCard(for wordCard: WordStudyCard) -> some View {
         trainingCardShell {
             wordCardFront(for: wordCard)
-                .overlay(alignment: .topTrailing) {
-                    speakButton(for: wordCard.word)
-                        .padding(.top, 32)
-                        .padding(.trailing, 6)
-                }
         } back: {
             studyCardBackShell(
                 reviewKey: wordCard.reviewKey,
-                onShowAllFields: { presentCardFieldSettings(side: .back) }
+                onShowAllFields: { presentCardFieldSettings(side: .back) },
+                onSpeak: { speech.speak(wordCard.word) }
             ) {
                 wordFullCardContent(for: wordCard)
             }
@@ -30,7 +26,8 @@ extension TrainingView {
         studyCardFrontShell(
             fallbackPrompt: "Нарисуй символы слова по памяти.",
             footerText: "Проверка покажет слово, чтение, перевод и состав.",
-            reviewKey: wordCard.reviewKey
+            reviewKey: wordCard.reviewKey,
+            speechText: wordCard.word
         ) {
             wordFrontFields(for: wordCard)
         }

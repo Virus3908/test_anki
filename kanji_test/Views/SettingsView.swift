@@ -15,10 +15,12 @@ struct SettingsView: View, StudyViewStyling {
     let onNextDay: () -> Void
     let onClearCache: () -> Void
     let onRestoreTranslations: () -> Void
+    let onResetDeckProgress: (StudyDeck) -> Void
     let initialDeck: StudyDeck?
     var importedDecks: [StudyDeck] = []
     @Environment(\.dismiss) var dismiss
     @State var isAboutPresented = false
+    @State var isResetConfirmationPresented = false
     @State var sample = SpeechService()
     @AppStorage("ankiCardDisplayMode") var ankiCardDisplayMode = "native"
     @State private var hasInitialized = false
@@ -40,6 +42,9 @@ struct SettingsView: View, StudyViewStyling {
         return "\(deck.mode.title): \(deck.title)"
     }
     var options: DeckOptions { settings.options(for: deckID) }
+    var selectedDeck: StudyDeck? {
+        (StudyDeck.builtIn + importedDecks).first { $0.id == selectedDeckID }
+    }
     var body: some View {
         settingsView()
             .onAppear {
