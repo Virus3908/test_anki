@@ -28,6 +28,7 @@ struct TrainingView: View, CardContentRendering {
                 await trainingSession.refreshForNewDay()
             }
             .onAppear(perform: applySpeechSettings)
+            .onChange(of: settings.speechEnabled) { _, _ in applySpeechSettings() }
             .onChange(of: settings.speechVoiceIdentifier) { _, _ in applySpeechSettings() }
             .onChange(of: settings.speechRate) { _, _ in applySpeechSettings() }
             .onDisappear { speech.stop() }
@@ -87,6 +88,7 @@ extension TrainingView {
     func applySpeechSettings() {
         speech.voiceIdentifier = settings.speechVoiceIdentifier.isEmpty ? nil : settings.speechVoiceIdentifier
         speech.rate = settings.speechRate
+        if settings.speechEnabled { speech.warmUp() }
     }
 
     func speakButton(for text: String) -> some View {
