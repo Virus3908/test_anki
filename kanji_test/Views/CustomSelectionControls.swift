@@ -87,6 +87,70 @@ extension View {
     }
 }
 
+/// Подсветка плитки по тому, как карточка знается в основном обучении колоды:
+/// уверенно освоенные слегка притушены, нетронутые чуть подкрашены синим,
+/// проблемные заливаются красным с ростом проблем, худшие дополнительно
+/// получают красную рамку. Чем хуже/лучше знается — тем сильнее выражен эффект.
+struct CardMasteryChrome: ViewModifier {
+    /// `nil` (вне режима выбора) — модификатор ничего не меняет.
+    let mastery: CardMastery?
+
+    func body(content: Content) -> some View {
+        content
+            .opacity(dimming)
+            .overlay {
+                ZStack {
+                    if let tint {
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .fill(tint)
+                    }
+                    if let problemStroke {
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .stroke(problemStroke, lineWidth: 1.5)
+                    }
+                }
+                .allowsHitTesting(false)
+            }
+    }
+
+    private var dimming: Double {
+        guard case .score(let score) = mastery, score >= Self.knownFloor else {
+            return mastery == .excluded ? 0.6 : 1
+        }
+        return 1 - 0.45 * (score - Self.knownFloor) / (1 - Self.knownFloor)
+    }
+
+    private var tint: Color? {
+        switch mastery {
+        case .untrained:
+            return AppPalette.newCard.opacity(0.09)
+        case .score(let score) where score < Self.problemCeiling:
+            let trouble = (Self.problemCeiling - score) / Self.problemCeiling
+            return AppPalette.correction.opacity(0.05 + 0.17 * trouble)
+        default:
+            return nil
+        }
+    }
+
+    private var problemStroke: Color? {
+        guard case .score(let score) = mastery, score < Self.worstCeiling else { return nil }
+        return AppPalette.correction.opacity(0.85)
+    }
+
+    /// Пороги полос: выше `knownFloor` — «уверенно знаю» (притушиваем),
+    /// ниже `problemCeiling` — «проблемная» (подсвечиваем), ниже
+    /// `worstCeiling` — худшие (рамка). Между порогами — нейтрально.
+    private static let knownFloor = 0.55
+    private static let problemCeiling = 0.4
+    private static let worstCeiling = 0.15
+}
+
+extension View {
+    func cardMasteryChrome(_ mastery: CardMastery?) -> some View {
+        modifier(CardMasteryChrome(mastery: mastery))
+    }
+}
+
 func customSelectionPluralCards(_ count: Int) -> String {
     let mod10 = count % 10
     let mod100 = count % 100

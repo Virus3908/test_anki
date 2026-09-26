@@ -28,6 +28,13 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
             options: settings.options(for: deck.id)
         )
     }
+
+    /// Насколько хорошо карточка знается — по прогрессу основного обучения колоды;
+    /// режим выбора подсвечивает проблемные и освоенные карточки.
+    private func cardMastery(for card: AnkiStudyCard) -> CardMastery {
+        CardMastery(record: reviewStore.record(for: card.reviewKey),
+                    isExcluded: reviewStore.isExcluded(card.reviewKey))
+    }
     private let fieldPreferences = AnkiFieldDisplayPreferences.shared
 
     /// В режиме выбора карточек кнопка «назад» сначала выходит из выбора,
@@ -85,6 +92,7 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
                                         .font(.caption2).foregroundStyle(AppPalette.secondaryText)
                                 }.padding(12).frame(maxWidth: .infinity, minHeight: 120, alignment: .topLeading).appSurfaceCard()
                             }.buttonStyle(.plain)
+                            .cardMasteryChrome(session.isSelecting ? cardMastery(for: card) : nil)
                             .customSelectionChrome(isSelecting: session.isSelecting,
                                                    isSelected: session.selectedIDs.contains(card.id))
                         }

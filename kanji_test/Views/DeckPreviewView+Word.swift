@@ -38,6 +38,7 @@ extension DeckPreviewView {
                     LazyVGrid(columns: wordPreviewColumns, spacing: 10) {
                         ForEach(deckState.previewWordCards) { card in
                             wordPreviewTile(for: card, action: session.isSelecting ? { session.toggle(card.id) } : nil)
+                                .cardMasteryChrome(session.isSelecting ? cardMastery(forReviewKey: card.reviewKey) : nil)
                                 .customSelectionChrome(isSelecting: session.isSelecting,
                                                        isSelected: session.selectedIDs.contains(card.id))
                         }

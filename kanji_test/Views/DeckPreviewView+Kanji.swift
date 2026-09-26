@@ -48,6 +48,7 @@ extension DeckPreviewView {
                     LazyVGrid(columns: kanjiPreviewColumns, spacing: 10) {
                         ForEach(deckState.previewCards) { card in
                             kanjiPreviewTile(for: card, action: session.isSelecting ? { session.toggle(card.id) } : nil)
+                                .cardMasteryChrome(session.isSelecting ? cardMastery(forReviewKey: card.reviewKey) : nil)
                                 .customSelectionChrome(isSelecting: session.isSelecting,
                                                        isSelected: session.selectedIDs.contains(card.id))
                         }
