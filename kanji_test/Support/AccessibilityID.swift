@@ -52,6 +52,12 @@ nonisolated enum AccessibilityID {
         static let rateHard = "training.rate.hard"
         static let rateGood = "training.rate.good"
         static let rateEasy = "training.rate.easy"
+        static let choiceOption = "training.choice.option"
+        static let typedField = "training.typed.field"
+        static let typedSubmit = "training.typed.submit"
+        static let typedDontKnow = "training.typed.dontKnow"
+        static let typedConfirmCorrect = "training.typed.confirm.correct"
+        static let typedConfirmWrong = "training.typed.confirm.wrong"
     }
 
     enum Drawing {

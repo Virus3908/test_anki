@@ -37,6 +37,22 @@ nonisolated enum ChoiceDistractorProvider {
         return selected
     }
 
+    /// Детерминированно перемешивает правильный вариант с дистракторами,
+    /// чтобы порядок кнопок не «прыгал» при перерисовках в течение дня.
+    static func orderedOptions(correct: String, distractors: [String], cardID: String, date: Date) -> [String] {
+        var options = distractors
+        options.append(correct)
+        guard options.count > 1 else { return options }
+
+        let dayOrdinal = Calendar.current.ordinality(of: .day, in: .era, for: date) ?? 0
+        var seed = stableHash("order|\(cardID)|\(dayOrdinal)")
+        for index in (1..<options.count).reversed() {
+            seed = nextSeed(seed)
+            options.swapAt(index, Int(seed % UInt64(index + 1)))
+        }
+        return options
+    }
+
     /// FNV-1a: stable across launches, unlike `String.hashValue`.
     private static func stableHash(_ text: String) -> UInt64 {
         var hash: UInt64 = 0xcbf29ce484222325
