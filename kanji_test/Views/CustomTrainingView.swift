@@ -40,6 +40,8 @@ struct CustomTrainingView: View, CardContentRendering {
             if session.isRunning {
                 if practiceMode == .anki {
                     ankiTrainingArea
+                } else if usesRecallPresentation {
+                    recallTrainingArea
                 } else {
                     drawingTrainingArea
                 }
@@ -63,6 +65,176 @@ struct CustomTrainingView: View, CardContentRendering {
         .onChange(of: settings.speechRate) { _, _ in applySpeechSettings() }
         .onDisappear { speech.stop() }
         .task(id: cardPresentationToken) { speakFrontIfNeeded() }
+    }
+
+    // MARK: - Recall area (mirrors TrainingView+RecallTraining)
+
+    /// True when the resolved card type renders through the recall
+    /// components instead of the drawing/flip card flow. Words keep their
+    /// existing card view for `.flip` — that is today's default presentation.
+    private var usesRecallPresentation: Bool {
+        let type = session.currentCardType
+        return type != .drawing && !(practiceMode == .words && type == .flip)
+    }
+
+    private var currentRecallContent: RecallCardContent? {
+        switch practiceMode {
+        case .kanji:
+            guard let card = session.currentKanjiCard else { return nil }
+            return RecallCardContent(card: card, type: session.currentCardType)
+        case .words:
+            guard let card = session.currentWordCard else { return nil }
+            return RecallCardContent(card: card, type: session.currentCardType)
+        case .kana:
+            guard let card = session.currentKanaCard else { return nil }
+            return RecallCardContent(card: card, type: session.currentCardType)
+        case .anki:
+            return nil
+        }
+    }
+
+    private var recallTrainingArea: some View {
+        VStack(spacing: 0) {
+            ScrollView(.vertical) {
+                VStack(alignment: .leading, spacing: 16) {
+                    headerControls
+                    recallCardBody
+                }
+                .padding(20)
+                .padding(.bottom, 12)
+                .foregroundStyle(AppPalette.text)
+            }
+            .id(cardPresentationToken)
+
+            if showsRecallRevealPanel {
+                recallRevealPanel
+            }
+        }
+    }
+
+    private var showsRecallRevealPanel: Bool {
+        let type = session.currentCardType
+        return type == .flip || type == .audio
+    }
+
+    @ViewBuilder private var recallCardBody: some View {
+        switch session.currentCardType {
+        case .flip:
+            if let content = currentRecallContent {
+                trainingCardShell {
+                    RecallCardFront(content: content) { speech.speak(content.speechText) }
+                } back: {
+                    recallBack
+                }
+            }
+        case .audio:
+            if let content = currentRecallContent {
+                trainingCardShell {
+                    RecallAudioFront(
+                        content: content,
+                        isSpeechAvailable: settings.speechEnabled
+                    ) { speech.speak(content.speechText) }
+                } back: {
+                    recallBack
+                }
+            }
+        case .choice:
+            if let content = currentRecallContent {
+                recallChoiceCard(content: content)
+            }
+        case .typed:
+            if let content = currentRecallContent {
+                recallTypedCard(content: content)
+            }
+        case .drawing:
+            EmptyView()
+        }
+    }
+
+    @ViewBuilder private var recallBack: some View {
+        switch practiceMode {
+        case .kanji:
+            if let card = session.currentKanjiCard {
+                cardBackContent(
+                    for: card,
+                    onShowAllFields: { presentFieldSettings(.back) },
+                    onSpeak: { speech.speak(card.kanji) }
+                )
+            }
+        case .kana:
+            if let card = session.currentKanaCard {
+                kanaCardBackContent(
+                    for: card,
+                    onShowAllFields: { presentFieldSettings(.back) },
+                    onSpeak: { speech.speak(card.character) }
+                )
+            }
+        case .words:
+            if let card = session.currentWordCard {
+                studyCardBackShell(
+                    reviewKey: card.reviewKey,
+                    onShowAllFields: { presentFieldSettings(.back) },
+                    onSpeak: { speech.speak(card.word) }
+                ) {
+                    wordFullCardContent(for: card)
+                }
+            }
+        case .anki:
+            EmptyView()
+        }
+    }
+
+    /// Панель самопроверки: показать ответ (переворачивает шейлл) и оценка.
+    private var recallRevealPanel: some View {
+        VStack(spacing: 12) {
+            if !drawingSession.isAnswerVisible {
+                Button("Показать ответ") {
+                    revealDrawingAnswer()
+                }
+                .buttonStyle(.borderedProminent)
+                .accessibilityIdentifier(AccessibilityID.Training.reveal)
+            }
+            ratingControls
+        }
+        .padding(16)
+        .background(AppPalette.surface)
+    }
+
+    private func recallChoiceCard(content: RecallCardContent) -> some View {
+        let correctOption = content.targetMeanings.first ?? ""
+        let options = ChoiceDistractorProvider.orderedOptions(
+            correct: correctOption,
+            distractors: choiceDistractors(for: content),
+            cardID: content.cardID,
+            date: session.studyDay
+        )
+        return VStack(alignment: .leading, spacing: 14) {
+            RecallCardFront(content: content) { speech.speak(content.speechText) }
+            RecallChoicePanel(
+                options: options,
+                correctOption: correctOption
+            ) { rating in submit(rating) }
+        }
+        .padding(18)
+        .appSurfaceCard()
+    }
+
+    private func recallTypedCard(content: RecallCardContent) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
+            RecallCardFront(content: content) { speech.speak(content.speechText) }
+            RecallTypedPanel(content: content) { rating in submit(rating) }
+        }
+        .padding(18)
+        .appSurfaceCard()
+    }
+
+    private func choiceDistractors(for content: RecallCardContent) -> [String] {
+        ChoiceDistractorProvider.options(
+            for: content.cardID,
+            targetMeanings: content.targetMeanings,
+            pool: session.recallMeaningPool(excluding: content.cardID),
+            date: session.studyDay
+        )
     }
 
     // MARK: - Layout (mirrors TrainingView+Layout)

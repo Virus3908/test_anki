@@ -2,18 +2,34 @@ import SwiftUI
 
 extension TrainingView {
     @ViewBuilder private func currentCardView() -> some View {
+        let cardType = trainingSession.currentCardType
         switch practiceMode {
         case .kanji:
             if let card = cards[safe: trainingSession.currentIndex] {
-                trainingView(for: card)
+                if cardType == .drawing {
+                    trainingView(for: card)
+                } else {
+                    recallTrainingView(for: card)
+                }
             } else { sessionWaitingView() }
         case .words:
             if let wordCard = wordCards[safe: trainingSession.currentIndex] {
-                wordTrainingView(for: wordCard)
+                // «Карточка» для слов — существующий экран: дефолт слов (.flip)
+                // сохраняет сегодняшнее поведение.
+                switch cardType {
+                case .choice, .typed, .audio:
+                    recallTrainingView(for: wordCard)
+                default:
+                    wordTrainingView(for: wordCard)
+                }
             } else { sessionWaitingView() }
         case .kana:
             if let kanaCard = kanaCards[safe: trainingSession.currentIndex] {
-                kanaTrainingView(for: kanaCard)
+                if cardType == .drawing {
+                    kanaTrainingView(for: kanaCard)
+                } else {
+                    recallTrainingView(for: kanaCard)
+                }
             } else { sessionWaitingView() }
         case .anki:
             if let card = trainingSession.currentAnkiCard {

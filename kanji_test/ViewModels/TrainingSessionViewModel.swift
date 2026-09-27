@@ -44,6 +44,39 @@ final class TrainingSessionViewModel {
     var cards: [KanjiCard] { mode == .kanji ? queueIDs.compactMap(catalog.kanji) : [] }
     var wordCards: [WordStudyCard] { mode == .words ? queueIDs.compactMap(catalog.word) : [] }
     var kanaCards: [KanaStudyCard] { mode == .kana ? queueIDs.compactMap(catalog.kana) : [] }
+
+    /// Тип текущей карточки: детерминированный на день сессии, поэтому
+    /// переживает rebuild очереди и undo. Guided-практика и Anki всегда рисуют.
+    var currentCardType: TrainingCardType {
+        guard let mode, mode != .anki, let deck,
+              !isGuidedSingleKanjiPractice,
+              let currentID = queueIDs[safe: currentIndex] else { return .drawing }
+        return TrainingCardType.resolve(
+            cardID: currentID,
+            deckID: deck.id,
+            date: state.studyDay ?? Date(),
+            allowed: TrainingCardType.effectiveTypes(configured: options.cardTypes, mode: mode)
+        )
+    }
+
+    /// Значения остальных карточек колоды — пул дистракторов для теста.
+    func recallMeaningPool(excluding cardID: String) -> [String] {
+        guard let mode else { return [] }
+        let ids = state.queue.value?.sourceIDs ?? []
+        return ids.filter { $0 != cardID }.compactMap { id -> [String]? in
+            switch mode {
+            case .kanji: return catalog.kanji(id)?.meanings
+            case .words:
+                guard let meaning = catalog.word(id)?.meaning, !meaning.isEmpty else { return nil }
+                return [meaning]
+            case .kana:
+                guard let reading = catalog.kana(id)?.reading, !reading.isEmpty else { return nil }
+                return [reading]
+            case .anki: return nil
+            }
+        }.flatMap { $0 }
+    }
+
     var currentAnkiCard: AnkiStudyCard? {
         guard mode == .anki, let id = queueIDs[safe: currentIndex] else { return nil }
         return catalog.anki(id)
