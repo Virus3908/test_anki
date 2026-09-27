@@ -9,6 +9,7 @@ struct TrainingView: View, CardContentRendering {
     let translationState: TranslationViewModel
     let coordinator: StudyCoordinator
     let onPractice: (PracticeSelection) -> Void
+    var onOpenSettings: () -> Void = {}
     var reviewStore: StudyProgressStore { trainingSession.reviewStore }
     var drawingSession: DrawingSessionViewModel { trainingSession.drawingSession }
     @State var speech = SpeechService()
@@ -19,6 +20,8 @@ struct TrainingView: View, CardContentRendering {
     var body: some View {
         activeTrainingView()
             .disabled(trainingSession.isPreparingCard)
+            .toolbar(.hidden, for: .navigationBar)
+            .cornerGlassControls(onOpenSettings: onOpenSettings, extraActions: cornerActions)
             .onChange(of: trainingSession.options) { Task { await trainingSession.refreshForNewDay() } }
             .task(id: trainingSession.state.nextLearningDate) {
                 guard let date = trainingSession.state.nextLearningDate else { return }
@@ -31,7 +34,14 @@ struct TrainingView: View, CardContentRendering {
             .onChange(of: settings.speechEnabled) { _, _ in applySpeechSettings() }
             .onChange(of: settings.speechVoiceIdentifier) { _, _ in applySpeechSettings() }
             .onChange(of: settings.speechRate) { _, _ in applySpeechSettings() }
+            .onChange(of: trainingSession.isActive) { _, isActive in if !isActive { speech.stop() } }
             .onDisappear { speech.stop() }
+    }
+    private var cornerActions: [CornerGlassAction] {
+        guard !trainingSession.isGuidedSingleKanjiPractice else { return [] }
+        return [CornerGlassAction(systemImage: "xmark.circle",
+                                  accessibilityLabel: "Исключить карточку из тренировок",
+                                  action: { excludeCurrentCard() })]
     }
     func sessionWaitingView() -> some View {
         VStack(spacing: 18) {
@@ -60,7 +70,10 @@ struct TrainingView: View, CardContentRendering {
         case .anki: return "Анки"
         }
     }
-    func finishTraining() { trainingSession.finish() }
+    func finishTraining() {
+        speech.stop()
+        trainingSession.finish()
+    }
     func moveToPreviousCard() { Task { await trainingSession.moveToPreviousCard() } }
     func moveToNextCard() { Task { await trainingSession.moveToNextCard() } }
     func excludeCurrentCard() { Task { await trainingSession.excludeCurrentCard() } }
@@ -89,6 +102,13 @@ extension TrainingView {
         speech.voiceIdentifier = settings.speechVoiceIdentifier.isEmpty ? nil : settings.speechVoiceIdentifier
         speech.rate = settings.speechRate
         if settings.speechEnabled { speech.warmUp() }
+    }
+
+    /// Автоозвучка лицевой стороны: уезжающий после выхода экран ещё
+    /// рендерится, и без проверки сессии карточка успевает «сказать» себя.
+    func speakCardFrontIfNeeded(_ text: String) {
+        guard settings.speechEnabled, trainingSession.isActive else { return }
+        speech.speak(text)
     }
 
     func speakButton(for text: String) -> some View {

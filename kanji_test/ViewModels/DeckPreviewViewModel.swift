@@ -18,15 +18,15 @@ final class DeckPreviewViewModel {
     }
 
     var previewDeck: KanjiDeck? {
-        if case .kanjiDeck(let deck) = navigation.route { return deck }
+        if case .kanjiDeck(let deck) = navigation.deckRoute { return deck }
         return nil
     }
     var previewKanaDeck: KanaDeck? {
-        if case .kanaDeck(let deck) = navigation.route { return deck }
+        if case .kanaDeck(let deck) = navigation.deckRoute { return deck }
         return nil
     }
     var previewWordDeck: WordFrequencyDeck? {
-        if case .wordDeck(let deck) = navigation.route { return deck }
+        if case .wordDeck(let deck) = navigation.deckRoute { return deck }
         return nil
     }
     var previewExpectedCount: Int?

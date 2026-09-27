@@ -28,8 +28,7 @@ extension TrainingView {
         return TrainingHeaderView(
             title: trainingTitle,
             subtitle: subtitle,
-            onFinish: { finishTraining() },
-            onExclude: isPractice ? nil : { excludeCurrentCard() }
+            onFinish: { finishTraining() }
         )
     }
 

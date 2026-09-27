@@ -17,8 +17,7 @@ extension TrainingView {
             await translateWordMeaningIfNeeded(for: wordCard)
         }
         .task(id: "speech-\(wordCard.id)") {
-            guard settings.speechEnabled else { return }
-            speech.speak(wordCard.word)
+            speakCardFrontIfNeeded(wordCard.word)
         }
     }
 

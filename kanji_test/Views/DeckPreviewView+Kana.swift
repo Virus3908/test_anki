@@ -10,20 +10,15 @@ extension DeckPreviewView {
                 .ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 14) {
-                previewHeader(title: deck.title, subtitle: kanaPreviewStatus(for: deck), onBack: closeKanaPreview)
+                previewHeader(title: deck.title, subtitle: kanaPreviewStatus(for: deck), onBack: exitSelectionOrClose) {
+                    GlassIconButton(systemImage: "gearshape",
+                                    accessibilityLabel: "Настройки",
+                                    action: onOpenSettings)
+                }
 
                 if session.isSelecting {
                     CustomSelectionToolbar(session: session, cardIDs: deckState.previewKanaCards.map(\.id))
                         .frame(maxWidth: .infinity, alignment: .trailing)
-                }
-
-                if !session.isSelecting {
-                    previewStartButton(
-                        plan: plan,
-                        isDisabled: deckState.previewKanaCards.isEmpty,
-                        action: { onPractice(.kana(deck, deckState.previewKanaCards, guided: false)) },
-                        onCustomTraining: onCustomTraining
-                    )
                 }
 
                 ScrollView(.vertical) {
@@ -46,15 +41,26 @@ extension DeckPreviewView {
                         .foregroundStyle(AppPalette.secondaryText)
                         .tint(AppPalette.accent)
                 }
+
             }
             .padding(.horizontal, 12)
-            .padding(.top, 20)
-            .padding(.bottom, 4)
+            .padding(.top, 8)
             .foregroundStyle(AppPalette.text)
         }
         .safeAreaInset(edge: .bottom) {
+            // Единая нижняя панель: старт колоды или режим выбора карточек
+            // занимают одно и то же место с одной и той же геометрией.
             if session.isSelecting {
                 CustomSelectionBar(session: session, onStart: onStartCustomTraining)
+            } else {
+                BottomActionBar {
+                    previewStartButton(
+                        plan: plan,
+                        isDisabled: deckState.previewKanaCards.isEmpty,
+                        action: { onPractice(.kana(deck, deckState.previewKanaCards, guided: false)) },
+                        onCustomTraining: onCustomTraining
+                    )
+                }
             }
         }
         .sheet(item: $coordinator.presentedKanaPreview, onDismiss: {

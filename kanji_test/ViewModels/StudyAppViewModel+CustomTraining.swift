@@ -33,9 +33,15 @@ extension StudyAppViewModel {
         navigation.beginCustomTraining()
     }
 
+    /// Очередь чистится в `cleanUpAfterCustomTraining` — уже после анимации
+    /// ухода экрана, иначе уезжающая страница мигает пустым состоянием.
     func finishCustomTraining() {
-        customTraining.stop()
         navigation.finishCustomTraining()
+    }
+
+    func cleanUpAfterCustomTraining() {
+        guard navigation.presentedTraining != .customTraining else { return }
+        customTraining.stop()
     }
 
     /// Cards of the currently open deck available for custom selection.

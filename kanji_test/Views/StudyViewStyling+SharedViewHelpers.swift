@@ -164,6 +164,86 @@ extension View {
     }
 }
 
+/// Круглая иконка-кнопка в стиле liquid glass; единый вид кнопки поиска
+/// и угловых элементов управления (настройки, инфо, исключение карточки).
+struct GlassIconButton: View {
+    let systemImage: String
+    let accessibilityLabel: String
+    var diameter: CGFloat = 44
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: systemImage)
+                .font(.system(size: diameter * 0.42, weight: .semibold))
+                .frame(width: diameter, height: diameter)
+        }
+        .buttonStyle(.plain)
+        .tint(AppPalette.text)
+        .glassEffect(in: Circle())
+        .glassEffectTransition(.identity)
+        .accessibilityLabel(accessibilityLabel)
+    }
+}
+
+/// Единая нижняя панель приложения: одинаковые поля и привязка к нижнему краю
+/// на главном экране, в колоде и в кастом-тренировке; меняется только начинка.
+struct BottomActionBar<Content: View>: View {
+    let content: Content
+
+    init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
+
+    var body: some View {
+        GlassEffectContainer(spacing: 10) {
+            HStack(spacing: 10) {
+                content
+            }
+        }
+        .padding(.horizontal, 10)
+        .padding(.top, 10)
+        .padding(.bottom, 6)
+    }
+}
+
+/// Дополнительная круглая кнопка в угловом кластере. Передаётся данными,
+/// а не generic-view: generic `@ViewBuilder`-контент внутри
+/// GlassEffectContainer приводил к EXC_BAD_ACCESS при копировании view.
+struct CornerGlassAction: Identifiable {
+    let systemImage: String
+    let accessibilityLabel: String
+    let action: () -> Void
+
+    var id: String { systemImage }
+}
+
+extension View {
+    /// Круглые glass-кнопки, закреплённые в правом верхнем углу экрана.
+    /// Последняя — всегда настройки: одна и та же позиция и стиль на всех экранах.
+    func cornerGlassControls(
+        onOpenSettings: @escaping () -> Void,
+        extraActions: [CornerGlassAction] = []
+    ) -> some View {
+        overlay(alignment: .topTrailing) {
+            GlassEffectContainer(spacing: 10) {
+                HStack(spacing: 10) {
+                    ForEach(extraActions) { extra in
+                        GlassIconButton(systemImage: extra.systemImage,
+                                        accessibilityLabel: extra.accessibilityLabel,
+                                        action: extra.action)
+                    }
+                    GlassIconButton(systemImage: "gearshape",
+                                    accessibilityLabel: "Настройки",
+                                    action: onOpenSettings)
+                }
+            }
+            .padding(.top, 8)
+            .padding(.trailing, 12)
+        }
+    }
+}
+
 struct BottomScrollMask: View {
     var body: some View {
         VStack(spacing: 0) {

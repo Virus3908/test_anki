@@ -18,7 +18,6 @@ extension DeckPreviewViewModel {
 
     func closeKanaPreview() {
         cancelPreviewTask()
-        navigation.open(.start)
         previewKanaCards.removeAll()
         isLoadingDeck = false
     }

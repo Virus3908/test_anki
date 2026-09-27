@@ -37,8 +37,11 @@ struct StartView: View, StudyViewStyling {
     let translationState: TranslationViewModel
     let reviewStore: StudyProgressStore
     let onPractice: (PracticeSelection) -> Void
+    var onOpenSettings: () -> Void = {}
     @State var selectedSection: StartMenuSection = .kanji
     @State var hasSelectedInitialSection = false
+    /// «Бегунок» выбранного раздела скользит между сегментами нижней панели.
+    @Namespace var sectionSelectionNamespace
     /// Открыт ли экран поиска (лупа рядом с заголовком).
     @State var isSearchPresented = false
 

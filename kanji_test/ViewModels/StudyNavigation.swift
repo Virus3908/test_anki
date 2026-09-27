@@ -1,7 +1,7 @@
 import Foundation
 import Observation
 
-enum StudyRoute: Equatable {
+enum StudyRoute: Hashable {
     case start
     case kanjiDeck(KanjiDeck)
     case wordDeck(WordFrequencyDeck)
@@ -11,40 +11,40 @@ enum StudyRoute: Equatable {
     case customTraining
 }
 
+/// Колоды живут в стеке `path` (системный push/pop со «стаскиванием»),
+/// тренировки — в `presentedTraining` поверх стека, чтобы свайп-назад
+/// не мог случайно прервать тренировку.
 @MainActor
 @Observable
 final class StudyNavigation {
-    private(set) var route: StudyRoute = .start
-    private var returnRoute: StudyRoute = .start
+    var path: [StudyRoute] = []
+    private(set) var presentedTraining: StudyRoute?
 
-    var deckRoute: StudyRoute {
-        switch route {
-        case .training, .customTraining: return returnRoute
-        default: return route
-        }
-    }
+    var route: StudyRoute { presentedTraining ?? deckRoute }
+    var deckRoute: StudyRoute { path.last ?? .start }
 
     func beginTraining(_ mode: PracticeMode) {
-        if case .training = route {} else { returnRoute = route }
-        route = .training(mode)
+        presentedTraining = .training(mode)
     }
 
     /// Starts the endless session for the currently open deck.
-    /// The deck route is kept in `returnRoute` so preview state keeps resolving.
     func beginCustomTraining() {
-        guard route.deck != nil else { return }
-        if case .customTraining = route {} else { returnRoute = route }
-        route = .customTraining
+        guard deckRoute.deck != nil else { return }
+        presentedTraining = .customTraining
     }
 
-    /// Exits the endless session back to the open deck preview.
-    func finishCustomTraining() { route = returnRoute }
+    func finishCustomTraining() { presentedTraining = nil }
+    func finishTraining() { presentedTraining = nil }
 
-    func open(_ route: StudyRoute) { self.route = route }
-
-    func finishTraining() { route = returnRoute }
-    func reset() {
-        route = .start
-        returnRoute = .start
+    func open(_ route: StudyRoute) {
+        presentedTraining = nil
+        path = route == .start ? [] : [route]
     }
+
+    func pop() {
+        guard !path.isEmpty else { return }
+        path.removeLast()
+    }
+
+    func reset() { open(.start) }
 }

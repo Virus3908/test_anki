@@ -14,6 +14,7 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
     let onPractice: (PracticeSelection) -> Void
     var onCustomTraining: () -> Void = {}
     var onStartCustomTraining: () -> Void = {}
+    var onOpenSettings: () -> Void = {}
     @State private var selectedCard: AnkiStudyCard?
     @State private var showSchedule = false
     @State private var deckPendingDeletion: AnkiDeckReference?
@@ -48,10 +49,6 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
             AppPalette.background.ignoresSafeArea()
             VStack(alignment: .leading, spacing: 14) {
                 previewHeader(title: deck.title, subtitle: "\(cards.count) карточек", onBack: exitSelectionOrClose) {
-                    if !session.isSelecting {
-                        Button { showSchedule = true } label: { Image(systemName: "calendar") }
-                            .buttonStyle(.bordered).tint(AppPalette.accent).accessibilityLabel("Расписание повторений")
-                    }
                     Button(role: .destructive) {
                         deckPendingDeletion = deck
                     } label: {
@@ -60,19 +57,21 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
                     }
                     .buttonStyle(.borderless)
                     .disabled(model.isOpeningDeck || model.isDeletingDeck)
+
+                    if !session.isSelecting {
+                        GlassIconButton(systemImage: "calendar",
+                                        accessibilityLabel: "Расписание повторений",
+                                        action: { showSchedule = true })
+                    }
+
+                    GlassIconButton(systemImage: "gearshape",
+                                    accessibilityLabel: "Настройки",
+                                    action: onOpenSettings)
                 }
 
                 if session.isSelecting {
                     CustomSelectionToolbar(session: session, cardIDs: cards.map(\.id))
                         .frame(maxWidth: .infinity, alignment: .trailing)
-                }
-                if !session.isSelecting {
-                    previewStartButton(
-                        plan: plan,
-                        isDisabled: cards.isEmpty || model.isOpeningDeck,
-                        action: { onPractice(.anki(deck, cards, guided: false)) },
-                        onCustomTraining: onCustomTraining
-                    )
                 }
                 ScrollView {
                     LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
@@ -104,11 +103,23 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
                     Button("Повторить") { Task { await model.openDeck(deck) } }
                 }
             }
-            .padding(.horizontal, 12).padding(.top, 20).padding(.bottom, 4).foregroundStyle(AppPalette.text)
+            .padding(.horizontal, 12).padding(.top, 8).foregroundStyle(AppPalette.text)
         }
+        .toolbar(.hidden, for: .navigationBar)
         .safeAreaInset(edge: .bottom) {
+            // Единая нижняя панель: старт колоды или режим выбора карточек
+            // занимают одно и то же место с одной и той же геометрией.
             if session.isSelecting {
                 CustomSelectionBar(session: session, onStart: onStartCustomTraining)
+            } else {
+                BottomActionBar {
+                    previewStartButton(
+                        plan: plan,
+                        isDisabled: cards.isEmpty || model.isOpeningDeck,
+                        action: { onPractice(.anki(deck, cards, guided: false)) },
+                        onCustomTraining: onCustomTraining
+                    )
+                }
             }
         }
         .sheet(item: $selectedCard) { card in

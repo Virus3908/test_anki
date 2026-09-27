@@ -6,23 +6,12 @@ extension StudyCoordinator {
         deckState.openKanjiPreview(deck)
     }
 
-    func closeDeckPreview(deckState: DeckPreviewViewModel) {
-        deckState.closeKanjiPreview()
-        closeKanjiPreview()
-        closeDeckSchedule()
-    }
-
     func openKanaPreview(
         _ deck: KanaDeck,
         deckState: DeckPreviewViewModel
     ) {
         clearDeckSelection()
         deckState.openKanaPreview(deck)
-    }
-
-    func closeKanaPreview(deckState: DeckPreviewViewModel) {
-        deckState.closeKanaPreview()
-        closeKanaPreview()
     }
 
     func openWordPreview(_ deck: WordFrequencyDeck, deckState: DeckPreviewViewModel) {
@@ -32,11 +21,6 @@ extension StudyCoordinator {
 
         clearDeckSelection()
         deckState.openWordPreview(deck)
-    }
-
-    func closeWordPreview(deckState: DeckPreviewViewModel) {
-        deckState.closeWordPreview()
-        closeWordPreview()
     }
 
     func openKanjiPreviewCard(_ card: KanjiCard) {

@@ -413,7 +413,6 @@ struct TrainingHeaderView: View {
     let title: String
     let subtitle: String
     let onFinish: () -> Void
-    var onExclude: (() -> Void)? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
@@ -430,21 +429,13 @@ struct TrainingHeaderView: View {
                     .lineLimit(1)
 
                 Spacer()
-
-                if let onExclude {
-                    Button {
-                        onExclude()
-                    } label: {
-                        Image(systemName: "xmark.circle")
-                    }
-                    .accessibilityLabel("Исключить карточку из тренировок")
-                }
             }
 
+            // Подзаголовок слева: правый верхний угол экрана занят
+            // закреплёнными glass-кнопками (исключение, настройки).
             Text(subtitle)
                 .font(.footnote.weight(.semibold))
                 .foregroundStyle(AppPalette.secondaryText)
-                .frame(maxWidth: .infinity, alignment: .trailing)
         }
         .buttonStyle(.bordered)
         .tint(AppPalette.accent)
