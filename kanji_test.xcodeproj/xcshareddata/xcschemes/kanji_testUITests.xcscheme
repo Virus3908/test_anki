@@ -32,16 +32,6 @@
       <Testables>
          <TestableReference
             skipped = "NO"
-            parallelizable = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "5BCD0455305B1D0400722EF9"
-               BuildableName = "kanji_testHostedTests.xctest"
-               ReferencedContainer = "container:kanji_test.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO"
             parallelizable = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"

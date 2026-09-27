@@ -14,6 +14,12 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
 struct kanji_testApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
+    init() {
+        #if DEBUG
+        UITestingLaunch.prepareIfNeeded()
+        #endif
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView()

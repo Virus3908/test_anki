@@ -47,7 +47,12 @@ extension TrainingView {
                     .textCase(.uppercase)
                 Spacer()
                 if let speechText, !speechText.isEmpty {
-                    CardHeaderActionButton(title: "Озвучить", systemImage: "speaker.wave.2.fill") {
+                    CardHeaderActionButton(
+                        title: "Озвучить",
+                        systemImage: "speaker.wave.2.fill",
+                        accessibilityIdentifier: AccessibilityID.Training.speak,
+                        accessibilityValue: speech.lastRequestedText
+                    ) {
                         speech.speak(speechText)
                     }
                 }

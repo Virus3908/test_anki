@@ -91,6 +91,7 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
                                         .font(.caption2).foregroundStyle(AppPalette.secondaryText)
                                 }.padding(12).frame(maxWidth: .infinity, minHeight: 120, alignment: .topLeading).appSurfaceCard()
                             }.buttonStyle(.plain)
+                            .accessibilityIdentifier(AccessibilityID.Preview.tile)
                             .cardMasteryChrome(cardMastery(for: card))
                             .customSelectionChrome(isSelecting: session.isSelecting,
                                                    isSelected: session.selectedIDs.contains(card.id))
@@ -201,7 +202,7 @@ struct AnkiCardPreviewView: View, StudyViewStyling {
                         Button { index += 1; answer = false } label: { Image(systemName: "chevron.right") }
                             .disabled(index + 1 == cards.count).accessibilityLabel("Следующая карточка")
                     }.buttonStyle(.bordered).tint(AppPalette.accent)
-                    primaryActionButton(title: "Практиковать эту карточку", systemImage: "rectangle.on.rectangle") { onPractice(card) }
+                    primaryActionButton(title: "Практиковать эту карточку", systemImage: "rectangle.on.rectangle", accessibilityIdentifier: AccessibilityID.Preview.practiceCard) { onPractice(card) }
                 }
             }.padding(20).background(AppPalette.background).foregroundStyle(AppPalette.text)
                 .navigationTitle("\(index + 1) / \(cards.count)").navigationBarTitleDisplayMode(.inline)

@@ -69,6 +69,7 @@ extension DeckPreviewView {
                     GlassIconButton(systemImage: "magnifyingglass",
                                     accessibilityLabel: "Поиск по колоде",
                                     diameter: 52,
+                                    accessibilityIdentifier: AccessibilityID.Preview.search,
                                     action: { isSearchPresented = true })
                 }
             }

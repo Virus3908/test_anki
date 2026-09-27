@@ -53,6 +53,7 @@ extension StudyViewStyling {
         }
         .buttonStyle(.plain)
         .disabled(isDisabled)
+        .accessibilityIdentifier(AccessibilityID.Deck.row)
     }
 
 }

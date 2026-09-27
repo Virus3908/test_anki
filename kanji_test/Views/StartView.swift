@@ -17,6 +17,15 @@ enum StartMenuSection: String, CaseIterable, Identifiable {
         }
     }
 
+    var accessibilityIdentifier: String {
+        switch self {
+        case .kanji: AccessibilityID.Start.sectionKanji
+        case .words: AccessibilityID.Start.sectionWords
+        case .kana: AccessibilityID.Start.sectionKana
+        case .anki: AccessibilityID.Start.sectionAnki
+        }
+    }
+
     var practiceMode: PracticeMode? {
         switch self {
         case .kanji: .kanji

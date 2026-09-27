@@ -79,6 +79,7 @@ extension StartView {
                     GlassIconButton(systemImage: "magnifyingglass",
                                     accessibilityLabel: "Поиск по всем карточкам",
                                     diameter: 52,
+                                    accessibilityIdentifier: AccessibilityID.Start.search,
                                     action: openSearchIfReady)
                 }
             }
@@ -137,6 +138,7 @@ extension StartView {
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
+        .accessibilityIdentifier(section.accessibilityIdentifier)
     }
 
     private func openSearchIfReady() {

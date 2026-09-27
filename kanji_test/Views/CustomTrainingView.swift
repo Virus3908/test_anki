@@ -121,6 +121,7 @@ struct CustomTrainingView: View, CardContentRendering {
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(AppPalette.accent)
+                    .accessibilityIdentifier(AccessibilityID.Training.reveal)
 
                     ratingControls
                 }
@@ -136,6 +137,8 @@ struct CustomTrainingView: View, CardContentRendering {
         TrainingHeaderView(
             title: session.deck?.title ?? "Кастом-тренировка",
             subtitle: "Круг \(session.round) · Ответов \(session.answersCount) · Точность \(accuracyText) · Серия \(session.currentStreak)",
+            answeredCount: session.answersCount,
+            remainingCount: session.queue.count,
             onFinish: exit
         )
     }
@@ -235,7 +238,12 @@ struct CustomTrainingView: View, CardContentRendering {
                     .textCase(.uppercase)
                 Spacer()
                 if !speechText.isEmpty {
-                    CardHeaderActionButton(title: "Озвучить", systemImage: "speaker.wave.2.fill") {
+                    CardHeaderActionButton(
+                        title: "Озвучить",
+                        systemImage: "speaker.wave.2.fill",
+                        accessibilityIdentifier: AccessibilityID.Training.speak,
+                        accessibilityValue: speech.lastRequestedText
+                    ) {
                         speech.speak(speechText)
                     }
                 }
@@ -385,6 +393,7 @@ struct CustomTrainingView: View, CardContentRendering {
                         revealDrawingAnswer()
                     }
                     .buttonStyle(.borderedProminent)
+                    .accessibilityIdentifier(AccessibilityID.Training.reveal)
                 }
                 ratingControls
             }
