@@ -181,6 +181,7 @@ struct GlassIconButton: View {
         .buttonStyle(.plain)
         .tint(AppPalette.text)
         .glassEffect(in: Circle())
+        .glassEffectTransition(.identity)
         .accessibilityLabel(accessibilityLabel)
     }
 }
@@ -195,8 +196,10 @@ struct BottomActionBar<Content: View>: View {
     }
 
     var body: some View {
-        HStack(spacing: 10) {
-            content
+        GlassEffectContainer(spacing: 10) {
+            HStack(spacing: 10) {
+                content
+            }
         }
         .padding(.horizontal, 10)
         .padding(.top, 10)
@@ -204,37 +207,40 @@ struct BottomActionBar<Content: View>: View {
     }
 }
 
+/// Дополнительная круглая кнопка в угловом кластере. Передаётся данными,
+/// а не generic-view: generic `@ViewBuilder`-контент внутри
+/// GlassEffectContainer приводил к EXC_BAD_ACCESS при копировании view.
+struct CornerGlassAction: Identifiable {
+    let systemImage: String
+    let accessibilityLabel: String
+    let action: () -> Void
+
+    var id: String { systemImage }
+}
+
 extension View {
     /// Круглые glass-кнопки, закреплённые в правом верхнем углу экрана.
     /// Последняя — всегда настройки: одна и та же позиция и стиль на всех экранах.
-    func cornerGlassControls<Leading: View>(
+    func cornerGlassControls(
         onOpenSettings: @escaping () -> Void,
-        @ViewBuilder leading: () -> Leading
+        extraActions: [CornerGlassAction] = []
     ) -> some View {
         overlay(alignment: .topTrailing) {
-            HStack(spacing: 10) {
-                leading()
-                GlassIconButton(systemImage: "gearshape",
-                                accessibilityLabel: "Настройки",
-                                action: onOpenSettings)
+            GlassEffectContainer(spacing: 10) {
+                HStack(spacing: 10) {
+                    ForEach(extraActions) { extra in
+                        GlassIconButton(systemImage: extra.systemImage,
+                                        accessibilityLabel: extra.accessibilityLabel,
+                                        action: extra.action)
+                    }
+                    GlassIconButton(systemImage: "gearshape",
+                                    accessibilityLabel: "Настройки",
+                                    action: onOpenSettings)
+                }
             }
             .padding(.top, 8)
             .padding(.trailing, 12)
         }
-    }
-
-    /// Свайп от левого края вправо — «назад», как системный жест поп-навигации.
-    /// Подключается только к экранам, где случайный выход безопасен (колоды).
-    func edgeBackSwipe(action: @escaping () -> Void) -> some View {
-        simultaneousGesture(
-            DragGesture(minimumDistance: 24)
-                .onEnded { value in
-                    guard value.startLocation.x < 32,
-                          value.translation.width > 50,
-                          abs(value.translation.height) < 90 else { return }
-                    action()
-                }
-        )
     }
 }
 

@@ -10,7 +10,7 @@ extension DeckPreviewView {
                 .ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 14) {
-                previewHeader(title: deck.title, subtitle: kanaPreviewStatus(for: deck), onBack: closeKanaPreview) {
+                previewHeader(title: deck.title, subtitle: kanaPreviewStatus(for: deck), onBack: exitSelectionOrClose) {
                     GlassIconButton(systemImage: "gearshape",
                                     accessibilityLabel: "Настройки",
                                     action: onOpenSettings)

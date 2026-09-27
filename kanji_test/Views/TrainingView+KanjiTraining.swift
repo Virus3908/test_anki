@@ -44,8 +44,7 @@ private struct KanjiTrainingCardView: View {
             await training.translateKanjiMeaningsIfNeeded(for: card, deck: training.selectedDeck)
         }
         .task(id: card.id) {
-            guard training.settings.speechEnabled else { return }
-            training.speech.speak(card.kanji)
+            training.speakCardFrontIfNeeded(card.kanji)
         }
     }
 }

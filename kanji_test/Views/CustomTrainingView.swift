@@ -48,7 +48,7 @@ struct CustomTrainingView: View, CardContentRendering {
             }
         }
         .toolbar(.hidden, for: .navigationBar)
-        .cornerGlassControls(onOpenSettings: onOpenSettings) { }
+        .cornerGlassControls(onOpenSettings: onOpenSettings)
         .sheet(isPresented: $isFieldSettingsPresented) {
             BuiltInCardFieldSettingsView(
                 settings: settings,
@@ -136,7 +136,7 @@ struct CustomTrainingView: View, CardContentRendering {
         TrainingHeaderView(
             title: session.deck?.title ?? "Кастом-тренировка",
             subtitle: "Круг \(session.round) · Ответов \(session.answersCount) · Точность \(accuracyText) · Серия \(session.currentStreak)",
-            onFinish: onExit
+            onFinish: exit
         )
     }
 
@@ -434,12 +434,17 @@ struct CustomTrainingView: View, CardContentRendering {
                 .font(.caption)
                 .foregroundStyle(AppPalette.secondaryText)
                 .multilineTextAlignment(.center)
-            primaryActionButton(title: "Вернуться к колоде", systemImage: "chevron.left", action: onExit)
+            primaryActionButton(title: "Вернуться к колоде", systemImage: "chevron.left", action: exit)
         }
         .padding(24)
     }
 
     // MARK: - Actions
+
+    private func exit() {
+        speech.stop()
+        onExit()
+    }
 
     private func revealDrawingAnswer() {
         withAnimation(.easeInOut(duration: 0.24)) {
@@ -498,7 +503,7 @@ struct CustomTrainingView: View, CardContentRendering {
     }
 
     private func speakFrontIfNeeded() {
-        guard settings.speechEnabled, !drawingSession.isAnswerVisible else { return }
+        guard settings.speechEnabled, session.isRunning, !drawingSession.isAnswerVisible else { return }
         switch practiceMode {
         case .kanji: if let card = session.currentKanjiCard { speech.speak(card.kanji) }
         case .kana: if let card = session.currentKanaCard { speech.speak(card.character) }

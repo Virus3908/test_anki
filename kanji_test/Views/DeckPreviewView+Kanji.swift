@@ -10,7 +10,7 @@ extension DeckPreviewView {
                 .ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 14) {
-                previewHeader(title: deck.title, subtitle: deckPreviewStatus, onBack: closeDeckPreview) {
+                previewHeader(title: deck.title, subtitle: deckPreviewStatus, onBack: exitSelectionOrClose) {
                     if !session.isSelecting {
                         GlassIconButton(systemImage: "info.circle",
                                         accessibilityLabel: "Расписание повторений",

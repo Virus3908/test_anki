@@ -29,7 +29,6 @@ extension DeckPreviewViewModel {
 
     func closeWordPreview() {
         cancelPreviewTask()
-        navigation.open(.start)
         previewWordCards.removeAll()
         isLoadingDeck = false
     }

@@ -79,14 +79,13 @@ extension StartView {
                     GlassIconButton(systemImage: "magnifyingglass",
                                     accessibilityLabel: "Поиск по всем карточкам",
                                     diameter: 52,
-                                    action: { isSearchPresented = true })
-                        .disabled(isLoading)
+                                    action: openSearchIfReady)
                 }
             }
         }
         .foregroundStyle(AppPalette.text)
         .toolbar(.hidden, for: .navigationBar)
-        .cornerGlassControls(onOpenSettings: onOpenSettings) { }
+        .cornerGlassControls(onOpenSettings: onOpenSettings)
     }
 
     /// Переключатель разделов, жёстко закреплённый внизу экрана:
@@ -101,6 +100,7 @@ extension StartView {
         .padding(5)
         .frame(maxWidth: .infinity)
         .glassEffect(in: Capsule())
+        .glassEffectTransition(.identity)
         .onChange(of: selectedSection) { _, section in
             if let mode = section.practiceMode {
                 practiceMode = mode
@@ -125,22 +125,34 @@ extension StartView {
         } label: {
             Text(section.title)
                 .font(.subheadline.weight(isSelected ? .semibold : .medium))
-                .foregroundStyle(isSelected ? Color.white : AppPalette.secondaryText)
+                .foregroundStyle(isSelected ? AppPalette.text : AppPalette.secondaryText)
                 .frame(maxWidth: .infinity, minHeight: 42)
                 .contentShape(Rectangle())
                 .background {
                     if isSelected {
-                        // Стеклянный «бабл»: второй слой liquid glass поверх
-                        // капсулы-трека, без акцентной заливки.
-                        Capsule()
-                            .fill(Color.clear)
-                            .glassEffect(in: Capsule())
+                        selectionBubble
                             .matchedGeometryEffect(id: "sectionSelection", in: sectionSelectionNamespace)
                     }
                 }
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+
+    private func openSearchIfReady() {
+        guard !isLoading else { return }
+        isSearchPresented = true
+    }
+
+    /// Glass поверх glass почти не виден (стекло не сэмплирует стекло),
+    /// поэтому бабл — полупрозрачная светлая капсула с бликом-обводкой.
+    private var selectionBubble: some View {
+        Capsule()
+            .fill(Color.primary.opacity(0.12))
+            .overlay {
+                Capsule().strokeBorder(Color.white.opacity(0.35), lineWidth: 1)
+            }
+            .shadow(color: Color.black.opacity(0.12), radius: 6, y: 2)
     }
 
     private var visibleKanjiGroups: [(title: String, decks: [KanjiDeck])] {

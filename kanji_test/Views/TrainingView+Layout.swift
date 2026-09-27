@@ -1,33 +1,37 @@
 import SwiftUI
 
 extension TrainingView {
+    @ViewBuilder private func currentCardView() -> some View {
+        switch practiceMode {
+        case .kanji:
+            if let card = cards[safe: trainingSession.currentIndex] {
+                trainingView(for: card)
+            } else { sessionWaitingView() }
+        case .words:
+            if let wordCard = wordCards[safe: trainingSession.currentIndex] {
+                wordTrainingView(for: wordCard)
+            } else { sessionWaitingView() }
+        case .kana:
+            if let kanaCard = kanaCards[safe: trainingSession.currentIndex] {
+                kanaTrainingView(for: kanaCard)
+            } else { sessionWaitingView() }
+        case .anki:
+            if let card = trainingSession.currentAnkiCard {
+                ankiTrainingView(for: card)
+            } else { sessionWaitingView() }
+        }
+    }
+
     func activeTrainingView() -> some View {
         @Bindable var coordinator = coordinator
 
         return Group {
-            switch practiceMode {
-            case .kanji:
-                if let card = cards[safe: trainingSession.currentIndex] {
-                    trainingView(for: card)
-                } else {
-                    sessionWaitingView()
-                }
-            case .words:
-                if let wordCard = wordCards[safe: trainingSession.currentIndex] {
-                    wordTrainingView(for: wordCard)
-                } else {
-                    sessionWaitingView()
-                }
-            case .kana:
-                if let kanaCard = kanaCards[safe: trainingSession.currentIndex] {
-                    kanaTrainingView(for: kanaCard)
-                } else {
-                    sessionWaitingView()
-                }
-            case .anki:
-                if let card = trainingSession.currentAnkiCard {
-                    ankiTrainingView(for: card)
-                } else { sessionWaitingView() }
+            // Сессия уже сброшена, а экран ещё уезжает: без этого на время
+            // анимации мелькает «На сейчас всё готово».
+            if trainingSession.isActive {
+                currentCardView()
+            } else {
+                AppPalette.background.ignoresSafeArea()
             }
         }
         .sheet(item: $coordinator.selectedLinkedKanjiCard, onDismiss: {

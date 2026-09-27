@@ -12,8 +12,7 @@ extension TrainingView {
             }
         }
         .task(id: "speech-\(kanaCard.id)") {
-            guard settings.speechEnabled else { return }
-            speech.speak(kanaCard.character)
+            speakCardFrontIfNeeded(kanaCard.character)
         }
     }
 

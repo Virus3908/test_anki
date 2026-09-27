@@ -106,7 +106,6 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
             .padding(.horizontal, 12).padding(.top, 8).foregroundStyle(AppPalette.text)
         }
         .toolbar(.hidden, for: .navigationBar)
-        .edgeBackSwipe(action: exitSelectionOrClose)
         .safeAreaInset(edge: .bottom) {
             // Единая нижняя панель: старт колоды или режим выбора карточек
             // занимают одно и то же место с одной и той же геометрией.

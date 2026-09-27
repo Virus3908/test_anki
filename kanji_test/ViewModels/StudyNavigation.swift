@@ -1,7 +1,7 @@
 import Foundation
 import Observation
 
-enum StudyRoute: Equatable {
+enum StudyRoute: Hashable {
     case start
     case kanjiDeck(KanjiDeck)
     case wordDeck(WordFrequencyDeck)
@@ -9,60 +9,42 @@ enum StudyRoute: Equatable {
     case ankiDeck(AnkiDeckReference)
     case training(PracticeMode)
     case customTraining
-
-    /// Уровень экрана в иерархии: главный — 0, колода — 1, тренировка — 2.
-    /// Убывание уровня означает «назад» и задаёт направление анимации перехода.
-    var navigationDepth: Int {
-        switch self {
-        case .start: 0
-        case .kanjiDeck, .wordDeck, .kanaDeck, .ankiDeck: 1
-        case .training, .customTraining: 2
-        }
-    }
 }
 
+/// Колоды живут в стеке `path` (системный push/pop со «стаскиванием»),
+/// тренировки — в `presentedTraining` поверх стека, чтобы свайп-назад
+/// не мог случайно прервать тренировку.
 @MainActor
 @Observable
 final class StudyNavigation {
-    private(set) var route: StudyRoute = .start
-    /// Последняя смена маршрута была «назад» (к менее глубокому экрану) —
-    /// тогда страница уезжает вправо, как системный pop.
-    private(set) var isMovingBack = false
-    private var returnRoute: StudyRoute = .start
+    var path: [StudyRoute] = []
+    private(set) var presentedTraining: StudyRoute?
 
-    var deckRoute: StudyRoute {
-        switch route {
-        case .training, .customTraining: return returnRoute
-        default: return route
-        }
-    }
+    var route: StudyRoute { presentedTraining ?? deckRoute }
+    var deckRoute: StudyRoute { path.last ?? .start }
 
     func beginTraining(_ mode: PracticeMode) {
-        if case .training = route {} else { returnRoute = route }
-        moveTo(.training(mode))
+        presentedTraining = .training(mode)
     }
 
     /// Starts the endless session for the currently open deck.
-    /// The deck route is kept in `returnRoute` so preview state keeps resolving.
     func beginCustomTraining() {
-        guard route.deck != nil else { return }
-        if case .customTraining = route {} else { returnRoute = route }
-        moveTo(.customTraining)
+        guard deckRoute.deck != nil else { return }
+        presentedTraining = .customTraining
     }
 
-    /// Exits the endless session back to the open deck preview.
-    func finishCustomTraining() { moveTo(returnRoute) }
+    func finishCustomTraining() { presentedTraining = nil }
+    func finishTraining() { presentedTraining = nil }
 
-    func open(_ route: StudyRoute) { moveTo(route) }
-
-    func finishTraining() { moveTo(returnRoute) }
-    func reset() {
-        moveTo(.start)
-        returnRoute = .start
+    func open(_ route: StudyRoute) {
+        presentedTraining = nil
+        path = route == .start ? [] : [route]
     }
 
-    private func moveTo(_ newRoute: StudyRoute) {
-        isMovingBack = newRoute.navigationDepth < route.navigationDepth
-        route = newRoute
+    func pop() {
+        guard !path.isEmpty else { return }
+        path.removeLast()
     }
+
+    func reset() { open(.start) }
 }

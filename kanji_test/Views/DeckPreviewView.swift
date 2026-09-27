@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct DeckPreviewView: View, CardContentRendering {
-    var deckID: String? { deckState.navigation.route.deck?.id }
+    let route: StudyRoute
+    var deckID: String? { route.deck?.id }
     let deckState: DeckPreviewViewModel
     let coordinator: StudyCoordinator
     let settings: StudyPreferences
@@ -9,6 +10,7 @@ struct DeckPreviewView: View, CardContentRendering {
     let reviewStore: StudyProgressStore
     let session: CustomTrainingSession
     let onPractice: (PracticeSelection) -> Void
+    let onBack: () -> Void
     var onCustomTraining: () -> Void = {}
     var onStartCustomTraining: () -> Void = {}
     var onOpenSettings: () -> Void = {}
@@ -35,29 +37,20 @@ struct DeckPreviewView: View, CardContentRendering {
     }
     var body: some View {
         Group {
-            if let deck = deckState.previewDeck { deckPreviewView(for: deck) }
-            else if let deck = deckState.previewWordDeck { wordPreviewView(for: deck) }
-            else if let deck = deckState.previewKanaDeck { kanaPreviewView(for: deck) }
+            switch route {
+            case .kanjiDeck(let deck): deckPreviewView(for: deck)
+            case .wordDeck(let deck): wordPreviewView(for: deck)
+            case .kanaDeck(let deck): kanaPreviewView(for: deck)
+            default: EmptyView()
+            }
         }
         .toolbar(.hidden, for: .navigationBar)
-        .edgeBackSwipe(action: closeOpenPreview)
     }
 
-    /// Свайп от левого края возвращает из открытой колоды на главный экран;
-    /// в режиме выбора сначала выходит из выбора — как и кнопка «назад».
-    func closeOpenPreview() {
-        if deckState.previewDeck != nil { closeDeckPreview() }
-        else if deckState.previewWordDeck != nil { closeWordPreview() }
-        else if deckState.previewKanaDeck != nil { closeKanaPreview() }
-    }
     /// В режиме выбора карточек кнопка «назад» сначала выходит из выбора,
     /// а закрывает колоду только при повторном нажатии.
-    func closeDeckPreview() { exitSelection { coordinator.closeDeckPreview(deckState: deckState) } }
-    func closeWordPreview() { exitSelection { coordinator.closeWordPreview(deckState: deckState) } }
-    func closeKanaPreview() { exitSelection { coordinator.closeKanaPreview(deckState: deckState) } }
-
-    private func exitSelection(then close: () -> Void) {
-        if session.isSelecting { session.cancelSelection() } else { close() }
+    func exitSelectionOrClose() {
+        if session.isSelecting { session.cancelSelection() } else { onBack() }
     }
 
     /// Лист поиска: кандзи-колода ищет по всем кандзи, словарная — по всем словам.

@@ -29,7 +29,6 @@ extension DeckPreviewViewModel {
 
     func closeKanjiPreview() {
         cancelPreviewTask()
-        navigation.open(.start)
         previewCards.removeAll()
         previewExpectedCount = nil
         isLoadingDeck = false
