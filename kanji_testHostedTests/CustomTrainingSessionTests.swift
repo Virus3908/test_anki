@@ -55,17 +55,55 @@ final class CustomTrainingSessionTests: XCTestCase {
         XCTAssertTrue(session.isRunning)
     }
 
-    func testAgainReinsertsCardSoonerThanGood() {
+    func testAgainRepeatsBeforeGoodAnsweredCards() {
         let session = makeSession()
         session.start(deck: deck, cardIDs: ids)
-        let current = session.currentID!
-
-        session.submit(.again)
-        XCTAssertEqual(session.queue[2], current)
-
-        let next = session.currentID!
+        let first = session.currentID!
         session.submit(.good)
-        XCTAssertEqual(session.queue.last, next)
+        let second = session.currentID!
+        session.submit(.good)
+        let third = session.currentID!
+        session.submit(.again)
+
+        // Не показанные в круге карточки остаются впереди любых повторов…
+        let unseen = Set(ids).subtracting([first, second, third])
+        XCTAssertEqual(Set(session.queue.prefix(unseen.count)), unseen)
+        // …а «снова» возвращается раньше карточек, отвеченных «норм».
+        let againPosition = session.queue.firstIndex(of: third)!
+        XCTAssertLessThan(againPosition, session.queue.firstIndex(of: first)!)
+        XCTAssertLessThan(againPosition, session.queue.firstIndex(of: second)!)
+    }
+
+    func testFirstPassShowsEverySelectedCardOnce() {
+        let manyIDs = (0..<12).map { "k\($0)" }
+        let session = makeSession()
+        session.start(deck: deck, cardIDs: manyIDs)
+        var shown: Set<String> = []
+
+        // «Трудно» — худший случай для голодания очереди: интервал не растёт.
+        for _ in manyIDs {
+            let current = session.currentID!
+            XCTAssertFalse(shown.contains(current))
+            shown.insert(current)
+            session.submit(.hard)
+        }
+
+        XCTAssertEqual(shown, Set(manyIDs))
+    }
+
+    func testRepeatsNeverOvertakeUnseenCards() {
+        let session = makeSession()
+        session.start(deck: deck, cardIDs: ids)
+        var shown: Set<String> = []
+
+        for _ in ids {
+            shown.insert(session.currentID!)
+            session.submit(.hard)
+            let unseen = Set(ids).subtracting(shown)
+            if !unseen.isEmpty {
+                XCTAssertEqual(Set(session.queue.prefix(unseen.count)), unseen)
+            }
+        }
     }
 
     func testFirstGoodPutsCardAtBackOfQueue() {

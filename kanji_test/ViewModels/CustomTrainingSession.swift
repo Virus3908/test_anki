@@ -3,10 +3,11 @@ import Observation
 
 /// Endless practice session over a user-selected subset of one deck.
 ///
-/// Answers only reorder the in-session queue (Leitner-style reinsertion gaps):
-/// nothing is persisted and the normal SRS day queue is never touched.
-/// The queue never drains — every answered card is reinserted, so the session
-/// runs until the user exits manually.
+/// Answers only reorder the in-session queue: a repeat never overtakes
+/// cards not yet shown in the current round, and Leitner-style gaps order
+/// the repeats once the round is covered. Nothing is persisted and the
+/// normal SRS day queue is never touched. The queue never drains — every
+/// answered card is reinserted, so the session runs until the user exits.
 @MainActor
 @Observable
 final class CustomTrainingSession {
@@ -141,7 +142,7 @@ final class CustomTrainingSession {
         let box = updatedBox(for: cardID, rating: rating)
         strength[cardID] = box
         queue.removeFirst()
-        queue.insert(cardID, at: min(reinsertionGap(box: box), queue.count))
+        queue.insert(cardID, at: reinsertionIndex(box: box))
         isAnswerVisible = false
         markSeenIfNeeded()
     }
@@ -180,6 +181,20 @@ final class CustomTrainingSession {
     /// How many other cards pass before the card returns, based on its box.
     private func reinsertionGap(box: Int) -> Int {
         box == 0 ? nearMissGap : baseGap * (1 << max(0, box - 1))
+    }
+
+    /// Slot the answered card returns to.
+    ///
+    /// A repeat must never overtake a card not yet shown in the current
+    /// round: until the whole selection has passed, repeats queue up behind
+    /// the unseen remainder. Front-anchored gaps alone starve large
+    /// selections — short-gap reinsertions (test/typed answers emit
+    /// "again"/"hard") rotate a ~5-card window at the head while the rest
+    /// of the queue never advances. The Leitner gap takes over only for
+    /// the repeat ordering once no unseen cards are left in the round.
+    private func reinsertionIndex(box: Int) -> Int {
+        let firstRepeatSlot = (queue.lastIndex { !seenThisRound.contains($0) } ?? -1) + 1
+        return min(max(reinsertionGap(box: box), firstRepeatSlot), queue.count)
     }
 
     /// A round completes once every selected card has been seen since the last completion.
