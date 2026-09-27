@@ -17,6 +17,40 @@ struct RecallCardContent: Equatable, Sendable {
     var expectedAnswer: String { targetMeanings.joined(separator: " / ") }
 }
 
+extension RecallCardContent {
+    init(card: KanjiCard, type: TrainingCardType) {
+        let readings = (card.onyomi + card.kunyomi).filter { !$0.isEmpty }
+        self.init(
+            cardID: card.id,
+            type: type,
+            promptText: card.kanji,
+            reading: readings.isEmpty ? nil : readings.joined(separator: ", "),
+            targetMeanings: card.meanings
+        )
+    }
+
+    init(card: WordStudyCard, type: TrainingCardType) {
+        self.init(
+            cardID: card.id,
+            type: type,
+            promptText: card.word,
+            reading: card.reading.isEmpty ? nil : card.reading,
+            targetMeanings: [card.meaning]
+        )
+    }
+
+    /// Для каны чтение — это и есть ответ, поэтому на фронт не подсказываем.
+    init(card: KanaStudyCard, type: TrainingCardType) {
+        self.init(
+            cardID: card.id,
+            type: type,
+            promptText: card.character,
+            reading: nil,
+            targetMeanings: [card.reading]
+        )
+    }
+}
+
 /// Фронт «вспомни значение»: крупный символ, чтение, озвучка.
 struct RecallCardFront: View {
     let content: RecallCardContent

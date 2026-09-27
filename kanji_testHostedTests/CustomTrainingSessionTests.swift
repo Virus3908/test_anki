@@ -6,8 +6,16 @@ final class CustomTrainingSessionTests: XCTestCase {
     private let deck = StudyDeck(id: "test:deck", title: "Test deck", mode: .kanji)
     private let ids = ["a", "b", "c", "d", "e"]
 
-    private func makeSession() -> CustomTrainingSession {
-        CustomTrainingSession(catalog: StudyCardCatalog())
+    private func makeSession(
+        deckID: String = "test:deck",
+        cardTypes: [TrainingCardType]? = nil
+    ) -> CustomTrainingSession {
+        let defaults = UserDefaults(suiteName: "custom-training-tests-\(UUID().uuidString)")!
+        let settings = StudyPreferences(defaults: defaults, errors: StorageStatus())
+        if let cardTypes {
+            settings.updateOptions(for: deckID) { $0.cardTypes = cardTypes }
+        }
+        return CustomTrainingSession(catalog: StudyCardCatalog(), settings: settings)
     }
 
     func testStartBuildsQueueAndResetsState() {
@@ -162,5 +170,97 @@ final class CustomTrainingSessionTests: XCTestCase {
         session.finishSelection()
         XCTAssertFalse(session.isSelecting)
         XCTAssertEqual(session.selectedIDs, Set(ids))
+    }
+
+    // MARK: - Card types
+
+    func testDefaultCardTypeIsDrawing() {
+        let session = makeSession()
+        session.start(deck: deck, cardIDs: ids)
+
+        XCTAssertEqual(session.currentCardType, .drawing)
+    }
+
+    func testConfiguredCardTypeComesFromDeckOptions() {
+        let session = makeSession(cardTypes: [.choice])
+        session.start(deck: deck, cardIDs: ids)
+
+        XCTAssertEqual(session.currentCardType, .choice)
+    }
+
+    func testCurrentCardTypeMatchesResolver() {
+        let configured = TrainingCardType.allowed(for: .kanji)
+        let session = makeSession(cardTypes: configured)
+        session.start(deck: deck, cardIDs: ids)
+        let effective = TrainingCardType.effectiveTypes(configured: configured, mode: .kanji)
+
+        XCTAssertEqual(
+            session.currentCardType,
+            TrainingCardType.resolve(
+                cardID: session.currentID!,
+                deckID: deck.id,
+                date: session.studyDay,
+                allowed: effective
+            )
+        )
+    }
+
+    func testCardTypeOfSameCardSurvivesRequeue() {
+        let session = makeSession(cardTypes: [.choice, .typed, .flip])
+        session.start(deck: deck, cardIDs: ["solo"])
+        let type = session.currentCardType
+
+        for _ in 0..<3 { session.submit(.good) }
+
+        XCTAssertEqual(session.currentID, "solo")
+        XCTAssertEqual(session.currentCardType, type)
+    }
+
+    func testWordsDeckCannotUseDrawingType() {
+        let wordsDeck = StudyDeck(id: "test:words", title: "Words", mode: .words)
+        let session = makeSession(deckID: wordsDeck.id, cardTypes: [.drawing])
+        session.start(deck: wordsDeck, cardIDs: ids)
+
+        XCTAssertEqual(session.currentCardType, .flip)
+    }
+
+    func testAnkiDeckAlwaysResolvesDrawing() {
+        let ankiDeck = StudyDeck(id: "test:anki", title: "Anki", mode: .anki)
+        let session = makeSession(deckID: ankiDeck.id, cardTypes: [.choice])
+        session.start(deck: ankiDeck, cardIDs: ids)
+
+        XCTAssertEqual(session.currentCardType, .drawing)
+    }
+
+    func testRecallMeaningPoolExcludesCurrentCardMeanings() {
+        let defaults = UserDefaults(suiteName: "custom-training-pool-\(UUID().uuidString)")!
+        let settings = StudyPreferences(defaults: defaults, errors: StorageStatus())
+        let catalog = StudyCardCatalog()
+        let sourceIDs = catalog.register([
+            kanjiCard("日", ["солнце", "день"]),
+            kanjiCard("月", ["луна", "месяц"]),
+            kanjiCard("水", ["вода"])
+        ])
+        let session = CustomTrainingSession(catalog: catalog, settings: settings)
+        session.start(deck: deck, cardIDs: sourceIDs)
+        // Очередь перемешивается, поэтому текущая карточка не фиксирована.
+        let current = session.currentKanjiCard!
+        let allMeanings: Set<String> = ["солнце", "день", "луна", "месяц", "вода"]
+
+        let pool = session.recallMeaningPool(excluding: session.currentID!)
+
+        XCTAssertEqual(Set(pool), allMeanings.subtracting(current.meanings))
+    }
+
+    private func kanjiCard(_ character: String, _ meanings: [String]) -> KanjiCard {
+        KanjiCard(
+            kanji: character,
+            meanings: meanings,
+            onyomi: [],
+            kunyomi: [],
+            examples: [],
+            source: KanjiSource(name: "test", file: "test.svg", license: "test"),
+            strokes: []
+        )
     }
 }

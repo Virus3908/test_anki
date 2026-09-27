@@ -11,6 +11,7 @@ import Observation
 @Observable
 final class CustomTrainingSession {
     private let catalog: StudyCardCatalog
+    private let settings: StudyPreferences
 
     private(set) var deck: StudyDeck?
     private(set) var selectedIDs: Set<String> = []
@@ -27,9 +28,13 @@ final class CustomTrainingSession {
     private(set) var bestStreak = 0
     private(set) var round = 0
     private var seenThisRound: Set<String> = []
+    /// День, в котором стартовала сессия: тип карточки и дистракторы теста
+    /// детерминированы от него и не «прыгают» при перестановке очереди.
+    private(set) var studyDay = Date()
 
-    init(catalog: StudyCardCatalog) {
+    init(catalog: StudyCardCatalog, settings: StudyPreferences) {
         self.catalog = catalog
+        self.settings = settings
     }
 
     var isRunning: Bool { !queue.isEmpty }
@@ -54,6 +59,35 @@ final class CustomTrainingSession {
     var currentAnkiCard: AnkiStudyCard? {
         guard deck?.mode == .anki, let id = currentID else { return nil }
         return catalog.anki(id)
+    }
+
+    /// Тип текущей карточки: детерминированный от дня старта сессии, поэтому
+    /// переживает перестановку очереди. Anki в кастом-режиме — свой экран.
+    var currentCardType: TrainingCardType {
+        guard let deck, deck.mode != .anki, let id = currentID else { return .drawing }
+        return TrainingCardType.resolve(
+            cardID: id,
+            deckID: deck.id,
+            date: studyDay,
+            allowed: TrainingCardType.effectiveTypes(configured: settings.options(for: deck.id).cardTypes, mode: deck.mode)
+        )
+    }
+
+    /// Значения остальных выбранных карточек — пул дистракторов для теста.
+    func recallMeaningPool(excluding cardID: String) -> [String] {
+        guard let mode = deck?.mode else { return [] }
+        return selectedIDs.filter { $0 != cardID }.sorted().compactMap { id -> [String]? in
+            switch mode {
+            case .kanji: return catalog.kanji(id)?.meanings
+            case .words:
+                guard let meaning = catalog.word(id)?.meaning, !meaning.isEmpty else { return nil }
+                return [meaning]
+            case .kana:
+                guard let reading = catalog.kana(id)?.reading, !reading.isEmpty else { return nil }
+                return [reading]
+            case .anki: return nil
+            }
+        }.flatMap { $0 }
     }
 
     func setSelection(_ ids: Set<String>) {
@@ -84,6 +118,7 @@ final class CustomTrainingSession {
         guard !cardIDs.isEmpty else { return }
         self.deck = deck
         selectedIDs = Set(cardIDs)
+        studyDay = Date()
         strength.removeAll()
         queue = cardIDs.shuffled()
         isAnswerVisible = false

@@ -42,35 +42,15 @@ extension TrainingView {
     // MARK: - Контент карточки
 
     private func recallContent(for card: KanjiCard) -> RecallCardContent {
-        let readings = (card.onyomi + card.kunyomi).filter { !$0.isEmpty }
-        return RecallCardContent(
-            cardID: card.id,
-            type: trainingSession.currentCardType,
-            promptText: card.kanji,
-            reading: readings.isEmpty ? nil : readings.joined(separator: ", "),
-            targetMeanings: card.meanings
-        )
+        RecallCardContent(card: card, type: trainingSession.currentCardType)
     }
 
     private func recallContent(for wordCard: WordStudyCard) -> RecallCardContent {
-        RecallCardContent(
-            cardID: wordCard.id,
-            type: trainingSession.currentCardType,
-            promptText: wordCard.word,
-            reading: wordCard.reading.isEmpty ? nil : wordCard.reading,
-            targetMeanings: [wordCard.meaning]
-        )
+        RecallCardContent(card: wordCard, type: trainingSession.currentCardType)
     }
 
     private func recallContent(for kanaCard: KanaStudyCard) -> RecallCardContent {
-        // Для каны чтение — это и есть ответ, поэтому на фронт не подсказываем.
-        RecallCardContent(
-            cardID: kanaCard.id,
-            type: trainingSession.currentCardType,
-            promptText: kanaCard.character,
-            reading: nil,
-            targetMeanings: [kanaCard.reading]
-        )
+        RecallCardContent(card: kanaCard, type: trainingSession.currentCardType)
     }
 
     // MARK: - Экран
