@@ -19,6 +19,8 @@ nonisolated struct DeckOptions: Codable, Equatable, Sendable {
     var builtInBackFieldOrder: [BuiltInCardField]? = nil
     var builtInFrontVisibleFields: Set<BuiltInCardField>? = nil
     var builtInBackVisibleFields: Set<BuiltInCardField>? = nil
+    /// Card presentation types enabled for the deck; nil = content-kind default.
+    var cardTypes: [TrainingCardType]? = nil
 
     var validated: Self {
         var copy = self
@@ -30,6 +32,9 @@ nonisolated struct DeckOptions: Codable, Equatable, Sendable {
         copy.relearningSteps = relearningSteps.filter { (1..<1440).contains($0) }
         if frontFieldOrder.count != FrontFieldKind.allCases.count || Set(frontFieldOrder).count != frontFieldOrder.count {
             copy.frontFieldOrder = [.readings, .meanings, .character]
+        }
+        if let cardTypes {
+            copy.cardTypes = cardTypes.isEmpty ? nil : TrainingCardType.canonicalOrder(Set(cardTypes))
         }
         return copy
     }

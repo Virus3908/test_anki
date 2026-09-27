@@ -8,6 +8,7 @@ extension SettingsView {
                 VStack(alignment: .leading, spacing: 16) {
                     speechSettingsView()
                     deckSelectionView()
+                    cardTypeSettingsView()
                     translationSettingsView()
                     learningSettingsView()
                     ankiDisplaySettingsView()
@@ -70,6 +71,25 @@ extension SettingsView {
                 .font(.caption)
                 .foregroundStyle(AppPalette.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    @ViewBuilder
+    func cardTypeSettingsView() -> some View {
+        if let deck = selectedBuiltInDeck {
+            settingsSection("Типы карточек") {
+                CardTypePicker(
+                    available: TrainingCardType.allowed(for: deck.mode),
+                    selection: Set(options.cardTypes ?? TrainingCardType.defaults(for: deck.mode))
+                ) { updated in
+                    settings.updateOptions(for: deckID) { $0.cardTypes = TrainingCardType.canonicalOrder(updated) }
+                }
+
+                Text("Какие типы карточек показывать в тренировке колоды. Тип каждой карточки выбирается случайно и держится весь день.")
+                    .font(.caption)
+                    .foregroundStyle(AppPalette.secondaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
     }
 

@@ -45,6 +45,10 @@ struct SettingsView: View, StudyViewStyling {
     var selectedDeck: StudyDeck? {
         (StudyDeck.builtIn + importedDecks).first { $0.id == selectedDeckID }
     }
+    var selectedBuiltInDeck: StudyDeck? {
+        guard let deck = selectedDeck, deck.mode != .anki else { return nil }
+        return deck
+    }
     var body: some View {
         settingsView()
             .onAppear {
