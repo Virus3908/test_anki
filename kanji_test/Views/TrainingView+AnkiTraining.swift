@@ -14,6 +14,7 @@ extension TrainingView {
                     Button(drawingSession.isAnswerVisible ? "Показать вопрос" : "Показать ответ") {
                         drawingSession.isAnswerVisible.toggle()
                     }.buttonStyle(.borderedProminent).tint(AppPalette.accent)
+                    .accessibilityIdentifier(AccessibilityID.Training.reveal)
                     reviewControls()
                 }.padding(16).appSurfaceCard()
             }.padding(20).foregroundStyle(AppPalette.text)

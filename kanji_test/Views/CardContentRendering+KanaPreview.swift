@@ -3,7 +3,11 @@ import SwiftUI
 extension CardContentRendering {
     /// `action` переопределяет нажатие — например, выбор карточки
     /// для кастом-тренировки вместо открытия превью.
-    func kanaPreviewTile(for card: KanaStudyCard, action: (() -> Void)? = nil) -> some View {
+    func kanaPreviewTile(
+        for card: KanaStudyCard,
+        accessibilityIdentifier: String = AccessibilityID.Preview.tile,
+        action: (() -> Void)? = nil
+    ) -> some View {
         Button {
             if let action {
                 action()
@@ -29,6 +33,7 @@ extension CardContentRendering {
             .appSurfaceCard(borderOpacity: 0.55)
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier(accessibilityIdentifier)
     }
 
     func kanaPreviewDetail(for card: KanaStudyCard, deck: KanaDeck) -> some View {
@@ -41,7 +46,7 @@ extension CardContentRendering {
                     VStack(alignment: .leading, spacing: 16) {
                         kanaPreviewCardContent(for: card)
 
-                        primaryActionButton(title: "Тренировать этот знак", systemImage: "pencil.and.scribble") {
+                        primaryActionButton(title: "Тренировать этот знак", systemImage: "pencil.and.scribble", accessibilityIdentifier: AccessibilityID.Preview.practiceCard) {
                             coordinator.closeKanaPreview()
                             startKanaTraining(deck: deck, cards: [card], guided: true)
                         }

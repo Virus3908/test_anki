@@ -20,6 +20,8 @@ extension StudyViewStyling {
             Button("", systemImage: "chevron.left", action: onBack)
                 .buttonStyle(.bordered)
                 .tint(AppPalette.accent)
+                .accessibilityLabel("Назад")
+                .accessibilityIdentifier(AccessibilityID.Preview.back)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
@@ -68,6 +70,8 @@ extension StudyViewStyling {
                 "Начать тренировку. Новые: \(plan.newCount). "
                     + "Повторяемые: \(plan.learningCount). К просмотру: \(plan.reviewCount)"
             )
+            .accessibilityIdentifier(AccessibilityID.Preview.start)
+            .accessibilityValue("new=\(plan.newCount);learning=\(plan.learningCount);review=\(plan.reviewCount)")
 
             Rectangle()
                 .fill(Color.white.opacity(0.35))
@@ -81,6 +85,7 @@ extension StudyViewStyling {
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Кастом-тренировка: выбрать карточки")
+            .accessibilityIdentifier(AccessibilityID.Preview.custom)
         }
         .foregroundStyle(Color.white)
         .background(AppPalette.accent, in: Capsule())
@@ -104,7 +109,12 @@ extension StudyViewStyling {
         .tint(AppPalette.accent)
     }
 
-    func primaryActionButton(title: String, systemImage: String, action: @escaping () -> Void) -> some View {
+    func primaryActionButton(
+        title: String,
+        systemImage: String,
+        accessibilityIdentifier: String? = nil,
+        action: @escaping () -> Void
+    ) -> some View {
         primaryActionButton(title: title, systemImage: systemImage, action: action) {
             HStack {
                 Image(systemName: systemImage)
@@ -112,6 +122,7 @@ extension StudyViewStyling {
                     .fontWeight(.semibold)
             }
         }
+        .accessibilityIdentifier(accessibilityIdentifier ?? title)
     }
 
     func detailBlock<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
@@ -170,6 +181,7 @@ struct GlassIconButton: View {
     let systemImage: String
     let accessibilityLabel: String
     var diameter: CGFloat = 44
+    var accessibilityIdentifier: String?
     let action: () -> Void
 
     var body: some View {
@@ -183,6 +195,7 @@ struct GlassIconButton: View {
         .glassEffect(in: Circle())
         .glassEffectTransition(.identity)
         .accessibilityLabel(accessibilityLabel)
+        .accessibilityIdentifier(accessibilityIdentifier ?? systemImage)
     }
 }
 
@@ -235,6 +248,7 @@ extension View {
                     }
                     GlassIconButton(systemImage: "gearshape",
                                     accessibilityLabel: "Настройки",
+                                    accessibilityIdentifier: AccessibilityID.Start.settings,
                                     action: onOpenSettings)
                 }
             }

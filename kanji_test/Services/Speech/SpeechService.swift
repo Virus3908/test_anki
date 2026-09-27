@@ -10,6 +10,7 @@ final class SpeechService {
     private var isWarmedUp = false
     private(set) var isSpeaking = false
     private(set) var lastError: String?
+    private(set) var lastRequestedText: String?
     var voiceIdentifier: String? {
         didSet { isWarmedUp = false }
     }
@@ -24,6 +25,7 @@ final class SpeechService {
     }
 
     func speak(_ text: String) {
+        lastRequestedText = text
         speak(text, volume: 1)
     }
 

@@ -143,6 +143,7 @@ struct CardSearchView: View, CardContentRendering {
                 .autocorrectionDisabled()
                 .textInputAutocapitalization(.never)
                 .submitLabel(.search)
+                .accessibilityIdentifier(AccessibilityID.Search.field)
 
             if !query.isEmpty {
                 Button {
@@ -151,6 +152,7 @@ struct CardSearchView: View, CardContentRendering {
                     Image(systemName: "xmark.circle.fill")
                 }
                 .foregroundStyle(AppPalette.mutedText)
+                .accessibilityLabel("Очистить поиск")
             }
         }
         .padding(.horizontal, 12)
@@ -162,6 +164,7 @@ struct CardSearchView: View, CardContentRendering {
         Text(query.isEmpty ? "Начните вводить запрос" : resultSummaryText)
             .font(.caption)
             .foregroundStyle(AppPalette.secondaryText)
+            .accessibilityIdentifier(AccessibilityID.Search.summary)
     }
 
     private var resultSummaryText: String {
@@ -180,16 +183,18 @@ struct CardSearchView: View, CardContentRendering {
             VStack(alignment: .leading, spacing: 18) {
                 resultSection("Кандзи", count: model.kanjiResults.count, columns: kanjiColumns) {
                     ForEach(model.kanjiResults) { card in
-                        kanjiPreviewTile(for: card) { coordinator.openLinkedKanjiPreview(card) }
+                        kanjiPreviewTile(for: card, accessibilityIdentifier: AccessibilityID.Search.result) { coordinator.openLinkedKanjiPreview(card) }
                     }
                 }
                 resultSection("Слова", count: model.wordResults.count, columns: standardColumns) {
                     ForEach(model.wordResults) { card in
-                        wordPreviewTile(for: card) { coordinator.openLinkedWordPreview(card) }
+                        wordPreviewTile(for: card, accessibilityIdentifier: AccessibilityID.Search.result) { coordinator.openLinkedWordPreview(card) }
                     }
                 }
                 resultSection("Кана", count: model.kanaResults.count, columns: kanaColumns) {
-                    ForEach(model.kanaResults) { card in kanaPreviewTile(for: card) }
+                    ForEach(model.kanaResults) { card in
+                        kanaPreviewTile(for: card, accessibilityIdentifier: AccessibilityID.Search.result)
+                    }
                 }
                 resultSection("Anki", count: model.ankiResults.count, columns: standardColumns) {
                     ForEach(model.ankiResults) { card in ankiResultTile(for: card) }
@@ -198,10 +203,10 @@ struct CardSearchView: View, CardContentRendering {
         } else {
             LazyVGrid(columns: resultColumns, spacing: 10) {
                 ForEach(model.kanjiResults) { card in
-                    kanjiPreviewTile(for: card) { coordinator.openLinkedKanjiPreview(card) }
+                    kanjiPreviewTile(for: card, accessibilityIdentifier: AccessibilityID.Search.result) { coordinator.openLinkedKanjiPreview(card) }
                 }
                 ForEach(model.wordResults) { card in
-                    wordPreviewTile(for: card) { coordinator.openLinkedWordPreview(card) }
+                    wordPreviewTile(for: card, accessibilityIdentifier: AccessibilityID.Search.result) { coordinator.openLinkedWordPreview(card) }
                 }
             }
         }
@@ -239,6 +244,7 @@ struct CardSearchView: View, CardContentRendering {
             .appSurfaceCard()
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier(AccessibilityID.Search.result)
     }
 
     private func kanaDeck(for card: KanaStudyCard) -> KanaDeck? {

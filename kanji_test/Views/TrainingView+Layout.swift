@@ -110,6 +110,7 @@ extension TrainingView {
                             if !drawingSession.isAnswerVisible {
                                 Button("Показать ответ") { revealDrawingAnswer() }
                                     .buttonStyle(.borderedProminent)
+                                    .accessibilityIdentifier(AccessibilityID.Training.reveal)
                             }
                             reviewControls()
                         }

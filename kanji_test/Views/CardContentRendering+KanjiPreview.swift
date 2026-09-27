@@ -3,7 +3,11 @@ import SwiftUI
 extension CardContentRendering {
     /// `action` переопределяет нажатие — например, поиск открывает
     /// linked-превью вместо обычного превью колоды.
-    func kanjiPreviewTile(for card: KanjiCard, action: (() -> Void)? = nil) -> some View {
+    func kanjiPreviewTile(
+        for card: KanjiCard,
+        accessibilityIdentifier: String = AccessibilityID.Preview.tile,
+        action: (() -> Void)? = nil
+    ) -> some View {
         Button {
             if let action {
                 action()
@@ -28,6 +32,7 @@ extension CardContentRendering {
             .appSurfaceCard(borderOpacity: 0.55)
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier(accessibilityIdentifier)
         .task(id: "preview-meaning-\(card.id)-\(meaningLanguage.rawValue)") {
             await translateKanjiMeaningsIfNeeded(for: card, deck: selectedDeck)
         }
@@ -55,7 +60,7 @@ extension CardContentRendering {
                             .padding(18)
                             .appSurfaceCard()
 
-                        primaryActionButton(title: "Тренировать этот кандзи", systemImage: "pencil.and.scribble") {
+                        primaryActionButton(title: "Тренировать этот кандзи", systemImage: "pencil.and.scribble", accessibilityIdentifier: AccessibilityID.Preview.practiceCard) {
                             coordinator.closeKanjiPreview()
                             startTraining(with: [card], guided: true)
                         }

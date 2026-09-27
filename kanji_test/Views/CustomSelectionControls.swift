@@ -20,6 +20,7 @@ struct CustomSelectionBar: View, StudyViewStyling {
                 GlassIconButton(systemImage: "magnifyingglass",
                                 accessibilityLabel: "Поиск по колоде",
                                 diameter: 52,
+                                accessibilityIdentifier: AccessibilityID.Preview.search,
                                 action: onSearch)
             }
         }
@@ -42,6 +43,8 @@ struct CustomSelectionBar: View, StudyViewStyling {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier(AccessibilityID.Custom.start)
+        .accessibilityValue("selected=\(selection.count)")
         .disabled(selection.isEmpty)
         .opacity(selection.isEmpty ? 0.55 : 1)
         .foregroundStyle(Color.white)
@@ -65,6 +68,7 @@ struct CustomSelectionToolbar: View, StudyViewStyling {
                 Image(systemName: "checkmark.circle")
             }
             .accessibilityLabel("Выбрать все")
+            .accessibilityIdentifier(AccessibilityID.Custom.selectAll)
 
             Button {
                 session.setSelection([])
@@ -72,6 +76,7 @@ struct CustomSelectionToolbar: View, StudyViewStyling {
                 Image(systemName: "slash.circle")
             }
             .accessibilityLabel("Сбросить выбор")
+            .accessibilityIdentifier(AccessibilityID.Custom.clear)
         }
         .buttonStyle(.bordered)
         .tint(AppPalette.accent)

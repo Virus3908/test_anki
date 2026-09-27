@@ -1,8 +1,15 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var appModel = StudyAppViewModel()
+    @State private var appModel = Self.makeAppModel()
     @Environment(\.scenePhase) private var scenePhase
+
+    private static func makeAppModel() -> StudyAppViewModel {
+        #if DEBUG
+        if UITestingLaunch.isActive { return .makeForUITesting() }
+        #endif
+        return StudyAppViewModel()
+    }
 
     var body: some View {
         @Bindable var model = appModel
@@ -42,7 +49,12 @@ struct ContentView: View {
         )) {
             Button("Понятно", role: .cancel) {}
         } message: { Text(appModel.errors.message ?? "") }
-        .task { await appModel.loadSavedState() }
+        .task {
+            await appModel.loadSavedState()
+            #if DEBUG
+            await appModel.importUITestingFixtureIfNeeded()
+            #endif
+        }
         .onChange(of: appModel.trainingSession.isActive) { appModel.synchronizeTrainingRoute() }
         .onChange(of: scenePhase) { if scenePhase == .active { Task { await appModel.resume() } } }
         .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged)) { _ in

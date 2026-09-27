@@ -12,6 +12,7 @@ struct AnkiLibraryView: View, StudyViewStyling {
             primaryActionButton(title: "Импортировать колоду", systemImage: "square.and.arrow.down") {
                 isImporterPresented = true
             }
+            .accessibilityIdentifier(AccessibilityID.Anki.importPackage)
             .disabled(model.isImporting || !model.isLoaded || isBusy)
             Text("Выбери .apkg или .colpkg в Файлах. При экспорте из Anki включи медиафайлы.")
                 .font(.footnote).foregroundStyle(AppPalette.secondaryText)
@@ -24,6 +25,7 @@ struct AnkiLibraryView: View, StudyViewStyling {
                 }
             } else if model.decks.isEmpty {
                 ContentUnavailableView("Пока нет колод", systemImage: "rectangle.stack", description: Text("Импортированные колоды появятся здесь."))
+                    .accessibilityIdentifier(AccessibilityID.Anki.empty)
             }
             ForEach(model.decks) { deck in
                 deckSelectionButton(title: deck.title, subtitle: "\(deck.cardCount) карточек", isDisabled: isBusy || model.isImporting) {

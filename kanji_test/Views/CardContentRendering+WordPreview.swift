@@ -3,7 +3,11 @@ import SwiftUI
 extension CardContentRendering {
     /// `action` переопределяет нажатие — например, поиск открывает
     /// linked-превью вместо обычного превью колоды.
-    func wordPreviewTile(for card: WordStudyCard, action: (() -> Void)? = nil) -> some View {
+    func wordPreviewTile(
+        for card: WordStudyCard,
+        accessibilityIdentifier: String = AccessibilityID.Preview.tile,
+        action: (() -> Void)? = nil
+    ) -> some View {
         Button {
             if let action {
                 action()
@@ -34,6 +38,7 @@ extension CardContentRendering {
             .appSurfaceCard(borderOpacity: 0.55)
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier(accessibilityIdentifier)
     }
 
     func wordPreviewDetail(for card: WordStudyCard, deck: WordFrequencyDeck) -> some View {
@@ -48,7 +53,7 @@ extension CardContentRendering {
                     VStack(alignment: .leading, spacing: 16) {
                         wordFullCard(for: card)
 
-                        primaryActionButton(title: "Практиковать слово", systemImage: "pencil.and.scribble") {
+                        primaryActionButton(title: "Практиковать слово", systemImage: "pencil.and.scribble", accessibilityIdentifier: AccessibilityID.Preview.practiceCard) {
                             coordinator.closeWordPreview()
                             startWordTraining(with: [card], guided: true)
                         }

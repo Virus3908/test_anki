@@ -23,6 +23,15 @@ struct TrainingRatingBar: View {
         }
     }
 
+    static func accessibilityIdentifier(for rating: ReviewRating) -> String {
+        switch rating {
+        case .again: AccessibilityID.Training.rateAgain
+        case .hard: AccessibilityID.Training.rateHard
+        case .good: AccessibilityID.Training.rateGood
+        case .easy: AccessibilityID.Training.rateEasy
+        }
+    }
+
     var body: some View {
         HStack(spacing: 6) {
             ForEach(ReviewRating.allCases) { rating in
@@ -40,6 +49,7 @@ struct TrainingRatingBar: View {
                 .controlSize(.small)
                 .tint(Self.buttonColor(for: rating))
                 .disabled(!isAnswerVisible || isPreparingCard)
+                .accessibilityIdentifier(Self.accessibilityIdentifier(for: rating))
             }
         }
     }
@@ -143,6 +153,7 @@ struct KanjiDrawingPanel<Controls: View>: View {
                         .font(.caption)
                         .lineLimit(2)
                     Button("Ответ") { onReveal() }
+                        .accessibilityIdentifier(AccessibilityID.Training.reveal)
                 }
             }
 
@@ -155,6 +166,9 @@ struct KanjiDrawingPanel<Controls: View>: View {
                     onStrokeFinished: onStrokeFinished
                 )
                 .frame(width: boardSide, height: boardSide)
+                .accessibilityElement()
+                .accessibilityLabel("Поле для рисования")
+                .accessibilityIdentifier(AccessibilityID.Drawing.canvas)
 
                 VStack {
                     HStack {
@@ -163,6 +177,8 @@ struct KanjiDrawingPanel<Controls: View>: View {
                         } label: {
                             Image(systemName: "trash")
                         }
+                        .accessibilityLabel("Очистить рисунок")
+                        .accessibilityIdentifier(AccessibilityID.Drawing.clear)
                         .disabled(session.drawnStrokes.isEmpty && session.currentStroke.isEmpty)
 
                         Spacer()
@@ -181,6 +197,8 @@ struct KanjiDrawingPanel<Controls: View>: View {
                     } label: {
                         Image(systemName: "arrow.uturn.backward")
                     }
+                    .accessibilityLabel("Отменить черту")
+                    .accessibilityIdentifier(AccessibilityID.Drawing.undo)
                     .disabled(session.drawnStrokes.isEmpty)
 
                     Spacer()
@@ -192,6 +210,8 @@ struct KanjiDrawingPanel<Controls: View>: View {
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(AppPalette.accent)
+                    .accessibilityLabel("Проверить")
+                    .accessibilityIdentifier(AccessibilityID.Training.reveal)
                 }
             }
             .frame(maxWidth: .infinity, minHeight: boardSide)
@@ -264,6 +284,7 @@ struct WordDrawingPanel<Controls: View>: View {
                         .font(.caption)
                         .lineLimit(2)
                     Button("Ответ") { onReveal() }
+                        .accessibilityIdentifier(AccessibilityID.Training.reveal)
                 }
             }
 
@@ -276,6 +297,9 @@ struct WordDrawingPanel<Controls: View>: View {
                     onStrokeFinished: onStrokeFinished
                 )
                 .frame(width: boardSide, height: boardSide)
+                .accessibilityElement()
+                .accessibilityLabel("Поле для рисования")
+                .accessibilityIdentifier(AccessibilityID.Drawing.canvas)
 
                 VStack {
                     HStack {
@@ -284,6 +308,8 @@ struct WordDrawingPanel<Controls: View>: View {
                         } label: {
                             Image(systemName: "trash")
                         }
+                        .accessibilityLabel("Очистить рисунок")
+                        .accessibilityIdentifier(AccessibilityID.Drawing.clear)
                         .disabled(session.drawnStrokes.isEmpty && session.currentStroke.isEmpty)
 
                         Spacer()
@@ -302,6 +328,8 @@ struct WordDrawingPanel<Controls: View>: View {
                     } label: {
                         Image(systemName: "arrow.uturn.backward")
                     }
+                    .accessibilityLabel("Отменить черту")
+                    .accessibilityIdentifier(AccessibilityID.Drawing.undo)
                     .disabled(session.drawnStrokes.isEmpty)
 
                     Spacer()
@@ -315,6 +343,8 @@ struct WordDrawingPanel<Controls: View>: View {
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(AppPalette.accent)
+                    .accessibilityLabel("Проверить")
+                    .accessibilityIdentifier(AccessibilityID.Training.reveal)
                 }
             }
             .frame(maxWidth: .infinity, minHeight: boardSide)
@@ -412,6 +442,8 @@ struct CompletedWordStrip: View {
 struct TrainingHeaderView: View {
     let title: String
     let subtitle: String
+    let answeredCount: Int
+    let remainingCount: Int
     let onFinish: () -> Void
 
     var body: some View {
@@ -423,6 +455,8 @@ struct TrainingHeaderView: View {
                     Image(systemName: "square.grid.2x2")
                         .frame(width: 34, height: 30)
                 }
+                .accessibilityLabel("Завершить тренировку")
+                .accessibilityIdentifier(AccessibilityID.Training.exit)
 
                 Text(title)
                     .font(.headline)
@@ -436,6 +470,8 @@ struct TrainingHeaderView: View {
             Text(subtitle)
                 .font(.footnote.weight(.semibold))
                 .foregroundStyle(AppPalette.secondaryText)
+                .accessibilityIdentifier(AccessibilityID.Training.progress)
+                .accessibilityValue("answered=\(answeredCount);remaining=\(remainingCount)")
         }
         .buttonStyle(.bordered)
         .tint(AppPalette.accent)

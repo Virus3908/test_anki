@@ -19,6 +19,7 @@ extension CardContentRendering {
                         CardHeaderActionButton(
                             title: "Озвучить",
                             systemImage: "speaker.wave.2.fill",
+                            accessibilityIdentifier: AccessibilityID.Training.speak,
                             action: onSpeak
                         )
                     }
@@ -88,7 +89,9 @@ struct BuiltInCardPreviewActions: View {
 
             CardHeaderActionButton(
                 title: "Озвучить",
-                systemImage: "speaker.wave.2.fill"
+                systemImage: "speaker.wave.2.fill",
+                accessibilityIdentifier: AccessibilityID.Training.speak,
+                accessibilityValue: speech.lastRequestedText
             ) {
                 speech.voiceIdentifier = settings.speechVoiceIdentifier.isEmpty
                     ? nil
@@ -120,6 +123,8 @@ struct BuiltInCardPreviewActions: View {
 struct CardHeaderActionButton: View {
     let title: String
     let systemImage: String
+    var accessibilityIdentifier: String?
+    var accessibilityValue: String?
     let action: () -> Void
 
     var body: some View {
@@ -127,6 +132,8 @@ struct CardHeaderActionButton: View {
             Label(title, systemImage: systemImage)
         }
         .buttonStyle(CardHeaderActionButtonStyle())
+        .accessibilityIdentifier(accessibilityIdentifier ?? systemImage)
+        .accessibilityValue(accessibilityValue ?? "")
     }
 }
 

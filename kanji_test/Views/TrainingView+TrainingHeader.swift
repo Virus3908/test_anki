@@ -28,6 +28,8 @@ extension TrainingView {
         return TrainingHeaderView(
             title: trainingTitle,
             subtitle: subtitle,
+            answeredCount: trainingSession.sessionCompletedCards,
+            remainingCount: trainingSession.sessionTotalCards,
             onFinish: { finishTraining() }
         )
     }

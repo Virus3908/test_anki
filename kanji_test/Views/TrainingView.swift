@@ -122,5 +122,7 @@ extension TrainingView {
         }
         .opacity(0.75)
         .accessibilityLabel("Озвучить")
+        .accessibilityIdentifier(AccessibilityID.Training.speak)
+        .accessibilityValue(speech.lastRequestedText ?? "")
     }
 }
