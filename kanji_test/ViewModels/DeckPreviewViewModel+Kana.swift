@@ -6,13 +6,20 @@ extension DeckPreviewViewModel {
         navigation.open(.kanaDeck(deck))
         loadError = nil
         previewWordCards.removeAll()
-        previewKanaCards = deck.baseCards
+        previewKanaCards.removeAll()
         isLoadingDeck = true
 
         let requestID = previewRequestID
         deckPreviewTask = Task { [weak self] in
-            let loadedCards = await KanaDataLoader.loadCards(deck: deck)
-            self?.finishKanaPreviewLoad(loadedCards, for: deck, requestID: requestID)
+            do {
+                let loadedCards = try await KanaDataLoader.loadCards(deck: deck)
+                self?.finishKanaPreviewLoad(loadedCards, for: deck, requestID: requestID)
+            } catch {
+                guard let self, previewKanaDeck == deck, previewRequestID == requestID, !Task.isCancelled else { return }
+                loadError = "Не удалось загрузить данные каны: \(error.localizedDescription)"
+                isLoadingDeck = false
+                deckPreviewTask = nil
+            }
         }
     }
 

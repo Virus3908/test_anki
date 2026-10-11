@@ -69,7 +69,7 @@ final class CardSearchViewModel {
             case .all:
                 try await prepareKanji()
                 try await prepareWords()
-                await prepareKana()
+                try await prepareKana()
                 if let ankiModel {
                     let cards = try await ankiModel.cardsForSearch()
                     ankiIndex = await Self.buildIndex(records: cards.map(AnkiSearchRecord.init))
@@ -107,8 +107,8 @@ final class CardSearchViewModel {
         wordIndex = await Self.buildIndex(records: entries.map(WordSearchRecord.init))
     }
 
-    private func prepareKana() async {
-        let cards = KanaDeck.allCases.flatMap(\.baseCards)
+    private func prepareKana() async throws {
+        let cards = try await KanaDataLoader.loadAllCards()
         kanaIndex = await Self.buildIndex(records: cards.map(KanaSearchRecord.init))
     }
 

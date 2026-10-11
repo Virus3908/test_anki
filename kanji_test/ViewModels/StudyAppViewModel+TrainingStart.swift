@@ -9,7 +9,22 @@ extension StudyAppViewModel {
         start(deck: .words(coordinator.selectedWordDeck), ids: catalog.register(guided ? cards : sourceCards ?? cards), guided: guided)
     }
     func startKanaTraining(deck: KanaDeck, cards: [KanaStudyCard]? = nil, sourceCards: [KanaStudyCard]? = nil, guided: Bool = false) {
-        start(deck: .kana(deck), ids: catalog.register(guided ? cards ?? deck.cards : sourceCards ?? cards ?? deck.cards), guided: guided)
+        if let selected = guided ? cards : sourceCards ?? cards {
+            start(deck: .kana(deck), ids: catalog.register(selected), guided: guided)
+            return
+        }
+        guard hasLoadedSavedState, trainingStartTask == nil else { return }
+        trainingStartTask = Task { [weak self] in
+            guard let self else { return }
+            do {
+                let loaded = try await KanaDataLoader.loadCards(deck: deck)
+                trainingStartTask = nil
+                start(deck: .kana(deck), ids: catalog.register(loaded), guided: guided)
+            } catch {
+                trainingStartTask = nil
+                errors.report("Не удалось загрузить данные каны.", error: error)
+            }
+        }
     }
     func startAnkiTraining(deck: AnkiDeckReference, cards: [AnkiStudyCard], guided: Bool = false) {
         start(deck: deck.studyDeck, ids: catalog.register(cards), guided: guided)

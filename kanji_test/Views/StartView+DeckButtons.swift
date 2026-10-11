@@ -4,7 +4,7 @@ extension StartView {
     func kanaDeckButton(for deck: KanaDeck) -> some View {
         deckSelectionButton(
             title: deck.title,
-            subtitle: "\(deck.cards.count) карточек", isDisabled: isLoading
+            subtitle: kanaCounts[deck].map { "\($0) карточек" } ?? kanaLoadError ?? "Загружаю данные", isDisabled: isLoading
         ) {
             onOpen(.kanaDeck(deck))
         }

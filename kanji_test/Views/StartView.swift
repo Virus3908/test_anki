@@ -53,6 +53,8 @@ struct StartView: View, StudyViewStyling {
     @Namespace var sectionSelectionNamespace
     /// Открыт ли экран поиска (лупа рядом с заголовком).
     @State var isSearchPresented = false
+    @State var kanaCounts: [KanaDeck: Int] = [:]
+    @State var kanaLoadError: String?
 
     /// Поиск из главного меню охватывает встроенные и импортированные карточки.
     func cardSearchSheet() -> some View {
@@ -67,7 +69,17 @@ struct StartView: View, StudyViewStyling {
         )
     }
 
-    var body: some View { startView() }
+    var body: some View {
+        startView().task {
+            do {
+                let metadata = try await BundledStudyData.shared.bundledKanaMetadata()
+                kanaCounts = Dictionary(grouping: metadata, by: \.script).mapValues(\.count)
+                kanaLoadError = nil
+            } catch {
+                kanaLoadError = "Не удалось загрузить данные каны"
+            }
+        }
+    }
     var startSubtitle: String {
         switch selectedSection {
         case .kanji: return "Колоды кандзи с порядком черт и интервальным повторением."

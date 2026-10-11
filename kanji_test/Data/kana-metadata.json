@@ -1,0 +1,1376 @@
+[
+  {
+    "character": "あ",
+    "reading": "a",
+    "script": "hiragana",
+    "order": 1
+  },
+  {
+    "character": "い",
+    "reading": "i",
+    "script": "hiragana",
+    "order": 2
+  },
+  {
+    "character": "う",
+    "reading": "u",
+    "script": "hiragana",
+    "order": 3
+  },
+  {
+    "character": "え",
+    "reading": "e",
+    "script": "hiragana",
+    "order": 4
+  },
+  {
+    "character": "お",
+    "reading": "o",
+    "script": "hiragana",
+    "order": 5
+  },
+  {
+    "character": "か",
+    "reading": "ka",
+    "script": "hiragana",
+    "order": 6
+  },
+  {
+    "character": "き",
+    "reading": "ki",
+    "script": "hiragana",
+    "order": 7
+  },
+  {
+    "character": "く",
+    "reading": "ku",
+    "script": "hiragana",
+    "order": 8
+  },
+  {
+    "character": "け",
+    "reading": "ke",
+    "script": "hiragana",
+    "order": 9
+  },
+  {
+    "character": "こ",
+    "reading": "ko",
+    "script": "hiragana",
+    "order": 10
+  },
+  {
+    "character": "さ",
+    "reading": "sa",
+    "script": "hiragana",
+    "order": 11
+  },
+  {
+    "character": "し",
+    "reading": "shi",
+    "script": "hiragana",
+    "order": 12
+  },
+  {
+    "character": "す",
+    "reading": "su",
+    "script": "hiragana",
+    "order": 13
+  },
+  {
+    "character": "せ",
+    "reading": "se",
+    "script": "hiragana",
+    "order": 14
+  },
+  {
+    "character": "そ",
+    "reading": "so",
+    "script": "hiragana",
+    "order": 15
+  },
+  {
+    "character": "た",
+    "reading": "ta",
+    "script": "hiragana",
+    "order": 16
+  },
+  {
+    "character": "ち",
+    "reading": "chi",
+    "script": "hiragana",
+    "order": 17
+  },
+  {
+    "character": "つ",
+    "reading": "tsu",
+    "script": "hiragana",
+    "order": 18
+  },
+  {
+    "character": "て",
+    "reading": "te",
+    "script": "hiragana",
+    "order": 19
+  },
+  {
+    "character": "と",
+    "reading": "to",
+    "script": "hiragana",
+    "order": 20
+  },
+  {
+    "character": "な",
+    "reading": "na",
+    "script": "hiragana",
+    "order": 21
+  },
+  {
+    "character": "に",
+    "reading": "ni",
+    "script": "hiragana",
+    "order": 22
+  },
+  {
+    "character": "ぬ",
+    "reading": "nu",
+    "script": "hiragana",
+    "order": 23
+  },
+  {
+    "character": "ね",
+    "reading": "ne",
+    "script": "hiragana",
+    "order": 24
+  },
+  {
+    "character": "の",
+    "reading": "no",
+    "script": "hiragana",
+    "order": 25
+  },
+  {
+    "character": "は",
+    "reading": "ha",
+    "script": "hiragana",
+    "order": 26
+  },
+  {
+    "character": "ひ",
+    "reading": "hi",
+    "script": "hiragana",
+    "order": 27
+  },
+  {
+    "character": "ふ",
+    "reading": "fu",
+    "script": "hiragana",
+    "order": 28
+  },
+  {
+    "character": "へ",
+    "reading": "he",
+    "script": "hiragana",
+    "order": 29
+  },
+  {
+    "character": "ほ",
+    "reading": "ho",
+    "script": "hiragana",
+    "order": 30
+  },
+  {
+    "character": "ま",
+    "reading": "ma",
+    "script": "hiragana",
+    "order": 31
+  },
+  {
+    "character": "み",
+    "reading": "mi",
+    "script": "hiragana",
+    "order": 32
+  },
+  {
+    "character": "む",
+    "reading": "mu",
+    "script": "hiragana",
+    "order": 33
+  },
+  {
+    "character": "め",
+    "reading": "me",
+    "script": "hiragana",
+    "order": 34
+  },
+  {
+    "character": "も",
+    "reading": "mo",
+    "script": "hiragana",
+    "order": 35
+  },
+  {
+    "character": "や",
+    "reading": "ya",
+    "script": "hiragana",
+    "order": 36
+  },
+  {
+    "character": "ゆ",
+    "reading": "yu",
+    "script": "hiragana",
+    "order": 37
+  },
+  {
+    "character": "よ",
+    "reading": "yo",
+    "script": "hiragana",
+    "order": 38
+  },
+  {
+    "character": "ら",
+    "reading": "ra",
+    "script": "hiragana",
+    "order": 39
+  },
+  {
+    "character": "り",
+    "reading": "ri",
+    "script": "hiragana",
+    "order": 40
+  },
+  {
+    "character": "る",
+    "reading": "ru",
+    "script": "hiragana",
+    "order": 41
+  },
+  {
+    "character": "れ",
+    "reading": "re",
+    "script": "hiragana",
+    "order": 42
+  },
+  {
+    "character": "ろ",
+    "reading": "ro",
+    "script": "hiragana",
+    "order": 43
+  },
+  {
+    "character": "わ",
+    "reading": "wa",
+    "script": "hiragana",
+    "order": 44
+  },
+  {
+    "character": "を",
+    "reading": "wo",
+    "script": "hiragana",
+    "order": 45
+  },
+  {
+    "character": "ん",
+    "reading": "n",
+    "script": "hiragana",
+    "order": 46
+  },
+  {
+    "character": "が",
+    "reading": "ga",
+    "script": "hiragana",
+    "order": 47
+  },
+  {
+    "character": "ぎ",
+    "reading": "gi",
+    "script": "hiragana",
+    "order": 48
+  },
+  {
+    "character": "ぐ",
+    "reading": "gu",
+    "script": "hiragana",
+    "order": 49
+  },
+  {
+    "character": "げ",
+    "reading": "ge",
+    "script": "hiragana",
+    "order": 50
+  },
+  {
+    "character": "ご",
+    "reading": "go",
+    "script": "hiragana",
+    "order": 51
+  },
+  {
+    "character": "ざ",
+    "reading": "za",
+    "script": "hiragana",
+    "order": 52
+  },
+  {
+    "character": "じ",
+    "reading": "ji",
+    "script": "hiragana",
+    "order": 53
+  },
+  {
+    "character": "ず",
+    "reading": "zu",
+    "script": "hiragana",
+    "order": 54
+  },
+  {
+    "character": "ぜ",
+    "reading": "ze",
+    "script": "hiragana",
+    "order": 55
+  },
+  {
+    "character": "ぞ",
+    "reading": "zo",
+    "script": "hiragana",
+    "order": 56
+  },
+  {
+    "character": "だ",
+    "reading": "da",
+    "script": "hiragana",
+    "order": 57
+  },
+  {
+    "character": "ぢ",
+    "reading": "ji",
+    "script": "hiragana",
+    "order": 58
+  },
+  {
+    "character": "づ",
+    "reading": "zu",
+    "script": "hiragana",
+    "order": 59
+  },
+  {
+    "character": "で",
+    "reading": "de",
+    "script": "hiragana",
+    "order": 60
+  },
+  {
+    "character": "ど",
+    "reading": "do",
+    "script": "hiragana",
+    "order": 61
+  },
+  {
+    "character": "ば",
+    "reading": "ba",
+    "script": "hiragana",
+    "order": 62
+  },
+  {
+    "character": "び",
+    "reading": "bi",
+    "script": "hiragana",
+    "order": 63
+  },
+  {
+    "character": "ぶ",
+    "reading": "bu",
+    "script": "hiragana",
+    "order": 64
+  },
+  {
+    "character": "べ",
+    "reading": "be",
+    "script": "hiragana",
+    "order": 65
+  },
+  {
+    "character": "ぼ",
+    "reading": "bo",
+    "script": "hiragana",
+    "order": 66
+  },
+  {
+    "character": "ぱ",
+    "reading": "pa",
+    "script": "hiragana",
+    "order": 67
+  },
+  {
+    "character": "ぴ",
+    "reading": "pi",
+    "script": "hiragana",
+    "order": 68
+  },
+  {
+    "character": "ぷ",
+    "reading": "pu",
+    "script": "hiragana",
+    "order": 69
+  },
+  {
+    "character": "ぺ",
+    "reading": "pe",
+    "script": "hiragana",
+    "order": 70
+  },
+  {
+    "character": "ぽ",
+    "reading": "po",
+    "script": "hiragana",
+    "order": 71
+  },
+  {
+    "character": "ぁ",
+    "reading": "small a",
+    "script": "hiragana",
+    "order": 72
+  },
+  {
+    "character": "ぃ",
+    "reading": "small i",
+    "script": "hiragana",
+    "order": 73
+  },
+  {
+    "character": "ぅ",
+    "reading": "small u",
+    "script": "hiragana",
+    "order": 74
+  },
+  {
+    "character": "ぇ",
+    "reading": "small e",
+    "script": "hiragana",
+    "order": 75
+  },
+  {
+    "character": "ぉ",
+    "reading": "small o",
+    "script": "hiragana",
+    "order": 76
+  },
+  {
+    "character": "ゃ",
+    "reading": "small ya",
+    "script": "hiragana",
+    "order": 77
+  },
+  {
+    "character": "ゅ",
+    "reading": "small yu",
+    "script": "hiragana",
+    "order": 78
+  },
+  {
+    "character": "ょ",
+    "reading": "small yo",
+    "script": "hiragana",
+    "order": 79
+  },
+  {
+    "character": "っ",
+    "reading": "small tsu",
+    "script": "hiragana",
+    "order": 80
+  },
+  {
+    "character": "ゎ",
+    "reading": "small wa",
+    "script": "hiragana",
+    "order": 81
+  },
+  {
+    "character": "きゃ",
+    "reading": "kya",
+    "script": "hiragana",
+    "order": 82
+  },
+  {
+    "character": "きゅ",
+    "reading": "kyu",
+    "script": "hiragana",
+    "order": 83
+  },
+  {
+    "character": "きょ",
+    "reading": "kyo",
+    "script": "hiragana",
+    "order": 84
+  },
+  {
+    "character": "しゃ",
+    "reading": "sha",
+    "script": "hiragana",
+    "order": 85
+  },
+  {
+    "character": "しゅ",
+    "reading": "shu",
+    "script": "hiragana",
+    "order": 86
+  },
+  {
+    "character": "しょ",
+    "reading": "sho",
+    "script": "hiragana",
+    "order": 87
+  },
+  {
+    "character": "ちゃ",
+    "reading": "cha",
+    "script": "hiragana",
+    "order": 88
+  },
+  {
+    "character": "ちゅ",
+    "reading": "chu",
+    "script": "hiragana",
+    "order": 89
+  },
+  {
+    "character": "ちょ",
+    "reading": "cho",
+    "script": "hiragana",
+    "order": 90
+  },
+  {
+    "character": "にゃ",
+    "reading": "nya",
+    "script": "hiragana",
+    "order": 91
+  },
+  {
+    "character": "にゅ",
+    "reading": "nyu",
+    "script": "hiragana",
+    "order": 92
+  },
+  {
+    "character": "にょ",
+    "reading": "nyo",
+    "script": "hiragana",
+    "order": 93
+  },
+  {
+    "character": "ひゃ",
+    "reading": "hya",
+    "script": "hiragana",
+    "order": 94
+  },
+  {
+    "character": "ひゅ",
+    "reading": "hyu",
+    "script": "hiragana",
+    "order": 95
+  },
+  {
+    "character": "ひょ",
+    "reading": "hyo",
+    "script": "hiragana",
+    "order": 96
+  },
+  {
+    "character": "みゃ",
+    "reading": "mya",
+    "script": "hiragana",
+    "order": 97
+  },
+  {
+    "character": "みゅ",
+    "reading": "myu",
+    "script": "hiragana",
+    "order": 98
+  },
+  {
+    "character": "みょ",
+    "reading": "myo",
+    "script": "hiragana",
+    "order": 99
+  },
+  {
+    "character": "りゃ",
+    "reading": "rya",
+    "script": "hiragana",
+    "order": 100
+  },
+  {
+    "character": "りゅ",
+    "reading": "ryu",
+    "script": "hiragana",
+    "order": 101
+  },
+  {
+    "character": "りょ",
+    "reading": "ryo",
+    "script": "hiragana",
+    "order": 102
+  },
+  {
+    "character": "ぎゃ",
+    "reading": "gya",
+    "script": "hiragana",
+    "order": 103
+  },
+  {
+    "character": "ぎゅ",
+    "reading": "gyu",
+    "script": "hiragana",
+    "order": 104
+  },
+  {
+    "character": "ぎょ",
+    "reading": "gyo",
+    "script": "hiragana",
+    "order": 105
+  },
+  {
+    "character": "じゃ",
+    "reading": "ja",
+    "script": "hiragana",
+    "order": 106
+  },
+  {
+    "character": "じゅ",
+    "reading": "ju",
+    "script": "hiragana",
+    "order": 107
+  },
+  {
+    "character": "じょ",
+    "reading": "jo",
+    "script": "hiragana",
+    "order": 108
+  },
+  {
+    "character": "びゃ",
+    "reading": "bya",
+    "script": "hiragana",
+    "order": 109
+  },
+  {
+    "character": "びゅ",
+    "reading": "byu",
+    "script": "hiragana",
+    "order": 110
+  },
+  {
+    "character": "びょ",
+    "reading": "byo",
+    "script": "hiragana",
+    "order": 111
+  },
+  {
+    "character": "ぴゃ",
+    "reading": "pya",
+    "script": "hiragana",
+    "order": 112
+  },
+  {
+    "character": "ぴゅ",
+    "reading": "pyu",
+    "script": "hiragana",
+    "order": 113
+  },
+  {
+    "character": "ぴょ",
+    "reading": "pyo",
+    "script": "hiragana",
+    "order": 114
+  },
+  {
+    "character": "ア",
+    "reading": "a",
+    "script": "katakana",
+    "order": 1
+  },
+  {
+    "character": "イ",
+    "reading": "i",
+    "script": "katakana",
+    "order": 2
+  },
+  {
+    "character": "ウ",
+    "reading": "u",
+    "script": "katakana",
+    "order": 3
+  },
+  {
+    "character": "エ",
+    "reading": "e",
+    "script": "katakana",
+    "order": 4
+  },
+  {
+    "character": "オ",
+    "reading": "o",
+    "script": "katakana",
+    "order": 5
+  },
+  {
+    "character": "カ",
+    "reading": "ka",
+    "script": "katakana",
+    "order": 6
+  },
+  {
+    "character": "キ",
+    "reading": "ki",
+    "script": "katakana",
+    "order": 7
+  },
+  {
+    "character": "ク",
+    "reading": "ku",
+    "script": "katakana",
+    "order": 8
+  },
+  {
+    "character": "ケ",
+    "reading": "ke",
+    "script": "katakana",
+    "order": 9
+  },
+  {
+    "character": "コ",
+    "reading": "ko",
+    "script": "katakana",
+    "order": 10
+  },
+  {
+    "character": "サ",
+    "reading": "sa",
+    "script": "katakana",
+    "order": 11
+  },
+  {
+    "character": "シ",
+    "reading": "shi",
+    "script": "katakana",
+    "order": 12
+  },
+  {
+    "character": "ス",
+    "reading": "su",
+    "script": "katakana",
+    "order": 13
+  },
+  {
+    "character": "セ",
+    "reading": "se",
+    "script": "katakana",
+    "order": 14
+  },
+  {
+    "character": "ソ",
+    "reading": "so",
+    "script": "katakana",
+    "order": 15
+  },
+  {
+    "character": "タ",
+    "reading": "ta",
+    "script": "katakana",
+    "order": 16
+  },
+  {
+    "character": "チ",
+    "reading": "chi",
+    "script": "katakana",
+    "order": 17
+  },
+  {
+    "character": "ツ",
+    "reading": "tsu",
+    "script": "katakana",
+    "order": 18
+  },
+  {
+    "character": "テ",
+    "reading": "te",
+    "script": "katakana",
+    "order": 19
+  },
+  {
+    "character": "ト",
+    "reading": "to",
+    "script": "katakana",
+    "order": 20
+  },
+  {
+    "character": "ナ",
+    "reading": "na",
+    "script": "katakana",
+    "order": 21
+  },
+  {
+    "character": "ニ",
+    "reading": "ni",
+    "script": "katakana",
+    "order": 22
+  },
+  {
+    "character": "ヌ",
+    "reading": "nu",
+    "script": "katakana",
+    "order": 23
+  },
+  {
+    "character": "ネ",
+    "reading": "ne",
+    "script": "katakana",
+    "order": 24
+  },
+  {
+    "character": "ノ",
+    "reading": "no",
+    "script": "katakana",
+    "order": 25
+  },
+  {
+    "character": "ハ",
+    "reading": "ha",
+    "script": "katakana",
+    "order": 26
+  },
+  {
+    "character": "ヒ",
+    "reading": "hi",
+    "script": "katakana",
+    "order": 27
+  },
+  {
+    "character": "フ",
+    "reading": "fu",
+    "script": "katakana",
+    "order": 28
+  },
+  {
+    "character": "ヘ",
+    "reading": "he",
+    "script": "katakana",
+    "order": 29
+  },
+  {
+    "character": "ホ",
+    "reading": "ho",
+    "script": "katakana",
+    "order": 30
+  },
+  {
+    "character": "マ",
+    "reading": "ma",
+    "script": "katakana",
+    "order": 31
+  },
+  {
+    "character": "ミ",
+    "reading": "mi",
+    "script": "katakana",
+    "order": 32
+  },
+  {
+    "character": "ム",
+    "reading": "mu",
+    "script": "katakana",
+    "order": 33
+  },
+  {
+    "character": "メ",
+    "reading": "me",
+    "script": "katakana",
+    "order": 34
+  },
+  {
+    "character": "モ",
+    "reading": "mo",
+    "script": "katakana",
+    "order": 35
+  },
+  {
+    "character": "ヤ",
+    "reading": "ya",
+    "script": "katakana",
+    "order": 36
+  },
+  {
+    "character": "ユ",
+    "reading": "yu",
+    "script": "katakana",
+    "order": 37
+  },
+  {
+    "character": "ヨ",
+    "reading": "yo",
+    "script": "katakana",
+    "order": 38
+  },
+  {
+    "character": "ラ",
+    "reading": "ra",
+    "script": "katakana",
+    "order": 39
+  },
+  {
+    "character": "リ",
+    "reading": "ri",
+    "script": "katakana",
+    "order": 40
+  },
+  {
+    "character": "ル",
+    "reading": "ru",
+    "script": "katakana",
+    "order": 41
+  },
+  {
+    "character": "レ",
+    "reading": "re",
+    "script": "katakana",
+    "order": 42
+  },
+  {
+    "character": "ロ",
+    "reading": "ro",
+    "script": "katakana",
+    "order": 43
+  },
+  {
+    "character": "ワ",
+    "reading": "wa",
+    "script": "katakana",
+    "order": 44
+  },
+  {
+    "character": "ヲ",
+    "reading": "wo",
+    "script": "katakana",
+    "order": 45
+  },
+  {
+    "character": "ン",
+    "reading": "n",
+    "script": "katakana",
+    "order": 46
+  },
+  {
+    "character": "ガ",
+    "reading": "ga",
+    "script": "katakana",
+    "order": 47
+  },
+  {
+    "character": "ギ",
+    "reading": "gi",
+    "script": "katakana",
+    "order": 48
+  },
+  {
+    "character": "グ",
+    "reading": "gu",
+    "script": "katakana",
+    "order": 49
+  },
+  {
+    "character": "ゲ",
+    "reading": "ge",
+    "script": "katakana",
+    "order": 50
+  },
+  {
+    "character": "ゴ",
+    "reading": "go",
+    "script": "katakana",
+    "order": 51
+  },
+  {
+    "character": "ザ",
+    "reading": "za",
+    "script": "katakana",
+    "order": 52
+  },
+  {
+    "character": "ジ",
+    "reading": "ji",
+    "script": "katakana",
+    "order": 53
+  },
+  {
+    "character": "ズ",
+    "reading": "zu",
+    "script": "katakana",
+    "order": 54
+  },
+  {
+    "character": "ゼ",
+    "reading": "ze",
+    "script": "katakana",
+    "order": 55
+  },
+  {
+    "character": "ゾ",
+    "reading": "zo",
+    "script": "katakana",
+    "order": 56
+  },
+  {
+    "character": "ダ",
+    "reading": "da",
+    "script": "katakana",
+    "order": 57
+  },
+  {
+    "character": "ヂ",
+    "reading": "ji",
+    "script": "katakana",
+    "order": 58
+  },
+  {
+    "character": "ヅ",
+    "reading": "zu",
+    "script": "katakana",
+    "order": 59
+  },
+  {
+    "character": "デ",
+    "reading": "de",
+    "script": "katakana",
+    "order": 60
+  },
+  {
+    "character": "ド",
+    "reading": "do",
+    "script": "katakana",
+    "order": 61
+  },
+  {
+    "character": "バ",
+    "reading": "ba",
+    "script": "katakana",
+    "order": 62
+  },
+  {
+    "character": "ビ",
+    "reading": "bi",
+    "script": "katakana",
+    "order": 63
+  },
+  {
+    "character": "ブ",
+    "reading": "bu",
+    "script": "katakana",
+    "order": 64
+  },
+  {
+    "character": "ベ",
+    "reading": "be",
+    "script": "katakana",
+    "order": 65
+  },
+  {
+    "character": "ボ",
+    "reading": "bo",
+    "script": "katakana",
+    "order": 66
+  },
+  {
+    "character": "パ",
+    "reading": "pa",
+    "script": "katakana",
+    "order": 67
+  },
+  {
+    "character": "ピ",
+    "reading": "pi",
+    "script": "katakana",
+    "order": 68
+  },
+  {
+    "character": "プ",
+    "reading": "pu",
+    "script": "katakana",
+    "order": 69
+  },
+  {
+    "character": "ペ",
+    "reading": "pe",
+    "script": "katakana",
+    "order": 70
+  },
+  {
+    "character": "ポ",
+    "reading": "po",
+    "script": "katakana",
+    "order": 71
+  },
+  {
+    "character": "ァ",
+    "reading": "small a",
+    "script": "katakana",
+    "order": 72
+  },
+  {
+    "character": "ィ",
+    "reading": "small i",
+    "script": "katakana",
+    "order": 73
+  },
+  {
+    "character": "ゥ",
+    "reading": "small u",
+    "script": "katakana",
+    "order": 74
+  },
+  {
+    "character": "ェ",
+    "reading": "small e",
+    "script": "katakana",
+    "order": 75
+  },
+  {
+    "character": "ォ",
+    "reading": "small o",
+    "script": "katakana",
+    "order": 76
+  },
+  {
+    "character": "ャ",
+    "reading": "small ya",
+    "script": "katakana",
+    "order": 77
+  },
+  {
+    "character": "ュ",
+    "reading": "small yu",
+    "script": "katakana",
+    "order": 78
+  },
+  {
+    "character": "ョ",
+    "reading": "small yo",
+    "script": "katakana",
+    "order": 79
+  },
+  {
+    "character": "ッ",
+    "reading": "small tsu",
+    "script": "katakana",
+    "order": 80
+  },
+  {
+    "character": "ヮ",
+    "reading": "small wa",
+    "script": "katakana",
+    "order": 81
+  },
+  {
+    "character": "ヴ",
+    "reading": "vu",
+    "script": "katakana",
+    "order": 82
+  },
+  {
+    "character": "キャ",
+    "reading": "kya",
+    "script": "katakana",
+    "order": 83
+  },
+  {
+    "character": "キュ",
+    "reading": "kyu",
+    "script": "katakana",
+    "order": 84
+  },
+  {
+    "character": "キョ",
+    "reading": "kyo",
+    "script": "katakana",
+    "order": 85
+  },
+  {
+    "character": "シャ",
+    "reading": "sha",
+    "script": "katakana",
+    "order": 86
+  },
+  {
+    "character": "シュ",
+    "reading": "shu",
+    "script": "katakana",
+    "order": 87
+  },
+  {
+    "character": "ショ",
+    "reading": "sho",
+    "script": "katakana",
+    "order": 88
+  },
+  {
+    "character": "チャ",
+    "reading": "cha",
+    "script": "katakana",
+    "order": 89
+  },
+  {
+    "character": "チュ",
+    "reading": "chu",
+    "script": "katakana",
+    "order": 90
+  },
+  {
+    "character": "チョ",
+    "reading": "cho",
+    "script": "katakana",
+    "order": 91
+  },
+  {
+    "character": "ニャ",
+    "reading": "nya",
+    "script": "katakana",
+    "order": 92
+  },
+  {
+    "character": "ニュ",
+    "reading": "nyu",
+    "script": "katakana",
+    "order": 93
+  },
+  {
+    "character": "ニョ",
+    "reading": "nyo",
+    "script": "katakana",
+    "order": 94
+  },
+  {
+    "character": "ヒャ",
+    "reading": "hya",
+    "script": "katakana",
+    "order": 95
+  },
+  {
+    "character": "ヒュ",
+    "reading": "hyu",
+    "script": "katakana",
+    "order": 96
+  },
+  {
+    "character": "ヒョ",
+    "reading": "hyo",
+    "script": "katakana",
+    "order": 97
+  },
+  {
+    "character": "ミャ",
+    "reading": "mya",
+    "script": "katakana",
+    "order": 98
+  },
+  {
+    "character": "ミュ",
+    "reading": "myu",
+    "script": "katakana",
+    "order": 99
+  },
+  {
+    "character": "ミョ",
+    "reading": "myo",
+    "script": "katakana",
+    "order": 100
+  },
+  {
+    "character": "リャ",
+    "reading": "rya",
+    "script": "katakana",
+    "order": 101
+  },
+  {
+    "character": "リュ",
+    "reading": "ryu",
+    "script": "katakana",
+    "order": 102
+  },
+  {
+    "character": "リョ",
+    "reading": "ryo",
+    "script": "katakana",
+    "order": 103
+  },
+  {
+    "character": "ギャ",
+    "reading": "gya",
+    "script": "katakana",
+    "order": 104
+  },
+  {
+    "character": "ギュ",
+    "reading": "gyu",
+    "script": "katakana",
+    "order": 105
+  },
+  {
+    "character": "ギョ",
+    "reading": "gyo",
+    "script": "katakana",
+    "order": 106
+  },
+  {
+    "character": "ジャ",
+    "reading": "ja",
+    "script": "katakana",
+    "order": 107
+  },
+  {
+    "character": "ジュ",
+    "reading": "ju",
+    "script": "katakana",
+    "order": 108
+  },
+  {
+    "character": "ジョ",
+    "reading": "jo",
+    "script": "katakana",
+    "order": 109
+  },
+  {
+    "character": "ビャ",
+    "reading": "bya",
+    "script": "katakana",
+    "order": 110
+  },
+  {
+    "character": "ビュ",
+    "reading": "byu",
+    "script": "katakana",
+    "order": 111
+  },
+  {
+    "character": "ビョ",
+    "reading": "byo",
+    "script": "katakana",
+    "order": 112
+  },
+  {
+    "character": "ピャ",
+    "reading": "pya",
+    "script": "katakana",
+    "order": 113
+  },
+  {
+    "character": "ピュ",
+    "reading": "pyu",
+    "script": "katakana",
+    "order": 114
+  },
+  {
+    "character": "ピョ",
+    "reading": "pyo",
+    "script": "katakana",
+    "order": 115
+  }
+]

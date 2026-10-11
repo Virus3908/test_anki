@@ -36,16 +36,7 @@ extension WordDataLoader {
     }
 
     static func kanaCard(for character: String) -> KanjiCard {
-        KanjiCard(
-            kanji: character,
-            meanings: [],
-            onyomi: [],
-            kunyomi: [],
-            examples: [],
-            source: KanjiSource(name: "Kana", file: "local-kana", license: "App data"),
-            strokes: KanaStrokePresets.strokes(for: character),
-            translationState: "ru-system"
-        )
+        (try? BundledKanaDrawing.card(for: character)) ?? unavailableDrawingCard(for: character)
     }
 
     nonisolated static func isKanji(_ text: String) -> Bool {

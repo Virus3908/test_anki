@@ -18,7 +18,7 @@ extension StudyAppViewModel {
                 keys = Set(entries[selected.bounds.clamped(to: entries.indices)].map { "word:\($0.word)-\($0.reading)" })
             case .kana:
                 guard let selected = KanaDeck(rawValue: String(deck.id.dropFirst("kana:".count))) else { return }
-                keys = Set(selected.baseCards.map(\.reviewKey))
+                keys = Set(try await KanaDataLoader.loadCards(deck: selected).map(\.reviewKey))
             case .anki:
                 guard let reference = ankiLibrary.decks.first(where: { $0.id == deck.id }),
                       let summary = ankiLibrary.imports.first(where: { $0.id == reference.importID }) else { return }

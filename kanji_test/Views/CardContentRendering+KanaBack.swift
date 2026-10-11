@@ -53,7 +53,12 @@ extension CardContentRendering {
         case .strokeOrder:
             if !card.strokes.isEmpty {
                 detailBlock("Порядок штрихов") {
-                    StrokeStepStrip(strokes: card.strokes)
+                    ForEach(card.drawingCards) { part in
+                        VStack(alignment: .leading, spacing: 6) {
+                            if card.drawingCards.count > 1 { Text(part.kanji) }
+                            StrokeStepStrip(strokes: part.strokes)
+                        }
+                    }
                 }
             }
         default:

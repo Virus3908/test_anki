@@ -248,7 +248,7 @@ struct CardSearchView: View, CardContentRendering {
     }
 
     private func kanaDeck(for card: KanaStudyCard) -> KanaDeck? {
-        KanaDeck.allCases.first { deck in deck.baseCards.contains { $0.id == card.id } }
+        card.script
     }
 
     private func ankiDeck(for card: AnkiStudyCard) -> AnkiDeckReference {

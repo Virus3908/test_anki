@@ -86,16 +86,7 @@ struct WordStudyCard: Identifiable, Sendable {
     }
 
     private static func kanaCard(for character: String) -> KanjiCard {
-        KanjiCard(
-            kanji: character,
-            meanings: [],
-            onyomi: [],
-            kunyomi: [],
-            examples: [],
-            source: KanjiSource(name: "Kana", file: "local-kana", license: "App data"),
-            strokes: KanaStrokePresets.strokes(for: character),
-            translationState: "ru-system"
-        )
+        WordDataLoader.kanaCard(for: character)
     }
 
     nonisolated private static func isJapaneseStudyCharacter(_ text: String) -> Bool {
