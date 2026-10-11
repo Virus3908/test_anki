@@ -321,6 +321,9 @@ App-hosted Anki/SRS integration tests:
 When changing scheduling/queue behavior, add or update focused
 integration/unit tests rather than relying only on UI testing.
 
+GitHub Actions runs AnkiImport package tests and all hosted iOS tests through
+`.github/workflows/tests.yml`; see `docs/ci.md` for runner, artifacts and limitations.
+
 ## Change workflow
 
 1.  Identify the user-visible subsystem from this map.

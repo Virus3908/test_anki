@@ -1,0 +1,81 @@
+name: Tests
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+
+jobs:
+  anki-import:
+    name: AnkiImport package tests
+    runs-on: macos-26
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - name: Show toolchain
+        run: |
+          xcodebuild -version
+          swift --version
+      - name: Run package tests
+        run: |
+          mkdir -p artifacts
+          swift test --package-path Packages/AnkiImport 2>&1 | tee artifacts/anki-import.log
+      - name: Upload package test log
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: anki-import-test-log
+          path: artifacts/anki-import.log
+          if-no-files-found: warn
+          retention-days: 14
+
+  ios-tests:
+    name: iOS hosted tests
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - name: Show Xcode and available simulators
+        run: |
+          xcodebuild -version
+          xcrun simctl list devices available
+      - name: Run hosted tests on iOS Simulator
+        run: |
+          mkdir -p artifacts
+          xcodebuild test \
+            -project kanji_test.xcodeproj \
+            -scheme kanji_test \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.5' \
+            -destination-timeout 120 \
+            -only-testing:kanji_testHostedTests \
+            -parallel-testing-enabled NO \
+            -onlyUsePackageVersionsFromResolvedFile \
+            -derivedDataPath "$RUNNER_TEMP/kanji-derived-data" \
+            -resultBundlePath artifacts/hosted-tests.xcresult \
+            CODE_SIGNING_ALLOWED=NO \
+            2>&1 | tee artifacts/hosted-tests.log
+      - name: Upload hosted test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ios-hosted-test-results
+          path: |
+            artifacts/hosted-tests.log
+            artifacts/hosted-tests.xcresult
+          if-no-files-found: warn
+          retention-days: 14
