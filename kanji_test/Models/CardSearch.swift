@@ -141,16 +141,40 @@ nonisolated struct KanaSearchRecord: CardSearchRecord {
 
 /// Импортированная карточка Anki ищется по содержимому всех полей, тегам,
 /// названию колоды, типу заметки и шаблону карточки.
-nonisolated struct AnkiSearchRecord: CardSearchRecord {
-    let card: AnkiStudyCard
+nonisolated struct AnkiSearchRecord: CardSearchRecord, Codable, Identifiable {
+    let importID: String
+    let cardID: Int64
+    let noteID: Int64
+    let deckID: Int64
+    let noteTypeID: Int64
+    let deckName: String
+    let titleFields: [String]
+    let text: String
+    var id: String { "\(importID):card:\(cardID)" }
+    var fieldPreferencesKey: String { "\(importID):\(deckID):\(noteTypeID)" }
+    var searchTerms: [String] { [text] }
 
-    var searchTerms: [String] {
-        var terms = card.note.parsedFields?.map(\.plainText) ?? card.note.fields
-        terms.append(contentsOf: card.note.tags)
-        terms.append(card.deckName)
-        terms.append(card.noteType.name)
-        terms.append(card.templateName)
-        return terms
+    func displayTitle(using options: AnkiFieldDisplayOptions) -> String {
+        let title = titleFields[safe: options.titleOrdinal] ?? ""
+        return title.isEmpty ? "Карточка \(cardID)" : title
+    }
+
+    static func records(collection: AnkiCollection, importID: String, filename: String) throws -> [Self] {
+        let notes = Dictionary(collection.notes.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        let types = Dictionary(collection.noteTypes.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        let decks = Dictionary(collection.decks.map { ($0.id, $0.name) }, uniquingKeysWith: { first, _ in first })
+        return try collection.cards.map { card -> Self? in
+            try Task.checkCancellation()
+            guard let note = notes[card.noteID], let type = types[note.noteTypeID] else { return nil }
+            let fields = note.parsedFields?.map(\.plainText) ?? note.fields
+            let deck = decks[card.deckID] ?? filename
+            let template = type.isCloze ? "Пропуск \(card.ordinal + 1)"
+                : type.templates.first(where: { $0.ordinal == card.ordinal })?.name ?? type.name
+            return Self(importID: importID, cardID: card.id, noteID: note.id,
+                deckID: card.deckID, noteTypeID: type.id, deckName: deck,
+                titleFields: fields.map { String($0.trimmingCharacters(in: .whitespacesAndNewlines).prefix(120)) },
+                text: (fields + note.tags + [deck, type.name, template]).joined(separator: " ").lowercased())
+        }.compactMap { $0 }
     }
 }
 

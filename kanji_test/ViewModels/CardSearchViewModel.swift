@@ -28,7 +28,7 @@ final class CardSearchViewModel {
     private(set) var kanjiResults: [KanjiCard] = []
     private(set) var wordResults: [WordStudyCard] = []
     private(set) var kanaResults: [KanaStudyCard] = []
-    private(set) var ankiResults: [AnkiStudyCard] = []
+    private(set) var ankiResults: [AnkiSearchRecord] = []
     /// Сколько всего нашлось (до капа на показ).
     private(set) var totalFound = 0
 
@@ -79,8 +79,8 @@ final class CardSearchViewModel {
                 try await prepareWords()
                 try await prepareKana()
                 if let ankiModel {
-                    let cards = try await ankiModel.cardsForSearch()
-                    ankiIndex = await Self.buildIndex(records: cards.map(AnkiSearchRecord.init))
+                    let records = try await ankiModel.recordsForSearch()
+                    ankiIndex = await Self.buildIndex(records: records)
                 }
             case .kanji:
                 try await prepareKanji()
@@ -130,6 +130,15 @@ final class CardSearchViewModel {
 
     // MARK: Поиск
 
+    func openAnkiResult(_ record: AnkiSearchRecord) async -> AnkiStudyCard? {
+        do {
+            let card = try await ankiModel?.cardForSearchResult(record)
+            try Task.checkCancellation()
+            return card
+        } catch is CancellationError { return nil }
+        catch { loadError = "Не удалось открыть карточку Anki."; return nil }
+    }
+
     /// Invalidate immediately on input changes, before the view's debounce ends.
     func cancelSearch() {
         generation += 1
@@ -169,7 +178,7 @@ final class CardSearchViewModel {
             wordResults = WordDataLoader.buildWords(from: entries,
                 cardsByCharacter: Dictionary(cards.map { ($0.kanji, $0) }, uniquingKeysWith: { first, _ in first }))
             kanaResults = found.kana?.records.map(\.card) ?? []
-            ankiResults = found.anki?.records.map(\.card) ?? []
+            ankiResults = found.anki?.records ?? []
             totalFound = (found.kanji?.totalFound ?? 0) + (found.words?.totalFound ?? 0)
                 + (found.kana?.totalFound ?? 0) + (found.anki?.totalFound ?? 0)
             searchTask = nil

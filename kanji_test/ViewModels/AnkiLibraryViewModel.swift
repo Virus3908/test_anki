@@ -121,36 +121,35 @@ final class AnkiLibraryViewModel {
         return (collection, media)
     }
 
-    /// Загружает карточки всех импортов для глобального поиска, не меняя
-    /// состояние открытой в интерфейсе колоды.
-    func cardsForSearch() async throws -> [AnkiStudyCard] {
-        if !isLoaded {
-            await load()
-        }
-
-        var result: [AnkiStudyCard] = []
+    func recordsForSearch() async throws -> [AnkiSearchRecord] {
+        if !isLoaded { await load() }
+        guard isLoaded else { throw AnkiImportError.invalid("не удалось загрузить библиотеку") }
+        var records: [AnkiSearchRecord] = []
         for summary in imports {
-            let (collection, media) = try await open(summary)
-            let importCards = await Task.detached(priority: .userInitiated) {
-                let notes = Dictionary(uniqueKeysWithValues: collection.notes.map { ($0.id, $0) })
-                let types = Dictionary(uniqueKeysWithValues: collection.noteTypes.map { ($0.id, $0) })
-                let deckNames = Dictionary(uniqueKeysWithValues: collection.decks.map { ($0.id, $0.name) })
-
-                return collection.cards.compactMap { card -> AnkiStudyCard? in
-                    guard let note = notes[card.noteID], let type = types[note.noteTypeID] else { return nil }
-                    return AnkiStudyCard(
-                        importID: summary.id,
-                        card: card,
-                        note: note,
-                        noteType: type,
-                        deckName: deckNames[card.deckID] ?? summary.filename,
-                        mediaDirectory: media
-                    )
-                }
-            }.value
-            result.append(contentsOf: importCards)
+            try Task.checkCancellation()
+            records += try await repository.searchRecords(summary)
         }
-        return result
+        return records
+    }
+
+    /// Resolve only the selected search hit. Full collection is released after
+    /// resolution; search results never enter the training catalog.
+    func cardForSearchResult(_ record: AnkiSearchRecord) async throws -> AnkiStudyCard {
+        guard let summary = imports.first(where: { $0.id == record.importID }) else {
+            throw AnkiImportError.invalid("импорт отсутствует в библиотеке")
+        }
+        let (collection, media) = try await open(summary)
+        let worker = Task.detached(priority: .userInitiated) {
+            try Task.checkCancellation()
+            guard let card = collection.cards.first(where: { $0.id == record.cardID }),
+                  let note = collection.notes.first(where: { $0.id == card.noteID }),
+                  let type = collection.noteTypes.first(where: { $0.id == note.noteTypeID }) else {
+                throw AnkiImportError.invalid("карточка отсутствует в импорте")
+            }
+            return AnkiStudyCard(importID: record.importID, card: card, note: note,
+                noteType: type, deckName: record.deckName, mediaDirectory: media)
+        }
+        return try await withTaskCancellationHandler { try await worker.value } onCancel: { worker.cancel() }
     }
 
     func openDeck(_ deck: AnkiDeckReference) async {

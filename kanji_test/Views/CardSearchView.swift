@@ -17,6 +17,7 @@ struct CardSearchView: View, CardContentRendering {
 
     @State private var model: CardSearchViewModel
     @State private var query = ""
+    @State private var openingAnkiTask: Task<Void, Never>?
     @State private var selectedAnkiCard: AnkiStudyCard?
     @Environment(\.dismiss) private var dismiss
 
@@ -83,7 +84,7 @@ struct CardSearchView: View, CardContentRendering {
             await model.updateResults(for: query)
         }
         .onChange(of: query) { model.cancelSearch() }
-        .onDisappear { model.cancelSearch() }
+        .onDisappear { model.cancelSearch(); openingAnkiTask?.cancel() }
         .task(id: query) {
             guard !query.isEmpty else {
                 await model.updateResults(for: query)
@@ -114,7 +115,7 @@ struct CardSearchView: View, CardContentRendering {
         .sheet(item: $selectedAnkiCard) { card in
             let deck = ankiDeck(for: card)
             AnkiCardPreviewView(
-                cards: model.ankiResults,
+                cards: [card],
                 initialCard: card,
                 translationState: translationState,
                 language: settings.options(for: deck.id).meaningLanguage
@@ -229,12 +230,19 @@ struct CardSearchView: View, CardContentRendering {
         }
     }
 
-    private func ankiResultTile(for card: AnkiStudyCard) -> some View {
-        Button { selectedAnkiCard = card } label: {
+    private func ankiResultTile(for card: AnkiSearchRecord) -> some View {
+        Button {
+            openingAnkiTask?.cancel()
+            openingAnkiTask = Task {
+                let resolved = await model.openAnkiResult(card)
+                guard !Task.isCancelled else { return }
+                selectedAnkiCard = resolved
+            }
+        } label: {
             VStack(alignment: .leading, spacing: 6) {
                 Text(card.displayTitle(using: fieldPreferences.options(
                     for: card.fieldPreferencesKey,
-                    fieldCount: card.noteType.fields.count
+                    fieldCount: card.titleFields.count
                 )))
                     .font(.headline)
                     .lineLimit(3)
@@ -258,7 +266,7 @@ struct CardSearchView: View, CardContentRendering {
             importID: card.importID,
             sourceDeckID: card.card.deckID,
             title: card.deckName,
-            cardCount: model.ankiResults.filter { $0.card.deckID == card.card.deckID && $0.importID == card.importID }.count
+            cardCount: model.ankiResults.filter { $0.deckID == card.card.deckID && $0.importID == card.importID }.count
         )
     }
 
