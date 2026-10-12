@@ -322,11 +322,7 @@ final class TrainingSessionViewModel {
         catalog.releaseAnkiCards()
     }
     private func effectiveOptions(for deckID: String?, studyDay: Date? = nil) -> DeckOptions {
-        var result = settings.options(for: deckID)
-        let day = studyDay ?? reviewStore.studyDate()
-        let additional = settings.additionalCardCount(for: deckID, studyDay: day)
-        result.dailyNewCardLimit = min(9999, result.dailyNewCardLimit + additional)
-        return result
+        settings.effectiveOptions(for: deckID, studyDay: studyDay ?? reviewStore.studyDate())
     }
 
     func answerID(for mode: PracticeMode, index: Int) -> String { "\(mode.rawValue):\(index)" }

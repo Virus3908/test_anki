@@ -21,12 +21,14 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
 
     private var cards: [AnkiStudyCard] { model.previewDeck == deck ? model.previewCards : [] }
     private var plan: StudyQueuePlan {
-        TrainingSessionEngine.plan(
+        let now = Date()
+        return TrainingSessionEngine.plan(
             sourceIDs: cards.map(\.id),
             mode: .anki,
             deckID: deck.id,
             progress: reviewStore,
-            options: settings.options(for: deck.id)
+            options: settings.effectiveOptions(for: deck.id, studyDay: reviewStore.studyDate(now: now)),
+            now: now
         )
     }
 
@@ -135,8 +137,7 @@ struct AnkiDeckPreviewView: View, StudyViewStyling {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 14) {
                         Text(deck.title).font(.title2.weight(.bold))
-                        let plan = TrainingSessionEngine.plan(sourceIDs: cards.map(\.id), mode: .anki, deckID: deck.id,
-                            progress: reviewStore, options: settings.options(for: deck.id))
+                        let plan = self.plan
                         Text("На сегодня: \(plan.todayIDs.count)").font(.headline)
                         ForEach(reviewStore.scheduleBuckets(forReviewKeys: Set(cards.map(\.reviewKey)))) { bucket in
                             HStack { Text(bucket.title); Spacer(); Text("\(bucket.count)").fontWeight(.semibold) }

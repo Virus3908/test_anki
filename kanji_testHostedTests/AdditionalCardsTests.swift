@@ -70,6 +70,37 @@ final class AdditionalCardsTests: XCTestCase {
         XCTAssertEqual(restoredSettings.additionalCardCount(for: "deck", studyDay: restored.reviewStore.studyDate()), 0)
     }
 
+    func testEffectiveOptionsMatchPreviewAndTrainingForBuiltInAndAnki() throws {
+        let suite = "EffectiveOptions-" + UUID().uuidString
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let settings = StudyPreferences(defaults: defaults, errors: StorageStatus())
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = try XCTUnwrap(TimeZone(secondsFromGMT: 0))
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        for (deckID, mode, ids) in [("kanji", PracticeMode.kanji, ["猫", "犬", "鳥", "魚"]),
+                                  ("anki:fixture:deck:10", PracticeMode.anki, ["fixture:card:1", "fixture:card:2", "fixture:card:3", "fixture:card:4"])] {
+            settings.updateOptions(for: deckID) { $0.dailyNewCardLimit = 1 }
+            settings.addAdditionalCards(2, for: deckID, studyDay: now, calendar: calendar)
+            let restored = StudyPreferences(defaults: defaults, errors: StorageStatus())
+            var progress = StudyProgressStore(records: [:])
+            let effective = restored.effectiveOptions(for: deckID, studyDay: progress.studyDate(now: now), calendar: calendar)
+            let preview = TrainingSessionEngine.plan(sourceIDs: ids, mode: mode, deckID: deckID,
+                progress: progress, options: effective, now: now)
+            let training = TrainingSessionEngine.plan(sourceIDs: ids, mode: mode, deckID: deckID,
+                progress: progress, options: restored.effectiveOptions(for: deckID,
+                    studyDay: progress.studyDate(now: now), calendar: calendar), now: now)
+            XCTAssertEqual(preview.todayIDs, training.todayIDs)
+            XCTAssertEqual(preview.todayIDs.count, 3)
+            XCTAssertEqual(restored.options(for: deckID).dailyNewCardLimit, 1)
+            XCTAssertEqual(restored.effectiveOptions(for: "another", studyDay: now, calendar: calendar).dailyNewCardLimit, 10)
+            let tomorrow = try XCTUnwrap(calendar.date(byAdding: .day, value: 1, to: now))
+            XCTAssertEqual(restored.effectiveOptions(for: deckID, studyDay: tomorrow, calendar: calendar).dailyNewCardLimit, 1)
+            progress.advanceStudyDay()
+            XCTAssertEqual(restored.effectiveOptions(for: deckID, studyDay: progress.studyDate(now: now), calendar: calendar).dailyNewCardLimit, 1)
+        }
+    }
+
     func testUnreadableGrantDataIsPreserved() throws {
         let suite = "AdditionalCards-" + UUID().uuidString
         let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
