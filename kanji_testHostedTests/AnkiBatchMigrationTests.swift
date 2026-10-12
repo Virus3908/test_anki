@@ -47,7 +47,7 @@ final class AnkiBatchMigrationTests: XCTestCase {
             var seed = StudyProgressStore(records: [:])
             _ = AnkiSchedulingMigrator.bootstrap(collection: single, importID: "fixture", optionsByDeck: [:], progress: &seed)
             let key = "anki:fixture:card:\(card.id)"
-            guard legacy.record(for: key) == nil, let record = seed.record(for: key) else { continue }
+            guard legacy.record(for: key) == nil, seed.record(for: key) != nil else { continue }
             // JSON fixture models the former append/dedup/rebuild-on-decode implementation.
             var object = try XCTUnwrap(JSONSerialization.jsonObject(with: encoded(legacy)) as? [String: Any])
             let source = try XCTUnwrap(JSONSerialization.jsonObject(with: encoded(seed)) as? [String: Any])
