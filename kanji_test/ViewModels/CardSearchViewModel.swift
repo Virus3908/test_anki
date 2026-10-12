@@ -23,6 +23,13 @@ final class CardSearchViewModel {
 
     private(set) var isPreparing = false
     private(set) var loadError: String?
+    private(set) var searchError: String?
+    var openingError: String?
+    private(set) var unavailableAnkiImports: [AnkiImportSummary] = []
+    @ObservationIgnored private let previewSession = AnkiSearchPreviewSession()
+    private var openingGeneration = 0
+    private var preparationGeneration = 0
+    private var isClosed = false
 
     /// Результаты последнего запроса (заполняется массив активного scope).
     private(set) var kanjiResults: [KanjiCard] = []
@@ -36,6 +43,7 @@ final class CardSearchViewModel {
 
     @ObservationIgnored private var searchTask: Task<SearchResults, Error>?
     private var generation = 0
+    private var latestQuery = ""
 
     nonisolated private struct SearchResults: Sendable {
         let kanji: CardSearchMatches<KanjiSearchRecord>?
@@ -67,20 +75,28 @@ final class CardSearchViewModel {
 
     /// Строит индекс по активному scope. Повторный вызов — мгновенный выход.
     func prepare() async {
+        isClosed = false
         if isPrepared { loadError = nil; return }
         guard !isPreparing else { return }
         isPreparing = true
+        preparationGeneration += 1
+        let token = preparationGeneration
         loadError = nil
-        defer { isPreparing = false }
+        defer { if preparationGeneration == token { isPreparing = false } }
 
         do {
             switch scope {
             case .all:
                 try await prepareKanji()
+                try Task.checkCancellation()
                 try await prepareWords()
+                try Task.checkCancellation()
                 try await prepareKana()
+                try Task.checkCancellation()
                 if let ankiModel {
                     let records = try await ankiModel.recordsForSearch()
+                    guard !isClosed, preparationGeneration == token else { return }
+                    unavailableAnkiImports = ankiModel.searchUnavailableImports
                     ankiIndex = await Self.buildIndex(records: records)
                 }
             case .kanji:
@@ -90,11 +106,12 @@ final class CardSearchViewModel {
             }
 
             try Task.checkCancellation()
+            guard !isClosed, preparationGeneration == token else { return }
             isPrepared = true
         } catch is CancellationError {
             return
         } catch {
-            loadError = "Не удалось подготовить поиск."
+            if !isClosed, !Task.isCancelled, preparationGeneration == token { loadError = "Не удалось подготовить поиск." }
         }
     }
 
@@ -132,18 +149,66 @@ final class CardSearchViewModel {
 
     func resolveAnkiResult(_ record: AnkiSearchRecord) async throws -> AnkiStudyCard {
         guard let ankiModel else { throw CocoaError(.fileReadNoSuchFile) }
-        let card = try await ankiModel.cardForSearchResult(record)
+        guard !isClosed else { throw CancellationError() }
+        let card = try await ankiModel.cardForSearchResult(record, session: previewSession)
         try Task.checkCancellation()
+        guard !isClosed else { throw CancellationError() }
         return card
     }
 
     func openAnkiResult(_ record: AnkiSearchRecord) async -> AnkiStudyCard? {
+        openingGeneration += 1
+        let token = openingGeneration
+        openingError = nil
         do {
             let card = try await resolveAnkiResult(record)
             try Task.checkCancellation()
+            guard !isClosed, token == openingGeneration else { return nil }
             return card
         } catch is CancellationError { return nil }
-        catch { loadError = "Не удалось открыть карточку Anki."; return nil }
+        catch {
+            if !isClosed, !Task.isCancelled, token == openingGeneration {
+                openingError = "Не удалось открыть карточку Anki."
+            }
+            return nil
+        }
+    }
+
+    func closeAnkiPreview() {
+        openingGeneration += 1
+        openingError = nil
+        previewSession.close()
+    }
+
+    func close() {
+        isClosed = true
+        preparationGeneration += 1
+        isPreparing = false
+        cancelSearch()
+        closeAnkiPreview()
+    }
+
+    func retryAnkiSearch() async {
+        guard let ankiModel, !isClosed else { return }
+        preparationGeneration += 1
+        let token = preparationGeneration
+        do {
+            let records = try await ankiModel.recordsForSearch()
+            let index = await Self.buildIndex(records: records)
+            try Task.checkCancellation()
+            guard !isClosed, token == preparationGeneration else { return }
+            ankiIndex = index
+            unavailableAnkiImports = ankiModel.searchUnavailableImports
+            await updateResults(for: latestQuery)
+        } catch is CancellationError { }
+        catch {
+            if !isClosed, token == preparationGeneration { searchError = "Не удалось обновить поиск Anki." }
+        }
+    }
+
+    func queryChanged(to query: String) {
+        latestQuery = query
+        cancelSearch()
     }
 
     /// Invalidate immediately on input changes, before the view's debounce ends.
@@ -154,14 +219,16 @@ final class CardSearchViewModel {
     }
 
     func updateResults(for query: String) async {
+        latestQuery = query
         cancelSearch()
+        searchError = nil
         let request = generation
         guard !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             kanjiResults = []; wordResults = []; kanaResults = []; ankiResults = []
             totalFound = 0
             return
         }
-        guard isPrepared, !Task.isCancelled else { return }
+        guard isPrepared, !isClosed, !Task.isCancelled else { return }
         let kanji = kanjiIndex, words = wordIndex, kana = kanaIndex, anki = ankiIndex
         let limit = Self.resultLimit
         let worker = Task.detached(priority: .userInitiated) {
@@ -195,7 +262,7 @@ final class CardSearchViewModel {
         } catch is CancellationError {
             // A cancelled query must never publish partial results.
         } catch {
-            if generation == request { loadError = "Не удалось выполнить поиск." }
+            if generation == request, !isClosed, !Task.isCancelled { searchError = "Не удалось выполнить поиск." }
         }
     }
 }

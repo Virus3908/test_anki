@@ -1,5 +1,6 @@
 import Foundation
 import AnkiImport
+import OSLog
 
 /// Disposable index files live in Caches, apart from the imported source and
 /// review history. Actor serialization prevents concurrent rebuild/clear races.
@@ -35,11 +36,18 @@ actor AnkiSearchIndexRepository {
             return file.records
         }
         // Never prepare/save native fields back into collection.json here.
-        var collection = try JSONDecoder().decode(AnkiCollection.self, from: Data(contentsOf: sourceURL))
-        _ = collection.prepareNativeFields()
+        try Task.checkCancellation()
+        let collection = try AnkiCollectionLoader.load(from: sourceURL)
         let records = try AnkiSearchRecord.records(collection: collection, importID: summary.id, filename: summary.filename)
         try Task.checkCancellation()
-        try save(records, for: summary)
+        do { try save(records, for: summary) }
+        catch is CancellationError { throw CancellationError() }
+        catch {
+            try Task.checkCancellation()
+            Logger(subsystem: "KanjiTrainer", category: "AnkiSearchIndex")
+                .error("Could not save disposable search index: \(error.localizedDescription, privacy: .public)")
+        }
+        try Task.checkCancellation()
         return records
     }
 
@@ -48,8 +56,11 @@ actor AnkiSearchIndexRepository {
         let url = try indexURL(summary)
         let data = try JSONEncoder().encode(IndexFile(version: 1, importID: summary.id, records: records))
         guard data.count <= byteLimit else { return } // oversized imports remain searchable without a disk cache
+        try Task.checkCancellation()
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        try Task.checkCancellation()
         try data.write(to: url, options: .atomic)
+        try Task.checkCancellation()
         try trim()
     }
 
@@ -75,6 +86,7 @@ actor AnkiSearchIndexRepository {
         }.sorted { ($0.1.contentModificationDate ?? .distantPast) < ($1.1.contentModificationDate ?? .distantPast) }
         var size = files.reduce(0) { $0 + ($1.1.fileSize ?? 0) }
         for (url, values) in files where size > byteLimit {
+            try Task.checkCancellation()
             try FileManager.default.removeItem(at: url)
             size -= values.fileSize ?? 0
         }

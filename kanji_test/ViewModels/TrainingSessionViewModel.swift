@@ -102,12 +102,14 @@ final class TrainingSessionViewModel {
             ($0.id, settings.options(for: "anki:\(importID):deck:\($0.id)"))
         })
         let current = reviewStore
-        let migrated = await Task.detached(priority: .userInitiated) {
+        let worker = Task.detached(priority: .userInitiated) {
             var progress = current
-            let count = AnkiSchedulingMigrator.bootstrap(collection: collection, importID: importID,
+            let count = try AnkiSchedulingMigrator.bootstrapCancellable(collection: collection, importID: importID,
                 optionsByDeck: options, progress: &progress)
             return (progress, count)
-        }.value
+        }
+        let migrated = try await withTaskCancellationHandler { try await worker.value } onCancel: { worker.cancel() }
+        try Task.checkCancellation()
         guard migrated.1 > 0 else { return 0 }
         try await repository.save(migrated.0)
         reviewStore = migrated.0
@@ -320,11 +322,7 @@ final class TrainingSessionViewModel {
         catalog.releaseAnkiCards()
     }
     private func effectiveOptions(for deckID: String?, studyDay: Date? = nil) -> DeckOptions {
-        var result = settings.options(for: deckID)
-        let day = studyDay ?? reviewStore.studyDate()
-        let additional = settings.additionalCardCount(for: deckID, studyDay: day)
-        result.dailyNewCardLimit = min(9999, result.dailyNewCardLimit + additional)
-        return result
+        settings.effectiveOptions(for: deckID, studyDay: studyDay ?? reviewStore.studyDate())
     }
 
     func answerID(for mode: PracticeMode, index: Int) -> String { "\(mode.rawValue):\(index)" }

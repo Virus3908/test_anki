@@ -75,6 +75,13 @@ final class StudyPreferences {
         (deckID.flatMap { stored.decks[$0] } ?? stored.defaults).validated
     }
 
+    func effectiveOptions(for deckID: String?, studyDay: Date, calendar: Calendar = .current) -> DeckOptions {
+        var result = options(for: deckID)
+        result.dailyNewCardLimit = min(9999, result.dailyNewCardLimit
+            + additionalCardCount(for: deckID, studyDay: studyDay, calendar: calendar))
+        return result
+    }
+
     func updateOptions(for deckID: String?, _ change: (inout DeckOptions) -> Void) {
         guard canSave else {
             errors.message = "Настройки не сохранены: сначала восстанови читаемую версию настроек колод."

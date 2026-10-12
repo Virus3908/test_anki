@@ -11,20 +11,47 @@ nonisolated enum AnkiSchedulingMigrator {
 
     static func bootstrap(collection: AnkiCollection, importID: String,
                           optionsByDeck: [Int64: DeckOptions], progress: inout StudyProgressStore) -> Int {
-        var imported = 0
+        // Compatibility for synchronous callers; production uses the cancellable API.
+        let entries = prepare(collection: collection, importID: importID,
+            optionsByDeck: optionsByDeck, progress: progress, checkCancellation: {})
+        return progress.bootstrap(entries)
+    }
+
+    static func bootstrapCancellable(collection: AnkiCollection, importID: String,
+                                     optionsByDeck: [Int64: DeckOptions], progress: inout StudyProgressStore,
+                                     checkCancellation: () throws -> Void = { try Task.checkCancellation() }) throws -> Int {
+        let entries = try prepare(collection: collection, importID: importID,
+            optionsByDeck: optionsByDeck, progress: progress, checkCancellation: checkCancellation)
+        try checkCancellation()
+        // Work on the caller's private snapshot; no state is published or saved on cancellation.
+        var next = progress
+        let count = try next.bootstrap(entries, checkCancellation: checkCancellation)
+        try checkCancellation()
+        progress = next
+        return count
+    }
+
+    private static func prepare(collection: AnkiCollection, importID: String,
+                                optionsByDeck: [Int64: DeckOptions], progress: StudyProgressStore,
+                                checkCancellation: () throws -> Void) rethrows -> [StudyProgressStore.BootstrapEntry] {
+        var entries: [StudyProgressStore.BootstrapEntry] = []
+        var seen = Set<String>()
         for card in collection.cards {
+            try checkCancellation()
             let key = "anki:\(importID):card:\(card.id)"
-            guard progress.record(for: key) == nil,
-                  let migration = migration(for: card, collectionCreationTime: collection.creationTime,
+            guard progress.record(for: key) == nil, !seen.contains(key),
+                  let migration = try migration(for: card, collectionCreationTime: collection.creationTime,
                                             key: key, deckID: "anki:\(importID):deck:\(card.deckID)",
-                                            options: optionsByDeck[card.deckID] ?? DeckOptions()) else { continue }
-            if progress.bootstrap(migration.record, logs: migration.logs, for: key) { imported += 1 }
+                                            options: optionsByDeck[card.deckID] ?? DeckOptions(),
+                                            checkCancellation: checkCancellation) else { continue }
+            seen.insert(key)
+            entries.append(.init(key: key, record: migration.record, logs: migration.logs))
         }
-        return imported
+        return entries
     }
 
     private static func migration(for card: AnkiCard, collectionCreationTime: Int64?, key: String,
-                                  deckID: String, options: DeckOptions) -> (record: StudyReviewRecord, logs: [StudyReviewLog])? {
+                                  deckID: String, options: DeckOptions, checkCancellation: () throws -> Void) rethrows -> (record: StudyReviewRecord, logs: [StudyReviewLog])? {
         let scheduling = card.scheduling
         let type = Int(scheduling["type", default: 0])
         let reps = Int(scheduling["reps", default: 0])
@@ -35,7 +62,7 @@ nonisolated enum AnkiSchedulingMigrator {
         let fallbackLast = inferredLastReview(scheduling: scheduling, due: dueDate(
             scheduling: scheduling, collectionCreationTime: collectionCreationTime))
         guard let lastReviewedAt = valid.last?.reviewedAt ?? fallbackLast else { return nil }
-        let replay = replay(valid, options: options)
+        let replay = try replay(valid, options: options, checkCancellation: checkCancellation)
         let lastRating = valid.last.flatMap { reviewRating($0.ease) } ?? .good
         let state = reviewState(type: type)
         let due = dueDate(scheduling: scheduling, collectionCreationTime: collectionCreationTime)
@@ -56,14 +83,15 @@ nonisolated enum AnkiSchedulingMigrator {
             lapses: max(Int(scheduling["lapses", default: 0]), seed?.lapses ?? 0),
             stability: max(0.0001, seed?.stability ?? 1), difficulty: min(10, max(1, seed?.difficulty ?? 5)),
             schedulerVersion: version)
-        return (record, importedLogs(history, cardKey: key, deckID: deckID))
+        return (record, try importedLogs(history, cardKey: key, deckID: deckID, checkCancellation: checkCancellation))
     }
 
-    private static func replay(_ history: [AnkiReviewLogEntry], options: DeckOptions) -> Card? {
+    private static func replay(_ history: [AnkiReviewLogEntry], options: DeckOptions, checkCancellation: () throws -> Void) rethrows -> Card? {
         guard let first = history.first else { return nil }
         let scheduler = FSRS(parameters: parameters(options))
         var card = Card(due: first.reviewedAt)
         for entry in history {
+            try checkCancellation()
             guard let rating = Rating(rawValue: entry.ease),
                   let result = try? scheduler.next(card: card, now: entry.reviewedAt, grade: rating) else { continue }
             card = result.card
@@ -129,9 +157,10 @@ nonisolated enum AnkiSchedulingMigrator {
         return max(0, remaining - 1)
     }
 
-    private static func importedLogs(_ history: [AnkiReviewLogEntry], cardKey: String, deckID: String) -> [StudyReviewLog] {
+    private static func importedLogs(_ history: [AnkiReviewLogEntry], cardKey: String, deckID: String, checkCancellation: () throws -> Void) rethrows -> [StudyReviewLog] {
         var previousDate: Date?
-        return history.map { entry in
+        return try history.map { entry in
+            try checkCancellation()
             let date = entry.reviewedAt
             let elapsed = previousDate.map { max(0, Calendar.current.dateComponents([.day], from: $0, to: date).day ?? 0) } ?? 0
             previousDate = date

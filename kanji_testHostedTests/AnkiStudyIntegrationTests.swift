@@ -257,6 +257,43 @@ final class AnkiStudyIntegrationTests: XCTestCase {
         XCTAssertNotNil(after.record(for: migrationKey))
     }
 
+    func testBootstrapSaveFailurePreservesProgressAndDoesNotMarkMigration() async throws {
+        let suite = "AnkiSaveFailure-" + UUID().uuidString
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        var original = StudyProgressStore(records: [:])
+        _ = try original.apply(.good, to: "kanji:猫", deckID: "built-in", options: DeckOptions(),
+            now: Date(timeIntervalSince1970: 1_700_000_000))
+        let reviews = MemoryReviews()
+        try await reviews.save(original)
+        reviews.failSave = true
+        let session = TrainingSessionViewModel(repository: reviews, catalog: StudyCardCatalog(),
+            settings: StudyPreferences(defaults: defaults, errors: StorageStatus()), errors: StorageStatus())
+        try await session.loadProgress()
+        let collection = migrationCollection(type: 2, queue: 2, due: 30, interval: 10,
+            reps: 5, history: ratingHistory(), creation: 1_690_000_000)
+        let repository = MemoryAnkiLibrary(summaries: [migrationSummary()], collections: ["fixture": collection])
+        let model = AnkiLibraryViewModel(repository: repository)
+        model.bootstrapScheduling = { collection, importID in
+            try await session.bootstrapAnkiHistory(collection, importID: importID)
+        }
+        await model.load()
+        XCTAssertNil(session.reviewStore.record(for: migrationKey))
+        XCTAssertEqual(session.reviewStore.reviewLog.map(\.id), original.reviewLog.map(\.id))
+        let saved = try await reviews.load()
+        XCTAssertEqual(saved.reviewLog.map(\.id), original.reviewLog.map(\.id))
+        XCTAssertNil(saved.record(for: migrationKey))
+        let marked = await repository.markedVersions
+        XCTAssertTrue(marked.isEmpty)
+        XCTAssertNotNil(model.message)
+        reviews.failSave = false
+        await model.load()
+        let retryMarked = await repository.markedVersions
+        XCTAssertEqual(retryMarked["fixture"], AnkiSchedulingMigrator.version)
+        XCTAssertNotNil(session.reviewStore.record(for: migrationKey))
+        XCTAssertEqual(session.reviewStore.reviewLog.first?.id, original.reviewLog.first?.id)
+    }
+
     private func migrationSummary() -> AnkiImportSummary {
         AnkiImportSummary(id: "fixture", directory: UUID().uuidString, filename: "sched.apkg",
             importedAt: Date(), decks: [.init(id: 40, name: "Deck")], cardCount: 1, noteCount: 1,
@@ -303,9 +340,13 @@ final class AnkiStudyIntegrationTests: XCTestCase {
 }
 
 @MainActor private final class MemoryReviews: ReviewPersisting {
+    var failSave = false
     private var progress = StudyProgressStore(records: [:])
     func load() async throws -> StudyProgressStore { progress }
-    func save(_ value: StudyProgressStore) async throws { progress = value }
+    func save(_ value: StudyProgressStore) async throws {
+        if failSave { throw CocoaError(.fileWriteNoPermission) }
+        progress = value
+    }
     func hasRecoverableBackup() async -> Bool { false }
     func restoreBackup() async throws -> StudyProgressStore { progress }
 }

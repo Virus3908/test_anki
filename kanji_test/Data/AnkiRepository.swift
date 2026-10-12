@@ -1,6 +1,7 @@
 import Foundation
 import CryptoKit
 import AnkiImport
+import OSLog
 
 /// Anki content is separate from built-in content; review-memory.json remains owned by ReviewRepository.
 nonisolated protocol AnkiLibraryPersisting: Sendable {
@@ -29,9 +30,18 @@ actor AnkiRepository: AnkiLibraryPersisting {
         var library = try await store.load()
         var changed = false
         for index in library.indices where library[index].deckCardCounts == nil {
-            let collection = try await collection(library[index])
-            library[index].deckCardCounts = Self.counts(collection)
-            changed = true
+            try Task.checkCancellation()
+            do {
+                let collection = try await collection(library[index])
+                library[index].deckCardCounts = Self.counts(collection)
+                changed = true
+            } catch is CancellationError { throw CancellationError() }
+            catch {
+                // Legacy count enrichment is per-import; keep the entry for search retry.
+                try Task.checkCancellation()
+                Logger(subsystem: "KanjiTrainer", category: "AnkiLibrary")
+                    .error("Could not load legacy deck counts: \(error.localizedDescription, privacy: .public)")
+            }
         }
         if changed { try await store.save(library) }
         return library
@@ -153,17 +163,7 @@ actor AnkiRepository: AnkiLibraryPersisting {
 
     func collection(_ summary: AnkiImportSummary) async throws -> AnkiCollection {
         let url = try directory(summary).appendingPathComponent("collection.json")
-        let worker = Task.detached(priority: .userInitiated) {
-            try Task.checkCancellation()
-            var collection = try JSONDecoder().decode(AnkiCollection.self, from: Data(contentsOf: url))
-            try Task.checkCancellation()
-            if collection.prepareNativeFields() {
-                try Task.checkCancellation()
-                try JSONEncoder().encode(collection).write(to: url, options: .atomic)
-            }
-            try Task.checkCancellation()
-            return collection
-        }
+        let worker = Task.detached(priority: .userInitiated) { try AnkiCollectionLoader.load(from: url) }
         return try await withTaskCancellationHandler { try await worker.value } onCancel: { worker.cancel() }
     }
 
