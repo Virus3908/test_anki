@@ -52,7 +52,7 @@ nonisolated struct KanjiCard: Codable, Identifiable, Sendable {
 
 }
 
-nonisolated struct KanjiExample: Codable, Identifiable, Sendable {
+nonisolated struct KanjiExample: Codable, Identifiable, Sendable, Equatable {
     var id: String { attribution.map { "tatoeba-\($0.sentenceID)" } ?? "\(word)-\(reading)" }
 
     let word: String

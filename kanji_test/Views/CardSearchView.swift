@@ -17,6 +17,7 @@ struct CardSearchView: View, CardContentRendering {
 
     @State private var model: CardSearchViewModel
     @State private var query = ""
+    @State private var openingAnkiTask: Task<Void, Never>?
     @State private var selectedAnkiCard: AnkiStudyCard?
     @Environment(\.dismiss) private var dismiss
 
@@ -80,17 +81,19 @@ struct CardSearchView: View, CardContentRendering {
         .task {
             await model.prepare()
             // Пользователь мог начать печатать, пока готовился индекс.
-            model.updateResults(for: query)
+            await model.updateResults(for: query)
         }
+        .onChange(of: query) { model.cancelSearch() }
+        .onDisappear { model.cancelSearch(); openingAnkiTask?.cancel() }
         .task(id: query) {
             guard !query.isEmpty else {
-                model.updateResults(for: query)
+                await model.updateResults(for: query)
                 return
             }
             // Небольшая пауза склеивает быстрые нажатия в один поиск.
             try? await Task.sleep(for: .milliseconds(250))
             guard !Task.isCancelled else { return }
-            model.updateResults(for: query)
+            await model.updateResults(for: query)
         }
         .sheet(item: $coordinator.selectedLinkedKanjiCard, onDismiss: {
             coordinator.closeLinkedKanjiPreview()
@@ -112,13 +115,15 @@ struct CardSearchView: View, CardContentRendering {
         .sheet(item: $selectedAnkiCard) { card in
             let deck = ankiDeck(for: card)
             AnkiCardPreviewView(
-                cards: model.ankiResults,
+                cards: [],
                 initialCard: card,
                 translationState: translationState,
-                language: settings.options(for: deck.id).meaningLanguage
+                language: settings.options(for: deck.id).meaningLanguage,
+                searchRecords: model.ankiResults,
+                loadSearchCard: { try await model.resolveAnkiResult($0) }
             ) { selected in
                 selectedAnkiCard = nil
-                onPractice(.anki(deck, [selected], guided: true))
+                onPractice(.anki(ankiDeck(for: selected), [selected], guided: true))
             }
         }
     }
@@ -227,12 +232,19 @@ struct CardSearchView: View, CardContentRendering {
         }
     }
 
-    private func ankiResultTile(for card: AnkiStudyCard) -> some View {
-        Button { selectedAnkiCard = card } label: {
+    private func ankiResultTile(for card: AnkiSearchRecord) -> some View {
+        Button {
+            openingAnkiTask?.cancel()
+            openingAnkiTask = Task {
+                let resolved = await model.openAnkiResult(card)
+                guard !Task.isCancelled else { return }
+                selectedAnkiCard = resolved
+            }
+        } label: {
             VStack(alignment: .leading, spacing: 6) {
                 Text(card.displayTitle(using: fieldPreferences.options(
                     for: card.fieldPreferencesKey,
-                    fieldCount: card.noteType.fields.count
+                    fieldCount: card.titleFields.count
                 )))
                     .font(.headline)
                     .lineLimit(3)
@@ -256,7 +268,7 @@ struct CardSearchView: View, CardContentRendering {
             importID: card.importID,
             sourceDeckID: card.card.deckID,
             title: card.deckName,
-            cardCount: model.ankiResults.filter { $0.card.deckID == card.card.deckID && $0.importID == card.importID }.count
+            cardCount: model.ankiResults.filter { $0.deckID == card.card.deckID && $0.importID == card.importID }.count
         )
     }
 

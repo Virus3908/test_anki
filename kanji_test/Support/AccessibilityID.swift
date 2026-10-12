@@ -12,6 +12,19 @@ nonisolated enum AccessibilityID {
         static let settings = "start.settings"
     }
 
+    enum Settings {
+        static let furigana = "settings.furigana"
+        static let done = "settings.done"
+    }
+    enum Examples {
+        static let furigana = "examples.furigana"
+        static let plain = "examples.plain"
+    }
+    enum Completion {
+        static let title = "completion.title"
+        static let stay = "completion.stay"
+    }
+
     enum Deck {
         static let row = "deck.row"
     }

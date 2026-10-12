@@ -15,9 +15,6 @@ final class TrainingSessionViewModel {
     /// Set only when the normal study queue for the day has been exhausted.
     /// The app uses this to return to the deck and present the completion sheet.
     private(set) var didCompleteToday = false
-    private var addedNewCardsToday = 0
-    private var addedNewCardsStudyDay: Date?
-    private var addedNewCardsDeckID: String?
     var drawingSession: DrawingSessionViewModel { presentation.drawing }
     private let repository: any ReviewPersisting
     private let catalog: StudyCardCatalog
@@ -87,6 +84,7 @@ final class TrainingSessionViewModel {
         guard !hasLoadedProgress else { return }
         do {
             reviewStore = try await repository.load()
+            settings.expireAdditionalCards(studyDay: reviewStore.studyDate())
             hasLoadedProgress = true
             canRestoreBackup = false
         } catch {
@@ -167,6 +165,7 @@ final class TrainingSessionViewModel {
         next.queue = .make(mode: deck.mode, ids: source, sourceIDs: source)
         next.isGuidedSingleKanjiPractice = guided
         next.studyDay = reviewStore.studyDate()
+        settings.expireAdditionalCards(studyDay: reviewStore.studyDate())
         var progress = reviewStore
         if !guided { rebuild(&next, progress: progress) }
         do {
@@ -256,16 +255,10 @@ final class TrainingSessionViewModel {
         guard !isPreparingCard else { return }
         didCompleteToday = false
         publish(TrainingSessionState())
+        catalog.releaseAnkiCards()
     }
     func addNewCardsToToday(_ count: Int, for deckID: String) {
-        let today = reviewStore.studyDate()
-        if addedNewCardsDeckID != deckID ||
-            addedNewCardsStudyDay.map({ Calendar.current.isDate($0, inSameDayAs: today) }) != true {
-            addedNewCardsToday = 0
-            addedNewCardsStudyDay = today
-            addedNewCardsDeckID = deckID
-        }
-        addedNewCardsToday = min(9999, addedNewCardsToday + max(1, count))
+        settings.addAdditionalCards(count, for: deckID, studyDay: reviewStore.studyDate())
         didCompleteToday = false
     }
     func advanceStudyDay() async throws {
@@ -276,6 +269,7 @@ final class TrainingSessionViewModel {
         progress.advanceStudyDay()
         try await repository.save(progress)
         reviewStore = progress
+        settings.expireAdditionalCards(studyDay: progress.studyDate())
         publish(TrainingSessionState())
     }
     private var hasStudyDayChanged: Bool {
@@ -289,7 +283,10 @@ final class TrainingSessionViewModel {
         var next = state
         var progress = reviewStore
         let previousID = queueIDs[safe: currentIndex]
-        if hasStudyDayChanged { next.undoHistory = []; next.sessionCompletedCards = 0 }
+        if hasStudyDayChanged {
+            next.undoHistory = []; next.sessionCompletedCards = 0
+            settings.expireAdditionalCards(studyDay: progress.studyDate())
+        }
         rebuild(&next, progress: progress, preferredID: hasStudyDayChanged ? nil : previousID)
         do {
             if markCurrentShown(in: next, progress: &progress) { try await repository.save(progress) }
@@ -320,17 +317,16 @@ final class TrainingSessionViewModel {
     private func finishCompletedToday() {
         didCompleteToday = true
         publish(TrainingSessionState())
+        catalog.releaseAnkiCards()
     }
     private func effectiveOptions(for deckID: String?, studyDay: Date? = nil) -> DeckOptions {
         var result = settings.options(for: deckID)
         let day = studyDay ?? reviewStore.studyDate()
-        guard addedNewCardsDeckID == deckID,
-              addedNewCardsStudyDay.map({ Calendar.current.isDate($0, inSameDayAs: day) }) == true else {
-            return result
-        }
-        result.dailyNewCardLimit = min(9999, result.dailyNewCardLimit + addedNewCardsToday)
+        let additional = settings.additionalCardCount(for: deckID, studyDay: day)
+        result.dailyNewCardLimit = min(9999, result.dailyNewCardLimit + additional)
         return result
     }
+
     func answerID(for mode: PracticeMode, index: Int) -> String { "\(mode.rawValue):\(index)" }
     func evaluateFeedback(for card: KanjiCard, reveal: Bool) -> Bool { drawingSession.evaluateFeedback(for: card, reveal: reveal) }
 }

@@ -15,12 +15,14 @@ struct FuriganaText: View {
                furigana.segments(for: text).contains(where: { $0.reading != nil }) {
                 NativeFuriganaText(segments: furigana.segments(for: text), fontSize: fontSize)
                     .accessibilityLabel(text)
+                    .accessibilityIdentifier(AccessibilityID.Examples.furigana)
                     .alignmentGuide(.firstTextBaseline) { _ in
                         UIFont.systemFont(ofSize: fontSize * 0.5).lineHeight + 2
                             + UIFont.systemFont(ofSize: fontSize).ascender
                     }
             } else {
                 Text(text)
+                    .accessibilityIdentifier(AccessibilityID.Examples.plain)
                     .foregroundStyle(AppPalette.text)
                     .textSelection(.enabled)
                     .fixedSize(horizontal: false, vertical: true)

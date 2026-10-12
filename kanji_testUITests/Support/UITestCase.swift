@@ -12,6 +12,7 @@ class UITestCase: XCTestCase {
     }
 
     override func tearDown() {
+        app?.terminate()
         attachTimings()
         app = nil
         super.tearDown()
@@ -31,13 +32,13 @@ class UITestCase: XCTestCase {
 
     func launch(importingAnkiFixture: Bool = false) {
         app = AppLauncher.makeApp(importingAnkiFixture: importingAnkiFixture)
-        step(.launch, until: element(AccessibilityID.Start.search)) { app.launch() }
+        step(.launch, until: { self.element(AccessibilityID.Start.search).isHittable }) { app.launch() }
     }
 
     func relaunchKeepingState() {
         app.terminate()
         app = AppLauncher.makeApp(keepingState: true)
-        step(.relaunch, until: element(AccessibilityID.Start.search)) { app.launch() }
+        step(.relaunch, until: { self.element(AccessibilityID.Start.search).isHittable }) { app.launch() }
     }
 
     // MARK: Timed steps
@@ -69,6 +70,17 @@ class UITestCase: XCTestCase {
         let seconds = Date().timeIntervalSince(started)
         timings.append((step, seconds))
 
+        if result != .completed {
+            let screenshot = XCTAttachment(screenshot: app.screenshot())
+            screenshot.name = "Failed step: \(step.rawValue)"
+            screenshot.lifetime = .keepAlways
+            add(screenshot)
+            let hierarchy = XCTAttachment(string: app.debugDescription)
+            hierarchy.name = "Accessibility hierarchy"
+            hierarchy.lifetime = .keepAlways
+            add(hierarchy)
+        }
+
         XCTAssertEqual(result, .completed, "\(step.rawValue): expected state not reached in \(step.budget)s", file: file, line: line)
         XCTAssertLessThanOrEqual(seconds, step.budget, "\(step.rawValue) took \(Int(seconds * 1000)) ms", file: file, line: line)
     }
@@ -77,6 +89,9 @@ class UITestCase: XCTestCase {
     func tap(_ id: String, _ step: UserStep, expecting next: String, file: StaticString = #filePath, line: UInt = #line) {
         let target = element(id)
         XCTAssertTrue(target.waitForExistence(timeout: step.budget), "\(id) not found", file: file, line: line)
+        let readiness = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in target.isHittable }, object: nil)
+        XCTAssertEqual(XCTWaiter().wait(for: [readiness], timeout: step.budget), .completed,
+                       "\(id) is not hittable", file: file, line: line)
         self.step(step, until: element(next), file: file, line: line) { target.tap() }
     }
 

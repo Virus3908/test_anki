@@ -4,8 +4,7 @@ import Observation
 /// Экран поиска карточек: по отдельному типу или по всему каталогу приложения.
 ///
 /// Индексы строятся один раз при первом открытии экрана (prepare); сам поиск
-/// по готовому индексу — синхронный линейный проход, его можно звать на каждый
-/// ввод символа. Результаты капятся до `resultLimit` с честным `totalFound`.
+/// по готовому индексу выполняется отменяемой фоновой задачей. Результаты капятся до `resultLimit` с честным `totalFound`.
 @MainActor
 @Observable
 final class CardSearchViewModel {
@@ -29,11 +28,22 @@ final class CardSearchViewModel {
     private(set) var kanjiResults: [KanjiCard] = []
     private(set) var wordResults: [WordStudyCard] = []
     private(set) var kanaResults: [KanaStudyCard] = []
-    private(set) var ankiResults: [AnkiStudyCard] = []
+    private(set) var ankiResults: [AnkiSearchRecord] = []
     /// Сколько всего нашлось (до капа на показ).
     private(set) var totalFound = 0
 
     let scope: Scope
+
+    @ObservationIgnored private var searchTask: Task<SearchResults, Error>?
+    private var generation = 0
+
+    nonisolated private struct SearchResults: Sendable {
+        let kanji: CardSearchMatches<KanjiSearchRecord>?
+        let words: CardSearchMatches<WordSearchRecord>?
+        let kana: CardSearchMatches<KanaSearchRecord>?
+        let anki: CardSearchMatches<AnkiSearchRecord>?
+        let wordCards: [WordStudyCard]
+    }
 
     // MARK: Данные (заполняются в prepare)
 
@@ -42,8 +52,6 @@ final class CardSearchViewModel {
     private var wordIndex: CardSearchIndex<WordSearchRecord>?
     private var kanaIndex: CardSearchIndex<KanaSearchRecord>?
     private var ankiIndex: CardSearchIndex<AnkiSearchRecord>?
-    /// Кандзи по символу — для сборки карточек слов из найденных записей.
-    private var cardsByCharacter: [String: KanjiCard] = [:]
 
     /// Переводы: из них берутся сохранённые рус. значения кандзи.
     private let translationState: TranslationViewModel
@@ -59,7 +67,8 @@ final class CardSearchViewModel {
 
     /// Строит индекс по активному scope. Повторный вызов — мгновенный выход.
     func prepare() async {
-        guard !isPrepared, !isPreparing else { return }
+        if isPrepared { loadError = nil; return }
+        guard !isPreparing else { return }
         isPreparing = true
         loadError = nil
         defer { isPreparing = false }
@@ -71,8 +80,8 @@ final class CardSearchViewModel {
                 try await prepareWords()
                 try await prepareKana()
                 if let ankiModel {
-                    let cards = try await ankiModel.cardsForSearch()
-                    ankiIndex = await Self.buildIndex(records: cards.map(AnkiSearchRecord.init))
+                    let records = try await ankiModel.recordsForSearch()
+                    ankiIndex = await Self.buildIndex(records: records)
                 }
             case .kanji:
                 try await prepareKanji()
@@ -80,7 +89,10 @@ final class CardSearchViewModel {
                 try await prepareWords()
             }
 
+            try Task.checkCancellation()
             isPrepared = true
+        } catch is CancellationError {
+            return
         } catch {
             loadError = "Не удалось подготовить поиск."
         }
@@ -99,12 +111,10 @@ final class CardSearchViewModel {
 
     private func prepareWords() async throws {
         let entries = try await WordDataLoader.loadDictionaryEntries()
-        let kanjiCards = await KanjiDataLoader.loadAvailableCards(deck: .all)
-        cardsByCharacter = Dictionary(
-            kanjiCards.map { ($0.kanji, $0) },
-            uniquingKeysWith: { current, _ in current }
-        )
-        wordIndex = await Self.buildIndex(records: entries.map(WordSearchRecord.init))
+        let worker = Task.detached(priority: .userInitiated) {
+            CardSearchIndex(records: entries.map(WordSearchRecord.init))
+        }
+        wordIndex = await withTaskCancellationHandler { await worker.value } onCancel: { worker.cancel() }
     }
 
     private func prepareKana() async throws {
@@ -112,50 +122,80 @@ final class CardSearchViewModel {
         kanaIndex = await Self.buildIndex(records: cards.map(KanaSearchRecord.init))
     }
 
-    /// Извлечение термов соблюдает isolation моделей, а тяжёлая склейка и
-    /// lowercase выполняются в фоне.
+    /// Sendable records can be normalized entirely outside MainActor.
     private static func buildIndex<Record: CardSearchRecord>(records: [Record]) async -> CardSearchIndex<Record> {
-        let terms = records.map(\.searchTerms)
-        return await Task.detached(priority: .userInitiated) {
-            let haystacks = terms.map { $0.joined(separator: " ").lowercased() }
-            return CardSearchIndex(records: records, haystacks: haystacks)
-        }.value
+        let worker = Task.detached(priority: .userInitiated) { CardSearchIndex(records: records) }
+        return await withTaskCancellationHandler { await worker.value } onCancel: { worker.cancel() }
     }
 
     // MARK: Поиск
 
-    /// Обновляет результаты по запросу. Пустой запрос — пустые результаты.
-    func updateResults(for query: String) {
-        guard isPrepared else { return }
+    func resolveAnkiResult(_ record: AnkiSearchRecord) async throws -> AnkiStudyCard {
+        guard let ankiModel else { throw CocoaError(.fileReadNoSuchFile) }
+        let card = try await ankiModel.cardForSearchResult(record)
+        try Task.checkCancellation()
+        return card
+    }
 
-        switch scope {
-        case .all:
-            let foundKanji = kanjiIndex?.search(query).map(\.card) ?? []
-            let foundEntries = wordIndex?.search(query).map(\.entry) ?? []
-            let foundKana = kanaIndex?.search(query).map(\.card) ?? []
-            let foundAnki = ankiIndex?.search(query).map(\.card) ?? []
-            totalFound = foundKanji.count + foundEntries.count + foundKana.count + foundAnki.count
-            kanjiResults = Array(foundKanji.prefix(Self.resultLimit))
-            wordResults = WordDataLoader.buildWords(
-                from: Array(foundEntries.prefix(Self.resultLimit)),
-                cardsByCharacter: cardsByCharacter
-            )
-            kanaResults = Array(foundKana.prefix(Self.resultLimit))
-            ankiResults = Array(foundAnki.prefix(Self.resultLimit))
-        case .kanji:
-            guard let index = kanjiIndex else { return }
-            let found = index.search(query).map(\.card)
-            totalFound = found.count
-            kanjiResults = Array(found.prefix(Self.resultLimit))
-        case .words:
-            guard let index = wordIndex else { return }
-            let foundEntries = index.search(query).map(\.entry)
-            totalFound = foundEntries.count
-            // Карточки слов собираются только для показываемого топа.
-            wordResults = WordDataLoader.buildWords(
-                from: Array(foundEntries.prefix(Self.resultLimit)),
-                cardsByCharacter: cardsByCharacter
-            )
+    func openAnkiResult(_ record: AnkiSearchRecord) async -> AnkiStudyCard? {
+        do {
+            let card = try await resolveAnkiResult(record)
+            try Task.checkCancellation()
+            return card
+        } catch is CancellationError { return nil }
+        catch { loadError = "Не удалось открыть карточку Anki."; return nil }
+    }
+
+    /// Invalidate immediately on input changes, before the view's debounce ends.
+    func cancelSearch() {
+        generation += 1
+        searchTask?.cancel()
+        searchTask = nil
+    }
+
+    func updateResults(for query: String) async {
+        cancelSearch()
+        let request = generation
+        guard !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            kanjiResults = []; wordResults = []; kanaResults = []; ankiResults = []
+            totalFound = 0
+            return
+        }
+        guard isPrepared, !Task.isCancelled else { return }
+        let kanji = kanjiIndex, words = wordIndex, kana = kanaIndex, anki = ankiIndex
+        let limit = Self.resultLimit
+        let worker = Task.detached(priority: .userInitiated) {
+            let foundKanji = try kanji?.search(query, limit: limit)
+            let foundWords = try words?.search(query, limit: limit)
+            let foundKana = try kana?.search(query, limit: limit)
+            let foundAnki = try anki?.search(query, limit: limit)
+            let entries = foundWords?.records.map(\.entry) ?? []
+            let characters = WordDataLoader.requiredKanjiCharacters(in: entries)
+            let cards = (try? await BundledStudyData.shared.bundledKanjiCards(characters: characters)) ?? []
+            try Task.checkCancellation()
+            let wordCards = WordDataLoader.buildWords(from: entries,
+                cardsByCharacter: Dictionary(cards.map { ($0.kanji, $0) }, uniquingKeysWith: { first, _ in first }))
+            try Task.checkCancellation()
+            return SearchResults(kanji: foundKanji, words: foundWords,
+                                 kana: foundKana, anki: foundAnki, wordCards: wordCards)
+        }
+        searchTask = worker
+        do {
+            let found = try await withTaskCancellationHandler {
+                try await worker.value
+            } onCancel: { worker.cancel() }
+            guard generation == request, !Task.isCancelled else { return }
+            kanjiResults = found.kanji?.records.map(\.card) ?? []
+            wordResults = found.wordCards
+            kanaResults = found.kana?.records.map(\.card) ?? []
+            ankiResults = found.anki?.records ?? []
+            totalFound = (found.kanji?.totalFound ?? 0) + (found.words?.totalFound ?? 0)
+                + (found.kana?.totalFound ?? 0) + (found.anki?.totalFound ?? 0)
+            searchTask = nil
+        } catch is CancellationError {
+            // A cancelled query must never publish partial results.
+        } catch {
+            if generation == request { loadError = "Не удалось выполнить поиск." }
         }
     }
 }

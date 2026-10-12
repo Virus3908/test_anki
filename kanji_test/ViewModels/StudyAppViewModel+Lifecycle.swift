@@ -40,6 +40,7 @@ extension StudyAppViewModel {
     func loadSavedState() async {
         guard !hasLoadedSavedState, !isLoadingSavedState else { return }
         isLoadingSavedState = true
+        try? await KanaDataLoader.clearCache()
         do {
             try await trainingSession.loadProgress()
             hasLoadedSavedState = true
@@ -89,6 +90,9 @@ extension StudyAppViewModel {
         do {
             try await KanjiDataLoader.clearCache()
             try await KanaDataLoader.clearCache()
+            try await WordExampleCacheRepository.clearCache()
+            try await KanjiExampleCacheRepository.clearCache()
+            try await AnkiSearchIndexRepository.shared.clear()
         } catch { errors.report("Не удалось очистить кэш.", error: error) }
     }
 }

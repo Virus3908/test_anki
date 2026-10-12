@@ -29,6 +29,15 @@ final class BundledKanaTests: XCTestCase {
         }
     }
 
+    func testClearingLegacyCachePreservesOfflineDecksAndGeometry() async throws {
+        let before = try await KanaDataLoader.loadAllCards()
+        try await KanaDataLoader.clearCache()
+        let after = try await KanaDataLoader.loadAllCards()
+        XCTAssertEqual(after.map(\.reviewKey), before.map(\.reviewKey))
+        XCTAssertEqual(after.map { $0.strokes.map(\.pathData) }, before.map { $0.strokes.map(\.pathData) })
+        XCTAssertTrue(after.allSatisfy { !$0.strokes.isEmpty })
+    }
+
     func testEveryCharacterUsesActualBundledKanjiVGStrokes() async throws {
         let cards = try await KanaDataLoader.loadAllCards()
         XCTAssertEqual(cards.filter { $0.character.count == 1 }.count, 163)

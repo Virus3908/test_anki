@@ -1,27 +1,31 @@
 import Foundation
 
 enum WordExampleCacheRepository {
-    private static let store = JSONFileStore(directory: .cachesDirectory, subdirectory: "WordExampleCache",
-        filename: "tatoeba-examples.json", emptyValue: [String: [WordUsageExample]]())
+    private static let store = ExampleCacheStore<WordUsageExample>(url:
+        FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("WordExampleCache/tatoeba-examples.json"))
 
     static func loadExamples(for wordID: String) async -> [WordUsageExample]? {
-        (try? await store.load())?[wordID]
+        await store.load(wordID)
     }
 
     static func saveExamples(_ examples: [WordUsageExample], for wordID: String) async {
-        try? await store.update { $0[wordID] = examples }
+        try? await store.save(examples, for: wordID)
     }
+    static func clearCache() async throws { try await store.clear() }
 }
 
 enum KanjiExampleCacheRepository {
-    private static let store = JSONFileStore(directory: .cachesDirectory, subdirectory: "KanjiTatoebaExampleCache",
-        filename: "tatoeba-kanji-examples.json", emptyValue: [String: [KanjiExample]]())
+    private static let store = ExampleCacheStore<KanjiExample>(url:
+        FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("KanjiTatoebaExampleCache/tatoeba-kanji-examples.json"))
 
     static func loadExamples(for kanji: String) async -> [KanjiExample]? {
-        (try? await store.load())?[kanji]
+        await store.load(kanji)
     }
 
     static func saveExamples(_ examples: [KanjiExample], for kanji: String) async {
-        try? await store.update { $0[kanji] = examples }
+        try? await store.save(examples, for: kanji)
     }
+    static func clearCache() async throws { try await store.clear() }
 }

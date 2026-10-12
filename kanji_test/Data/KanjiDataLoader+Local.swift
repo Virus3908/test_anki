@@ -3,37 +3,25 @@ import Foundation
 extension KanjiDataLoader {
     static func loadBundledMasterCards() async -> [KanjiCard] {
         let metadata = (try? await BundledStudyData.shared.bundledKanjiMetadata()) ?? []
-        return metadata.sorted(by: canonicalKanjiOrder).map { $0.makeCard() }
+        return (try? await BundledStudyData.shared.bundledKanjiCards(characters: Set(metadata.map(\.kanji)))) ?? []
     }
 
     static func loadAvailableCards(deck: KanjiDeck) async -> [KanjiCard] {
         let metadata = (try? await BundledStudyData.shared.bundledKanjiMetadata()) ?? []
-        return metadata
-            .filter { metadata in
-                switch deck {
-                case .joyo:
-                    metadata.joyo
-                case .jinmeiyo:
-                    metadata.jinmeiyo
-                case .all:
-                    true
-                default:
-                    metadata.makeCardFilter(deck)
-                }
+        let characters = Set(metadata.filter { metadata in
+            switch deck {
+            case .joyo: metadata.joyo
+            case .jinmeiyo: metadata.jinmeiyo
+            case .all: true
+            default: metadata.makeCardFilter(deck)
             }
-            .sorted(by: canonicalKanjiOrder)
-            .map { $0.makeCard() }
+        }.map(\.kanji))
+        return (try? await BundledStudyData.shared.bundledKanjiCards(characters: characters)) ?? []
     }
 
     static func loadLocalCards() async -> [KanjiCard] {
         await loadBundledMasterCards()
     }
-}
-
-private func canonicalKanjiOrder(_ left: BundledKanjiMetadata, _ right: BundledKanjiMetadata) -> Bool {
-    let leftScalar = left.kanji.unicodeScalars.first?.value ?? UInt32.max
-    let rightScalar = right.kanji.unicodeScalars.first?.value ?? UInt32.max
-    return leftScalar == rightScalar ? left.kanji < right.kanji : leftScalar < rightScalar
 }
 
 private extension BundledKanjiMetadata {

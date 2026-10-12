@@ -17,6 +17,7 @@ struct StudyDayCompleteSheet: View {
                 .foregroundStyle(AppPalette.success)
 
             Text("На сегодня всё")
+                .accessibilityIdentifier(AccessibilityID.Completion.title)
                 .font(.title2.weight(.bold))
                 .foregroundStyle(AppPalette.text)
 
@@ -52,6 +53,7 @@ struct StudyDayCompleteSheet: View {
                 .padding(.top, 6)
 
             Button("Остаться в колоде") { dismiss() }
+                .accessibilityIdentifier(AccessibilityID.Completion.stay)
                 .buttonStyle(.bordered)
                 .tint(AppPalette.accent)
         }

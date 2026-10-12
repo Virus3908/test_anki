@@ -27,6 +27,9 @@ final class StudyCardCatalog {
         for card in cards { ankiByID[card.id] = card }
         return cards.map(\.id)
     }
+    /// Imported cards are needed only by the active training/custom session.
+    func releaseAnkiCards() { ankiByID.removeAll() }
+
     func word(_ id: String) -> WordStudyCard? {
         guard let record = wordsByID[id] else { return nil }
         return WordStudyCard(word: record.word, reading: record.reading, meaning: record.meaning,

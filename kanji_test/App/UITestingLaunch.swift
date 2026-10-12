@@ -45,7 +45,7 @@ enum UITestingLaunch {
         let caches = fileManager.urls(for: .cachesDirectory, in: .userDomainMask)
         let appOwnedDirectories = applicationSupport.map { $0.appendingPathComponent("KanjiTrainer", isDirectory: true) }
             + caches.flatMap { cachesURL in
-                ["KanjiTrainer", "KanjiDeckCacheV2", "KanaVGCache", "WordExampleCache", "KanjiTatoebaExampleCache"].map {
+                ["KanjiTrainer", "KanjiDeckCacheV2", "KanaVGCache", "WordExampleCache", "KanjiTatoebaExampleCache", "AnkiSearchIndex"].map {
                     cachesURL.appendingPathComponent($0, isDirectory: true)
                 }
             }
@@ -68,7 +68,11 @@ private struct OfflineMeaningTranslator: MeaningTranslating {
 }
 
 private struct OfflineKanjiProvider: KanjiProviding {
-    func loadExamples(for kanji: String) async -> [KanjiExample] { [] }
+    func loadExamples(for kanji: String) async -> [KanjiExample] {
+        [KanjiExample(word: "学校だよ。", reading: "", meaning: "School",
+            attribution: TatoebaAttribution(sentenceID: 10756861, author: "small_snow", license: "CC BY 2.0 FR"),
+            furigana: ExampleFurigana(transcriptions: [TatoebaTranscription(text: "[学校|がっ|こう]だよ。", script: "Hrkt", type: "altscript")], checkedAt: Date()))]
+    }
 }
 
 private struct OfflineWordExampleProvider: WordExampleProviding {

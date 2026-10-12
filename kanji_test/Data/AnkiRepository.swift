@@ -11,7 +11,14 @@ nonisolated protocol AnkiLibraryPersisting: Sendable {
     func deleteImport(id: String) async throws
     func markSchedulingMigration(importID: String, version: String) async throws
     func collection(_ summary: AnkiImportSummary) async throws -> AnkiCollection
+    func searchRecords(_ summary: AnkiImportSummary) async throws -> [AnkiSearchRecord]
     func mediaDirectory(_ summary: AnkiImportSummary) async throws -> URL
+}
+
+extension AnkiLibraryPersisting {
+    func searchRecords(_ summary: AnkiImportSummary) async throws -> [AnkiSearchRecord] {
+        try AnkiSearchRecord.records(collection: await collection(summary), importID: summary.id, filename: summary.filename)
+    }
 }
 
 actor AnkiRepository: AnkiLibraryPersisting {
@@ -69,16 +76,24 @@ actor AnkiRepository: AnkiLibraryPersisting {
             }
             let fingerprint = hash.finalize().map { String(format: "%02x", $0) }.joined()
             if let existing = library.first(where: { $0.id == fingerprint }) {
-                return AnkiImportResult(summary: existing, alreadyImported: true)
+                return (AnkiImportResult(summary: existing, alreadyImported: true), [AnkiSearchRecord]())
             }
             let collection = try AnkiPackageParser.extract(from: url, to: staging)
             let summary = AnkiImportSummary(id: fingerprint, directory: UUID().uuidString,
                 filename: url.lastPathComponent, importedAt: Date(), decks: collection.decks,
                 cardCount: collection.cards.count, noteCount: collection.notes.count,
                 mediaCount: collection.media.count, warnings: collection.warnings, deckCardCounts: Self.counts(collection))
-            return AnkiImportResult(summary: summary, alreadyImported: false)
+            return (AnkiImportResult(summary: summary, alreadyImported: false),
+                try AnkiSearchRecord.records(collection: collection, importID: fingerprint, filename: summary.filename))
         }
-        let result = try await withTaskCancellationHandler { try await worker.value } onCancel: { worker.cancel() }
+        let parsed: (AnkiImportResult, [AnkiSearchRecord])
+        do {
+            parsed = try await withTaskCancellationHandler { try await worker.value } onCancel: { worker.cancel() }
+        } catch {
+            try? FileManager.default.removeItem(at: staging)
+            throw error
+        }
+        let result = parsed.0
         if result.alreadyImported { return result }
         let destination = root.appendingPathComponent(result.summary.directory, isDirectory: true)
         do {
@@ -92,6 +107,7 @@ actor AnkiRepository: AnkiLibraryPersisting {
             try? FileManager.default.removeItem(at: destination)
             throw error
         }
+        try? await AnkiSearchIndexRepository.shared.save(parsed.1, for: result.summary)
         return result
     }
 
@@ -127,17 +143,28 @@ actor AnkiRepository: AnkiLibraryPersisting {
             try? await store.save(Array(library.prefix(index)) + [summary] + Array(library.dropFirst(index)))
             throw error
         }
+        try? await AnkiSearchIndexRepository.shared.remove(summary)
+    }
+
+    func searchRecords(_ summary: AnkiImportSummary) async throws -> [AnkiSearchRecord] {
+        try await AnkiSearchIndexRepository.shared.records(for: summary,
+            sourceURL: directory(summary).appendingPathComponent("collection.json"))
     }
 
     func collection(_ summary: AnkiImportSummary) async throws -> AnkiCollection {
         let url = try directory(summary).appendingPathComponent("collection.json")
-        return try await Task.detached(priority: .userInitiated) {
+        let worker = Task.detached(priority: .userInitiated) {
+            try Task.checkCancellation()
             var collection = try JSONDecoder().decode(AnkiCollection.self, from: Data(contentsOf: url))
+            try Task.checkCancellation()
             if collection.prepareNativeFields() {
+                try Task.checkCancellation()
                 try JSONEncoder().encode(collection).write(to: url, options: .atomic)
             }
+            try Task.checkCancellation()
             return collection
-        }.value
+        }
+        return try await withTaskCancellationHandler { try await worker.value } onCancel: { worker.cancel() }
     }
 
     func mediaDirectory(_ summary: AnkiImportSummary) async throws -> URL {

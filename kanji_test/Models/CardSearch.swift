@@ -6,7 +6,7 @@ import AnkiImport
 /// Запись сама решает, по каким строкам её можно найти: например, кандзи
 /// ищется по символу, значениям и чтениям в обеих письменностях (кана и
 /// ромадзи). Индекс только хранит эти строки и сравнивает их с запросом.
-protocol CardSearchRecord: Sendable {
+nonisolated protocol CardSearchRecord: Sendable {
     /// Нормализованные (lowercase) строки, по которым находится запись.
     var searchTerms: [String] { get }
 }
@@ -18,7 +18,7 @@ protocol CardSearchRecord: Sendable {
 ///
 /// Подготовка (`searchTerms`) выполняется один раз при создании; сам поиск —
 /// линейный проход без аллокаций на каждый запрос.
-struct CardSearchIndex<Record: CardSearchRecord>: Sendable {
+nonisolated struct CardSearchIndex<Record: CardSearchRecord>: Sendable {
     private let prepared: [Prepared]
 
     /// Нормализованные строки одной записи, собранные в одну строку для
@@ -52,27 +52,34 @@ struct CardSearchIndex<Record: CardSearchRecord>: Sendable {
     /// КАЖДОЕ слово содержится в каком-нибудь её терме (пересечение по AND).
     /// Порядок результата — порядок записей в индексе.
     func search(_ rawQuery: String) -> [Record] {
-        let words = rawQuery
-            .lowercased()
-            .split(separator: " ")
-            .filter { !$0.isEmpty }
-
-        guard !words.isEmpty else { return [] }
-
-        return prepared.compactMap { entry in
-            let matches = words.allSatisfy { word in
-                entry.haystack.range(of: word) != nil
-            }
-            return matches ? entry.record : nil
-        }
+        (try? search(rawQuery, limit: .max).records) ?? []
     }
+
+    /// Count every match but retain only the visible prefix. Cancellation is
+    /// checked during the scan so an obsolete query releases the worker promptly.
+    func search(_ rawQuery: String, limit: Int) throws -> CardSearchMatches<Record> {
+        let words = rawQuery.lowercased().split(separator: " ")
+        guard !words.isEmpty else { return CardSearchMatches(records: [], totalFound: 0) }
+        var records: [Record] = []
+        var total = 0
+        for (offset, entry) in prepared.enumerated() {
+            if offset.isMultiple(of: 128) { try Task.checkCancellation() }
+            if words.allSatisfy({ entry.haystack.range(of: $0) != nil }) {
+                total += 1
+                if records.count < max(0, limit) { records.append(entry.record) }
+            }
+        }
+        try Task.checkCancellation()
+        return CardSearchMatches(records: records, totalFound: total)
+    }
+
 }
 
 /// Кандзи в поиске: символ, значения (англ. и рус.), чтения (кана и ромадзи).
 ///
 /// Рус. значения передаются снаружи: в данных их нет — они живут в
 /// сохранённых переводах, поэтому их приносит с собой тот, кто строит индекс.
-struct KanjiSearchRecord: CardSearchRecord {
+nonisolated struct KanjiSearchRecord: CardSearchRecord {
     let card: KanjiCard
     let russianMeanings: [String]
 
@@ -103,7 +110,7 @@ struct KanjiSearchRecord: CardSearchRecord {
 
 /// Слово в поиске: само слово, чтение (кана и ромадзи), значение.
 /// Рус. переводов для слов в данных нет — значение только английское.
-struct WordSearchRecord: CardSearchRecord {
+nonisolated struct WordSearchRecord: CardSearchRecord {
     let entry: WordDictionaryEntry
 
     init(entry: WordDictionaryEntry) {
@@ -124,7 +131,7 @@ struct WordSearchRecord: CardSearchRecord {
 }
 
 /// Кана в поиске: знак и его чтение в ромадзи.
-struct KanaSearchRecord: CardSearchRecord {
+nonisolated struct KanaSearchRecord: CardSearchRecord {
     let card: KanaStudyCard
 
     var searchTerms: [String] {
@@ -134,15 +141,44 @@ struct KanaSearchRecord: CardSearchRecord {
 
 /// Импортированная карточка Anki ищется по содержимому всех полей, тегам,
 /// названию колоды, типу заметки и шаблону карточки.
-struct AnkiSearchRecord: CardSearchRecord {
-    let card: AnkiStudyCard
+nonisolated struct AnkiSearchRecord: CardSearchRecord, Codable, Identifiable {
+    let importID: String
+    let cardID: Int64
+    let noteID: Int64
+    let deckID: Int64
+    let noteTypeID: Int64
+    let deckName: String
+    let titleFields: [String]
+    let text: String
+    var id: String { "\(importID):card:\(cardID)" }
+    var fieldPreferencesKey: String { "\(importID):\(deckID):\(noteTypeID)" }
+    var searchTerms: [String] { [text] }
 
-    var searchTerms: [String] {
-        var terms = card.note.parsedFields?.map(\.plainText) ?? card.note.fields
-        terms.append(contentsOf: card.note.tags)
-        terms.append(card.deckName)
-        terms.append(card.noteType.name)
-        terms.append(card.templateName)
-        return terms
+    func displayTitle(using options: AnkiFieldDisplayOptions) -> String {
+        let title = titleFields[safe: options.titleOrdinal] ?? ""
+        return title.isEmpty ? "Карточка \(cardID)" : title
     }
+
+    static func records(collection: AnkiCollection, importID: String, filename: String) throws -> [Self] {
+        let notes = Dictionary(collection.notes.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        let types = Dictionary(collection.noteTypes.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        let decks = Dictionary(collection.decks.map { ($0.id, $0.name) }, uniquingKeysWith: { first, _ in first })
+        return try collection.cards.map { card -> Self? in
+            try Task.checkCancellation()
+            guard let note = notes[card.noteID], let type = types[note.noteTypeID] else { return nil }
+            let fields = note.parsedFields?.map(\.plainText) ?? note.fields
+            let deck = decks[card.deckID] ?? filename
+            let template = type.isCloze ? "Пропуск \(card.ordinal + 1)"
+                : type.templates.first(where: { $0.ordinal == card.ordinal })?.name ?? type.name
+            return Self(importID: importID, cardID: card.id, noteID: note.id,
+                deckID: card.deckID, noteTypeID: type.id, deckName: deck,
+                titleFields: fields.map { String($0.trimmingCharacters(in: .whitespacesAndNewlines).prefix(120)) },
+                text: (fields + note.tags + [deck, type.name, template]).joined(separator: " ").lowercased())
+        }.compactMap { $0 }
+    }
+}
+
+nonisolated struct CardSearchMatches<Record: Sendable>: Sendable {
+    let records: [Record]
+    let totalFound: Int
 }
