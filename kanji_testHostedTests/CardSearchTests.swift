@@ -65,6 +65,33 @@ final class CardSearchTests: XCTestCase {
         XCTAssertTrue(index.search("   ").isEmpty)
     }
 
+    func testBoundedSearchCountsAllMatchesAndPreservesOrder() throws {
+        let records = (0..<1000).map { ToyRecord(id: "match \($0)") }
+        let found = try CardSearchIndex(records: records).search("match", limit: 60)
+        XCTAssertEqual(found.totalFound, 1000)
+        XCTAssertEqual(found.records.map(\.id), records.prefix(60).map(\.id))
+        XCTAssertEqual(try CardSearchIndex(records: records).search("match", limit: 0).totalFound, 1000)
+    }
+
+    func testCancelledScanDoesNotReturnPartialResults() async {
+        let index = CardSearchIndex(records: (0..<10000).map { ToyRecord(id: "match \($0)") })
+        let task = Task {
+            withUnsafeCurrentTask { $0?.cancel() }
+            return try index.search("match", limit: 60)
+        }
+        do { _ = try await task.value; XCTFail("Expected cancellation") }
+        catch { XCTAssertTrue(error is CancellationError) }
+    }
+
+    func testLargeSearchPerformance() {
+        let index = CardSearchIndex(records: (0..<50000).map { ToyRecord(id: "日本 nihon japan \($0)") })
+        measure {
+            let found = try? index.search("nihon japan", limit: 60)
+            XCTAssertEqual(found?.totalFound, 50000)
+            XCTAssertEqual(found?.records.count, 60)
+        }
+    }
+
     // MARK: KanjiSearchRecord
 
     private func makeKanjiCard(

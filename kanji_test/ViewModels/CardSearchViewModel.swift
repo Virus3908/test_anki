@@ -4,8 +4,7 @@ import Observation
 /// Экран поиска карточек: по отдельному типу или по всему каталогу приложения.
 ///
 /// Индексы строятся один раз при первом открытии экрана (prepare); сам поиск
-/// по готовому индексу — синхронный линейный проход, его можно звать на каждый
-/// ввод символа. Результаты капятся до `resultLimit` с честным `totalFound`.
+/// по готовому индексу выполняется отменяемой фоновой задачей. Результаты капятся до `resultLimit` с честным `totalFound`.
 @MainActor
 @Observable
 final class CardSearchViewModel {
@@ -35,6 +34,16 @@ final class CardSearchViewModel {
 
     let scope: Scope
 
+    @ObservationIgnored private var searchTask: Task<SearchResults, Error>?
+    private var generation = 0
+
+    nonisolated private struct SearchResults: Sendable {
+        let kanji: CardSearchMatches<KanjiSearchRecord>?
+        let words: CardSearchMatches<WordSearchRecord>?
+        let kana: CardSearchMatches<KanaSearchRecord>?
+        let anki: CardSearchMatches<AnkiSearchRecord>?
+    }
+
     // MARK: Данные (заполняются в prepare)
 
     private var isPrepared = false
@@ -43,7 +52,6 @@ final class CardSearchViewModel {
     private var kanaIndex: CardSearchIndex<KanaSearchRecord>?
     private var ankiIndex: CardSearchIndex<AnkiSearchRecord>?
     /// Кандзи по символу — для сборки карточек слов из найденных записей.
-    private var cardsByCharacter: [String: KanjiCard] = [:]
 
     /// Переводы: из них берутся сохранённые рус. значения кандзи.
     private let translationState: TranslationViewModel
@@ -80,7 +88,10 @@ final class CardSearchViewModel {
                 try await prepareWords()
             }
 
+            try Task.checkCancellation()
             isPrepared = true
+        } catch is CancellationError {
+            return
         } catch {
             loadError = "Не удалось подготовить поиск."
         }
@@ -99,11 +110,6 @@ final class CardSearchViewModel {
 
     private func prepareWords() async throws {
         let entries = try await WordDataLoader.loadDictionaryEntries()
-        let kanjiCards = await KanjiDataLoader.loadAvailableCards(deck: .all)
-        cardsByCharacter = Dictionary(
-            kanjiCards.map { ($0.kanji, $0) },
-            uniquingKeysWith: { current, _ in current }
-        )
         wordIndex = await Self.buildIndex(records: entries.map(WordSearchRecord.init))
     }
 
@@ -124,38 +130,53 @@ final class CardSearchViewModel {
 
     // MARK: Поиск
 
-    /// Обновляет результаты по запросу. Пустой запрос — пустые результаты.
-    func updateResults(for query: String) {
-        guard isPrepared else { return }
+    /// Invalidate immediately on input changes, before the view's debounce ends.
+    func cancelSearch() {
+        generation += 1
+        searchTask?.cancel()
+        searchTask = nil
+    }
 
-        switch scope {
-        case .all:
-            let foundKanji = kanjiIndex?.search(query).map(\.card) ?? []
-            let foundEntries = wordIndex?.search(query).map(\.entry) ?? []
-            let foundKana = kanaIndex?.search(query).map(\.card) ?? []
-            let foundAnki = ankiIndex?.search(query).map(\.card) ?? []
-            totalFound = foundKanji.count + foundEntries.count + foundKana.count + foundAnki.count
-            kanjiResults = Array(foundKanji.prefix(Self.resultLimit))
-            wordResults = WordDataLoader.buildWords(
-                from: Array(foundEntries.prefix(Self.resultLimit)),
-                cardsByCharacter: cardsByCharacter
+    func updateResults(for query: String) async {
+        cancelSearch()
+        let request = generation
+        guard !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            kanjiResults = []; wordResults = []; kanaResults = []; ankiResults = []
+            totalFound = 0
+            return
+        }
+        guard isPrepared, !Task.isCancelled else { return }
+        let kanji = kanjiIndex, words = wordIndex, kana = kanaIndex, anki = ankiIndex
+        let limit = Self.resultLimit
+        let worker = Task.detached(priority: .userInitiated) {
+            try SearchResults(
+                kanji: kanji?.search(query, limit: limit),
+                words: words?.search(query, limit: limit),
+                kana: kana?.search(query, limit: limit),
+                anki: anki?.search(query, limit: limit)
             )
-            kanaResults = Array(foundKana.prefix(Self.resultLimit))
-            ankiResults = Array(foundAnki.prefix(Self.resultLimit))
-        case .kanji:
-            guard let index = kanjiIndex else { return }
-            let found = index.search(query).map(\.card)
-            totalFound = found.count
-            kanjiResults = Array(found.prefix(Self.resultLimit))
-        case .words:
-            guard let index = wordIndex else { return }
-            let foundEntries = index.search(query).map(\.entry)
-            totalFound = foundEntries.count
-            // Карточки слов собираются только для показываемого топа.
-            wordResults = WordDataLoader.buildWords(
-                from: Array(foundEntries.prefix(Self.resultLimit)),
-                cardsByCharacter: cardsByCharacter
-            )
+        }
+        searchTask = worker
+        do {
+            let found = try await withTaskCancellationHandler {
+                try await worker.value
+            } onCancel: { worker.cancel() }
+            guard generation == request, !Task.isCancelled else { return }
+            let entries = found.words?.records.map(\.entry) ?? []
+            let cards = await WordDataLoader.loadKanjiCards(for: entries, provider: KanjiAPIProvider())
+            guard generation == request, !Task.isCancelled else { return }
+            kanjiResults = found.kanji?.records.map(\.card) ?? []
+            wordResults = WordDataLoader.buildWords(from: entries,
+                cardsByCharacter: Dictionary(cards.map { ($0.kanji, $0) }, uniquingKeysWith: { first, _ in first }))
+            kanaResults = found.kana?.records.map(\.card) ?? []
+            ankiResults = found.anki?.records.map(\.card) ?? []
+            totalFound = (found.kanji?.totalFound ?? 0) + (found.words?.totalFound ?? 0)
+                + (found.kana?.totalFound ?? 0) + (found.anki?.totalFound ?? 0)
+            searchTask = nil
+        } catch is CancellationError {
+            // A cancelled query must never publish partial results.
+        } catch {
+            if generation == request { loadError = "Не удалось выполнить поиск." }
         }
     }
 }

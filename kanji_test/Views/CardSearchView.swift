@@ -80,17 +80,19 @@ struct CardSearchView: View, CardContentRendering {
         .task {
             await model.prepare()
             // Пользователь мог начать печатать, пока готовился индекс.
-            model.updateResults(for: query)
+            await model.updateResults(for: query)
         }
+        .onChange(of: query) { model.cancelSearch() }
+        .onDisappear { model.cancelSearch() }
         .task(id: query) {
             guard !query.isEmpty else {
-                model.updateResults(for: query)
+                await model.updateResults(for: query)
                 return
             }
             // Небольшая пауза склеивает быстрые нажатия в один поиск.
             try? await Task.sleep(for: .milliseconds(250))
             guard !Task.isCancelled else { return }
-            model.updateResults(for: query)
+            await model.updateResults(for: query)
         }
         .sheet(item: $coordinator.selectedLinkedKanjiCard, onDismiss: {
             coordinator.closeLinkedKanjiPreview()
