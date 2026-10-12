@@ -57,10 +57,7 @@ private struct NativeFuriganaText: UIViewRepresentable {
     func sizeThatFits(_ proposal: ProposedViewSize, uiView: FuriganaDrawingView, context: Context) -> CGSize? {
         let proposedWidth = proposal.width ?? 320
         let width = proposedWidth.isFinite ? max(1, proposedWidth) : 320
-        let layout = uiView.layout(width: width)
-        // Report the occupied width, like SwiftUI Text, rather than consuming
-        // the entire proposal and pushing an adjacent attribution button away.
-        return CGSize(width: min(width, ceil(layout.width)), height: layout.height)
+        return CGSize(width: width, height: uiView.layout(width: width).height)
     }
 }
 
@@ -84,9 +81,6 @@ final class FuriganaDrawingView: UIView {
     struct TextLayout {
         let placements: [Placement]
         let height: CGFloat
-        var width: CGFloat {
-            placements.reduce(CGFloat.zero) { max($0, $1.origin.x + $1.width) }
-        }
     }
     private var units: [[Glyph]] = []
     private var font = UIFont.systemFont(ofSize: 17)
