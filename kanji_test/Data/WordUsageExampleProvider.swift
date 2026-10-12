@@ -5,7 +5,7 @@ protocol WordExampleProviding {
     func reloadRemoteExamples(for card: WordStudyCard, limit: Int) async -> [WordUsageExample]
 }
 
-struct TatoebaWordExampleProvider: WordExampleProviding {
+struct TatoebaWordExampleProvider: WordExampleProviding, Sendable {
     let session: URLSession
 
     nonisolated init(session: URLSession = TatoebaWordExampleProvider.defaultSession) {
@@ -27,26 +27,26 @@ struct TatoebaWordExampleProvider: WordExampleProviding {
                     && example.attribution != nil && $0.sentence == example.sentence } ?? example
             }
             let examples = await enrich(Array(candidates.prefix(limit)))
-            await WordExampleCacheRepository.saveExamples(examples, for: card.id)
+            if !Task.isCancelled { await WordExampleCacheRepository.saveExamples(examples, for: card.id) }
             return examples
         }
 
         if let cachedExamples = cached, !cachedExamples.isEmpty,
            cachedExamples.allSatisfy({ $0.attribution != nil && ($0.meaning == nil || $0.translationAttribution != nil) }) {
             let examples = await enrich(cachedExamples)
-            await WordExampleCacheRepository.saveExamples(examples, for: card.id)
+            if !Task.isCancelled { await WordExampleCacheRepository.saveExamples(examples, for: card.id) }
             return Array(examples.prefix(limit))
         }
 
         let remoteExamples = await loadRemoteExamples(for: card, limit: limit)
-        await WordExampleCacheRepository.saveExamples(remoteExamples, for: card.id)
+        if !Task.isCancelled, !remoteExamples.isEmpty { await WordExampleCacheRepository.saveExamples(remoteExamples, for: card.id) }
         return remoteExamples
     }
 
     func reloadRemoteExamples(for card: WordStudyCard, limit: Int = 3) async -> [WordUsageExample] {
         let remoteExamples = await loadRemoteExamples(for: card, limit: limit)
         if !remoteExamples.isEmpty {
-            await WordExampleCacheRepository.saveExamples(remoteExamples, for: card.id)
+            if !Task.isCancelled, !remoteExamples.isEmpty { await WordExampleCacheRepository.saveExamples(remoteExamples, for: card.id) }
         }
         return remoteExamples
     }

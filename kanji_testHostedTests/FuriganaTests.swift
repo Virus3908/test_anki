@@ -155,6 +155,34 @@ final class FuriganaTests: XCTestCase {
         XCTAssertNil(mismatch.first?.furigana?.transcriptions)
     }
 
+    func testMultipleExamplesPreserveOrderAndSkipFreshEntries() async throws {
+        let session = mockSession(data: try singleResponse())
+        let provider = TatoebaWordExampleProvider(session: session)
+        let fresh = WordUsageExample(sentence: "先", meaning: "first",
+            furigana: ExampleFurigana(transcriptions: [], checkedAt: Date()))
+        let old = WordUsageExample(sentence: "学校だよ。", meaning: "school", attribution: attribution)
+        let examples = [fresh, old, fresh]
+        let result = await provider.enrich(examples)
+        XCTAssertEqual(result.map(\.sentence), examples.map(\.sentence))
+        XCTAssertEqual(result.map(\.meaning), examples.map(\.meaning))
+        XCTAssertEqual(FuriganaURLProtocol.requests.count, 1)
+        _ = await provider.enrich(result)
+        XCTAssertEqual(FuriganaURLProtocol.requests.count, 1)
+    }
+
+    func testCancelledEnrichmentKeepsOriginalAndDoesNotRequest() async {
+        let session = mockSession(data: Data())
+        let provider = TatoebaWordExampleProvider(session: session)
+        let old = WordUsageExample(sentence: "学校だよ。", meaning: "School", attribution: attribution)
+        let task = Task {
+            withUnsafeCurrentTask { $0?.cancel() }
+            return await provider.enrich([old])
+        }
+        let result = await task.value
+        XCTAssertEqual(result, [old])
+        XCTAssertTrue(FuriganaURLProtocol.requests.isEmpty)
+    }
+
     func testKanjiCacheRetainsTranscriptions() async {
         let key = "furigana-test-" + UUID().uuidString
         let example = KanjiExample(word: "学校だよ。", reading: "", meaning: "School", attribution: attribution,

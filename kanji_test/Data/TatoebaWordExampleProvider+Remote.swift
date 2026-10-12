@@ -7,10 +7,7 @@ extension TatoebaWordExampleProvider {
         }
 
         do {
-            let (data, response) = try await session.data(from: url)
-            if let httpResponse = response as? HTTPURLResponse, !(200..<300).contains(httpResponse.statusCode) {
-                return []
-            }
+            guard let data = await TatoebaRequests.shared.data(from: url, session: session), !Task.isCancelled else { return [] }
 
             let payload = try JSONDecoder().decode(TatoebaSentenceResponse.self, from: data)
             return payload.data
@@ -45,10 +42,7 @@ extension TatoebaWordExampleProvider {
         }
 
         do {
-            let (data, response) = try await session.data(from: url)
-            if let httpResponse = response as? HTTPURLResponse, !(200..<300).contains(httpResponse.statusCode) {
-                return []
-            }
+            guard let data = await TatoebaRequests.shared.data(from: url, session: session), !Task.isCancelled else { return [] }
 
             let payload = try JSONDecoder().decode(TatoebaSentenceResponse.self, from: data)
             return payload.data
