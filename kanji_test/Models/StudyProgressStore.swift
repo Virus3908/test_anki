@@ -112,6 +112,7 @@ nonisolated struct StudyProgressStore: Codable, Sendable {
 
     @discardableResult
     mutating func bootstrap(_ entries: [BootstrapEntry], checkCancellation: () throws -> Void) rethrows -> Int {
+        guard !entries.isEmpty else { return 0 }
         var existing = Set<UUID>()
         for log in reviewLog {
             try checkCancellation()

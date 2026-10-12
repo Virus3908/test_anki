@@ -67,7 +67,7 @@ struct CardSearchView: View, CardContentRendering {
                             .font(.caption).foregroundStyle(AppPalette.correction)
                         Button("Повторить загрузку Anki") {
                             retryAnkiTask?.cancel()
-                            retryAnkiTask = Task { await model.retryAnkiSearch(for: query) }
+                            retryAnkiTask = Task { await model.retryAnkiSearch() }
                         }
                     }
                     if let error = model.searchError {
@@ -95,7 +95,7 @@ struct CardSearchView: View, CardContentRendering {
             // Пользователь мог начать печатать, пока готовился индекс.
             await model.updateResults(for: query)
         }
-        .onChange(of: query) { model.cancelSearch() }
+        .onChange(of: query) { model.queryChanged(to: query) }
         .onDisappear { model.close(); openingAnkiTask?.cancel(); retryAnkiTask?.cancel(); selectedAnkiCard = nil }
         .task(id: query) {
             guard !query.isEmpty else {

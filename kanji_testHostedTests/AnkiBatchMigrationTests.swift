@@ -126,6 +126,32 @@ final class AnkiBatchMigrationTests: XCTestCase {
         XCTAssertTrue(unchanged)
     }
 
+    func testBatchVisitsAreLinearAndCancellationDuringApplicationIsAtomic() throws {
+        let source = collection(count: 1000)
+        var seed = StudyProgressStore(records: [:])
+        _ = AnkiSchedulingMigrator.bootstrap(collection: source, importID: "fixture", optionsByDeck: [:], progress: &seed)
+        let logs = Dictionary(grouping: seed.reviewLog, by: \.cardID)
+        let entries = seed.records.keys.sorted().compactMap { key -> StudyProgressStore.BootstrapEntry? in
+            guard let record = seed.record(for: key) else { return nil }
+            return .init(key: key, record: record, logs: logs[key] ?? [])
+        }
+        var progress = StudyProgressStore(records: [:])
+        var visits = 0
+        XCTAssertEqual(progress.bootstrap(entries, checkCancellation: { visits += 1 }), 1000)
+        // One visit per card/log during append, then one per introduction/log in the index rebuild.
+        XCTAssertEqual(visits, 8000)
+        var cancelled = StudyProgressStore(records: [:])
+        let before = try encoded(cancelled)
+        visits = 0
+        XCTAssertThrowsError(try AnkiSchedulingMigrator.bootstrapCancellable(collection: source,
+            importID: "fixture", optionsByDeck: [:], progress: &cancelled, checkCancellation: {
+                visits += 1
+                // 7000 preparation checks + boundary; interrupt the actual batch application.
+                if visits == 7500 { throw CancellationError() }
+            })) { XCTAssertTrue($0 is CancellationError) }
+        XCTAssertEqual(try encoded(cancelled), before)
+    }
+
     func testLargeSyntheticMigrationPerformance() {
         let source = collection(count: 3000, historyCount: 10)
         measure {

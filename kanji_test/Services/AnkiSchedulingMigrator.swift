@@ -18,14 +18,15 @@ nonisolated enum AnkiSchedulingMigrator {
     }
 
     static func bootstrapCancellable(collection: AnkiCollection, importID: String,
-                                     optionsByDeck: [Int64: DeckOptions], progress: inout StudyProgressStore) throws -> Int {
+                                     optionsByDeck: [Int64: DeckOptions], progress: inout StudyProgressStore,
+                                     checkCancellation: () throws -> Void = { try Task.checkCancellation() }) throws -> Int {
         let entries = try prepare(collection: collection, importID: importID,
-            optionsByDeck: optionsByDeck, progress: progress, checkCancellation: { try Task.checkCancellation() })
-        try Task.checkCancellation()
+            optionsByDeck: optionsByDeck, progress: progress, checkCancellation: checkCancellation)
+        try checkCancellation()
         // Work on the caller's private snapshot; no state is published or saved on cancellation.
         var next = progress
-        let count = try next.bootstrap(entries, checkCancellation: { try Task.checkCancellation() })
-        try Task.checkCancellation()
+        let count = try next.bootstrap(entries, checkCancellation: checkCancellation)
+        try checkCancellation()
         progress = next
         return count
     }

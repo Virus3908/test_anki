@@ -165,11 +165,19 @@ final class AnkiSearchIndexTests: XCTestCase {
         let reopened = await model.openAnkiResult(records[0])
         XCTAssertNotNil(reopened)
         await repository.recover("B")
-        await model.retryAnkiSearch(for: "cat")
+        await model.retryAnkiSearch()
         XCTAssertTrue(model.unavailableAnkiImports.isEmpty)
         XCTAssertEqual(model.ankiResults.map(\.importID), ["A", "A", "B", "B", "C", "C"])
-        await model.retryAnkiSearch(for: "cat")
+        await model.retryAnkiSearch()
         XCTAssertEqual(Set(model.ankiResults.map(\.id)).count, 6)
+        let gate = FollowupGate()
+        await repository.blockSearch("A", gate: gate)
+        let retry = Task { await model.retryAnkiSearch() }
+        await gate.entered()
+        model.queryChanged(to: "reverse")
+        await gate.release()
+        await retry.value
+        XCTAssertEqual(model.ankiResults.map(\.cardID), [8, 8, 8], "Retry must use the latest query")
         let deletions = await repository.deletions
         XCTAssertTrue(deletions.isEmpty)
     }

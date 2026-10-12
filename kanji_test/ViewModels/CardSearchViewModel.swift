@@ -43,6 +43,7 @@ final class CardSearchViewModel {
 
     @ObservationIgnored private var searchTask: Task<SearchResults, Error>?
     private var generation = 0
+    private var latestQuery = ""
 
     nonisolated private struct SearchResults: Sendable {
         let kanji: CardSearchMatches<KanjiSearchRecord>?
@@ -187,7 +188,7 @@ final class CardSearchViewModel {
         closeAnkiPreview()
     }
 
-    func retryAnkiSearch(for query: String) async {
+    func retryAnkiSearch() async {
         guard let ankiModel, !isClosed else { return }
         preparationGeneration += 1
         let token = preparationGeneration
@@ -198,11 +199,16 @@ final class CardSearchViewModel {
             guard !isClosed, token == preparationGeneration else { return }
             ankiIndex = index
             unavailableAnkiImports = ankiModel.searchUnavailableImports
-            await updateResults(for: query)
+            await updateResults(for: latestQuery)
         } catch is CancellationError { }
         catch {
             if !isClosed, token == preparationGeneration { searchError = "Не удалось обновить поиск Anki." }
         }
+    }
+
+    func queryChanged(to query: String) {
+        latestQuery = query
+        cancelSearch()
     }
 
     /// Invalidate immediately on input changes, before the view's debounce ends.
@@ -213,6 +219,7 @@ final class CardSearchViewModel {
     }
 
     func updateResults(for query: String) async {
+        latestQuery = query
         cancelSearch()
         searchError = nil
         let request = generation
