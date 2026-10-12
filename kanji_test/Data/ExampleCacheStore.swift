@@ -9,6 +9,7 @@ actor ExampleCacheStore<Example: Codable & Sendable & Equatable> {
     private var values: [String: [Example]]?
     private var access: [String: Int] = [:]
     private var clock = 0
+    private var needsPersistence = false
     nonisolated private struct Envelope: Codable {
         let schemaVersion: Int
         let payload: [String: [Example]]
@@ -28,9 +29,12 @@ actor ExampleCacheStore<Example: Codable & Sendable & Equatable> {
 
     func save(_ examples: [Example], for key: String) throws {
         readIfNeeded()
-        guard values?[key] != examples else { touch(key); return }
-        values?[key] = examples
+        if values?[key] != examples {
+            values?[key] = examples
+            needsPersistence = true
+        }
         touch(key)
+        guard needsPersistence else { return }
         try persistBounded()
     }
 
@@ -38,6 +42,7 @@ actor ExampleCacheStore<Example: Codable & Sendable & Equatable> {
         if FileManager.default.fileExists(atPath: url.path) { try FileManager.default.removeItem(at: url) }
         values = [:]
         access = [:]
+        needsPersistence = false
     }
 
     private func touch(_ key: String) {
@@ -59,7 +64,10 @@ actor ExampleCacheStore<Example: Codable & Sendable & Equatable> {
         } else { values = [:] }
         // Legacy files carry no recency metadata: deterministic eviction until
         // the current process observes actual reads.
-        if oversized || (values?.count ?? 0) > entryLimit { try? persistBounded() }
+        if oversized || (values?.count ?? 0) > entryLimit {
+            needsPersistence = true
+            try? persistBounded()
+        }
     }
 
     private func persistBounded() throws {
@@ -82,5 +90,6 @@ actor ExampleCacheStore<Example: Codable & Sendable & Equatable> {
         }
         try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
         try data.write(to: url, options: .atomic)
+        needsPersistence = false
     }
 }

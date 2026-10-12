@@ -2,6 +2,23 @@ import XCTest
 @testable import kanji_test
 
 final class ExampleCacheTests: XCTestCase {
+    func testFailedWriteRetriesUnchangedInMemoryValue() async throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        // A file where the directory belongs makes the first atomic write fail.
+        try Data("blocked".utf8).write(to: root)
+        let url = root.appendingPathComponent("cache.json")
+        let cache = ExampleCacheStore<String>(url: url)
+        do {
+            try await cache.save(["example"], for: "key")
+            XCTFail("The blocked directory must reject the write")
+        } catch { }
+        try FileManager.default.removeItem(at: root)
+        try await cache.save(["example"], for: "key")
+        let restored = await ExampleCacheStore<String>(url: url).load("key")
+        XCTAssertEqual(restored, ["example"])
+    }
+
     func testLegacyReadUnchangedSaveEvictionCorruptionAndClear() async throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: root) }
