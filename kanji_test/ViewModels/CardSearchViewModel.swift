@@ -42,6 +42,7 @@ final class CardSearchViewModel {
         let words: CardSearchMatches<WordSearchRecord>?
         let kana: CardSearchMatches<KanaSearchRecord>?
         let anki: CardSearchMatches<AnkiSearchRecord>?
+        let wordCards: [WordStudyCard]
     }
 
     // MARK: Данные (заполняются в prepare)
@@ -110,7 +111,10 @@ final class CardSearchViewModel {
 
     private func prepareWords() async throws {
         let entries = try await WordDataLoader.loadDictionaryEntries()
-        wordIndex = await Self.buildIndex(records: entries.map(WordSearchRecord.init))
+        let worker = Task.detached(priority: .userInitiated) {
+            CardSearchIndex(records: entries.map(WordSearchRecord.init))
+        }
+        wordIndex = await withTaskCancellationHandler { await worker.value } onCancel: { worker.cancel() }
     }
 
     private func prepareKana() async throws {
@@ -161,12 +165,19 @@ final class CardSearchViewModel {
         let kanji = kanjiIndex, words = wordIndex, kana = kanaIndex, anki = ankiIndex
         let limit = Self.resultLimit
         let worker = Task.detached(priority: .userInitiated) {
-            try SearchResults(
-                kanji: kanji?.search(query, limit: limit),
-                words: words?.search(query, limit: limit),
-                kana: kana?.search(query, limit: limit),
-                anki: anki?.search(query, limit: limit)
-            )
+            let foundKanji = try kanji?.search(query, limit: limit)
+            let foundWords = try words?.search(query, limit: limit)
+            let foundKana = try kana?.search(query, limit: limit)
+            let foundAnki = try anki?.search(query, limit: limit)
+            let entries = foundWords?.records.map(\.entry) ?? []
+            let characters = WordDataLoader.requiredKanjiCharacters(in: entries)
+            let cards = (try? await BundledStudyData.shared.bundledKanjiCards(characters: characters)) ?? []
+            try Task.checkCancellation()
+            let wordCards = WordDataLoader.buildWords(from: entries,
+                cardsByCharacter: Dictionary(cards.map { ($0.kanji, $0) }, uniquingKeysWith: { first, _ in first }))
+            try Task.checkCancellation()
+            return SearchResults(kanji: foundKanji, words: foundWords,
+                                 kana: foundKana, anki: foundAnki, wordCards: wordCards)
         }
         searchTask = worker
         do {
@@ -174,12 +185,8 @@ final class CardSearchViewModel {
                 try await worker.value
             } onCancel: { worker.cancel() }
             guard generation == request, !Task.isCancelled else { return }
-            let entries = found.words?.records.map(\.entry) ?? []
-            let cards = await WordDataLoader.loadKanjiCards(for: entries, provider: KanjiAPIProvider())
-            guard generation == request, !Task.isCancelled else { return }
             kanjiResults = found.kanji?.records.map(\.card) ?? []
-            wordResults = WordDataLoader.buildWords(from: entries,
-                cardsByCharacter: Dictionary(cards.map { ($0.kanji, $0) }, uniquingKeysWith: { first, _ in first }))
+            wordResults = found.wordCards
             kanaResults = found.kana?.records.map(\.card) ?? []
             ankiResults = found.anki?.records ?? []
             totalFound = (found.kanji?.totalFound ?? 0) + (found.words?.totalFound ?? 0)

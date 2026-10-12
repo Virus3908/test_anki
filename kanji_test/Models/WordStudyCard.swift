@@ -1,6 +1,6 @@
 import Foundation
 
-struct WordStudyCard: Identifiable, Sendable {
+nonisolated struct WordStudyCard: Identifiable, Sendable {
     nonisolated var id: String { "\(word)-\(reading)" }
 
     let word: String

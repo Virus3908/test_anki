@@ -1,7 +1,7 @@
 import Foundation
 
 extension WordDataLoader {
-    static func buildWords(
+    nonisolated static func buildWords(
         from entries: [WordDictionaryEntry],
         cardsByCharacter: [String: KanjiCard]
     ) -> [WordStudyCard] {
@@ -33,12 +33,12 @@ extension WordDataLoader {
         }
     }
 
-    static func unavailableDrawingCard(for character: String) -> KanjiCard {
+    nonisolated static func unavailableDrawingCard(for character: String) -> KanjiCard {
         KanjiCard(kanji: character, meanings: [], onyomi: [], kunyomi: [], examples: [],
                   source: KanjiSource(name: "", file: "", license: ""), strokes: [])
     }
 
-    static func kanaCard(for character: String) -> KanjiCard {
+    nonisolated static func kanaCard(for character: String) -> KanjiCard {
         (try? BundledKanaDrawing.card(for: character)) ?? unavailableDrawingCard(for: character)
     }
 

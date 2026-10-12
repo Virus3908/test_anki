@@ -332,7 +332,8 @@ When changing scheduling/queue behavior, add focused tests for CI.
 ## Search and disposable data
 
 - `CardSearchIndex` counts all AND-matches and retains at most 60 per category.
-  Index normalization and scans run in detached tasks using Sendable values.
+  Index normalization, scans and visible word-card construction run in detached
+  tasks using Sendable values.
 - `CardSearchViewModel` cancels workers and checks a generation before publishing.
   Input changes invalidate immediately; the view owns the only 250 ms debounce.
 - `WordDataLoader` requests only `requiredKanjiCharacters(in:)`; `BundledStudyData`

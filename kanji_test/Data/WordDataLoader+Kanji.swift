@@ -16,7 +16,7 @@ extension WordDataLoader {
         return masterCards.isEmpty ? await KanjiDataLoader.loadLocalCards() : masterCards
     }
 
-    static func requiredKanjiCharacters(in entries: [WordDictionaryEntry]) -> Set<String> {
+    nonisolated static func requiredKanjiCharacters(in entries: [WordDictionaryEntry]) -> Set<String> {
         Set(entries.flatMap { entry in
             entry.word.map(String.init).filter(isKanji)
         })
