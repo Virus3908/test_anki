@@ -68,7 +68,6 @@ private struct GrammarPracticeCard: View {
                         intervalLabel: session.intervalLabel) { rating in
                             Task { await session.submitReview(rating, expectedKey: rule.reviewKey) }
                         }
-                        .accessibilityIdentifier("grammar.training.rating")
                 } else {
                     Text("\(practice.isSelfAssessment ? "Самопроверка" : "Задание") \(practice.position + 1) / \(practice.count)")
                         .font(.headline)
@@ -107,6 +106,7 @@ private struct GrammarPracticeCard: View {
             }
             .padding(20).frame(maxWidth: .infinity, alignment: .leading)
         }
+        .id("\(isLessonRead):\(practice.position)")
         .sheet(isPresented: $isLessonPresented) {
             NavigationStack {
                 ScrollView { GrammarLessonContent(rule: rule, settings: settings, progress: session.reviewStore).padding(16) }

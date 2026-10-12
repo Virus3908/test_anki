@@ -29,13 +29,17 @@ final class GrammarUITests: UITestCase {
         tap("grammar.practice", .startTraining, expecting: "grammar.training.begin")
         scrollTo("grammar.training.begin")
         tap("grammar.training.begin", .startTraining, expecting: "grammar.training.reveal")
-        for _ in 0..<3 {
+        for index in 0..<3 {
             tap("grammar.training.reveal", .revealCard, expecting: "grammar.training.next")
-            element("grammar.training.next").tap()
+            tap("grammar.training.next", .revealCard,
+                expecting: index < 2 ? "grammar.training.reveal" : ID.Training.rateGood)
         }
         XCTAssertTrue(element(ID.Training.rateGood).waitForExistence(timeout: 5))
         XCTAssertTrue(element(ID.Training.rateGood).isEnabled)
         XCTAssertTrue(element("grammar.training.exit").exists)
+        tap(ID.Training.rateGood, .rateCard, expecting: "grammar.training.reveal")
+        tap("grammar.training.undo", .rateCard, expecting: "grammar.training.begin")
+        tap("grammar.training.exit", .exitTraining, expecting: "grammar.practice")
     }
 
     func testGlobalGrammarSearchOpensFullLessonAndSourceReference() {
