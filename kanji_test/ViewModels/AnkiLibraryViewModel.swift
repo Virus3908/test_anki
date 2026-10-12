@@ -16,14 +16,20 @@ final class AnkiLibraryViewModel {
     private(set) var isDeletingDeck = false
     var loadError: String?
     private let request = LoadRequest()
+    @ObservationIgnored private weak var searchPreviewSession: AnkiSearchPreviewSession?
+    typealias DeckCardBuilder = @Sendable (AnkiCollection, URL, AnkiDeckReference) async throws -> [AnkiStudyCard]
+    private let deckCardBuilder: DeckCardBuilder
+    private(set) var searchUnavailableImports: [AnkiImportSummary] = []
     private var openToken: UUID { request.id }
     private var isLoading = false
     /// `nil` means the bootstrap could not run yet (e.g. review progress is not loaded);
     /// the migration must then stay unmarked so it is retried later.
     @ObservationIgnored var bootstrapScheduling: ((AnkiCollection, String) async throws -> Int?)?
 
-    init(repository: any AnkiLibraryPersisting = AnkiRepository()) {
+    init(repository: any AnkiLibraryPersisting = AnkiRepository(),
+         deckCardBuilder: @escaping DeckCardBuilder = { try AnkiCollectionLookup.deckCards(collection: $0, media: $1, deck: $2) }) {
         self.repository = repository
+        self.deckCardBuilder = deckCardBuilder
     }
 
     var decks: [AnkiDeckReference] {
@@ -82,6 +88,7 @@ final class AnkiLibraryViewModel {
             try await trainingSession.deleteAnkiImportProgress(importID: deck.importID) {
                 try await repository.deleteImport(id: deck.importID)
             }
+            if searchPreviewSession?.importID == deck.importID { searchPreviewSession?.close() }
             imports.removeAll { $0.id == deck.importID }
             closeDeck()
             return true
@@ -95,7 +102,8 @@ final class AnkiLibraryViewModel {
         guard bootstrapScheduling != nil else { return }
         var failures: [String] = []
         for summary in imports where summary.schedulingMigrationVersion != AnkiSchedulingMigrator.version {
-            do { _ = try await migrateScheduling(summary) }
+            do { try Task.checkCancellation(); _ = try await migrateScheduling(summary) }
+            catch is CancellationError { return }
             catch { failures.append("\(summary.filename): \(error.localizedDescription)") }
         }
         guard !failures.isEmpty else { return }
@@ -108,6 +116,7 @@ final class AnkiLibraryViewModel {
               let bootstrapScheduling else { return 0 }
         let collection = try await repository.collection(summary)
         guard let count = try await bootstrapScheduling(collection, summary.id) else { return 0 }
+        try Task.checkCancellation()
         try await repository.markSchedulingMigration(importID: summary.id, version: AnkiSchedulingMigrator.version)
         if let index = imports.firstIndex(where: { $0.id == summary.id }) {
             imports[index].schedulingMigrationVersion = AnkiSchedulingMigrator.version
@@ -117,44 +126,55 @@ final class AnkiLibraryViewModel {
 
     func open(_ summary: AnkiImportSummary) async throws -> (AnkiCollection, URL) {
         let collection = try await repository.collection(summary)
+        try Task.checkCancellation()
         let media = try await repository.mediaDirectory(summary)
+        try Task.checkCancellation()
         return (collection, media)
     }
 
     func recordsForSearch() async throws -> [AnkiSearchRecord] {
-        if !isLoaded { await load() }
-        guard isLoaded else { throw AnkiImportError.invalid("не удалось загрузить библиотеку") }
+        if !isLoaded {
+            // Search needs the library index, not scheduling migration of every import.
+            imports = try await repository.load()
+            try Task.checkCancellation()
+            isLoaded = true
+        }
         var records: [AnkiSearchRecord] = []
+        var unavailable: [AnkiImportSummary] = []
         for summary in imports {
             try Task.checkCancellation()
-            records += try await repository.searchRecords(summary)
+            do { records.append(contentsOf: try await repository.searchRecords(summary)) }
+            catch is CancellationError { throw CancellationError() }
+            catch {
+                try Task.checkCancellation()
+                unavailable.append(summary)
+            }
         }
+        try Task.checkCancellation()
+        searchUnavailableImports = unavailable
         return records
     }
 
-    /// Resolve only the selected search hit. Full collection is released after
-    /// resolution; search results never enter the training catalog.
-    func cardForSearchResult(_ record: AnkiSearchRecord) async throws -> AnkiStudyCard {
+    func cardForSearchResult(_ record: AnkiSearchRecord,
+                             session: AnkiSearchPreviewSession) async throws -> AnkiStudyCard {
         guard let summary = imports.first(where: { $0.id == record.importID }) else {
+            session.close()
             throw AnkiImportError.invalid("импорт отсутствует в библиотеке")
         }
-        let (collection, media) = try await open(summary)
-        let worker = Task.detached(priority: .userInitiated) {
-            try Task.checkCancellation()
-            guard let card = collection.cards.first(where: { $0.id == record.cardID }),
-                  let note = collection.notes.first(where: { $0.id == card.noteID }),
-                  let type = collection.noteTypes.first(where: { $0.id == note.noteTypeID }) else {
-                throw AnkiImportError.invalid("карточка отсутствует в импорте")
-            }
-            return AnkiStudyCard(importID: record.importID, card: card, note: note,
-                noteType: type, deckName: record.deckName, mediaDirectory: media)
+        searchPreviewSession = session
+        let card = try await session.card(record, summary: summary, repository: repository)
+        try Task.checkCancellation()
+        guard imports.contains(where: { $0.id == summary.id }) else {
+            session.close()
+            throw AnkiImportError.invalid("импорт отсутствует в библиотеке")
         }
-        return try await withTaskCancellationHandler { try await worker.value } onCancel: { worker.cancel() }
+        return card
     }
 
     func openDeck(_ deck: AnkiDeckReference) async {
-        request.cancel()
-        await loadDeck(deck)
+        beginOpening(deck)
+        let task = request.task
+        await withTaskCancellationHandler { await task?.value } onCancel: { task?.cancel() }
     }
 
     private func loadDeck(_ deck: AnkiDeckReference) async {
@@ -169,18 +189,18 @@ final class AnkiLibraryViewModel {
                 throw AnkiImportError.invalid("колода отсутствует в библиотеке")
             }
             let (collection, media) = try await open(summary)
-            let cards = await Task.detached(priority: .userInitiated) {
-                let notes = Dictionary(uniqueKeysWithValues: collection.notes.map { ($0.id, $0) })
-                let types = Dictionary(uniqueKeysWithValues: collection.noteTypes.map { ($0.id, $0) })
-                let deckCards = collection.cards.filter { $0.deckID == deck.sourceDeckID }.compactMap { card -> AnkiStudyCard? in
-                    guard let note = notes[card.noteID], let type = types[note.noteTypeID] else { return nil }
-                    return AnkiStudyCard(importID: deck.importID, card: card, note: note, noteType: type, deckName: deck.title, mediaDirectory: media)
-                }
-                return AnkiStudyCard.orderedByAnkiPosition(deckCards)
-            }.value
+            try Task.checkCancellation()
+            guard openToken == token else { return }
+            let builder = deckCardBuilder
+            let worker = Task.detached(priority: .userInitiated) {
+                try Task.checkCancellation()
+                return try await builder(collection, media, deck)
+            }
+            let cards = try await withTaskCancellationHandler { try await worker.value } onCancel: { worker.cancel() }
             guard openToken == token, !Task.isCancelled else { return }
             previewCards = cards
-        } catch { if openToken == token { loadError = error.localizedDescription } }
+        } catch is CancellationError { }
+        catch { if openToken == token, !Task.isCancelled { loadError = error.localizedDescription } }
     }
 
     func closeDeck() {

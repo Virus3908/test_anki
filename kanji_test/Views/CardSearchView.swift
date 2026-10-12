@@ -17,6 +17,7 @@ struct CardSearchView: View, CardContentRendering {
 
     @State private var model: CardSearchViewModel
     @State private var query = ""
+    @State private var retryAnkiTask: Task<Void, Never>?
     @State private var openingAnkiTask: Task<Void, Never>?
     @State private var selectedAnkiCard: AnkiStudyCard?
     @Environment(\.dismiss) private var dismiss
@@ -61,6 +62,17 @@ struct CardSearchView: View, CardContentRendering {
                     Text(error).font(.caption).foregroundStyle(AppPalette.correction)
                     Button("Повторить") { Task { await model.prepare() } }
                 } else {
+                    if !model.unavailableAnkiImports.isEmpty {
+                        Text("Некоторые Anki-колоды временно недоступны для поиска.")
+                            .font(.caption).foregroundStyle(AppPalette.correction)
+                        Button("Повторить загрузку Anki") {
+                            retryAnkiTask?.cancel()
+                            retryAnkiTask = Task { await model.retryAnkiSearch(for: query) }
+                        }
+                    }
+                    if let error = model.searchError {
+                        Text(error).font(.caption).foregroundStyle(AppPalette.correction)
+                    }
                     resultSummary
 
                     ScrollView(.vertical) {
@@ -84,7 +96,7 @@ struct CardSearchView: View, CardContentRendering {
             await model.updateResults(for: query)
         }
         .onChange(of: query) { model.cancelSearch() }
-        .onDisappear { model.cancelSearch(); openingAnkiTask?.cancel() }
+        .onDisappear { model.close(); openingAnkiTask?.cancel(); retryAnkiTask?.cancel(); selectedAnkiCard = nil }
         .task(id: query) {
             guard !query.isEmpty else {
                 await model.updateResults(for: query)
@@ -112,7 +124,13 @@ struct CardSearchView: View, CardContentRendering {
                 kanaPreviewDetail(for: card, deck: deck)
             }
         }
-        .sheet(item: $selectedAnkiCard) { card in
+        .alert("Карточка Anki", isPresented: Binding(
+            get: { model.openingError != nil },
+            set: { if !$0 { model.openingError = nil } }
+        )) {
+            Button("OK") { model.openingError = nil }
+        } message: { Text(model.openingError ?? "") }
+        .sheet(item: $selectedAnkiCard, onDismiss: { model.closeAnkiPreview() }) { card in
             let deck = ankiDeck(for: card)
             AnkiCardPreviewView(
                 cards: [],
