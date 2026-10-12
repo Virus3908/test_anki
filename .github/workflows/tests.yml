@@ -66,6 +66,10 @@ jobs:
             -onlyUsePackageVersionsFromResolvedFile \
             -derivedDataPath "$RUNNER_TEMP/kanji-derived-data" \
             CODE_SIGNING_ALLOWED=NO 2>&1 | tee artifacts/hosted-build.log
+      - name: Wait for hosted simulator boot
+        run: |
+          set -euo pipefail
+          xcrun simctl bootstatus "$CI_SIMULATOR_ID" -b 2>&1 | tee artifacts/hosted-simulator-boot.log
       - name: Run hosted tests on iOS Simulator
         run: |
           set -euo pipefail
@@ -91,6 +95,7 @@ jobs:
           name: ios-hosted-test-results
           path: |
             artifacts/hosted-build.log
+            artifacts/hosted-simulator-boot.log
             artifacts/hosted-tests.log
             artifacts/hosted-tests.xcresult
           if-no-files-found: warn
@@ -117,6 +122,10 @@ jobs:
             -onlyUsePackageVersionsFromResolvedFile \
             -derivedDataPath "$RUNNER_TEMP/kanji-derived-data" \
             CODE_SIGNING_ALLOWED=NO 2>&1 | tee artifacts/ui-build.log
+      - name: Wait for UI simulator boot
+        run: |
+          set -euo pipefail
+          xcrun simctl bootstatus "$CI_SIMULATOR_ID" -b 2>&1 | tee artifacts/ui-simulator-boot.log
       - name: Run ui tests on iOS Simulator
         run: |
           set -euo pipefail
@@ -142,6 +151,7 @@ jobs:
           name: ios-ui-test-results
           path: |
             artifacts/ui-build.log
+            artifacts/ui-simulator-boot.log
             artifacts/ui-tests.log
             artifacts/ui-tests.xcresult
           if-no-files-found: warn

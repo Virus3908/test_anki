@@ -18,7 +18,9 @@ Workflow [Tests](https://github.com/Virus3908/test_anki/actions/workflows/tests.
 runtime iOS >= 26.5. Если подходящего устройства нет, job явно падает;
 он не скачивает дополнительные runtime. Скрипт предназначен только для CI.
 
-iOS jobs сначала выполняют `build-for-testing`, затем `test-without-building`.
+iOS jobs сначала выполняют `build-for-testing`, ждут загрузки выбранного устройства
+через `simctl bootstatus -b`, затем выполняют `test-without-building`. Подготовка
+ОС симулятора не входит в измерение запуска приложения в UI-тесте.
 Сборки используют закреплённые SPM-зависимости. Code signing отключён,
 секреты не нужны. `set -euo pipefail` сохраняет ошибку `xcodebuild`/`swift`
 при выводе через `tee`. Таймауты: 20 минут для package, 30 для hosted,
@@ -29,6 +31,8 @@ UI target использует `-ui-testing`, offline providers, чистое с
 это состояние. Ожидания проверяют элементы/состояние через XCTest predicates;
 фиксированных `sleep` нет. Приложение завершается в `tearDown`.
 UI-режим и очистка тестового состояния доступны только в Debug.
+Тесты ждут доступности элементов для нажатия и явно закрывают уведомление
+об импорте фикстуры. При сбое ожидания сохраняются screenshot и accessibility tree.
 
 ## Результаты и повторный запуск
 
@@ -38,6 +42,8 @@ UI-режим и очистка тестового состояния досту
 - `ios-hosted-test-results`: `hosted-build.log`, `hosted-tests.log`,
   `hosted-tests.xcresult`;
 - `ios-ui-test-results`: `ui-build.log`, `ui-tests.log`, `ui-tests.xcresult`.
+
+В iOS artifacts также включён отдельный `*-simulator-boot.log`.
 
 Artifacts загружаются даже при падении и хранятся 14 дней. Скачанный
 `.xcresult` можно открыть в Xcode для просмотра failures, timings и вложений.
