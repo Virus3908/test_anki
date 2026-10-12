@@ -280,7 +280,6 @@ For drawing correctness bugs, inspect `DrawingSessionViewModel`,
 -   `Services/KanjiAPIEndpoint.swift`, `KanjiAPIModels.swift` ---
     endpoint/transport models.
 -   `Data/KanjiDeckCacheRepository.swift` --- cached kanji decks.
--   `Data/KanaSVGCacheRepository.swift` --- cached kana SVG.
 
 ## UI map
 
@@ -323,18 +322,36 @@ persistence path without a clear reason.
 
 ## Tests and verification
 
-Useful commands: - App build:
-`xcodebuild -project kanji_test.xcodeproj -scheme kanji_test -sdk iphoneos -configuration Debug CODE_SIGNING_ALLOWED=NO build` -
-Anki package tests: `swift test --package-path Packages/AnkiImport` -
-App-hosted Anki/SRS integration tests:
-`kanji_testHostedTests/AnkiStudyIntegrationTests.swift` via the
-`kanji_test` test scheme on iOS Simulator.
+Local verification is limited to device builds, package compilation and static checks:
+`xcodebuild -project kanji_test.xcodeproj -scheme kanji_test -configuration Debug -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO build`
+and `swift build --package-path Packages/AnkiImport -j 2`.
+**Do not run local tests or launch iOS Simulator.** All package, hosted and UI
+checks run through `.github/workflows/tests.yml`; see `docs/ci.md`.
+When changing scheduling/queue behavior, add focused tests for CI.
 
-When changing scheduling/queue behavior, add or update focused
-integration/unit tests rather than relying only on UI testing.
+## Search and disposable data
 
-GitHub Actions runs AnkiImport package tests and all hosted iOS tests through
-`.github/workflows/tests.yml`; see `docs/ci.md` for runner, artifacts and limitations.
+- `CardSearchIndex` counts all AND-matches and retains at most 60 per category.
+  Index normalization and scans run in detached tasks using Sendable values.
+- `CardSearchViewModel` cancels workers and checks a generation before publishing.
+  Input changes invalidate immediately; the view owns the only 250 ms debounce.
+- `WordDataLoader` requests only `requiredKanjiCharacters(in:)`; `BundledStudyData`
+  indexes metadata once and reuses cards/geometry. Related words build only their prefix.
+- `AnkiSearchIndexRepository` stores versioned compact records in Caches (128 MiB
+  disk cap). Missing, corrupt or obsolete indices rebuild from source; indexing
+  never rewrites source imports. Full search hits resolve only on opening.
+- `ExampleCacheStore` bounds Tatoeba caches to 1000 keys/8 MiB per repository,
+  evicting least recently accessed keys in the current process. Legacy JSON and
+  envelopes remain readable; unchanged examples are not written. Furigana's
+  successful-empty/retry-after-one-day semantics remain independent of eviction.
+- `TatoebaRequests` deduplicates URLs per URLSession and caps total networking at
+  three requests. Enrichment keeps three children and preserves sentence order.
+- Bundled resources have no TTL. Kana clearing only removes legacy `KanaVGCache`;
+  the obsolete SVG repository is gone. Offline decks remain available.
+- Extra daily new-card grants are versioned UserDefaults data in `StudyPreferences`,
+  keyed by deck and study day. They never modify `DeckOptions` or review JSON.
+
+Cache clearing must never delete progress, translations, settings or Anki sources.
 
 ## Change workflow
 
@@ -342,7 +359,7 @@ GitHub Actions runs AnkiImport package tests and all hosted iOS tests through
 2.  Read the smallest relevant ViewModel/domain file(s).
 3.  Follow only direct dependencies needed to explain the behavior.
 4.  Make the smallest coherent change.
-5.  Build and run the focused tests available for that subsystem.
+5.  Build locally; run focused tests only through GitHub Actions.
 6.  Fix compiler errors/warnings caused by the change; avoid unrelated
     cleanup.
 7.  Summarize changed behavior and anything not verified.

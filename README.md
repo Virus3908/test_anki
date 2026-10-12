@@ -62,34 +62,11 @@ xcodebuild \
 
 ## Тесты и CI
 
-Тесты самостоятельного пакета импорта Anki:
-
-```sh
-swift test --package-path Packages/AnkiImport
-```
-
-Тесты приложения, включая кану, поиск, рисование, очереди SRS и интеграцию Anki:
-
-```sh
-xcodebuild test \
-  -project kanji_test.xcodeproj \
-  -scheme kanji_test \
-  -sdk iphonesimulator \
-  -configuration Debug \
-  -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.5' \
-  -only-testing:kanji_testHostedTests \
-  CODE_SIGNING_ALLOWED=NO
-```
-
-Если указанного симулятора нет, замените `-destination` на доступное устройство
-с iOS 26.5 или новее. Список устройств: `xcrun simctl list devices available`.
-
-[GitHub Actions](.github/workflows/tests.yml) запускает обе группы тестов
-при открытии и обновлении pull request. Результаты и логи сохраняются в
-artifacts, включая `.xcresult`, который можно открыть в Xcode.
-Ручной запуск доступен через **Actions → Tests → Run workflow** после появления
-workflow в основной ветке. Подробности и текущее состояние UI test targets —
-в [документации CI](docs/ci.md).
+[GitHub Actions](.github/workflows/tests.yml) запускает package, hosted и UI tests
+для pull request, push в `main` и вручную. Логи и `.xcresult` сохраняются в artifacts.
+В рамках работы Codex локально разрешены только сборки приложения и
+`swift build --package-path Packages/AnkiImport -j 2`; тесты и Simulator — только CI.
+Подробности: [документация CI](docs/ci.md).
 
 ## Устройство проекта
 

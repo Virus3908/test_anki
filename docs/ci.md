@@ -1,31 +1,62 @@
 # Тесты в GitHub Actions
 
-Workflow: `.github/workflows/tests.yml` (название **Tests**).
+Workflow [Tests](https://github.com/Virus3908/test_anki/actions/workflows/tests.yml)
+запускается для `pull_request`, `push` в `main` и `workflow_dispatch`.
+Новый запуск отменяет старый только для того же события и Git ref;
+разные ветки и PR не делят concurrency group.
 
-Запускается при открытии pull request, обновлении его ветки и повторном
-открытии PR, а также вручную через **Actions → Tests → Run workflow**.
-Новый запуск отменяет предыдущий для той же Git ref. Обычный push без PR
-не запускает тесты.
+Три независимых job на `macos-26`, Xcode 26.6:
 
-Две независимые задачи выполняются на `macos-26` с Xcode 26.6:
+- **AnkiImport package tests** — все тесты `Packages/AnkiImport`.
+- **iOS hosted tests** — только `kanji_testHostedTests`: поиск, bundled-данные,
+  рисование, SRS, Anki, кеши, фуригана и дневные разрешения.
+- **iOS UI tests** — только `kanji_testUITests`: запуск, разделы и колоды,
+  поиск/просмотр, тренировка, рисование, озвучивание, фуригана/настройка,
+  импорт небольшой локальной Anki-фикстуры, сохранение прогресса и завершение дня.
 
-- **AnkiImport package tests**: `swift test --package-path Packages/AnkiImport`.
-- **iOS hosted tests**: `xcodebuild test` со схемой `kanji_test`, только
-  `kanji_testHostedTests`, на iPhone 17 / iOS 26.5. Запускаются все hosted-тесты,
-  включая кану, поиск, рисование, SRS и интеграцию Anki.
+`scripts/ci-select-simulator.py` выбирает доступный iPhone с установленным
+runtime iOS >= 26.5. Если подходящего устройства нет, job явно падает;
+он не скачивает дополнительные runtime. Скрипт предназначен только для CI.
 
-Подпись приложения отключена; сертификаты и дополнительные secrets не нужны.
-Для приложения используются версии зависимостей из закоммиченного
-`kanji_test.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved`.
-Bash сохраняет ненулевой exit code тестовой команды даже при выводе через `tee`.
+iOS jobs сначала выполняют `build-for-testing`, затем `test-without-building`.
+Сборки используют закреплённые SPM-зависимости. Code signing отключён,
+секреты не нужны. `set -euo pipefail` сохраняет ошибку `xcodebuild`/`swift`
+при выводе через `tee`. Таймауты: 20 минут для package, 30 для hosted,
+40 для UI. Test jobs не дублируют группы тестов.
 
-Логи обеих задач и `.xcresult` iOS-тестов публикуются как artifacts даже при
-ошибке тестов и хранятся 14 дней. `.xcresult` можно скачать и открыть в Xcode.
+UI target использует `-ui-testing`, offline providers, чистое состояние перед
+каждым сценарием и локальную `ui-test-deck.apkg`. Relaunch-тесты явно сохраняют
+это состояние. Ожидания проверяют элементы/состояние через XCTest predicates;
+фиксированных `sleep` нет. Приложение завершается в `tearDown`.
+UI-режим и очистка тестового состояния доступны только в Debug.
 
-Targets для файлов `kanji_testUITests` и старой схемы `kanji_testUnitTests`
-в текущем `project.pbxproj` отсутствуют. Эти схемы не используются в CI;
-добавление полноценного UI test target — отдельная задача.
+## Результаты и повторный запуск
 
-При обновлении минимальной версии iOS или образа GitHub нужно проверить
-`DEVELOPER_DIR` и `-destination` в workflow. Список установленных инструментов:
-https://github.com/actions/runner-images/blob/main/images/macos/macos-26-Readme.md
+Откройте PR → **Checks**, затем нужный job. В summary запуска доступны artifacts:
+
+- `anki-import-test-log`;
+- `ios-hosted-test-results`: `hosted-build.log`, `hosted-tests.log`,
+  `hosted-tests.xcresult`;
+- `ios-ui-test-results`: `ui-build.log`, `ui-tests.log`, `ui-tests.xcresult`.
+
+Artifacts загружаются даже при падении и хранятся 14 дней. Скачанный
+`.xcresult` можно открыть в Xcode для просмотра failures, timings и вложений.
+Для повтора используйте **Re-run failed jobs** либо **Actions → Tests → Run
+workflow**, выбрав feature-ветку. При обновлении runner проверьте путь
+`DEVELOPER_DIR` и доступность runtime.
+
+## Ограничение локального окружения
+
+Для этой работы все package, hosted и UI tests выполняются **только в CI**.
+Codex не запускает локально XCTest, `swift test`, `xcodebuild test` или Simulator.
+Разрешены статические проверки и сборки:
+
+```sh
+xcodebuild -project kanji_test.xcodeproj -scheme kanji_test \
+  -configuration Debug -destination 'generic/platform=iOS' \
+  CODE_SIGNING_ALLOWED=NO build
+swift build --package-path Packages/AnkiImport -j 2
+git diff --check
+```
+
+Успешная локальная сборка не подтверждает прохождение тестов.

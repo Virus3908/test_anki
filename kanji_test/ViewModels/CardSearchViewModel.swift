@@ -51,7 +51,6 @@ final class CardSearchViewModel {
     private var wordIndex: CardSearchIndex<WordSearchRecord>?
     private var kanaIndex: CardSearchIndex<KanaSearchRecord>?
     private var ankiIndex: CardSearchIndex<AnkiSearchRecord>?
-    /// Кандзи по символу — для сборки карточек слов из найденных записей.
 
     /// Переводы: из них берутся сохранённые рус. значения кандзи.
     private let translationState: TranslationViewModel
@@ -118,14 +117,10 @@ final class CardSearchViewModel {
         kanaIndex = await Self.buildIndex(records: cards.map(KanaSearchRecord.init))
     }
 
-    /// Извлечение термов соблюдает isolation моделей, а тяжёлая склейка и
-    /// lowercase выполняются в фоне.
+    /// Sendable records can be normalized entirely outside MainActor.
     private static func buildIndex<Record: CardSearchRecord>(records: [Record]) async -> CardSearchIndex<Record> {
-        let terms = records.map(\.searchTerms)
-        return await Task.detached(priority: .userInitiated) {
-            let haystacks = terms.map { $0.joined(separator: " ").lowercased() }
-            return CardSearchIndex(records: records, haystacks: haystacks)
-        }.value
+        let worker = Task.detached(priority: .userInitiated) { CardSearchIndex(records: records) }
+        return await withTaskCancellationHandler { await worker.value } onCancel: { worker.cancel() }
     }
 
     // MARK: Поиск
