@@ -23,7 +23,7 @@ final class AnkiTests: UITestCase {
         XCTAssertLessThan(countersAfterStudy["new"] ?? .max, fixtureCardCount, "Rated card must leave the new pile")
 
         relaunchKeepingState()
-        openImportedDeck()
+        openImportedDeck(expectingImportNotice: false)
         XCTAssertEqual(counters(of: ID.Preview.start), countersAfterStudy, "Progress must survive relaunch")
     }
 
@@ -44,9 +44,8 @@ final class AnkiTests: UITestCase {
         tap(ID.Completion.stay, .backToStart, expecting: ID.Preview.start)
     }
 
-    private func openImportedDeck() {
-        tap(ID.Start.sectionAnki, .openAnki, expecting: ID.Anki.importPackage)
-        step(.importAnki, until: element(ID.Deck.row)) {}
+    private func openImportedDeck(expectingImportNotice: Bool = true) {
+        openImportedLibrary(expectingImportNotice: expectingImportNotice)
         tap(ID.Deck.row, .openDeck, expecting: ID.Preview.start)
     }
 }

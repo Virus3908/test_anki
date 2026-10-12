@@ -189,6 +189,7 @@ struct GlassIconButton: View {
             Image(systemName: systemImage)
                 .font(.system(size: diameter * 0.42, weight: .semibold))
                 .frame(width: diameter, height: diameter)
+                .contentShape(Circle())
         }
         .buttonStyle(.plain)
         .tint(AppPalette.text)

@@ -11,6 +11,20 @@ extension UITestCase {
         ID.Start.sectionAnki,
     ]
 
+    func openImportedLibrary(expectingImportNotice: Bool = true) {
+        let notice = app.alerts["Импорт Anki"]
+        let section = element(ID.Start.sectionAnki)
+        step(.openAnki, until: { section.isSelected || notice.exists }) { section.tap() }
+        if expectingImportNotice {
+            step(.importAnki, until: notice) {}
+            XCTAssertTrue(notice.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "3 карточек")).firstMatch.exists,
+                          "The fixture must finish importing successfully")
+            step(.importAnki, until: { !notice.exists }) { notice.buttons["Понятно"].tap() }
+        }
+        step(.openAnki, until: element(ID.Anki.importPackage)) {}
+        step(.importAnki, until: element(ID.Deck.row)) {}
+    }
+
     /// Start screen → section → first deck preview.
     func openFirstDeck(in section: String = ID.Start.sectionKanji) {
         tap(section, .switchSection, expecting: ID.Deck.row)
