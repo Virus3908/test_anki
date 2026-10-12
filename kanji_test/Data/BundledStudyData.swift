@@ -2,7 +2,13 @@ import Foundation
 
 actor BundledStudyData {
     static let shared = BundledStudyData()
+    private let bundle: Bundle
+
+    init(bundle: Bundle = .main) { self.bundle = bundle }
+
     private var words: [WordDictionaryEntry]?
+    private var kanaMetadata: [BundledKanaMetadata]?
+    private var kanaCards: [KanaDeck: [KanaStudyCard]] = [:]
     private var kanjiMetadata: [BundledKanjiMetadata]?
 
     func wordEntries() throws -> [WordDictionaryEntry] {
@@ -19,8 +25,29 @@ actor BundledStudyData {
         return loaded
     }
 
+    func bundledKanaMetadata() throws -> [BundledKanaMetadata] {
+        if let kanaMetadata { return kanaMetadata }
+        let loaded: [BundledKanaMetadata] = try decode("kana-metadata")
+        try BundledKanaMetadata.validate(loaded)
+        kanaMetadata = loaded
+        return loaded
+    }
+
+    func bundledKanaCards(deck: KanaDeck) throws -> [KanaStudyCard] {
+        if let cached = kanaCards[deck] { return cached }
+        let metadata = try bundledKanaMetadata()
+        let cards = try BundledKanaMetadata.cards(for: deck, from: metadata)
+        guard cards.allSatisfy({ !$0.strokes.isEmpty }) else { throw CocoaError(.fileReadCorruptFile) }
+        kanaCards[deck] = cards
+        return cards
+    }
+
     private func decode<Value: Decodable>(_ resource: String) throws -> Value {
-        guard let url = Bundle.main.url(forResource: resource, withExtension: "json") else {
+        try Self.decodeResource(resource, bundle: bundle)
+    }
+
+    nonisolated static func decodeResource<Value: Decodable>(_ resource: String, bundle: Bundle = .main) throws -> Value {
+        guard let url = bundle.url(forResource: resource, withExtension: "json") else {
             throw CocoaError(.fileReadNoSuchFile)
         }
         return try JSONDecoder().decode(Value.self, from: Data(contentsOf: url))

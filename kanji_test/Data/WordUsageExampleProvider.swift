@@ -20,14 +20,22 @@ struct TatoebaWordExampleProvider: WordExampleProviding {
     }()
 
     func loadExamples(for card: WordStudyCard, limit: Int = 3) async -> [WordUsageExample] {
+        let cached = await WordExampleCacheRepository.loadExamples(for: card.id)
         if !card.examples.isEmpty {
-            return Array(card.examples.prefix(limit))
+            let candidates = card.examples.map { example in
+                cached?.first { $0.attribution?.sentenceID == example.attribution?.sentenceID
+                    && example.attribution != nil && $0.sentence == example.sentence } ?? example
+            }
+            let examples = await enrich(Array(candidates.prefix(limit)))
+            await WordExampleCacheRepository.saveExamples(examples, for: card.id)
+            return examples
         }
 
-        if let cachedExamples = await WordExampleCacheRepository.loadExamples(for: card.id),
-           !cachedExamples.isEmpty,
+        if let cachedExamples = cached, !cachedExamples.isEmpty,
            cachedExamples.allSatisfy({ $0.attribution != nil && ($0.meaning == nil || $0.translationAttribution != nil) }) {
-            return Array(cachedExamples.prefix(limit))
+            let examples = await enrich(cachedExamples)
+            await WordExampleCacheRepository.saveExamples(examples, for: card.id)
+            return Array(examples.prefix(limit))
         }
 
         let remoteExamples = await loadRemoteExamples(for: card, limit: limit)

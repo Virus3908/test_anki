@@ -36,6 +36,10 @@ extension DeckPreviewView {
                 .mask { BottomScrollMask() }
                 .frame(maxHeight: .infinity)
 
+                if let error = deckState.loadError {
+                    Text(error).foregroundStyle(AppPalette.secondaryText)
+                }
+
                 if deckState.isLoadingDeck {
                     ProgressView("Загружаю штрихи")
                         .foregroundStyle(AppPalette.secondaryText)

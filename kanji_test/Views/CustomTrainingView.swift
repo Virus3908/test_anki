@@ -242,8 +242,9 @@ struct CustomTrainingView: View, CardContentRendering {
     private var drawingTrainingArea: some View {
         GeometryReader { proxy in
             let panelHeight = TrainingDrawingPanelMetrics.drawingPanelHeight(for: proxy.size)
-            let showsWordStrip = practiceMode == .words
-                && session.currentWordCard.flatMap { currentWordKanji(for: $0) } != nil
+            let showsWordStrip = (practiceMode == .words
+                && session.currentWordCard.flatMap { currentWordKanji(for: $0) } != nil)
+                || (practiceMode == .kana && (session.currentKanaCard?.drawingCards.count ?? 0) > 1)
 
             ZStack(alignment: .bottom) {
                 AppPalette.background
@@ -530,18 +531,20 @@ struct CustomTrainingView: View, CardContentRendering {
         }
     }
 
-    private func kanaDrawingArea(for card: KanaStudyCard, panelHeight: CGFloat) -> some View {
-        let expectedCard = kanjiCard(for: card)
-
-        return KanjiDrawingPanel(
-            drawingSession: drawingSession,
-            expectedCard: expectedCard,
-            panelHeight: panelHeight,
-            onStrokeFinished: { handleGuidedStrokeFinished(expectedCard) },
-            onReveal: { revealDrawingAnswer() },
-            onAdvance: { advanceStrokeOrReveal(expectedCard) }
-        ) {
-            ratingControls
+    @ViewBuilder private func kanaDrawingArea(for card: KanaStudyCard, panelHeight: CGFloat) -> some View {
+        if card.drawingCards.count > 1 {
+            wordDrawingArea(for: card.drawingWordCard, panelHeight: panelHeight)
+        } else if let expectedCard = card.drawingCards.first {
+            KanjiDrawingPanel(
+                drawingSession: drawingSession,
+                expectedCard: expectedCard,
+                panelHeight: panelHeight,
+                onStrokeFinished: { handleGuidedStrokeFinished(expectedCard) },
+                onReveal: { revealDrawingAnswer() },
+                onAdvance: { advanceStrokeOrReveal(expectedCard) }
+            ) {
+                ratingControls
+            }
         }
     }
 
@@ -576,14 +579,16 @@ struct CustomTrainingView: View, CardContentRendering {
 
     private var completedWordStrip: some View {
         Group {
-            if let card = session.currentWordCard {
+            if let card = session.currentWordCard ?? session.currentKanaCard.flatMap({ $0.drawingCards.count > 1 ? $0.drawingWordCard : nil }) {
                 CompletedWordStrip(
                     wordCard: card,
                     currentKanjiIndex: drawingSession.currentWordKanjiIndex,
                     drawnStrokes: drawingSession.drawnStrokes,
                     completedDrawings: drawingSession.completedWordDrawings,
                     isAnswerVisible: drawingSession.isAnswerVisible,
-                    isKanjiTextShown: cardFields(for: .words, side: .front).contains(.word),
+                    isKanjiTextShown: practiceMode == .kana
+                        ? cardFields(for: .kana, side: .front).contains(.character)
+                        : cardFields(for: .words, side: .front).contains(.word),
                     onSelectKanji: { drawingSession.selectWordKanji(at: $0, in: card) }
                 )
             }

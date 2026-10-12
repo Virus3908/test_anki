@@ -116,6 +116,34 @@ change to which due/waiting card is shown next usually belongs in
 -   `Data/word-data.json` --- large bundled vocabulary data; ignore by
     default.
 
+## Bundled kana
+
+-   `Data/kana-metadata.json` is the only application source for kana
+    characters/readings/deck order: an array of `{character, reading,
+    script, order}`; `script` is `hiragana` or `katakana`, and `order` is
+    contiguous from 1 within each deck. Current decks contain 114/115 cards.
+-   `Models/BundledKanaMetadata.swift` decodes/validates metadata, filters
+    by script, sorts by order and builds cards. Duplicate characters,
+    empty readings and invalid orders are rejected.
+-   `BundledStudyData` reads and caches metadata and completed decks on
+    its actor. `KanaDataLoader` exposes asynchronous throwing loading.
+    Counts use cached metadata; search/preview/training use loaded cards.
+    Views must not perform synchronous bundled JSON reads.
+-   `Data/BundledKanaDrawing.swift` uses `BundledKanjiVG` for each
+    character. The local archive index contains all 163 single characters
+    used by the decks. There are no Swift stroke tables or fallback JSON.
+    Missing/corrupt stroke resources fail deck loading explicitly.
+-   The 66 combined cards retain their original card ID/readings and
+    `kana:<character>` review keys, but draw characters sequentially through
+    the existing word drawing session/panels. `drawingWordCard` is only a
+    drawing adapter; never use its word review key for kana progress.
+    Preview displays the stroke sequence separately for each character.
+-   Word builders also resolve kana through local KanjiVG; unsupported
+    characters retain empty strokes and the existing self-assessment UI.
+-   `kanji_testHostedTests/LegacyKanaFixture.swift` freezes the old
+    sequences/readings; `BundledKanaTests.swift` covers resource loading,
+    compatibility, caching, errors and multi-character drawing transitions.
+
 ## Anki import and study
 
 Anki support is now a first-class subsystem. Start with
@@ -209,7 +237,7 @@ validation, staging/atomicity, or security-scoped URL handling. See
 -   `Drawing/StrokeFeedbackModels.swift` --- evaluation/feedback models.
 -   `Drawing/SVGStrokeExtractor.swift`, `SVGPathParser.swift` --- SVG
     stroke extraction/parsing.
--   `Drawing/KanaStrokePresets.swift` --- kana presets.
+-   `Data/BundledKanaDrawing.swift` --- single-character kana strokes from local KanjiVG; no geometric fallback.
 -   `Models/KanjiStroke.swift` --- stroke/source domain models.
 -   `Views/TrainingView+*Drawing*.swift` --- training integration.
 
@@ -229,7 +257,19 @@ For drawing correctness bugs, inspect `DrawingSessionViewModel`,
 -   `Services/RussianMeaningDictionary.swift` --- local Russian
     meanings.
 -   Tatoeba files in `Data/` --- remote word examples.
--   `Data/WordExampleCacheRepository.swift` --- example cache.
+-   `Data/WordExampleCacheRepository.swift` --- word and kanji example caches.
+-   `Models/Furigana.swift` --- optional raw Tatoeba transcription metadata,
+    structured segments and strict bracket-markup parser. See `docs/tatoeba-furigana.md`.
+-   `Data/TatoebaFuriganaLoader.swift` --- upgrades old examples by sentence ID,
+    preserving text/attribution; successful empty results are cached, failures retry
+    after one day. Do not replace cached sentences with new search results to add ruby.
+-   `Views/FuriganaText.swift` --- native SwiftUI/Core Text ruby renderer shared
+    by word and kanji examples. `StudyPreferences.showExampleFurigana` controls
+    display immediately; never reload examples merely to toggle it.
+-   Tatoeba `Hrkt`/`altscript` uses `[今日|きょう]` and `[学校|がっ|こう]`,
+    not trusted HTML. Reconstructed UTF-8 must exactly match the source sentence;
+    unknown/missing/malformed readings fall back to original text. Keep optional
+    cache fields backward compatible and preserve transcription editor metadata.
 
 ## Remote kanji data
 
@@ -292,6 +332,9 @@ App-hosted Anki/SRS integration tests:
 
 When changing scheduling/queue behavior, add or update focused
 integration/unit tests rather than relying only on UI testing.
+
+GitHub Actions runs AnkiImport package tests and all hosted iOS tests through
+`.github/workflows/tests.yml`; see `docs/ci.md` for runner, artifacts and limitations.
 
 ## Change workflow
 

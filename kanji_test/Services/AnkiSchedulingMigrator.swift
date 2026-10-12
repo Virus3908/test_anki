@@ -40,7 +40,14 @@ nonisolated enum AnkiSchedulingMigrator {
         let state = reviewState(type: type)
         let due = dueDate(scheduling: scheduling, collectionCreationTime: collectionCreationTime)
             ?? fallbackDue(lastReviewedAt: lastReviewedAt, scheduling: scheduling)
-        let interval = intervalDays(scheduling["ivl", default: 0], due: due, lastReview: lastReviewedAt)
+        let queue = Int(scheduling["queue", default: Int64(type)])
+        let interval: Double = queue == 1
+            ? 0
+            : intervalDays(
+                scheduling["ivl", default: 0],
+                due: due,
+                lastReview: lastReviewedAt
+            )
         let seed = replay ?? seedMemory(at: lastReviewedAt, rating: lastRating, options: options)
         let record = StudyReviewRecord(
             attempts: max(reps, valid.count), intervalDays: interval, dueDate: due,

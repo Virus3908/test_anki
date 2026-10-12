@@ -1,18 +1,25 @@
 import Foundation
 
-struct KanaStudyCard: Identifiable, Sendable {
+nonisolated struct KanaStudyCard: Identifiable, Sendable {
     var id: String { character }
 
     let character: String
+    let script: KanaDeck
     let reading: String
-    let strokes: [KanjiStroke]
+    let drawingCards: [KanjiCard]
 
-    init(character: String, reading: String, strokes: [KanjiStroke]? = nil) {
+    /// Total stroke count; drawing always evaluates each character separately.
+    var strokes: [KanjiStroke] { drawingCards.flatMap(\.strokes) }
+
+    init(character: String, reading: String, script: KanaDeck, drawingCards: [KanjiCard]) {
         self.character = character
         self.reading = reading
-        self.strokes = strokes ?? KanaStrokePresets.strokes(for: character)
+        self.script = script
+        self.drawingCards = drawingCards
     }
 
-    static let hiragana: [KanaStudyCard] = HiraganaPresets.cards
-    static let katakana: [KanaStudyCard] = KatakanaPresets.cards
+    /// Adapter to the existing multi-character drawing session, without word progress keys.
+    @MainActor var drawingWordCard: WordStudyCard {
+        WordStudyCard(word: character, reading: reading, meaning: "", examples: [], kanjiCards: drawingCards)
+    }
 }

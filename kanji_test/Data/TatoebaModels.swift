@@ -11,6 +11,7 @@ struct TatoebaSentence: Decodable {
     let owner: String?
     let license: String?
     let translations: [TatoebaTranslation]
+    let transcriptions: [TatoebaTranscription]?
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -19,6 +20,19 @@ struct TatoebaSentence: Decodable {
         case owner
         case license
         case translations
+        case transcriptions
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(Int.self, forKey: .id)
+        text = try container.decode(String.self, forKey: .text)
+        isUnapproved = try container.decode(Bool.self, forKey: .isUnapproved)
+        owner = try container.decodeIfPresent(String.self, forKey: .owner)
+        license = try container.decodeIfPresent(String.self, forKey: .license)
+        translations = try container.decodeIfPresent([TatoebaTranslation].self, forKey: .translations) ?? []
+        // Optional malformed associated data must never discard the sentence.
+        transcriptions = (try? container.decodeIfPresent([TatoebaTranscription].self, forKey: .transcriptions))
     }
 
     var attribution: TatoebaAttribution? {

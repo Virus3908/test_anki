@@ -22,7 +22,8 @@ extension TatoebaWordExampleProvider {
                         reading: Self.fallbackReading(for: card, in: sentence.text),
                         meaning: sentence.preferredEnglishTranslation?.text,
                         attribution: sentence.attribution,
-                        translationAttribution: sentence.preferredEnglishTranslation?.attribution
+                        translationAttribution: sentence.preferredEnglishTranslation?.attribution,
+                        furigana: ExampleFurigana(transcriptions: sentence.transcriptions ?? [], checkedAt: Date())
                     )
                 }
         } catch {
@@ -59,7 +60,8 @@ extension TatoebaWordExampleProvider {
                         reading: "",
                         meaning: sentence.preferredEnglishTranslation?.text ?? "",
                         attribution: sentence.attribution,
-                        translationAttribution: sentence.preferredEnglishTranslation?.attribution
+                        translationAttribution: sentence.preferredEnglishTranslation?.attribution,
+                        furigana: ExampleFurigana(transcriptions: sentence.transcriptions ?? [], checkedAt: Date())
                     )
                 }
         } catch {

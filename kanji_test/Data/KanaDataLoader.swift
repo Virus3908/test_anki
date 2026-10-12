@@ -1,37 +1,16 @@
 import Foundation
 
-enum KanaDataLoader {
-    static func loadCards(deck: KanaDeck) async -> [KanaStudyCard] {
-        let baseCards = deck.baseCards
-
-        return await withTaskGroup(of: KanaStudyCard.self) { group in
-            for card in baseCards {
-                group.addTask {
-                    await loadCard(card)
-                }
-            }
-
-            var cardsByCharacter: [String: KanaStudyCard] = [:]
-            for await card in group {
-                cardsByCharacter[card.character] = card
-            }
-
-            return baseCards.map { cardsByCharacter[$0.character] ?? $0 }
-        }
+nonisolated enum KanaDataLoader {
+    static func loadCards(deck: KanaDeck) async throws -> [KanaStudyCard] {
+        try await BundledStudyData.shared.bundledKanaCards(deck: deck)
     }
 
-    private static func loadCard(_ card: KanaStudyCard) async -> KanaStudyCard {
-        guard card.character.unicodeScalars.count == 1 else {
-            return card
+    static func loadAllCards() async throws -> [KanaStudyCard] {
+        var cards: [KanaStudyCard] = []
+        for deck in KanaDeck.allCases {
+            cards += try await loadCards(deck: deck)
         }
-
-        do {
-            let strokes = try BundledKanjiVG.strokes(for: card.character)
-
-            return KanaStudyCard(character: card.character, reading: card.reading, strokes: strokes)
-        } catch {
-            return card
-        }
+        return cards
     }
 
     static func clearCache() async throws {

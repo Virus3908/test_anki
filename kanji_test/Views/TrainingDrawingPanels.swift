@@ -3,7 +3,7 @@ import SwiftUI
 // Shared training-screen building blocks, extracted from TrainingView so the
 // SRS training screen and the endless custom-training screen render
 // identically: rating bar, drawing panels, word strip, header and the
-// kana→kanji card mapping used by the drawing panels.
+// character sequences used by the drawing panels.
 
 // MARK: - Rating bar
 
@@ -407,30 +407,37 @@ struct CompletedWordStrip: View {
         HStack(spacing: 8) {
             ForEach(wordCard.kanjiCards.enumerated(), id: \.offset) { index, kanjiCard in
                 let isSelected = index == currentKanjiIndex
-                ZStack {
-                    if isSelected && !drawnStrokes.isEmpty {
-                        UserStrokePreview(strokes: drawnStrokes)
-                    } else if index < completedDrawings.count {
-                        UserStrokePreview(strokes: completedDrawings[index])
-                    } else if isAnswerVisible || isKanjiTextShown {
-                        Text(kanjiCard.kanji)
-                            .font(.title3.weight(.semibold))
-                            .foregroundStyle(isAnswerVisible ? AppPalette.text : AppPalette.secondaryText)
-                    } else {
-                        Text("\(index + 1)")
-                            .font(.caption.weight(.bold))
-                            .foregroundStyle(index == currentKanjiIndex ? AppPalette.accent : AppPalette.mutedText)
+                Button {
+                    onSelectKanji(index)
+                } label: {
+                    ZStack {
+                        if isSelected && !drawnStrokes.isEmpty {
+                            UserStrokePreview(strokes: drawnStrokes)
+                        } else if index < completedDrawings.count && !completedDrawings[index].isEmpty {
+                            UserStrokePreview(strokes: completedDrawings[index])
+                        } else if isAnswerVisible || isKanjiTextShown {
+                            Text(kanjiCard.kanji)
+                                .font(.title3.weight(.semibold))
+                                .foregroundStyle(isAnswerVisible ? AppPalette.text : AppPalette.secondaryText)
+                        } else {
+                            Text("\(index + 1)")
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(isSelected ? AppPalette.accent : AppPalette.mutedText)
+                        }
                     }
+                    .frame(width: 34, height: 34)
+                    .background(AppPalette.surface)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 4)
+                            .stroke(isSelected ? AppPalette.accent : AppPalette.border.opacity(0.45),
+                                    lineWidth: isSelected ? 2 : 1)
+                    )
+                    .contentShape(Rectangle())
                 }
-                .frame(width: 34, height: 34)
-                .background(AppPalette.surface)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 4)
-                        .stroke(isSelected ? AppPalette.accent : AppPalette.border.opacity(0.45),
-                                lineWidth: isSelected ? 2 : 1)
-                )
-                .contentShape(Rectangle())
-                .onTapGesture { onSelectKanji(index) }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Символ \(index + 1)")
+                .accessibilityValue(isSelected ? "Выбран" : "")
+                .accessibilityIdentifier("drawing.character.\(index)")
             }
         }
     }
@@ -475,24 +482,5 @@ struct TrainingHeaderView: View {
         }
         .buttonStyle(.bordered)
         .tint(AppPalette.accent)
-    }
-}
-
-// MARK: - Kana → kanji card mapping for drawing panels
-
-extension CardContentRendering {
-    /// Maps a kana card onto the kanji-card shape the drawing panel expects,
-    /// reusing the kana stroke presets as the expected stroke order.
-    func kanjiCard(for kanaCard: KanaStudyCard) -> KanjiCard {
-        KanjiCard(
-            kanji: kanaCard.character,
-            meanings: [kanaCard.reading],
-            onyomi: [],
-            kunyomi: [kanaCard.reading],
-            examples: [],
-            source: KanjiSource(name: "KanjiVG", file: "kana", license: "KanjiVG: Creative Commons Attribution-Share Alike 3.0"),
-            strokes: kanaCard.strokes,
-            translationState: "ru-system"
-        )
     }
 }

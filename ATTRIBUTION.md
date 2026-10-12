@@ -1,3 +1,10 @@
+# Attribution and third-party licenses
+
+The project's own code and documentation are licensed under the MIT License;
+see [LICENSE](LICENSE). The licenses below apply independently to third-party
+data and dependencies. Imported Anki deck content retains its original rights
+and is not covered by the project's MIT License.
+
 ## Dictionary Data
 
 This project uses dictionary data derived from JMdict and KANJIDIC.
@@ -14,9 +21,24 @@ JMdict project: https://www.edrdg.org/wiki/index.php/JMdict-EDICT_Dictionary_Pro
 
 KANJIDIC project: https://www.edrdg.org/wiki/index.php/KANJIDIC_Project
 
-The JMdict-derived files in this project include:
+The bundled dictionary-derived resources include:
 
-- `kanji_test/Data/word-data.json`
+- `kanji_test/Data/word-data.json` (JMdict)
+- `kanji_test/Data/kanji-metadata.json` (KANJIDIC2, via kanjiapi.dev; see
+  [KanjiData-NOTICE.txt](kanji_test/Data/KanjiData-NOTICE.txt))
+
+## KanjiVG Stroke Data
+
+Kanji and kana drawing samples come from KanjiVG, Copyright Ulrich Apel and
+KanjiVG contributors, licensed under Creative Commons Attribution-ShareAlike 3.0.
+
+The bundled archive is adapted from release `r20250816`: it preserves ordered
+SVG paths and omits unused SVG metadata and presentation elements. This adapted
+stroke dataset remains under CC BY-SA 3.0.
+
+- Source: https://github.com/KanjiVG/kanjivg
+- Adaptation notice: [KanjiVG-NOTICE.txt](kanji_test/Data/KanjiVG-NOTICE.txt)
+- Full license: [KanjiVG-LICENSE.txt](kanji_test/Data/KanjiVG-LICENSE.txt)
 
 ## Example Sentences
 

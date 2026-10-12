@@ -73,6 +73,7 @@ extension CardContentRendering {
                 let key = TranslationBlockKey.kanjiExamples(card.kanji)
                 StudyExamplesContent(
                     examples: displayedKanjiExamples(for: card).map { StudyExample(kanjiExample: $0) },
+                    showsFurigana: settings.showExampleFurigana,
                     isLoading: translationState.isAutomaticallyTranslating(key)
                         || translationState.isManuallyTranslating(key)
                         || translationState.isManuallyReloadingExamples(key),

@@ -7,6 +7,7 @@ enum TatoebaEndpoint {
         }
 
         components.queryItems = [
+            URLQueryItem(name: "include", value: "transcriptions"),
             URLQueryItem(name: "q", value: word),
             URLQueryItem(name: "lang", value: "jpn"),
             URLQueryItem(name: "sort", value: "relevance"),
@@ -20,5 +21,10 @@ enum TatoebaEndpoint {
         ]
 
         return components.url
+    }
+
+    /// Refresh an existing cache entry by identity, without replacing its sentence or translation.
+    static func sentence(id: Int) -> URL? {
+        URL(string: "https://api.tatoeba.org/unstable/sentences/\(id)?include=transcriptions")
     }
 }

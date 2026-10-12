@@ -1,6 +1,6 @@
 import Foundation
 
-enum KanaDeck: String, CaseIterable, Identifiable, Sendable {
+nonisolated enum KanaDeck: String, Codable, CaseIterable, Identifiable, Sendable {
     case hiragana
     case katakana
 
@@ -24,16 +24,4 @@ enum KanaDeck: String, CaseIterable, Identifiable, Sendable {
         }
     }
 
-    var baseCards: [KanaStudyCard] {
-        switch self {
-        case .hiragana:
-            return KanaStudyCard.hiragana
-        case .katakana:
-            return KanaStudyCard.katakana
-        }
-    }
-
-    var cards: [KanaStudyCard] {
-        baseCards
-    }
 }

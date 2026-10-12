@@ -32,21 +32,23 @@ nonisolated struct WordDictionaryEntry: Codable, Identifiable, Sendable {
 }
 
 nonisolated struct WordUsageExample: Codable, Identifiable, Sendable {
-    var id: String { "\(sentence)-\(reading ?? "")-\(meaning ?? "")" }
+    var id: String { attribution.map { "tatoeba-\($0.sentenceID)" } ?? "\(sentence)-\(reading ?? "")-\(meaning ?? "")" }
 
     let sentence: String
     let reading: String?
     let meaning: String?
     let attribution: TatoebaAttribution?
     let translationAttribution: TatoebaAttribution?
+    var furigana: ExampleFurigana?
 
     init(sentence: String, reading: String? = nil, meaning: String? = nil,
-         attribution: TatoebaAttribution? = nil, translationAttribution: TatoebaAttribution? = nil) {
+         attribution: TatoebaAttribution? = nil, translationAttribution: TatoebaAttribution? = nil, furigana: ExampleFurigana? = nil) {
         self.sentence = sentence
         self.reading = reading
         self.meaning = meaning
         self.attribution = attribution
         self.translationAttribution = translationAttribution
+        self.furigana = furigana
     }
 
     enum CodingKeys: String, CodingKey {
@@ -57,6 +59,7 @@ nonisolated struct WordUsageExample: Codable, Identifiable, Sendable {
         case translation
         case attribution
         case translationAttribution
+        case furigana
     }
 
     init(from decoder: Decoder) throws {
@@ -69,6 +72,7 @@ nonisolated struct WordUsageExample: Codable, Identifiable, Sendable {
             ?? container.decodeIfPresent(String.self, forKey: .translation)
         attribution = try container.decodeIfPresent(TatoebaAttribution.self, forKey: .attribution)
         translationAttribution = try container.decodeIfPresent(TatoebaAttribution.self, forKey: .translationAttribution)
+        furigana = try? container.decodeIfPresent(ExampleFurigana.self, forKey: .furigana)
     }
 
     func encode(to encoder: Encoder) throws {
@@ -78,6 +82,7 @@ nonisolated struct WordUsageExample: Codable, Identifiable, Sendable {
         try container.encodeIfPresent(meaning, forKey: .meaning)
         try container.encodeIfPresent(attribution, forKey: .attribution)
         try container.encodeIfPresent(translationAttribution, forKey: .translationAttribution)
+        try container.encodeIfPresent(furigana, forKey: .furigana)
     }
 }
 
@@ -87,14 +92,16 @@ nonisolated struct StudyExample: Identifiable, Sendable, Hashable {
     let reading: String?
     let meaning: String?
     let sources: [StudyExampleSource]
+    let furigana: ExampleFurigana?
 
     init(id: String, text: String, reading: String? = nil, meaning: String? = nil,
-         sources: [StudyExampleSource] = []) {
+         sources: [StudyExampleSource] = [], furigana: ExampleFurigana? = nil) {
         self.id = id
         self.text = text
         self.reading = reading?.nilIfBlank
         self.meaning = meaning?.nilIfBlank
         self.sources = sources
+        self.furigana = furigana
     }
 
     init(wordExample example: WordUsageExample, reading: String? = nil) {
@@ -103,7 +110,9 @@ nonisolated struct StudyExample: Identifiable, Sendable, Hashable {
             text: example.sentence,
             reading: reading ?? example.reading,
             meaning: example.meaning,
-            sources: [example.attribution, example.translationAttribution].compactMap(StudyExampleSource.init)
+            sources: [StudyExampleSource(example.attribution, editors: example.furigana?.transcriptions?.compactMap(\.editor) ?? []),
+                      StudyExampleSource(example.translationAttribution)].compactMap { $0 },
+            furigana: example.furigana
         )
     }
 
@@ -113,7 +122,9 @@ nonisolated struct StudyExample: Identifiable, Sendable, Hashable {
             text: example.word,
             reading: example.reading,
             meaning: example.meaning,
-            sources: [example.attribution, example.translationAttribution].compactMap(StudyExampleSource.init)
+            sources: [StudyExampleSource(example.attribution, editors: example.furigana?.transcriptions?.compactMap(\.editor) ?? []),
+                      StudyExampleSource(example.translationAttribution)].compactMap { $0 },
+            furigana: example.furigana
         )
     }
 }
@@ -123,10 +134,11 @@ nonisolated struct StudyExampleSource: Identifiable, Sendable, Hashable {
     let title: String
     let url: URL
 
-    init?(_ attribution: TatoebaAttribution?) {
+    init?(_ attribution: TatoebaAttribution?, editors: [String] = []) {
         guard let attribution, let url = attribution.sentenceURL else { return nil }
         self.id = "tatoeba-\(attribution.sentenceID)"
-        self.title = attribution.displayText
+        let editors = Set(editors).sorted()
+        self.title = attribution.displayText + (editors.isEmpty ? "" : " · редакторы транскрипции: " + editors.joined(separator: ", "))
         self.url = url
     }
 }

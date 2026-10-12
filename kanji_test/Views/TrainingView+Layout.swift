@@ -149,25 +149,40 @@ extension TrainingView {
         GeometryReader { proxy in
             let panelHeight = TrainingDrawingPanelMetrics.drawingPanelHeight(for: proxy.size)
 
-            ZStack {
-            AppPalette.background
-                .ignoresSafeArea()
+            ZStack(alignment: .bottom) {
+                AppPalette.background
+                    .ignoresSafeArea()
 
                 VStack(spacing: 0) {
-            ScrollView(.vertical) {
-                VStack(alignment: .leading, spacing: 16) {
-                    headerControls()
-                    kanaStudyCard(for: kanaCard)
-                }
-                .padding(20)
-                .padding(.bottom, 12)
-                .foregroundStyle(AppPalette.text)
-            }
-            .simultaneousGesture(cardSwipeGesture())
+                    ScrollView(.vertical) {
+                        VStack(alignment: .leading, spacing: 16) {
+                            headerControls()
+                            kanaStudyCard(for: kanaCard)
+                        }
+                        .padding(20)
+                        .padding(.bottom, 12)
+                        .foregroundStyle(AppPalette.text)
+                    }
+                    .simultaneousGesture(cardSwipeGesture())
 
                     kanaDrawingPanel(for: kanaCard, panelHeight: panelHeight)
                 }
-        }
+
+                if kanaCard.drawingCards.count > 1 {
+                    CompletedWordStrip(
+                        wordCard: kanaCard.drawingWordCard,
+                        currentKanjiIndex: drawingSession.currentWordKanjiIndex,
+                        drawnStrokes: drawingSession.drawnStrokes,
+                        completedDrawings: drawingSession.completedWordDrawings,
+                        isAnswerVisible: drawingSession.isAnswerVisible,
+                        isKanjiTextShown: cardFields(for: .kana, side: .front).contains(.character),
+                        onSelectKanji: { selectWordKanji(at: $0, in: kanaCard.drawingWordCard) }
+                    )
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, panelHeight + 10)
+                    .zIndex(2)
+                }
+            }
         }
     }
 
