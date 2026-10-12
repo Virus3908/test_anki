@@ -38,6 +38,32 @@ final class FuriganaRenderingTests: XCTestCase {
         assertNoOverlaps(view.layout(width: 100), width: 100)
     }
 
+    func testShortRubySentenceLeavesAttributionBesideText() {
+        let host = UIHostingController(rootView:
+            HStack(alignment: .firstTextBaseline, spacing: 6) {
+                FuriganaText(text: text, furigana: data)
+                    .fixedSize(horizontal: false, vertical: true)
+                Image(systemName: "info.circle").font(.caption).fixedSize()
+            }
+        )
+        let size = host.sizeThatFits(in: CGSize(width: 320, height: 300))
+        // This short sentence and its source icon must not stretch to the
+        // container's edge merely because ruby replaced ordinary Text.
+        XCTAssertGreaterThan(size.width, 0)
+        XCTAssertLessThan(size.width, 200)
+    }
+
+    func testWrappedRubyReportsOccupiedWidthWithinProposal() {
+        let original = String(repeating: text, count: 20)
+        let markup = String(repeating: "[学校|がっ|こう]は[好|す]き？", count: 20)
+        let furigana = ExampleFurigana(transcriptions: [TatoebaTranscription(text: markup, script: "Hrkt", type: "altscript")], checkedAt: Date())
+        let host = UIHostingController(rootView: FuriganaText(text: original, furigana: furigana))
+        let size = host.sizeThatFits(in: CGSize(width: 240, height: 2000))
+        XCTAssertGreaterThan(size.width, 0)
+        XCTAssertLessThanOrEqual(size.width, 240)
+        XCTAssertGreaterThan(size.height, drawingView(text: text, data: data).layout(width: 240).height)
+    }
+
     func testSwiftUIEnabledDisabledAndAbsentTranscription() throws {
         for (enabled, furigana, expectedNative) in [(true, Optional(data), true), (false, Optional(data), false), (true, nil, false)] {
             let host = UIHostingController(rootView: FuriganaText(text: text, furigana: furigana, showsFurigana: enabled))
