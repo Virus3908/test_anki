@@ -6,6 +6,7 @@ extension WordDataLoader {
         cardsByCharacter: [String: KanjiCard]
     ) -> [WordStudyCard] {
         var seen: Set<String> = []
+        var resolvedCharacters = cardsByCharacter
 
         return entries.compactMap { entry in
             guard seen.insert(entry.id).inserted else {
@@ -13,11 +14,13 @@ extension WordDataLoader {
             }
 
             let characterCards = entry.word.map(String.init).map { character -> KanjiCard in
-                if let card = cardsByCharacter[character] {
+                if let card = resolvedCharacters[character] {
                     return card
                 }
 
-                return isKana(character) ? kanaCard(for: character) : unavailableDrawingCard(for: character)
+                let card = isKana(character) ? kanaCard(for: character) : unavailableDrawingCard(for: character)
+                resolvedCharacters[character] = card
+                return card
             }
 
             return WordStudyCard(

@@ -10,6 +10,26 @@ actor BundledStudyData {
     private var kanaMetadata: [BundledKanaMetadata]?
     private var kanaCards: [KanaDeck: [KanaStudyCard]] = [:]
     private var kanjiMetadata: [BundledKanjiMetadata]?
+    private var kanjiByCharacter: [String: BundledKanjiMetadata]?
+    private var kanjiCards: [String: KanjiCard] = [:]
+
+    /// Metadata is decoded/indexed once; geometry is built only on demand and
+    /// shared by subsequent word/deck loads through Swift's value storage.
+    func bundledKanjiCards(characters: Set<String>) throws -> [KanjiCard] {
+        if kanjiByCharacter == nil {
+            kanjiByCharacter = Dictionary(try bundledKanjiMetadata().map { ($0.kanji, $0) },
+                uniquingKeysWith: { first, _ in first })
+        }
+        return try characters.sorted().compactMap { character in
+            try Task.checkCancellation()
+            if let cached = kanjiCards[character] { return cached }
+            guard let metadata = kanjiByCharacter?[character] else { return nil }
+            let card = metadata.makeCard()
+            kanjiCards[character] = card
+            return card
+        }
+    }
+
 
     func wordEntries() throws -> [WordDictionaryEntry] {
         if let words { return words }

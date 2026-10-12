@@ -1,8 +1,9 @@
 import Foundation
 
 extension WordDataLoader {
-    static func loadKanjiCards(for _: [WordDictionaryEntry], provider _: KanjiProviding) async -> [KanjiCard] {
-        await loadSourceKanjiCards()
+    static func loadKanjiCards(for entries: [WordDictionaryEntry], provider _: KanjiProviding) async -> [KanjiCard] {
+        let characters = requiredKanjiCharacters(in: entries)
+        return (try? await BundledStudyData.shared.bundledKanjiCards(characters: characters)) ?? []
     }
 
     static func loadSourceKanjiCards() async -> [KanjiCard] {
