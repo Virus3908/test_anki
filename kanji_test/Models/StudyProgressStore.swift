@@ -23,10 +23,18 @@ nonisolated struct StudyProgressStore: Codable, Sendable {
     }
     private func day(_ date: Date) -> Date { Calendar.current.startOfDay(for: date) }
     private mutating func rebuildDailyIndex() {
+        rebuildDailyIndex(checkCancellation: {})
+    }
+    private mutating func rebuildDailyIndex(checkCancellation: () throws -> Void) rethrows {
         dailyReviewCounts = [:]
         dailyIntroductions = [:]
-        for (key, date) in firstShownAt { dailyIntroductions[day(date), default: []].insert(key) }
-        for entry in reviewLog where entry.countsTowardReviewLimit {
+        for (key, date) in firstShownAt {
+            try checkCancellation()
+            dailyIntroductions[day(date), default: []].insert(key)
+        }
+        for entry in reviewLog {
+            try checkCancellation()
+            guard entry.countsTowardReviewLimit else { continue }
             dailyReviewCounts[day(entry.reviewedAt), default: [:]][entry.deckID, default: 0] += 1
         }
     }
@@ -86,13 +94,43 @@ nonisolated struct StudyProgressStore: Codable, Sendable {
     /// FSRS continuity, but never participates in the current session's undo stack.
     @discardableResult
     mutating func bootstrap(_ record: StudyReviewRecord, logs: [StudyReviewLog], for key: String) -> Bool {
-        guard records[key] == nil else { return false }
-        firstShownAt[key] = firstShownAt[key] ?? record.lastReviewedAt
-        records[key] = record
-        let existing = Set(reviewLog.map(\.id))
-        reviewLog.append(contentsOf: logs.filter { !existing.contains($0.id) })
-        rebuildDailyIndex()
-        return true
+        bootstrap([BootstrapEntry(key: key, record: record, logs: logs)]) > 0
+    }
+
+    struct BootstrapEntry: Sendable {
+        let key: String
+        let record: StudyReviewRecord
+        let logs: [StudyReviewLog]
+    }
+
+    /// One UUID set and one index rebuild per import. First occurrence wins;
+    /// existing app progress and history order are preserved.
+    @discardableResult
+    mutating func bootstrap(_ entries: [BootstrapEntry]) -> Int {
+        bootstrap(entries, checkCancellation: {})
+    }
+
+    @discardableResult
+    mutating func bootstrap(_ entries: [BootstrapEntry], checkCancellation: () throws -> Void) rethrows -> Int {
+        var existing = Set<UUID>()
+        for log in reviewLog {
+            try checkCancellation()
+            existing.insert(log.id)
+        }
+        var imported = 0
+        for entry in entries {
+            try checkCancellation()
+            guard records[entry.key] == nil else { continue }
+            firstShownAt[entry.key] = firstShownAt[entry.key] ?? entry.record.lastReviewedAt
+            records[entry.key] = entry.record
+            for log in entry.logs {
+                try checkCancellation()
+                if existing.insert(log.id).inserted { reviewLog.append(log) }
+            }
+            imported += 1
+        }
+        if imported > 0 { try rebuildDailyIndex(checkCancellation: checkCancellation) }
+        return imported
     }
     func isExcluded(_ key: String) -> Bool { excludedReviewKeys.contains(key) }
     mutating func exclude(_ key: String) { excludedReviewKeys.insert(key) }

@@ -102,12 +102,14 @@ final class TrainingSessionViewModel {
             ($0.id, settings.options(for: "anki:\(importID):deck:\($0.id)"))
         })
         let current = reviewStore
-        let migrated = await Task.detached(priority: .userInitiated) {
+        let worker = Task.detached(priority: .userInitiated) {
             var progress = current
-            let count = AnkiSchedulingMigrator.bootstrap(collection: collection, importID: importID,
+            let count = try AnkiSchedulingMigrator.bootstrapCancellable(collection: collection, importID: importID,
                 optionsByDeck: options, progress: &progress)
             return (progress, count)
-        }.value
+        }
+        let migrated = try await withTaskCancellationHandler { try await worker.value } onCancel: { worker.cancel() }
+        try Task.checkCancellation()
         guard migrated.1 > 0 else { return 0 }
         try await repository.save(migrated.0)
         reviewStore = migrated.0
