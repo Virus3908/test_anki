@@ -3,6 +3,7 @@
 import hashlib
 import json
 import re
+from author_exercises import authored
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -60,6 +61,7 @@ def generate():
                 if re.search(re.escape(pattern) + r'(?![ぁ-ヿ一-龯])', rule.get('notes', '')):
                     relations.append({'ruleID': ids[0], 'kind': 'sourceMention',
                         'explanationRU': 'Конструкция прямо упомянута в исходном примечании. Связь не означает равнозначность.'})
+            rule["exercises"] = authored(rule, all_rules)
             if relations:
                 rule['relations'] = relations
             if rule['id'] in overlay:
@@ -97,8 +99,12 @@ def generate():
         'counts': COUNTS, 'sourceSHA256': hashes,
         'totalRules': len(seen), 'totalExamples': examples,
         'localizedRules': sum('localization' in r for r in imported),
-        'reviewedChoiceExercises': sum(len(r.get('exercises', [])) for r in imported),
-        'releaseReady': all('localization' in r and len(r.get('exercises', [])) >= 3 for r in imported)})
+        'sourceAlignedExercises': sum(len(r.get('exercises', [])) for r in imported),
+        'exercisesByKind': {kind: sum(e['kind'] == kind for r in imported for e in r.get('exercises', []))
+            for kind in ('chooseConstruction','fillBlank','identifyConstruction','chooseCorrectSentence','transformSentence')},
+        'translationPolicy': 'on-device-en-ru',
+        'releaseReady': all(len(r.get('exercises', [])) >= 3 for r in imported),
+        'manualLinguisticReviewClaimed': False})
     print(f'Imported {len(seen)} rules / {examples} examples from {SHA}. Check manifest for localization coverage.')
 
 if __name__ == '__main__':

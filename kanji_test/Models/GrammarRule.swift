@@ -52,7 +52,37 @@ nonisolated struct GrammarRule: Identifiable, Codable, Sendable, StudyItem {
     var categories: [GrammarCategory] { tags.compactMap(GrammarCategory.init(rawValue:)) }
     var displayedMeaning: String { localization?.meaningRU ?? meaning }
     var displayedFormation: String { localization?.formationRU ?? formation }
-    var displayedExplanation: String? { localization?.explanationRU ?? notes }
+    var displayedExplanation: String? { localization?.explanationRU ?? notes ?? exercises?.first?.explanationEN }
+
+    func withExercises(_ value: [GrammarExercise]?) -> GrammarRule {
+        GrammarRule(id: id, level: level, pattern: pattern, reading: reading, romaji: romaji,
+            meaning: meaning, formation: formation, notes: notes, examples: examples, tags: tags,
+            localization: localization, exercises: value, relations: relations)
+    }
+}
+
+extension GrammarRule {
+    // Malformed exercise content disables this rule's practice, not other lessons.
+    nonisolated init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        let decodedID = try values.decode(String.self, forKey: .id)
+        id = decodedID
+        level = try values.decode(GrammarLevel.self, forKey: .level)
+        pattern = try values.decode(String.self, forKey: .pattern)
+        reading = try values.decodeIfPresent(String.self, forKey: .reading)
+        romaji = try values.decodeIfPresent(String.self, forKey: .romaji)
+        meaning = try values.decode(String.self, forKey: .meaning)
+        formation = try values.decode(String.self, forKey: .formation)
+        notes = try values.decodeIfPresent(String.self, forKey: .notes)
+        examples = try values.decode([GrammarExample].self, forKey: .examples)
+        tags = try values.decode([String].self, forKey: .tags)
+        localization = try values.decodeIfPresent(GrammarLocalization.self, forKey: .localization)
+        relations = try values.decodeIfPresent([GrammarRelation].self, forKey: .relations)
+        let decoded = try? values.decodeIfPresent([GrammarExercise].self, forKey: .exercises)
+        if let decoded, decoded.allSatisfy({ $0.isUsable(for: decodedID) }),
+           Set(decoded.map(\.id)).count == decoded.count { exercises = decoded }
+        else { exercises = nil }
+    }
 }
 
 nonisolated struct GrammarLocalization: Codable, Sendable {

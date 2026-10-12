@@ -13,6 +13,8 @@ final class GrammarPracticeViewModel {
     }
     let rule: GrammarRule
     let exercises: [GrammarExercise]
+    let isFreePractice: Bool
+    private(set) var isClosed = false
     let recallPrompts: [RecallPrompt]
     private(set) var position = 0
     private(set) var selectedOptionID: String?
@@ -20,11 +22,13 @@ final class GrammarPracticeViewModel {
     private(set) var results: [GrammarExerciseResult] = []
     private let seed: String
 
-    init(rule: GrammarRule, seed: String) {
-        self.rule = rule; self.seed = seed
-        exercises = GrammarExerciseSelection.ordered(rule.exercises ?? [], seed: seed)
+    init(rule: GrammarRule, seed: String, freePractice: Bool = false) {
+        self.rule = rule; self.seed = seed; isFreePractice = freePractice
+        let available = rule.exercises ?? []
+        exercises = available.allSatisfy { $0.isUsable(for: rule.id) }
+            ? Array(GrammarExerciseSelection.ordered(available, seed: seed).prefix(3)) : []
         let examples = GrammarExerciseSelection.ordered(rule.examples, seed: seed + "examples")
-        let example = examples[0] // Loader requires at least one real source example.
+        let example = examples.first ?? GrammarExample(ja: "", en: "", furigana: nil, ru: nil) // Loader requires at least one real source example.
         let prompts = [
             RecallPrompt(id: "\(rule.id):recall-meaning", question: "Объясни значение и контекст употребления конструкции.",
                 cue: rule.pattern, sourceAnswer: [rule.displayedMeaning, rule.displayedExplanation ?? ""].joined(separator: "\n\n")),
@@ -36,9 +40,13 @@ final class GrammarPracticeViewModel {
         recallPrompts = GrammarExerciseSelection.ordered(prompts, seed: seed + "recall")
     }
 
-    var isSelfAssessment: Bool { exercises.isEmpty }
+    var isSelfAssessment: Bool { isFreePractice }
+    var contentError: String? { !isFreePractice && exercises.count < 3 ? "Для этого правила пока нет трёх полноценных упражнений. Можно прочитать урок; результат обучения не будет сохранён." : nil }
+    var correctCount: Int { results.filter(\.isCorrect).count }
+    var proposedRating: ReviewRating? { isComplete && !isSelfAssessment && !isClosed ? GrammarLessonRating.rating(correct: correctCount, total: count) : nil }
+    func close() { isClosed = true }
     var count: Int { isSelfAssessment ? recallPrompts.count : exercises.count }
-    var isComplete: Bool { position >= count }
+    var isComplete: Bool { contentError == nil && count > 0 && position >= count }
     var currentExercise: GrammarExercise? { exercises[safe: position] }
     var currentRecall: RecallPrompt? { recallPrompts[safe: position] }
     var options: [GrammarExercise.Option] {
@@ -47,14 +55,14 @@ final class GrammarPracticeViewModel {
     }
 
     func choose(_ optionID: String) {
-        guard !isAnswerVisible, let exercise = currentExercise,
+        guard !isClosed, contentError == nil, !isAnswerVisible, let exercise = currentExercise,
               exercise.options.contains(where: { $0.id == optionID }) else { return }
         selectedOptionID = optionID; isAnswerVisible = true
         results.append(GrammarExerciseResult(exerciseID: exercise.id, optionID: optionID, isCorrect: exercise.accepts(optionID)))
     }
-    func reveal() { guard isSelfAssessment, !isComplete else { return }; isAnswerVisible = true }
+    func reveal() { guard !isClosed, isSelfAssessment, !isComplete else { return }; isAnswerVisible = true }
     func next() {
-        guard isAnswerVisible, !isComplete else { return }
+        guard !isClosed, contentError == nil, isAnswerVisible, !isComplete else { return }
         position += 1; selectedOptionID = nil; isAnswerVisible = false
     }
 }

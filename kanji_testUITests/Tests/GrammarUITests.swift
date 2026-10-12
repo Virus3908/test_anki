@@ -3,43 +3,55 @@ import XCTest
 final class GrammarUITests: UITestCase {
     func testAllFiveLevelsOpenWithRealStatistics() {
         launch()
-        tap("start.section.grammar", .switchSection, expecting: "grammar.total")
+        openGrammar()
+        capture("01-grammar-home")
         for level in ["N5", "N4", "N3", "N2", "N1"] {
             scrollTo("grammar.level.\(level)")
             tap("grammar.level.\(level)", .openDeck, expecting: "grammar.statistics")
             XCTAssertTrue(element("grammar.learn").exists)
             XCTAssertTrue(element("grammar.review").exists)
-            XCTAssertTrue(element("grammar.contentStatus").exists)
-            step(.backToStart, until: element("grammar.total")) { app.navigationBars.buttons.firstMatch.tap() }
+            if level == "N5" { capture("02-n5-rule-list") }
+            tap(ID.Preview.back, .backToStart, expecting: "grammar.total")
         }
     }
 
-    func testRuleExampleFuriganaAndThreePromptSelfAssessment() {
+    func testLessonExercisesResultContinuationAndUndo() {
         launch()
-        tap("start.section.grammar", .switchSection, expecting: "grammar.level.N5")
-        tap("grammar.level.N5", .openDeck, expecting: "grammar.rule.wa")
-        scrollTo("grammar.rule.wa")
-        tap("grammar.rule.wa", .openDeck, expecting: "grammar.lesson.title")
+        openWaLesson()
+        capture("03-rule-explanation")
         XCTAssertTrue(element("grammar.lesson.explanation").exists)
-        app.swipeUp()
-        XCTAssertTrue(element("grammar.example").waitForExistence(timeout: 5))
-        XCTAssertTrue(element("grammar.furigana").exists)
-        // Practice is after examples/attribution; scroll until it can be tapped.
-        scrollTo("grammar.practice")
+        scrollTo("grammar.furigana")
+        XCTAssertTrue(element("grammar.example").exists)
         tap("grammar.practice", .startTraining, expecting: "grammar.training.begin")
-        scrollTo("grammar.training.begin")
-        tap("grammar.training.begin", .startTraining, expecting: "grammar.training.reveal")
+        tap("grammar.training.begin", .startTraining, expecting: "grammar.training.next")
+        capture("04-exercise-before-answer")
         for index in 0..<3 {
-            tap("grammar.training.reveal", .revealCard, expecting: "grammar.training.next")
+            answer(correct: true)
+            if index == 0 { capture("05-correct-answer") }
             tap("grammar.training.next", .revealCard,
-                expecting: index < 2 ? "grammar.training.reveal" : ID.Training.rateGood)
+                expecting: index < 2 ? "grammar.training.next" : "grammar.training.saved")
         }
-        XCTAssertTrue(element(ID.Training.rateGood).waitForExistence(timeout: 5))
-        XCTAssertTrue(element(ID.Training.rateGood).isEnabled)
-        XCTAssertTrue(element("grammar.training.exit").exists)
-        tap(ID.Training.rateGood, .rateCard, expecting: "grammar.training.reveal")
+        capture("07-lesson-result")
+        XCTAssertTrue(element("grammar.training.result").label.contains("3 из 3"))
+        tap("grammar.training.continue", .rateCard, expecting: "grammar.training.next")
         tap("grammar.training.undo", .rateCard, expecting: "grammar.training.begin")
-        tap("grammar.training.exit", .exitTraining, expecting: "grammar.practice")
+        tap(ID.Preview.back, .exitTraining, expecting: "grammar.practice")
+    }
+
+    func testWrongAnswersOnCompactPhoneWithLargeText() {
+        launch(largeText: true)
+        XCTAssertLessThanOrEqual(app.frame.width, 430, "CI must use an installed compact iPhone")
+        openWaLesson()
+        tap("grammar.practice", .startTraining, expecting: "grammar.training.begin")
+        tap("grammar.training.begin", .startTraining, expecting: "grammar.training.next")
+        for index in 0..<3 {
+            answer(correct: false)
+            if index == 0 { capture("06-incorrect-answer-large-text") }
+            tap("grammar.training.next", .revealCard,
+                expecting: index < 2 ? "grammar.training.next" : "grammar.training.saved")
+        }
+        XCTAssertTrue(element("grammar.training.result").label.contains("0 из 3"))
+        capture("08-lesson-result-large-text")
     }
 
     func testGlobalGrammarSearchOpensFullLessonAndSourceReference() {
@@ -52,13 +64,44 @@ final class GrammarUITests: UITestCase {
         result.tap()
         XCTAssertTrue(element("grammar.lesson.title").waitForExistence(timeout: 5))
         scrollTo("grammar.related.katawara")
-        XCTAssertTrue(element("grammar.related.katawara").exists)
         element("grammar.related.katawara").tap()
         XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "〜かたわら")).firstMatch.waitForExistence(timeout: 5))
     }
 
+    private func openGrammar() {
+        for _ in 0..<5 where !element("start.section.grammar").isHittable {
+            element("start.sectionSwitcher").swipeLeft()
+        }
+        tap("start.section.grammar", .switchSection, expecting: "grammar.total")
+    }
+
+    private func openWaLesson() {
+        openGrammar()
+        tap("grammar.level.N5", .openDeck, expecting: "grammar.statistics")
+        scrollTo("grammar.rule.wa")
+        tap("grammar.rule.wa", .openDeck, expecting: "grammar.lesson.title")
+    }
+
+    private func answer(correct: Bool) {
+        let query = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "grammar.option."))
+        let predicate = NSPredicate(format: correct ? "identifier BEGINSWITH %@" : "NOT (identifier BEGINSWITH %@)", "grammar.option.wa")
+        let option = query.matching(predicate).firstMatch
+        XCTAssertTrue(option.waitForExistence(timeout: 10))
+        for _ in 0..<8 where !option.isHittable { app.swipeUp() }
+        XCTAssertTrue(option.isHittable)
+        step(.revealCard, until: element("grammar.training.feedback")) { option.tap() }
+        XCTAssertEqual(option.value as? String, correct ? "correct" : "selectedIncorrect")
+    }
+
+    private func capture(_ name: String) {
+        let attachment = XCTAttachment(screenshot: app.screenshot())
+        attachment.name = "grammar-" + name
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+
     private func scrollTo(_ identifier: String) {
-        for _ in 0..<8 where !element(identifier).isHittable { app.swipeUp() }
-        XCTAssertTrue(element(identifier).isHittable, "Element must be reachable after scrolling: \(identifier)")
+        for _ in 0..<10 where !element(identifier).isHittable { app.swipeUp() }
+        XCTAssertTrue(element(identifier).isHittable, "Element must be reachable: \(identifier)")
     }
 }

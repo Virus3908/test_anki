@@ -41,6 +41,7 @@ enum StartMenuSection: String, CaseIterable, Identifiable {
 }
 
 struct StartView: View, StudyViewStyling {
+    @ScaledMetric(relativeTo: .subheadline) var sectionBarHeight: CGFloat = 54
     @Binding var practiceMode: PracticeMode
     let isLoading: Bool
     let onOpen: (StudyRoute) -> Void
@@ -89,7 +90,7 @@ struct StartView: View, StudyViewStyling {
         case .kanji: return "Колоды кандзи с порядком черт и интервальным повторением."
         case .words: return "Слова из локального JMdict, сгруппированные в common-наборы."
         case .kana: return "Хирагана и катакана с просмотром карточек и тренировкой письма."
-        case .grammar: return "Все 526 правил JLPT N5–N1. Исходные материалы OpenJLPT на английском языке."
+        case .grammar: return "Все 526 правил JLPT N5–N1: уроки, упражнения и интервальные повторения."
         case .anki: return "Импортируй колоды Anki с полями, картинками и звуком."
         }
     }

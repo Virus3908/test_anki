@@ -83,7 +83,7 @@ actor GrammarDataLoader {
             for exercise in rule.exercises ?? [] {
                 try require(nonempty(exercise.id) && exerciseIDs.insert(exercise.id).inserted
                     && exercise.ruleID == rule.id && nonempty(exercise.promptRU)
-                    && nonempty(exercise.explanationRU) && nonempty(exercise.reviewer), "неполное задание \(rule.id)")
+                    && nonempty(exercise.explanationRU), "неполное задание \(rule.id)")
                 let optionIDs = Set(exercise.options.map(\.id))
                 try require(exercise.options.count >= 2 && optionIDs.count == exercise.options.count
                     && exercise.options.allSatisfy { nonempty($0.id) && nonempty($0.text) }

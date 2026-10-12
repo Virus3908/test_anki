@@ -37,13 +37,14 @@ struct GrammarLevelMenu: View {
 
 struct GrammarContentStatus: View {
     var body: some View {
-        Text("Исходный учебный материал на английском языке. Русская локализация и проверенные задания с выбором ответа ещё не подготовлены. Доступна самопроверка с оценкой FSRS.")
+        Text("Урок → упражнения → результат → повторение. Английский оригинал переводится системой на устройстве. Задания основаны на OpenJLPT; автоматическая проверка источника не заменяет лингвистическое ревью.")
             .font(.callout).foregroundStyle(AppPalette.secondaryText)
             .accessibilityIdentifier("grammar.contentStatus")
     }
 }
 
-struct GrammarLevelView: View {
+struct GrammarLevelView: View, StudyViewStyling {
+    @Environment(\.dismiss) private var dismiss
     let level: GrammarLevel
     let appModel: StudyAppViewModel
     @State private var model = GrammarLibraryViewModel()
@@ -57,9 +58,13 @@ struct GrammarLevelView: View {
     private var filterToken: String { "\(query)|\(category?.rawValue ?? "all")|\(model.rules.count)" }
 
     var body: some View {
+        VStack(spacing: 14) {
+            previewHeader(title: "Грамматика \(level.rawValue)", subtitle: "\(rules.count) правил", onBack: { dismiss() }) {
+                GlassIconButton(systemImage: "gearshape", accessibilityLabel: "Настройки") { appModel.isSettingsPresented = true }
+            }
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                if model.isLoading { ProgressView("Загружаю правила") }
+                if model.isLoading { CenteredLoadingIndicator(title: "Загружаю правила") }
                 if let error = model.error {
                     Text(error).foregroundStyle(AppPalette.correction)
                     Button("Повторить") { Task { await model.load() } }
@@ -67,11 +72,6 @@ struct GrammarLevelView: View {
                 if !rules.isEmpty {
                     statistics
                     GrammarContentStatus()
-                    Button("Начать обучение") { appModel.startGrammar(level) }
-                        .buttonStyle(.borderedProminent).accessibilityIdentifier("grammar.learn")
-                    Button("Повторить изученное") { appModel.startGrammar(level, reviewsOnly: true) }
-                        .buttonStyle(.bordered).accessibilityIdentifier("grammar.review")
-                    Button("Настройки колоды") { appModel.isSettingsPresented = true }
                     TextField("Конструкция, чтение, значение", text: $query)
                         .textFieldStyle(.roundedBorder).autocorrectionDisabled().textInputAutocapitalization(.never)
                         .accessibilityIdentifier("grammar.search")
@@ -85,7 +85,7 @@ struct GrammarLevelView: View {
                             NavigationLink(value: StudyRoute.grammarRule(level, rule.id)) {
                                 VStack(alignment: .leading, spacing: 6) {
                                     Text(rule.pattern).font(.headline)
-                                    Text(rule.displayedMeaning).font(.callout)
+                                    Text(appModel.translationState.displayedGrammarText(rule.displayedMeaning, rule: rule, language: appModel.settings.options(for: level.deck.id).meaningLanguage)).font(.callout)
                                     Text(GrammarStatistics.status(rule, progress: appModel.trainingSession.reviewStore))
                                         .font(.caption).foregroundStyle(AppPalette.secondaryText)
                                 }
@@ -101,7 +101,17 @@ struct GrammarLevelView: View {
             }
             .padding(16).foregroundStyle(AppPalette.text)
         }
-        .background(AppPalette.background).navigationTitle("Грамматика \(level.rawValue)")
+        }
+        .padding(.horizontal, 12).padding(.top, 8)
+        .background(AppPalette.background.ignoresSafeArea()).toolbar(.hidden, for: .navigationBar)
+        .safeAreaInset(edge: .bottom) {
+            BottomActionBar {
+                primaryActionButton(title: "Начать обучение", systemImage: "checklist",
+                    accessibilityIdentifier: "grammar.learn") { appModel.startGrammar(level) }
+                GlassIconButton(systemImage: "arrow.clockwise", accessibilityLabel: "Повторить изученное",
+                    accessibilityIdentifier: "grammar.review") { appModel.startGrammar(level, reviewsOnly: true) }
+            }
+        }
         .task { await model.load() }
         .onChange(of: query) { model.invalidateSearch() }
         .onChange(of: category) { model.invalidateSearch() }
@@ -124,7 +134,7 @@ struct GrammarLevelView: View {
         return VStack(alignment: .leading, spacing: 8) {
             Text("На повторении: \(stats.review) / \(stats.total)").font(.headline)
             ProgressView(value: Double(stats.review), total: Double(max(1, stats.total)))
-            Text("Новые: \(stats.new) · Learning: \(stats.learning) · Relearning: \(stats.relearning)")
+            Text("Новые: \(stats.new) · Обучение: \(stats.learning) · Переучивание: \(stats.relearning)")
             Text("Готовы к повторению: \(stats.due) · Исключены: \(stats.excluded)")
             Text("Сегодня: \(plan.todayIDs.count) · Новые: \(plan.newCount) · Скрыты лимитом: \(plan.hiddenReviews)")
             DisclosureGroup("Расписание") {

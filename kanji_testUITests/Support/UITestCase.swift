@@ -30,8 +30,8 @@ class UITestCase: XCTestCase {
 
     // MARK: Launch
 
-    func launch(importingAnkiFixture: Bool = false) {
-        app = AppLauncher.makeApp(importingAnkiFixture: importingAnkiFixture)
+    func launch(importingAnkiFixture: Bool = false, largeText: Bool = false) {
+        app = AppLauncher.makeApp(importingAnkiFixture: importingAnkiFixture, largeText: largeText)
         step(.launch, until: { self.element(AccessibilityID.Start.search).isHittable }) { app.launch() }
     }
 

@@ -15,6 +15,8 @@ final class TrainingSessionViewModel {
     /// Set only when the normal study queue for the day has been exhausted.
     /// The app uses this to return to the deck and present the completion sheet.
     private(set) var didCompleteToday = false
+    /// Keeps grammar feedback visible after persistence, until explicit continuation.
+    private(set) var isGrammarResultPending = false
     var drawingSession: DrawingSessionViewModel { presentation.drawing }
     private let repository: any ReviewPersisting
     private let catalog: StudyCardCatalog
@@ -162,6 +164,7 @@ final class TrainingSessionViewModel {
     func start(deck: StudyDeck, sourceIDs: [String], guided: Bool = false) async -> Bool {
         guard hasLoadedProgress, !isPreparingCard else { return false }
         didCompleteToday = false
+        isGrammarResultPending = false
         isPreparingCard = true
         defer { isPreparingCard = false }
         var seen: Set<String> = []
@@ -186,8 +189,8 @@ final class TrainingSessionViewModel {
             return false
         }
     }
-    func submitReview(_ rating: ReviewRating, expectedKey: String?) async {
-        guard hasLoadedProgress, !isPreparingCard, let mode, let deck,
+    func submitReview(_ rating: ReviewRating, expectedKey: String?, holdGrammarResult: Bool = false) async {
+        guard hasLoadedProgress, !isPreparingCard, !isGrammarResultPending, let mode, let deck,
               let id = queueIDs[safe: currentIndex] else { return }
         if hasStudyDayChanged { await refreshForNewDay(); return }
         let key = ReviewItem(id: id, mode: mode).reviewKey
@@ -205,14 +208,39 @@ final class TrainingSessionViewModel {
             let logID = try progress.apply(rating, to: key, deckID: deck.id, options: options)
             next.undoHistory.append(ReviewUndo(id: id, reviewKey: key, recordBefore: previous, logID: logID))
             next.sessionCompletedCards += 1
-            rebuild(&next, progress: progress)
-            _ = markCurrentShown(in: next, progress: &progress)
+            let hold = holdGrammarResult && mode == .grammar
+            if !hold {
+                rebuild(&next, progress: progress)
+                _ = markCurrentShown(in: next, progress: &progress)
+            }
             try await repository.save(progress)
             reviewStore = progress
-            if next.todayIDs.isEmpty { finishCompletedToday() }
+            isGrammarResultPending = hold
+            if hold { state = next }
+            else if next.todayIDs.isEmpty { finishCompletedToday() }
             else { publish(next) }
         } catch { errors.report("Ответ не сохранён. Попробуй оценить карточку ещё раз.", error: error) }
     }
+    /// Advance the same queue after a saved grammar result; never apply another rating.
+    func continueGrammarAfterResult() async {
+        guard mode == .grammar, isGrammarResultPending, !isPreparingCard else { return }
+        isPreparingCard = true
+        defer { isPreparingCard = false }
+        var next = state
+        var progress = reviewStore
+        if hasStudyDayChanged {
+            next.undoHistory = []; next.sessionCompletedCards = 0
+            settings.expireAdditionalCards(studyDay: progress.studyDate())
+        }
+        rebuild(&next, progress: progress)
+        do {
+            if markCurrentShown(in: next, progress: &progress) { try await repository.save(progress) }
+            reviewStore = progress
+            isGrammarResultPending = false
+            if next.todayIDs.isEmpty { finishCompletedToday() } else { publish(next) }
+        } catch { errors.report("Не удалось перейти к следующему правилу.", error: error) }
+    }
+
     func moveToPreviousCard() async {
         if isGuidedSingleKanjiPractice { moveInPractice(to: currentIndex - 1); return }
         guard !isPreparingCard, let undo = state.undoHistory.last else { return }
@@ -228,6 +256,7 @@ final class TrainingSessionViewModel {
         do {
             try await repository.save(progress)
             reviewStore = progress
+            isGrammarResultPending = false
             publish(next)
         } catch { errors.report("Не удалось отменить ответ.", error: error) }
     }
@@ -261,6 +290,7 @@ final class TrainingSessionViewModel {
     func finish() {
         guard !isPreparingCard else { return }
         didCompleteToday = false
+        isGrammarResultPending = false
         publish(TrainingSessionState())
         catalog.releaseAnkiCards()
     }
@@ -284,7 +314,7 @@ final class TrainingSessionViewModel {
         return !Calendar.current.isDate(day, inSameDayAs: reviewStore.studyDate())
     }
     func refreshForNewDay() async {
-        guard isActive, !isPreparingCard, !isGuidedSingleKanjiPractice else { return }
+        guard isActive, !isPreparingCard, !isGrammarResultPending, !isGuidedSingleKanjiPractice else { return }
         isPreparingCard = true
         defer { isPreparingCard = false }
         var next = state

@@ -22,6 +22,13 @@ struct ContentView: View {
             }
             trainingScreen
         }
+        .transformEnvironment(\.dynamicTypeSize) { size in
+            #if DEBUG
+            if UITestingLaunch.isActive && ProcessInfo.processInfo.environment["UITEST_GRAMMAR_LARGE_TEXT"] == "1" {
+                size = .accessibility3
+            }
+            #endif
+        }
         .animation(.easeInOut(duration: 0.3), value: appModel.navigation.presentedTraining)
         .sheet(isPresented: $model.isSettingsPresented) {
             SettingsView(settings: appModel.settings,
@@ -85,7 +92,7 @@ struct ContentView: View {
             GrammarLevelView(level: level, appModel: appModel)
         case .grammarRule(_, let ruleID):
             GrammarRuleView(ruleID: ruleID, settings: appModel.settings,
-                progress: appModel.trainingSession.reviewStore) { rule in
+                progress: appModel.trainingSession.reviewStore, translationState: appModel.translationState) { rule in
                     appModel.startGrammar(rule.level, ruleID: rule.id)
                 }
         case .ankiDeck(let deck):
@@ -119,7 +126,7 @@ struct ContentView: View {
     @ViewBuilder private var trainingScreen: some View {
         switch appModel.navigation.presentedTraining {
         case .training(.grammar):
-            GrammarTrainingView(session: appModel.trainingSession, settings: appModel.settings,
+            GrammarTrainingView(session: appModel.trainingSession, settings: appModel.settings, translationState: appModel.translationState,
                 onOpenSettings: openSettings)
                 .background(AppPalette.background.ignoresSafeArea())
                 .transition(.move(edge: .trailing))

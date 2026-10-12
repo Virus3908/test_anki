@@ -18,6 +18,15 @@
   "totalRules": 526,
   "totalExamples": 1526,
   "localizedRules": 0,
-  "reviewedChoiceExercises": 0,
-  "releaseReady": false
+  "sourceAlignedExercises": 2440,
+  "exercisesByKind": {
+    "chooseConstruction": 1052,
+    "fillBlank": 406,
+    "identifyConstruction": 526,
+    "chooseCorrectSentence": 455,
+    "transformSentence": 1
+  },
+  "translationPolicy": "on-device-en-ru",
+  "releaseReady": true,
+  "manualLinguisticReviewClaimed": false
 }

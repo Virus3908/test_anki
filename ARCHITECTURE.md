@@ -707,20 +707,27 @@ Anki. Базовые настройки и review JSON не изменяются
 восстанавливаются после перезапуска; studyDate учитывает ручной сдвиг дня,
 Calendar — полночь. Observation обновляет превью при изменении разрешения.
 
-### Грамматика OpenJLPT N5–N1 (незавершённый русский курс)
+### Грамматика OpenJLPT N5–N1
 
-GrammarRule/GrammarExample/GrammarExercise отделяют исходные материалы,
-русские адаптации и состояние прохода. Actor GrammarDataLoader читает
-версионированный pinned Bundle snapshot и кеширует все пять уровней.
+GrammarRule/GrammarExample/GrammarExercise отделяют исходники от сессии и SRS.
+Actor GrammarDataLoader кеширует pinned Bundle snapshot всех пяти уровней;
+невалидные упражнения отключают только практику соответствующего правила.
 GrammarLibraryViewModel использует прежний CardSearchIndex вне MainActor.
-GrammarLevelView/GrammarRuleView/GrammarTrainingView добавляют навигацию,
-фуригану через прежний renderer и практику через общий TrainingSessionViewModel.
-Колоды grammar:n5 … grammar:n1; одна запись grammar:<upstreamID> на правило.
-Планировщик, JSON-прогресс, история и формулы FSRS не менялись.
+Экраны переиспользуют previewHeader, BottomActionBar, appSurfaceCard и AppPalette.
 
-Все 526 оригиналов импортированы; русские уроки/переводы и авторские задания
-не подготовлены. Доступна открытая самопроверка с ручной оценкой FSRS,
-которую нельзя считать полноценным проверенным корпусом упражнений.
-См. [формат, архитектуру и обновление](docs/grammar.md),
-[ограничения качества](docs/grammar-quality.md). CI проверяет целостность
-и отдельно блокирует готовность русского курса при отсутствующих материалах.
+526 правил/1526 исходных примеров и 2440 source-aligned заданий. Перевод английских
+полей выполняется на устройстве прежним TranslationViewModel/TranslationRepository
+с grammar-content:<id>:ru; японские части защищены и сохранён оригинал. Учебные
+переводы не выдаются за ручное лингвистическое ревью.
+
+Первый урок → три задания → разбор результата → одно сохранение FSRS → продолжение.
+Повторение сразу открывает задания. GrammarPracticeViewModel проверяет option ID;
+GrammarLessonRating назначает Again/Again/Hard/Good для 0/1/2/3 правильных.
+Общая TrainingSessionViewModel удерживает сохранённый результат до продолжения;
+Undo восстанавливает record и запускает упражнение заново. Второй сессии/FSRS нет.
+Колоды grammar:n5 … n1, ключ grammar:<upstreamID>. JSON-прогресс, история других
+режимов и формулы FSRS не меняются. Дневные лимиты/дополнительные карточки прежние.
+
+[Формат и обновление](docs/grammar.md), [качество](docs/grammar-quality.md).
+CI проверяет pinned исходники, задания и основу перевода на телефоне; все тесты
+и визуальные артефакты получают только на GitHub-hosted runners.

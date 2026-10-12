@@ -133,7 +133,7 @@ struct CardSearchView: View, CardContentRendering {
         } message: { Text(model.openingError ?? "") }
         .sheet(item: $selectedGrammarRule) { rule in
             NavigationStack {
-                GrammarRuleView(ruleID: rule.id, settings: settings, progress: reviewStore) { selected in
+                GrammarRuleView(ruleID: rule.id, settings: settings, progress: reviewStore, translationState: translationState) { selected in
                     selectedGrammarRule = nil
                     dismiss()
                     onPractice(.grammar(selected.level, ruleID: selected.id))

@@ -39,7 +39,10 @@ final class GrammarDataTests: XCTestCase {
             XCTAssertEqual(rule.displayedFormation, rule.formation)
             XCTAssertTrue(rule.examples.allSatisfy { $0.ru == nil })
             let practice = GrammarPracticeViewModel(rule: rule, seed: "source-only")
-            if practice.isSelfAssessment { XCTAssertTrue(practice.results.isEmpty) }
+            XCTAssertFalse(practice.isSelfAssessment)
+            XCTAssertGreaterThanOrEqual(rule.exercises?.count ?? 0, 3)
+            XCTAssertGreaterThanOrEqual(Set((rule.exercises ?? []).map(\.kind)).count, 2)
+            XCTAssertTrue((rule.exercises ?? []).allSatisfy { $0.provenance?.status == .automaticallyChecked && $0.reviewer == nil })
         }
     }
 

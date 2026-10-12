@@ -141,6 +141,41 @@ final class GrammarStudyIntegrationTests: XCTestCase {
         XCTAssertEqual(restarted.reviewStore.firstShownAt.keys.sorted(), session.reviewStore.firstShownAt.keys.sorted())
     }
 
+    func testSavedResultIsHeldOnceUntilContinueAndUndoRestoresLesson() async throws {
+        let repository = GrammarMemoryReviews()
+        let suite = "GrammarPending-\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suite)!
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let errors = StorageStatus()
+        let settings = StudyPreferences(defaults: defaults, errors: errors)
+        let catalog = StudyCardCatalog()
+        let session = TrainingSessionViewModel(repository: repository, catalog: catalog, settings: settings, errors: errors)
+        let rules = Array(try await GrammarDataLoader.shared.rules(.n5).prefix(2))
+        try await session.loadProgress()
+        let started = await session.start(deck: GrammarLevel.n5.deck, sourceIDs: catalog.register(rules))
+        XCTAssertTrue(started)
+        let revision = session.scrollToTopToken
+        await session.submitReview(.good, expectedKey: rules[0].reviewKey, holdGrammarResult: true)
+        await session.submitReview(.good, expectedKey: rules[0].reviewKey, holdGrammarResult: true)
+        XCTAssertTrue(session.isGrammarResultPending)
+        XCTAssertEqual(session.scrollToTopToken, revision)
+        XCTAssertEqual(session.currentGrammarRule?.id, rules[0].id)
+        XCTAssertEqual(session.reviewStore.reviewLog.count, 1)
+        let stored = try await repository.load()
+        XCTAssertEqual(stored.reviewLog.count, 1)
+        await session.refreshForNewDay()
+        XCTAssertTrue(session.isGrammarResultPending)
+        await session.continueGrammarAfterResult()
+        await session.continueGrammarAfterResult()
+        XCTAssertFalse(session.isGrammarResultPending)
+        XCTAssertEqual(session.currentGrammarRule?.id, rules[1].id)
+        XCTAssertEqual(session.reviewStore.reviewLog.count, 1)
+        await session.moveToPreviousCard()
+        XCTAssertEqual(session.currentGrammarRule?.id, rules[0].id)
+        XCTAssertNil(session.reviewStore.record(for: rules[0].reviewKey))
+        XCTAssertTrue(session.reviewStore.reviewLog.isEmpty)
+    }
+
     func testCancelledSearchCannotPublishPreviousResults() async throws {
         let model = GrammarLibraryViewModel()
         await model.load()

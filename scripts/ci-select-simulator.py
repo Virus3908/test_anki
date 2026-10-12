@@ -2,6 +2,7 @@
 import json
 import os
 import subprocess
+import sys
 
 inventory = json.loads(subprocess.check_output(["xcrun", "simctl", "list", "--json"]))
 candidates = []
@@ -18,7 +19,16 @@ for runtime in inventory["runtimes"]:
             candidates.append((version, device["name"], device["udid"]))
 if not candidates:
     raise SystemExit("No available iPhone simulator with iOS >= 26.5; check the runner image")
-version, name, identifier = max(candidates)
+if '--compact' in sys.argv:
+    newest = max(version for version, _, _ in candidates)
+    available = [device for device in candidates if device[0] == newest]
+    def compact_rank(device):
+        name = device[1]
+        return ('Max' in name or 'Plus' in name, 'SE' not in name and 'mini' not in name,
+                '16e' not in name, 'Pro' not in name, name)
+    version, name, identifier = min(available, key=compact_rank)
+else:
+    version, name, identifier = max(candidates)
 print(f"Using {name}, iOS {version}: {identifier}")
 with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as output:
     output.write(f"CI_SIMULATOR_ID={identifier}\n")

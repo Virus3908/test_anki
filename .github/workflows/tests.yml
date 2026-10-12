@@ -47,7 +47,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v6
-      - name: Require Russian lessons and reviewed exercises for every rule
+      - name: Require on-device localization source and three exercises per rule
         run: python3 tools/grammar/validate_ci.py --release
       - name: Upload unresolved content requirements
         if: always()
@@ -146,7 +146,7 @@ jobs:
       - name: Show Xcode and available simulators
         run: |
           xcodebuild -version
-          python3 scripts/ci-select-simulator.py
+          python3 scripts/ci-select-simulator.py --compact
       - name: Build ui tests
         run: |
           set -euo pipefail
@@ -180,6 +180,20 @@ jobs:
             -resultBundlePath artifacts/ui-tests.xcresult \
             CODE_SIGNING_ALLOWED=NO \
             2>&1 | tee artifacts/ui-tests.log
+      - name: Export screenshots and other UI attachments
+        if: always()
+        run: |
+          if [ -d artifacts/ui-tests.xcresult ]; then
+            xcrun xcresulttool export attachments --path artifacts/ui-tests.xcresult --output-path artifacts/grammar-ui-screenshots
+          fi
+      - name: Upload grammar screenshots for visual review
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: grammar-ui-screenshots
+          path: artifacts/grammar-ui-screenshots
+          if-no-files-found: warn
+          retention-days: 14
       - name: Upload ui test results
         if: always()
         uses: actions/upload-artifact@v7
