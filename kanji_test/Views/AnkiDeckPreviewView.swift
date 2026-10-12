@@ -200,7 +200,10 @@ struct AnkiCardPreviewView: View, StudyViewStyling {
     }
 
     private var count: Int { searchRecords?.count ?? cards.count }
-    private var currentCard: AnkiStudyCard? { searchRecords == nil ? cards[safe: index] : searchCard }
+    private var currentCard: AnkiStudyCard? {
+        guard let searchRecords else { return cards[safe: index] }
+        return searchCard?.id == searchRecords[safe: index]?.id ? searchCard : nil
+    }
 
     var body: some View {
         NavigationStack {

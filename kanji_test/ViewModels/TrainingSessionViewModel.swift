@@ -255,6 +255,7 @@ final class TrainingSessionViewModel {
         guard !isPreparingCard else { return }
         didCompleteToday = false
         publish(TrainingSessionState())
+        catalog.releaseAnkiCards()
     }
     func addNewCardsToToday(_ count: Int, for deckID: String) {
         settings.addAdditionalCards(count, for: deckID, studyDay: reviewStore.studyDate())
@@ -316,6 +317,7 @@ final class TrainingSessionViewModel {
     private func finishCompletedToday() {
         didCompleteToday = true
         publish(TrainingSessionState())
+        catalog.releaseAnkiCards()
     }
     private func effectiveOptions(for deckID: String?, studyDay: Date? = nil) -> DeckOptions {
         var result = settings.options(for: deckID)

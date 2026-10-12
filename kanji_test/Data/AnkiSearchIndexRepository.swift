@@ -22,9 +22,13 @@ actor AnkiSearchIndexRepository {
     func records(for summary: AnkiImportSummary, sourceURL: URL) throws -> [AnkiSearchRecord] {
         try Task.checkCancellation()
         let url = try indexURL(summary)
-        if let data = try? Data(contentsOf: url),
+        if let size = try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize,
+           size <= byteLimit,
+           let data = try? Data(contentsOf: url),
            let file = try? JSONDecoder().decode(IndexFile.self, from: data),
            file.version == 1, file.importID == summary.id,
+           file.records.count == summary.cardCount,
+           Set(file.records.map(\.cardID)).count == file.records.count,
            file.records.allSatisfy({ $0.importID == summary.id }) {
             try Task.checkCancellation()
             try? FileManager.default.setAttributes([.modificationDate: Date()], ofItemAtPath: url.path)

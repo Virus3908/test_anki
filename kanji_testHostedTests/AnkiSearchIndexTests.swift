@@ -44,7 +44,8 @@ final class AnkiSearchIndexTests: XCTestCase {
         XCTAssertEqual(saved.map(\.id), first.map(\.id), "Saved index must avoid decoding source")
         try original.write(to: source)
         let indexFile = root.appendingPathComponent("index/\(summary.directory).json")
-        for data in [Data("broken".utf8), Data(#"{"version":999,"importID":"fixture","records":[]}"#.utf8)] {
+        for data in [Data("broken".utf8), Data(#"{"version":999,"importID":"fixture","records":[]}"#.utf8),
+                     Data(#"{"version":1,"importID":"fixture","records":[]}"#.utf8)] {
             try data.write(to: indexFile)
             let rebuilt = try await cache.records(for: summary, sourceURL: source)
             XCTAssertEqual(rebuilt.map(\.id), first.map(\.id))

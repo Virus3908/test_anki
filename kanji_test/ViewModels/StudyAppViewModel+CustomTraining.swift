@@ -42,6 +42,7 @@ extension StudyAppViewModel {
     func cleanUpAfterCustomTraining() {
         guard navigation.presentedTraining != .customTraining else { return }
         customTraining.stop()
+        if !trainingSession.isActive { catalog.releaseAnkiCards() }
     }
 
     /// Cards of the currently open deck available for custom selection.
