@@ -19,6 +19,9 @@ extension StudyAppViewModel {
             case .kana:
                 guard let selected = KanaDeck(rawValue: String(deck.id.dropFirst("kana:".count))) else { return }
                 keys = Set(try await KanaDataLoader.loadCards(deck: selected).map(\.reviewKey))
+            case .grammar:
+                guard let level = GrammarLevel.allCases.first(where: { $0.deck.id == deck.id }) else { return }
+                keys = Set(try await GrammarDataLoader.shared.rules(level).map(\.reviewKey))
             case .anki:
                 guard let reference = ankiLibrary.decks.first(where: { $0.id == deck.id }),
                       let summary = ankiLibrary.imports.first(where: { $0.id == reference.importID }) else { return }

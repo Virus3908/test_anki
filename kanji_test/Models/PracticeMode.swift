@@ -5,6 +5,7 @@ nonisolated enum PracticeMode: String, CaseIterable, Identifiable, Codable, Send
     case words
     case kana
     case anki
+    case grammar
 
     var id: String { rawValue }
 
@@ -16,6 +17,8 @@ nonisolated enum PracticeMode: String, CaseIterable, Identifiable, Codable, Send
             return "Слова"
         case .kana:
             return "Кана"
+        case .grammar:
+            return "Грамматика"
         case .anki:
             return "Анки"
         }

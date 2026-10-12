@@ -38,7 +38,7 @@ nonisolated enum TrainingCardType: String, CaseIterable, Identifiable, Codable, 
         case .kanji: return allCases
         case .words: return [.flip, .choice, .typed, .audio]
         case .kana: return [.drawing, .flip, .choice, .audio]
-        case .anki: return []
+        case .anki, .grammar: return []
         }
     }
 
@@ -48,7 +48,7 @@ nonisolated enum TrainingCardType: String, CaseIterable, Identifiable, Codable, 
         switch mode {
         case .kanji, .kana: return [.drawing]
         case .words: return [.flip]
-        case .anki: return []
+        case .anki, .grammar: return []
         }
     }
 

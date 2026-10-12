@@ -3,6 +3,8 @@ import Observation
 
 enum StudyRoute: Hashable {
     case start
+    case grammarLevel(GrammarLevel)
+    case grammarRule(GrammarLevel, String)
     case kanjiDeck(KanjiDeck)
     case wordDeck(WordFrequencyDeck)
     case kanaDeck(KanaDeck)

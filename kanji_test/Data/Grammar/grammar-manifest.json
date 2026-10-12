@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "commit": "0d1d3410bec90bd4098a7c72de820543cb4f707c",
+  "counts": {
+    "N5": 81,
+    "N4": 98,
+    "N3": 101,
+    "N2": 123,
+    "N1": 123
+  },
+  "sourceSHA256": {
+    "n5.json": "fb8151594263f5e98372adc51d4498578bc198e22259b161fba524eea2faa0bd",
+    "n4.json": "7b388b8636ab7d9eaed02484d7d6be1c2468885f2354e28c02a29c2dfeb8d70d",
+    "n3.json": "a94fed69f213a0896a06e62d47c81b870c570ebc0ae5f01b971780f844a7b295",
+    "n2.json": "fc7a26fd991b80505480ca64f3fce03014a3f91f921045b9fb14bc63a31f3f95",
+    "n1.json": "b6df1691cf9441f044b18490e25eef02a5c93ad9c0d0d69d62eb889256e6708b"
+  },
+  "totalRules": 526,
+  "totalExamples": 1526,
+  "localizedRules": 0,
+  "reviewedChoiceExercises": 0,
+  "releaseReady": false
+}

@@ -19,6 +19,7 @@ struct CardSearchView: View, CardContentRendering {
     @State private var query = ""
     @State private var retryAnkiTask: Task<Void, Never>?
     @State private var openingAnkiTask: Task<Void, Never>?
+    @State private var selectedGrammarRule: GrammarRule?
     @State private var selectedAnkiCard: AnkiStudyCard?
     @Environment(\.dismiss) private var dismiss
 
@@ -130,6 +131,16 @@ struct CardSearchView: View, CardContentRendering {
         )) {
             Button("OK") { model.openingError = nil }
         } message: { Text(model.openingError ?? "") }
+        .sheet(item: $selectedGrammarRule) { rule in
+            NavigationStack {
+                GrammarRuleView(ruleID: rule.id, settings: settings, progress: reviewStore) { selected in
+                    selectedGrammarRule = nil
+                    dismiss()
+                    onPractice(.grammar(selected.level, ruleID: selected.id))
+                }
+                .toolbar { Button("Закрыть") { selectedGrammarRule = nil } }
+            }
+        }
         .sheet(item: $selectedAnkiCard, onDismiss: { model.closeAnkiPreview() }) { card in
             let deck = ankiDeck(for: card)
             AnkiCardPreviewView(
@@ -150,7 +161,7 @@ struct CardSearchView: View, CardContentRendering {
 
     private var subtitle: String {
         switch model.scope {
-        case .all: "Кандзи, слова, кана и Anki"
+        case .all: "Кандзи, слова, кана, Anki и грамматика"
         case .kanji: "Все кандзи, все колоды"
         case .words: "Все слова, все уровни частотности"
         }
@@ -217,6 +228,16 @@ struct CardSearchView: View, CardContentRendering {
                 resultSection("Кана", count: model.kanaResults.count, columns: kanaColumns) {
                     ForEach(model.kanaResults) { card in
                         kanaPreviewTile(for: card, accessibilityIdentifier: AccessibilityID.Search.result)
+                    }
+                }
+                resultSection("Грамматика", count: model.grammarResults.count, columns: standardColumns) {
+                    ForEach(model.grammarResults) { rule in
+                        Button { selectedGrammarRule = rule } label: {
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text("\(rule.level.rawValue) · \(rule.pattern)").font(.headline)
+                                Text(rule.displayedMeaning).font(.caption)
+                            }.frame(maxWidth: .infinity, alignment: .leading).padding(12).appSurfaceCard()
+                        }.buttonStyle(.plain).accessibilityIdentifier("grammar.searchResult.\(rule.id)")
                     }
                 }
                 resultSection("Anki", count: model.ankiResults.count, columns: standardColumns) {
@@ -300,7 +321,7 @@ struct CardSearchView: View, CardContentRendering {
 
     private var hasTruncatedSection: Bool {
         model.totalFound > model.kanjiResults.count + model.wordResults.count
-            + model.kanaResults.count + model.ankiResults.count
+            + model.kanaResults.count + model.ankiResults.count + model.grammarResults.count
     }
 
     private var standardColumns: [GridItem] { Array(repeating: GridItem(.flexible(), spacing: 10), count: 2) }

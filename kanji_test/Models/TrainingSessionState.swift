@@ -10,6 +10,7 @@ enum ActiveStudyQueue {
     case kanji(StudyQueue)
     case words(StudyQueue)
     case kana(StudyQueue)
+    case grammar(StudyQueue)
     case anki(StudyQueue)
 
     var mode: PracticeMode? {
@@ -18,13 +19,14 @@ enum ActiveStudyQueue {
         case .kanji: return .kanji
         case .words: return .words
         case .kana: return .kana
+        case .grammar: return .grammar
         case .anki: return .anki
         }
     }
     var value: StudyQueue? {
         switch self {
         case .idle: return nil
-        case .kanji(let value), .words(let value), .kana(let value), .anki(let value): return value
+        case .kanji(let value), .words(let value), .kana(let value), .anki(let value), .grammar(let value): return value
         }
     }
     static func make(mode: PracticeMode, ids: [String], sourceIDs: [String]) -> Self {
@@ -33,6 +35,7 @@ enum ActiveStudyQueue {
         case .kanji: return .kanji(value)
         case .words: return .words(value)
         case .kana: return .kana(value)
+        case .grammar: return .grammar(value)
         case .anki: return .anki(value)
         }
     }
@@ -95,6 +98,7 @@ nonisolated struct ReviewItem: StudyItem {
         case .kanji: return id
         case .words: return "word:\(id)"
         case .kana: return "kana:\(id)"
+        case .grammar: return "grammar:\(id)"
         case .anki: return "anki:\(id)"
         }
     }

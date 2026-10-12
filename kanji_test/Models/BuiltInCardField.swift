@@ -44,7 +44,7 @@ nonisolated enum BuiltInCardField: String, Identifiable, Codable, Sendable {
         case .kanji: [.character, .onyomi, .kunyomi, .meanings, .strokeOrder, .relatedWords, .examples]
         case .words: [.word, .reading, .meanings, .components, .examples]
         case .kana: [.character, .reading, .strokeCount, .strokeOrder]
-        case .anki: []
+        case .anki, .grammar: []
         }
     }
 }

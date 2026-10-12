@@ -1,0 +1,19 @@
+Учебные данные: OpenJLPT 0.3.0, OpenJLPT contributors и Evan Clan.
+Источник: https://github.com/evanclan/OpenJLPT
+Snapshot: 0d1d3410bec90bd4098a7c72de820543cb4f707c
+Лицензия: Creative Commons Attribution-ShareAlike 4.0 International
+https://creativecommons.org/licenses/by-sa/4.0/
+Полный текст: OpenJLPT-LICENSE.txt. Оригинальная атрибуция: OpenJLPT-NOTICE.txt.
+
+Изменения test_anki: версия оболочки ресурсов; ссылки на конструкции,
+явно упомянутые в английских примечаниях. Исходные ID, японские предложения,
+английские значения, формулы, примечания и чтения сохранены.
+Русский перевод учебных текстов ещё не подготовлен.
+Производные учебные ресурсы этого каталога распространяются под CC BY-SA 4.0.
+Это не изменяет MIT-лицензию собственного Swift-кода приложения.
+
+OpenJLPT использует JMdict и KANJIDIC2 (EDRDG), списки JLPT Jonathan Waller
+и Tatoeba. Сведения об их использовании и лицензиях сохранены в
+OpenJLPT-NOTICE.txt. Примеры именно в наборе grammar — оригинальные тексты
+OpenJLPT contributors (CC BY-SA 4.0), а не добавленные здесь предложения Tatoeba.
+JLPT не публикует официальный полный список грамматики N5–N1.

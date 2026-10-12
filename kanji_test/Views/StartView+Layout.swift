@@ -15,7 +15,9 @@ extension StartView {
                     Text(startSubtitle)
                         .foregroundStyle(AppPalette.secondaryText)
 
-                    if selectedSection == .anki {
+                    if selectedSection == .grammar {
+                        GrammarLevelMenu(reviewStore: reviewStore, onOpen: onOpen)
+                    } else if selectedSection == .anki {
                         AnkiLibraryView(model: ankiModel, isBusy: isLoading, onOpen: onOpen)
                     } else if practiceMode == .kana {
                         ForEach(KanaDeck.allCases) { deck in

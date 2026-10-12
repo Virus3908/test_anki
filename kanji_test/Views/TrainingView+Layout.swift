@@ -31,6 +31,8 @@ extension TrainingView {
                     recallTrainingView(for: kanaCard)
                 }
             } else { sessionWaitingView() }
+        case .grammar:
+            EmptyView() // ContentView routes grammar to its specialized practice adapter.
         case .anki:
             if let card = trainingSession.currentAnkiCard {
                 ankiTrainingView(for: card)

@@ -69,9 +69,14 @@ final class TrainingSessionViewModel {
             case .kana:
                 guard let reading = catalog.kana(id)?.reading, !reading.isEmpty else { return nil }
                 return [reading]
-            case .anki: return nil
+            case .anki, .grammar: return nil
             }
         }.flatMap { $0 }
+    }
+
+    var currentGrammarRule: GrammarRule? {
+        guard mode == .grammar, let id = queueIDs[safe: currentIndex] else { return nil }
+        return catalog.grammar(id)
     }
 
     var currentAnkiCard: AnkiStudyCard? {

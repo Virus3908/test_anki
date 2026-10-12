@@ -176,7 +176,7 @@ extension TrainingView {
             applyWordReview(rating)
         case .kana:
             applyKanaReview(rating)
-        case .anki:
+        case .anki, .grammar:
             break
         }
     }

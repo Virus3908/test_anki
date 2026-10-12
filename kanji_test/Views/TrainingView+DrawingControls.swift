@@ -30,6 +30,7 @@ extension TrainingView {
                 case .words: applyWordReview(rating)
                 case .kana: applyKanaReview(rating)
                 case .anki: applyAnkiReview(rating)
+                case .grammar: break
                 }
             }
         }

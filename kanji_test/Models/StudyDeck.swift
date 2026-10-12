@@ -12,7 +12,7 @@ extension StudyDeck {
     static func words(_ deck: WordFrequencyDeck) -> Self { .init(id: "words:\(deck.rawValue)", title: deck.title, mode: .words) }
     static func kana(_ deck: KanaDeck) -> Self { .init(id: "kana:\(deck.rawValue)", title: deck.title, mode: .kana) }
     static var builtIn: [Self] {
-        KanjiDeck.allCases.map(Self.kanji) + WordFrequencyDeck.allCases.map(Self.words) + KanaDeck.allCases.map(Self.kana)
+        KanjiDeck.allCases.map(Self.kanji) + WordFrequencyDeck.allCases.map(Self.words) + KanaDeck.allCases.map(Self.kana) + GrammarLevel.allCases.map(\.deck)
     }
 }
 
@@ -22,6 +22,8 @@ extension StudyRoute {
         case .kanjiDeck(let value): return .kanji(value)
         case .wordDeck(let value): return .words(value)
         case .kanaDeck(let value): return .kana(value)
+        case .grammarLevel(let level): return level.deck
+        case .grammarRule(let level, _): return level.deck
         case .ankiDeck(let value): return value.studyDeck
         default: return nil
         }

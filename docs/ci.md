@@ -14,6 +14,15 @@ Workflow [Tests](https://github.com/Virus3908/test_anki/actions/workflows/tests.
   поиск/просмотр, тренировка, рисование, озвучивание, фуригана/настройка,
   импорт небольшой локальной Anki-фикстуры, сохранение прогресса и завершение дня.
 
+Дополнительно два job на Ubuntu: **Grammar source integrity** проверяет pinned
+OpenJLPT snapshot, исходные ID/порядок/поля, JSON, атрибуцию, ссылки и
+воспроизводимость; **Grammar Russian content readiness** требует русские уроки
+и три авторских задания у каждого из 526 правил. Сейчас последний job должен
+падать, не маскируя отсутствие локализации зелёным CI. Оба сохраняют
+grammar-quality.json. validate_ci.py предназначен только для GitHub Actions.
+В hosted/UI targets добавлены GrammarDataTests, GrammarPracticeTests,
+GrammarStudyIntegrationTests и GrammarUITests. См. [грамматику](grammar.md).
+
 `scripts/ci-select-simulator.py` выбирает доступный iPhone с установленным
 runtime iOS >= 26.5. Если подходящего устройства нет, job явно падает;
 он не скачивает дополнительные runtime. Скрипт предназначен только для CI.

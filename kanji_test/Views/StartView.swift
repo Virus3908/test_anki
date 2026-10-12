@@ -5,6 +5,7 @@ enum StartMenuSection: String, CaseIterable, Identifiable {
     case words
     case kana
     case anki
+    case grammar
 
     var id: Self { self }
 
@@ -14,6 +15,7 @@ enum StartMenuSection: String, CaseIterable, Identifiable {
         case .words: "Слова"
         case .kana: "Кана"
         case .anki: "Анки"
+        case .grammar: "Грамматика"
         }
     }
 
@@ -23,6 +25,7 @@ enum StartMenuSection: String, CaseIterable, Identifiable {
         case .words: AccessibilityID.Start.sectionWords
         case .kana: AccessibilityID.Start.sectionKana
         case .anki: AccessibilityID.Start.sectionAnki
+        case .grammar: "start.section.grammar"
         }
     }
 
@@ -32,6 +35,7 @@ enum StartMenuSection: String, CaseIterable, Identifiable {
         case .words: .words
         case .kana: .kana
         case .anki: .anki
+        case .grammar: .grammar
         }
     }
 }
@@ -85,6 +89,7 @@ struct StartView: View, StudyViewStyling {
         case .kanji: return "Колоды кандзи с порядком черт и интервальным повторением."
         case .words: return "Слова из локального JMdict, сгруппированные в common-наборы."
         case .kana: return "Хирагана и катакана с просмотром карточек и тренировкой письма."
+        case .grammar: return "Все 526 правил JLPT N5–N1. Исходные материалы OpenJLPT на английском языке."
         case .anki: return "Импортируй колоды Anki с полями, картинками и звуком."
         }
     }

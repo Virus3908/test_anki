@@ -21,6 +21,42 @@ env:
   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
 
 jobs:
+  grammar-data:
+    name: Grammar source integrity
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - name: Validate pinned grammar snapshot and resources
+        run: python3 tools/grammar/validate_ci.py
+      - name: Check reproducible generation
+        run: |
+          python3 tools/grammar/generate.py
+          git diff --exit-code -- kanji_test/Data/Grammar
+      - name: Upload grammar integrity report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: grammar-integrity-report
+          path: artifacts/grammar-quality.json
+          retention-days: 14
+
+  grammar-release:
+    name: Grammar Russian content readiness
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - name: Require Russian lessons and reviewed exercises for every rule
+        run: python3 tools/grammar/validate_ci.py --release
+      - name: Upload unresolved content requirements
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: grammar-release-report
+          path: artifacts/grammar-quality.json
+          retention-days: 14
+
   anki-import:
     name: AnkiImport package tests
     runs-on: macos-26
