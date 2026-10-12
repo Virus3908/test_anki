@@ -11,8 +11,12 @@ actor KanjiDeckCacheRepository {
             return nil
         }
 
-        let data = try Data(contentsOf: url)
-        let cards = try JSONDecoder().decode([KanjiCard].self, from: data)
+        let cards: [KanjiCard]
+        do { cards = try JSONDecoder().decode([KanjiCard].self, from: Data(contentsOf: url)) }
+        catch {
+            try? FileManager.default.removeItem(at: url)
+            return nil
+        }
         decodedDecks[deck] = cards
         return cards
     }
@@ -54,9 +58,18 @@ actor KanjiDeckCacheRepository {
     private func saveCards(_ cards: [KanjiCard], for deck: KanjiDeck) throws {
         let url = cacheURL(for: deck)
         try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-        let data = try JSONEncoder().encode(cards.map(\.withoutTranslations))
+        let normalized = cards.map(\.withoutTranslations)
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .sortedKeys
+        let data = try encoder.encode(normalized)
+        if let existing = try? Data(contentsOf: url),
+           let old = try? JSONDecoder().decode([KanjiCard].self, from: existing),
+           try encoder.encode(old) == data {
+            decodedDecks[deck] = normalized
+            return
+        }
         try data.write(to: url, options: .atomic)
-        decodedDecks[deck] = cards.map(\.withoutTranslations)
+        decodedDecks[deck] = normalized
     }
 
     private func cacheURL(for deck: KanjiDeck) -> URL {

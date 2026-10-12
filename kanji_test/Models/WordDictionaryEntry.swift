@@ -31,7 +31,7 @@ nonisolated struct WordDictionaryEntry: Codable, Identifiable, Sendable {
     }
 }
 
-nonisolated struct WordUsageExample: Codable, Identifiable, Sendable {
+nonisolated struct WordUsageExample: Codable, Identifiable, Sendable, Equatable {
     var id: String { attribution.map { "tatoeba-\($0.sentenceID)" } ?? "\(sentence)-\(reading ?? "")-\(meaning ?? "")" }
 
     let sentence: String
