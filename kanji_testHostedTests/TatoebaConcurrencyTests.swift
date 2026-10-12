@@ -3,6 +3,99 @@ import XCTest
 
 @MainActor
 final class TatoebaConcurrencyTests: XCTestCase {
+    func testCachedKanjiAppearsBeforeMetadataResponse() async {
+        let refresh = expectation(description: "Metadata request started")
+        ControlledTatoebaProtocol.configure { count in if count == 1 { refresh.fulfill() } }
+        let config = URLSessionConfiguration.ephemeral
+        config.protocolClasses = [ControlledTatoebaProtocol.self]
+        let session = URLSession(configuration: config)
+        defer { session.invalidateAndCancel() }
+        let card = KanjiCard(kanji: UUID().uuidString, meanings: [], onyomi: [], kunyomi: [], examples: [],
+                             source: KanjiSource(name: "test", file: "", license: ""), strokes: [])
+        let cached = KanjiExample(word: "学校だよ。", reading: "", meaning: "",
+            attribution: TatoebaAttribution(sentenceID: 10756861, author: "small_snow", license: "CC BY 2.0 FR"))
+        await KanjiExampleCacheRepository.saveExamples([cached], for: card.id)
+        let app = StudyAppViewModel(kanjiProvider: KanjiAPIProvider(session: session))
+        let task = Task { await app.translationState.loadKanjiExamplesIfNeeded(for: card, language: .english) }
+        await fulfillment(of: [refresh], timeout: 5)
+        XCTAssertEqual(app.translationState.kanjiUsageExamples[card.id], [cached])
+        ControlledTatoebaProtocol.completeActive()
+        await task.value
+        XCTAssertEqual(app.translationState.kanjiUsageExamples[card.id]?.first?.word, cached.word)
+        XCTAssertEqual(app.translationState.kanjiUsageExamples[card.id]?.first?.attribution, cached.attribution)
+    }
+
+    func testTranscriptionsReserveCapacityForUncachedExamples() async {
+        let metadataStarted = expectation(description: "Two metadata requests")
+        let searchStarted = expectation(description: "Visible search uses reserved slot")
+        let remainingStarted = expectation(description: "Remaining metadata requests")
+        ControlledTatoebaProtocol.configure { count in
+            if count == 2 { metadataStarted.fulfill() }
+            if count == 3 { searchStarted.fulfill() }
+            if count == 5 { remainingStarted.fulfill() }
+        }
+        let config = URLSessionConfiguration.ephemeral
+        config.protocolClasses = [ControlledTatoebaProtocol.self]
+        let session = URLSession(configuration: config)
+        defer { session.invalidateAndCancel() }
+        let metadata = Task {
+            await withTaskGroup(of: Data?.self) { group in
+                for id in 1...4 {
+                    group.addTask {
+                        await TatoebaRequests.shared.data(from: URL(string: "https://mock.invalid/detail/\(id)")!,
+                                                         session: session, kind: .transcription)
+                    }
+                }
+                for await _ in group { }
+            }
+        }
+        await fulfillment(of: [metadataStarted], timeout: 5)
+        XCTAssertEqual(ControlledTatoebaProtocol.activeCount, 2)
+        let search = Task {
+            await TatoebaRequests.shared.data(from: URL(string: "https://mock.invalid/search")!, session: session)
+        }
+        await fulfillment(of: [searchStarted], timeout: 5)
+        XCTAssertEqual(ControlledTatoebaProtocol.activeCount, 3)
+        ControlledTatoebaProtocol.completeActive()
+        await fulfillment(of: [remainingStarted], timeout: 5)
+        ControlledTatoebaProtocol.completeActive()
+        await metadata.value
+        let data = await search.value
+        XCTAssertNotNil(data)
+        XCTAssertEqual(ControlledTatoebaProtocol.requestCount, 5)
+        XCTAssertLessThanOrEqual(ControlledTatoebaProtocol.maximumActive, 3)
+    }
+
+    func testCachedWordAppearsBeforeRefreshAndCancelledRefreshRetriesOnReopen() async {
+        let firstRefresh = expectation(description: "First metadata refresh started")
+        let secondRefresh = expectation(description: "Cancelled refresh retried")
+        ControlledTatoebaProtocol.configure { count in
+            if count == 1 { firstRefresh.fulfill() }
+            if count == 2 { secondRefresh.fulfill() }
+        }
+        let config = URLSessionConfiguration.ephemeral
+        config.protocolClasses = [ControlledTatoebaProtocol.self]
+        let session = URLSession(configuration: config)
+        defer { session.invalidateAndCancel() }
+        let card = WordStudyCard(word: UUID().uuidString, reading: "test", meaning: "test", examples: [], kanjiCards: [])
+        let cached = WordUsageExample(sentence: "学校だよ。",
+            attribution: TatoebaAttribution(sentenceID: 10756861, author: "small_snow", license: "CC BY 2.0 FR"))
+        await WordExampleCacheRepository.saveExamples([cached], for: card.id)
+        let app = StudyAppViewModel(wordProvider: TatoebaWordExampleProvider(session: session))
+        let first = Task { await app.translationState.loadAndTranslateWordExamples(for: card, language: .english) }
+        await fulfillment(of: [firstRefresh], timeout: 5)
+        XCTAssertEqual(app.translationState.wordUsageExamples[card.id], [cached])
+        first.cancel()
+        await first.value
+        let second = Task { await app.translationState.loadAndTranslateWordExamples(for: card, language: .english) }
+        await fulfillment(of: [secondRefresh], timeout: 5)
+        ControlledTatoebaProtocol.completeActive()
+        await second.value
+        XCTAssertEqual(app.translationState.wordUsageExamples[card.id]?.first?.sentence, cached.sentence)
+        await app.translationState.loadAndTranslateWordExamples(for: card, language: .english)
+        XCTAssertEqual(ControlledTatoebaProtocol.requestCount, 2)
+    }
+
     func testGlobalCapAndSingleFlightAcrossConcurrentCallers() async throws {
         let firstWave = expectation(description: "First three requests")
         let secondWave = expectation(description: "Next three requests")

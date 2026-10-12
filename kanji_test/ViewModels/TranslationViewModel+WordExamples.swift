@@ -20,8 +20,14 @@ extension TranslationViewModel {
         guard let id = beginAutomatic(key, kind: .automaticExamples) else { return }
         defer { end(id, key: key) }
         let examples: [WordUsageExample]
-        if let loaded = wordUsageExamples[card.id] { examples = loaded }
-        else { examples = await wordProvider.loadExamples(for: card, limit: 3) }
+        if let loaded = wordUsageExamples[card.id],
+           !loaded.contains(where: { $0.attribution != nil && ($0.furigana?.needsRefresh ?? true) }) { examples = loaded }
+        else {
+            let cached = await wordProvider.cachedExamples(for: card, limit: 3)
+            guard current(id, key: key) else { return }
+            if !cached.isEmpty { wordUsageExamples[card.id] = cached }
+            examples = await wordProvider.loadExamples(for: card, limit: 3)
+        }
         guard current(id, key: key) else { return }
         wordUsageExamples[card.id] = examples
         guard language == .russian else { return }

@@ -32,8 +32,12 @@ extension TranslationViewModel {
         guard let id = beginAutomatic(key, kind: .automaticTranslation) else { return }
         defer { end(id, key: key) }
         let examples: [KanjiExample]
-        if let loaded = kanjiUsageExamples[card.id] { examples = loaded }
+        if let loaded = kanjiUsageExamples[card.id],
+           !loaded.contains(where: { $0.attribution != nil && ($0.furigana?.needsRefresh ?? true) }) { examples = loaded }
         else {
+            let cached = await KanjiDataLoader.cachedExamples(for: card)
+            guard current(id, key: key) else { return }
+            if !cached.isEmpty { kanjiUsageExamples[card.id] = cached }
             examples = await KanjiDataLoader.loadExamplesIfNeeded(card, provider: kanjiProvider).englishExamples
         }
         guard current(id, key: key) else { return }

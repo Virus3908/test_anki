@@ -346,7 +346,9 @@ When changing scheduling/queue behavior, add focused tests for CI.
   envelopes remain readable; unchanged examples are not written. Furigana's
   successful-empty/retry-after-one-day semantics remain independent of eviction.
 - `TatoebaRequests` deduplicates URLs per URLSession and caps total networking at
-  three requests. Enrichment keeps three children and preserves sentence order.
+  three requests, with at most two transcription requests so uncached examples
+  have capacity and queue priority. Enrichment preserves sentence order.
+  TranslationViewModel publishes cache-only examples before awaiting enrichment.
 - Bundled resources have no TTL. Kana clearing only removes legacy `KanaVGCache`;
   the obsolete SVG repository is gone. Offline decks remain available.
 - Extra daily new-card grants are versioned UserDefaults data in `StudyPreferences`,

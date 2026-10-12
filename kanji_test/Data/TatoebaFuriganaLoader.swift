@@ -5,7 +5,7 @@ extension TatoebaWordExampleProvider {
         guard let attribution, current?.needsRefresh ?? true else { return current }
         guard !Task.isCancelled, let url = TatoebaEndpoint.sentence(id: attribution.sentenceID) else { return current }
         struct Response: Decodable { let data: TatoebaSentence }
-        let data = await TatoebaRequests.shared.data(from: url, session: session)
+        let data = await TatoebaRequests.shared.data(from: url, session: session, kind: .transcription)
         guard !Task.isCancelled else { return current }
         let sentence = data.flatMap { try? JSONDecoder().decode(Response.self, from: $0).data }
         guard let sentence, sentence.id == attribution.sentenceID,

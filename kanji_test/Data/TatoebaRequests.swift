@@ -4,6 +4,7 @@ import Foundation
 /// has one worker; cancellation removes a subscriber, cancelling the network
 /// operation only when nobody else needs it.
 actor TatoebaRequests {
+    nonisolated enum Kind: Sendable { case examples, transcription }
     static let shared = TatoebaRequests()
     private struct Key: Hashable {
         let session: ObjectIdentifier
@@ -14,10 +15,10 @@ actor TatoebaRequests {
         var subscribers: Set<UUID>
     }
     private var pending: [Key: Pending] = [:]
-    private var active: Set<UUID> = []
-    private var waiting: [(UUID, CheckedContinuation<Bool, Never>)] = []
+    private var active: [UUID: Kind] = [:]
+    private var waiting: [(id: UUID, kind: Kind, continuation: CheckedContinuation<Bool, Never>)] = []
 
-    func data(from url: URL, session: URLSession) async -> Data? {
+    func data(from url: URL, session: URLSession, kind: Kind = .examples) async -> Data? {
         guard !Task.isCancelled else { return nil }
         let key = Key(session: ObjectIdentifier(session), url: url)
         let subscriber = UUID()
@@ -29,7 +30,7 @@ actor TatoebaRequests {
         } else {
             let operation = UUID()
             worker = Task.detached {
-                guard await self.acquire(operation) else { return nil }
+                guard await self.acquire(operation, kind: kind) else { return nil }
                 var result: Data?
                 if !Task.isCancelled {
                     do {
@@ -59,28 +60,37 @@ actor TatoebaRequests {
         else { pending[key] = entry }
     }
 
-    private func acquire(_ id: UUID) async -> Bool {
+    private func canStart(_ kind: Kind) -> Bool {
+        active.count < 3 && (kind == .examples || active.values.filter { $0 == .transcription }.count < 2)
+    }
+
+    private func acquire(_ id: UUID, kind: Kind) async -> Bool {
         guard !Task.isCancelled else { return false }
-        if active.count < 3 { active.insert(id); return true }
+        if canStart(kind) { active[id] = kind; return true }
         return await withTaskCancellationHandler {
             await withCheckedContinuation { continuation in
                 if Task.isCancelled { continuation.resume(returning: false) }
-                else { waiting.append((id, continuation)) }
+                else { waiting.append((id, kind, continuation)) }
             }
         } onCancel: { Task { await self.cancelWaiting(id) } }
     }
 
     private func cancelWaiting(_ id: UUID) {
-        guard let index = waiting.firstIndex(where: { $0.0 == id }) else { return }
-        waiting.remove(at: index).1.resume(returning: false)
+        guard let index = waiting.firstIndex(where: { $0.id == id }) else { return }
+        waiting.remove(at: index).continuation.resume(returning: false)
     }
 
     private func release(_ id: UUID) {
-        active.remove(id)
-        if !waiting.isEmpty {
-            let (next, continuation) = waiting.removeFirst()
-            active.insert(next)
-            continuation.resume(returning: true)
+        active[id] = nil
+        // Keep one slot available for uncached examples, and place visible
+        // sentence searches ahead of queued metadata refreshes.
+        while active.count < 3 {
+            let index = waiting.firstIndex { $0.kind == .examples }
+                ?? waiting.firstIndex { canStart($0.kind) }
+            guard let index else { break }
+            let next = waiting.remove(at: index)
+            active[next.id] = next.kind
+            next.continuation.resume(returning: true)
         }
     }
 }
