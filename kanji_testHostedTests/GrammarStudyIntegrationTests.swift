@@ -82,6 +82,27 @@ final class GrammarStudyIntegrationTests: XCTestCase {
         XCTAssertEqual(stats.relearning, 1); XCTAssertEqual(stats.due, 1); XCTAssertEqual(stats.review, 0)
     }
 
+    func testRuleStatusUsesExistingMasteryAndKeepsLearningDistinct() async throws {
+        let rules = try await GrammarDataLoader.shared.rules(.n5)
+        let rule = try XCTUnwrap(rules.first)
+        var record = StudyReviewRecord(attempts: 3, intervalDays: 10, dueDate: now,
+            lastRating: .good, lastReviewedAt: Date(), state: .review, learningStep: 0,
+            lapses: 0, stability: 100, difficulty: 1, schedulerVersion: "fsrs-6")
+        var progress = StudyProgressStore(records: [rule.reviewKey: record])
+        XCTAssertEqual(GrammarStatistics.status(rule, progress: progress), "Изучено хорошо")
+        record.lastReviewedAt = Date(timeIntervalSince1970: 0); record.stability = 0.1
+        progress = StudyProgressStore(records: [rule.reviewKey: record])
+        XCTAssertEqual(GrammarStatistics.status(rule, progress: progress), "На повторении")
+        record.state = .learning
+        progress = StudyProgressStore(records: [rule.reviewKey: record])
+        XCTAssertEqual(GrammarStatistics.status(rule, progress: progress), "В процессе изучения")
+        record.state = .relearning
+        progress = StudyProgressStore(records: [rule.reviewKey: record])
+        XCTAssertEqual(GrammarStatistics.status(rule, progress: progress), "Повторное обучение")
+        progress.exclude(rule.reviewKey)
+        XCTAssertEqual(GrammarStatistics.status(rule, progress: progress), "Исключено")
+    }
+
     func testSharedSessionPersistsUndoAndAdditionalCardsWithIndependentDecks() async throws {
         let repository = GrammarMemoryReviews()
         let suite = "GrammarTests-\(UUID().uuidString)"

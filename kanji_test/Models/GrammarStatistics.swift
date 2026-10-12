@@ -38,7 +38,10 @@ nonisolated struct GrammarStatistics: Sendable {
         switch record.state {
         case .learning: return "В процессе изучения"
         case .relearning: return "Повторное обучение"
-        case .review: return "На повторении"
+        case .review:
+            let mastery = CardMastery(record: record, isExcluded: false, now: progress.studyDate())
+            if case .score(let score) = mastery, score >= CardMastery.knownFloor { return "Изучено хорошо" }
+            return "На повторении"
         }
     }
 }

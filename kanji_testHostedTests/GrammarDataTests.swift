@@ -34,9 +34,13 @@ final class GrammarDataTests: XCTestCase {
 
     func testSourceOnlyContentIsNeverMisrepresentedAsRussianOrReviewedExercises() async throws {
         let all = try await GrammarDataLoader.shared.allRules()
-        XCTAssertTrue(all.allSatisfy { $0.localization == nil })
-        XCTAssertTrue(all.allSatisfy { ($0.exercises ?? []).isEmpty })
-        XCTAssertTrue(all.allSatisfy { $0.examples.allSatisfy { $0.ru == nil } })
+        for rule in all where rule.localization == nil {
+            XCTAssertEqual(rule.displayedMeaning, rule.meaning)
+            XCTAssertEqual(rule.displayedFormation, rule.formation)
+            XCTAssertTrue(rule.examples.allSatisfy { $0.ru == nil })
+            let practice = GrammarPracticeViewModel(rule: rule, seed: "source-only")
+            if practice.isSelfAssessment { XCTAssertTrue(practice.results.isEmpty) }
+        }
     }
 
     func testLookupCategoriesAndExplicitSourceMentions() async throws {

@@ -90,6 +90,9 @@ struct GrammarLevelView: View {
                                         .font(.caption).foregroundStyle(AppPalette.secondaryText)
                                 }
                                 .frame(maxWidth: .infinity, alignment: .leading).padding(16).appSurfaceCard()
+                                .cardMasteryChrome(CardMastery(record: appModel.trainingSession.reviewStore.record(for: rule.reviewKey),
+                                    isExcluded: appModel.trainingSession.reviewStore.isExcluded(rule.reviewKey),
+                                    now: appModel.trainingSession.reviewStore.studyDate()))
                             }
                             .buttonStyle(.plain).accessibilityIdentifier("grammar.rule.\(rule.id)")
                         }

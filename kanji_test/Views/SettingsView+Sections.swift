@@ -13,7 +13,7 @@ extension SettingsView {
                     speechSettingsView()
                     deckSelectionView()
                     cardTypeSettingsView()
-                    translationSettingsView()
+                    if selectedDeck?.mode != .grammar { translationSettingsView() }
                     learningSettingsView()
                     ankiDisplaySettingsView()
                     storageSettingsView()

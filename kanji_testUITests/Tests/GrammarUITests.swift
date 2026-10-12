@@ -5,6 +5,7 @@ final class GrammarUITests: UITestCase {
         launch()
         tap("start.section.grammar", .switchSection, expecting: "grammar.total")
         for level in ["N5", "N4", "N3", "N2", "N1"] {
+            scrollTo("grammar.level.\(level)")
             tap("grammar.level.\(level)", .openDeck, expecting: "grammar.statistics")
             XCTAssertTrue(element("grammar.learn").exists)
             XCTAssertTrue(element("grammar.review").exists)
@@ -17,15 +18,16 @@ final class GrammarUITests: UITestCase {
         launch()
         tap("start.section.grammar", .switchSection, expecting: "grammar.level.N5")
         tap("grammar.level.N5", .openDeck, expecting: "grammar.rule.wa")
+        scrollTo("grammar.rule.wa")
         tap("grammar.rule.wa", .openDeck, expecting: "grammar.lesson.title")
         XCTAssertTrue(element("grammar.lesson.explanation").exists)
         app.swipeUp()
         XCTAssertTrue(element("grammar.example").waitForExistence(timeout: 5))
         XCTAssertTrue(element("grammar.furigana").exists)
         // Practice is after examples/attribution; scroll until it can be tapped.
-        for _ in 0..<5 where !element("grammar.practice").isHittable { app.swipeUp() }
+        scrollTo("grammar.practice")
         tap("grammar.practice", .startTraining, expecting: "grammar.training.begin")
-        for _ in 0..<6 where !element("grammar.training.begin").isHittable { app.swipeUp() }
+        scrollTo("grammar.training.begin")
         tap("grammar.training.begin", .startTraining, expecting: "grammar.training.reveal")
         for _ in 0..<3 {
             tap("grammar.training.reveal", .revealCard, expecting: "grammar.training.next")
@@ -45,9 +47,14 @@ final class GrammarUITests: UITestCase {
         XCTAssertTrue(result.waitForExistence(timeout: 15))
         result.tap()
         XCTAssertTrue(element("grammar.lesson.title").waitForExistence(timeout: 5))
-        for _ in 0..<7 where !element("grammar.related.katawara").exists { app.swipeUp() }
+        scrollTo("grammar.related.katawara")
         XCTAssertTrue(element("grammar.related.katawara").exists)
         element("grammar.related.katawara").tap()
         XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "〜かたわら")).firstMatch.waitForExistence(timeout: 5))
+    }
+
+    private func scrollTo(_ identifier: String) {
+        for _ in 0..<8 where !element(identifier).isHittable { app.swipeUp() }
+        XCTAssertTrue(element(identifier).isHittable, "Element must be reachable after scrolling: \(identifier)")
     }
 }

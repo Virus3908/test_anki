@@ -142,10 +142,10 @@ struct CardMasteryChrome: ViewModifier {
     }
 
     private var dimming: Double {
-        guard case .score(let score) = mastery, score >= Self.knownFloor else {
+        guard case .score(let score) = mastery, score >= CardMastery.knownFloor else {
             return mastery == .excluded ? 0.6 : 1
         }
-        return 1 - 0.45 * (score - Self.knownFloor) / (1 - Self.knownFloor)
+        return 1 - 0.45 * (score - CardMastery.knownFloor) / (1 - CardMastery.knownFloor)
     }
 
     private var tint: Color? {
@@ -168,7 +168,6 @@ struct CardMasteryChrome: ViewModifier {
     /// Пороги полос: выше `knownFloor` — «уверенно знаю» (притушиваем),
     /// ниже `problemCeiling` — «проблемная» (подсвечиваем), ниже
     /// `worstCeiling` — худшие (рамка). Между порогами — нейтрально.
-    private static let knownFloor = 0.55
     private static let problemCeiling = 0.4
     private static let worstCeiling = 0.15
 }
