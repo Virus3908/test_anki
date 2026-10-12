@@ -44,23 +44,31 @@ private struct NativeFuriganaText: UIViewRepresentable {
         view.backgroundColor = .clear
         view.isAccessibilityElement = true
         view.accessibilityTraits = .staticText
+        configure(view)
         return view
     }
 
     func updateUIView(_ view: FuriganaDrawingView, context: Context) {
-        view.configure(segments: segments, fontSize: fontSize,
-                       textColor: UIColor(AppPalette.text), readingColor: UIColor(AppPalette.secondaryText))
+        configure(view)
         // Reading the environment makes palette changes invalidate this representable.
         _ = colorScheme
     }
 
     func sizeThatFits(_ proposal: ProposedViewSize, uiView: FuriganaDrawingView, context: Context) -> CGSize? {
+        // SwiftUI can measure a representable before updateUIView is called.
+        // Always measure this sentence, not empty or previously rendered glyphs.
+        configure(uiView)
         let proposedWidth = proposal.width ?? 320
         let width = proposedWidth.isFinite ? max(1, proposedWidth) : 320
         let layout = uiView.layout(width: width)
         // Report the occupied width, like SwiftUI Text, rather than consuming
         // the entire proposal and pushing an adjacent attribution button away.
         return CGSize(width: min(width, ceil(layout.width)), height: layout.height)
+    }
+
+    private func configure(_ view: FuriganaDrawingView) {
+        view.configure(segments: segments, fontSize: fontSize,
+                       textColor: UIColor(AppPalette.text), readingColor: UIColor(AppPalette.secondaryText))
     }
 }
 
@@ -92,8 +100,23 @@ final class FuriganaDrawingView: UIView {
     private var font = UIFont.systemFont(ofSize: 17)
     private var rubyFont = UIFont.systemFont(ofSize: 8.5)
     private var rubyHeight: CGFloat = 0
+    private var configuredSegments: [FuriganaSegment]?
+    private var configuredFontSize: CGFloat?
+    private var configuredTextColor: UIColor?
+    private var configuredReadingColor: UIColor?
+
+    override var intrinsicContentSize: CGSize {
+        let measured = layout(width: .greatestFiniteMagnitude)
+        return CGSize(width: ceil(measured.width), height: measured.height)
+    }
 
     func configure(segments: [FuriganaSegment], fontSize: CGFloat, textColor: UIColor, readingColor: UIColor) {
+        guard configuredSegments != segments || configuredFontSize != fontSize
+                || configuredTextColor != textColor || configuredReadingColor != readingColor else { return }
+        configuredSegments = segments
+        configuredFontSize = fontSize
+        configuredTextColor = textColor
+        configuredReadingColor = readingColor
         font = UIFont.systemFont(ofSize: fontSize)
         rubyFont = UIFont.systemFont(ofSize: fontSize * 0.5)
         rubyHeight = segments.contains { $0.reading != nil } ? rubyFont.lineHeight + 2 : 0

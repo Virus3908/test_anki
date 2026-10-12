@@ -123,6 +123,7 @@ private struct StudyExampleRow: View {
                     .fixedSize(horizontal: false, vertical: true)
 
                 attributionButton
+                    .accessibilityIdentifier(AccessibilityID.Examples.source)
             }
 
             if let reading = example.reading {

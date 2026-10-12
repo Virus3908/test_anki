@@ -6,6 +6,7 @@ final class FuriganaUITests: UITestCase {
         openExample()
         XCTAssertTrue(element(ID.Examples.furigana).exists)
         XCTAssertEqual(element(ID.Examples.furigana).label, "学校だよ。")
+        assertSourceBesideShortSentence(ID.Examples.furigana)
     }
 
     func testFuriganaSettingPersistsAndShowsOriginalText() {
@@ -19,6 +20,19 @@ final class FuriganaUITests: UITestCase {
         openExample(showsFurigana: false)
         XCTAssertFalse(element(ID.Examples.furigana).exists)
         XCTAssertEqual(element(ID.Examples.plain).label, "学校だよ。")
+        assertSourceBesideShortSentence(ID.Examples.plain)
+    }
+
+    private func assertSourceBesideShortSentence(_ sentenceID: String) {
+        let sentence = element(sentenceID)
+        let source = element(ID.Examples.source)
+        XCTAssertTrue(source.waitForExistence(timeout: 5))
+        XCTAssertTrue(source.isHittable)
+        // The offline fixture is five Japanese characters, not a full row.
+        // Check actual on-screen frames, including the real attribution Menu.
+        XCTAssertLessThan(sentence.frame.width, 150)
+        XCTAssertGreaterThanOrEqual(source.frame.minX, sentence.frame.maxX - 1)
+        XCTAssertLessThanOrEqual(source.frame.minX - sentence.frame.maxX, 12)
     }
 
     private func openExample(showsFurigana: Bool = true) {
