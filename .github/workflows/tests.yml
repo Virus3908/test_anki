@@ -2,13 +2,15 @@ name: Tests
 
 on:
   pull_request:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: tests-${{ github.workflow }}-${{ github.ref }}
+  group: tests-${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 defaults:
@@ -31,6 +33,7 @@ jobs:
           swift --version
       - name: Run package tests
         run: |
+          set -euo pipefail
           mkdir -p artifacts
           swift test --package-path Packages/AnkiImport 2>&1 | tee artifacts/anki-import.log
       - name: Upload package test log
@@ -51,16 +54,28 @@ jobs:
       - name: Show Xcode and available simulators
         run: |
           xcodebuild -version
-          xcrun simctl list devices available
+          python3 scripts/ci-select-simulator.py
+      - name: Build hosted tests
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          xcodebuild build-for-testing \
+            -project kanji_test.xcodeproj -scheme kanji_test -configuration Debug \
+            -destination "platform=iOS Simulator,id=$CI_SIMULATOR_ID" \
+            -only-testing:kanji_testHostedTests -parallel-testing-enabled NO \
+            -onlyUsePackageVersionsFromResolvedFile \
+            -derivedDataPath "$RUNNER_TEMP/kanji-derived-data" \
+            CODE_SIGNING_ALLOWED=NO 2>&1 | tee artifacts/hosted-build.log
       - name: Run hosted tests on iOS Simulator
         run: |
+          set -euo pipefail
           mkdir -p artifacts
-          xcodebuild test \
+          xcodebuild test-without-building \
             -project kanji_test.xcodeproj \
             -scheme kanji_test \
             -configuration Debug \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.5' \
+            -destination "platform=iOS Simulator,id=$CI_SIMULATOR_ID" \
             -destination-timeout 120 \
             -only-testing:kanji_testHostedTests \
             -parallel-testing-enabled NO \
@@ -75,7 +90,59 @@ jobs:
         with:
           name: ios-hosted-test-results
           path: |
+            artifacts/hosted-build.log
             artifacts/hosted-tests.log
             artifacts/hosted-tests.xcresult
+          if-no-files-found: warn
+          retention-days: 14
+
+  ios-ui-tests:
+    name: iOS UI tests
+    runs-on: macos-26
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v6
+      - name: Show Xcode and available simulators
+        run: |
+          xcodebuild -version
+          python3 scripts/ci-select-simulator.py
+      - name: Build ui tests
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          xcodebuild build-for-testing \
+            -project kanji_test.xcodeproj -scheme kanji_test -configuration Debug \
+            -destination "platform=iOS Simulator,id=$CI_SIMULATOR_ID" \
+            -only-testing:kanji_testUITests -parallel-testing-enabled NO \
+            -onlyUsePackageVersionsFromResolvedFile \
+            -derivedDataPath "$RUNNER_TEMP/kanji-derived-data" \
+            CODE_SIGNING_ALLOWED=NO 2>&1 | tee artifacts/ui-build.log
+      - name: Run ui tests on iOS Simulator
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          xcodebuild test-without-building \
+            -project kanji_test.xcodeproj \
+            -scheme kanji_test \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination "platform=iOS Simulator,id=$CI_SIMULATOR_ID" \
+            -destination-timeout 120 \
+            -only-testing:kanji_testUITests \
+            -parallel-testing-enabled NO \
+            -onlyUsePackageVersionsFromResolvedFile \
+            -derivedDataPath "$RUNNER_TEMP/kanji-derived-data" \
+            -resultBundlePath artifacts/ui-tests.xcresult \
+            CODE_SIGNING_ALLOWED=NO \
+            2>&1 | tee artifacts/ui-tests.log
+      - name: Upload ui test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ios-ui-test-results
+          path: |
+            artifacts/ui-build.log
+            artifacts/ui-tests.log
+            artifacts/ui-tests.xcresult
           if-no-files-found: warn
           retention-days: 14

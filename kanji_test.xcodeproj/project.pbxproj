@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		A10000000000000000000001 /* FSRS in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000002 /* FSRS */; };
 		B10000000000000000000001 /* AnkiImport in Frameworks */ = {isa = PBXBuildFile; productRef = B10000000000000000000002 /* AnkiImport */; };
+		D1000000000000000000000C /* AccessibilityID.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1000000000000000000000D; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -24,6 +25,8 @@
 /* Begin PBXFileReference section */
 		5BD24D2C30583E9F00F23D33 /* kanji_test.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = kanji_test.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C10000000000000000000002 /* kanji_testHostedTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = kanji_testHostedTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+        D10000000000000000000002 /* kanji_testUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = kanji_testUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+        D1000000000000000000000D /* AccessibilityID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = kanji_test/Support/AccessibilityID.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -37,6 +40,7 @@
 			path = kanji_testHostedTests;
 			sourceTree = "<group>";
 		};
+        D10000000000000000000008 /* kanji_testUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; path = kanji_testUITests; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +60,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+        D10000000000000000000009 /* UI Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -64,6 +69,8 @@
 			children = (
 				5BD24D2E30583E9F00F23D33 /* kanji_test */,
 				C10000000000000000000008 /* kanji_testHostedTests */,
+                D10000000000000000000008 /* kanji_testUITests */,
+                D1000000000000000000000D /* AccessibilityID.swift */,
 				5BD24D2D30583E9F00F23D33 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -73,6 +80,7 @@
 			children = (
 				5BD24D2C30583E9F00F23D33 /* kanji_test.app */,
 				C10000000000000000000002 /* kanji_testHostedTests.xctest */,
+                D10000000000000000000002 /* kanji_testUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -125,6 +133,18 @@
 			productReference = 5BD24D2C30583E9F00F23D33 /* kanji_test.app */;
 			productType = "com.apple.product-type.application";
 		};
+        D10000000000000000000001 /* kanji_testUITests */ = {
+            isa = PBXNativeTarget;
+            buildConfigurationList = D10000000000000000000005;
+            buildPhases = (D1000000000000000000000A, D10000000000000000000009, D1000000000000000000000B);
+            buildRules = ();
+            dependencies = (C10000000000000000000003);
+            fileSystemSynchronizedGroups = (D10000000000000000000008);
+            name = kanji_testUITests;
+            productName = kanji_testUITests;
+            productReference = D10000000000000000000002;
+            productType = "com.apple.product-type.bundle.ui-testing";
+        };
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -161,6 +181,7 @@
 			targets = (
 				5BD24D2B30583E9F00F23D33 /* kanji_test */,
 				5BCD0455305B1D0400722EF9 /* kanji_testHostedTests */,
+                D10000000000000000000001 /* kanji_testUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -180,6 +201,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+        D1000000000000000000000B /* UI Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -197,6 +219,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+        D1000000000000000000000A /* UI Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (D1000000000000000000000C); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -429,6 +452,30 @@
 			};
 			name = Release;
 		};
+        D10000000000000000000006 /* Debug UI */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                GENERATE_INFOPLIST_FILE = YES;
+                PRODUCT_BUNDLE_IDENTIFIER = "com.lomach.kanji-test.ui-tests";
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                SWIFT_VERSION = 5.0;
+                TARGETED_DEVICE_FAMILY = "1,2";
+                TEST_TARGET_NAME = kanji_test;
+            };
+            name = Debug;
+        };
+        D10000000000000000000007 /* Release UI */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                GENERATE_INFOPLIST_FILE = YES;
+                PRODUCT_BUNDLE_IDENTIFIER = "com.lomach.kanji-test.ui-tests";
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                SWIFT_VERSION = 5.0;
+                TARGETED_DEVICE_FAMILY = "1,2";
+                TEST_TARGET_NAME = kanji_test;
+            };
+            name = Release;
+        };
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -459,6 +506,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+        D10000000000000000000005 /* UI configurations */ = {isa = XCConfigurationList; buildConfigurations = (D10000000000000000000006, D10000000000000000000007); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */

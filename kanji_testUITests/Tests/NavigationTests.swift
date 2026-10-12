@@ -18,6 +18,18 @@ final class NavigationTests: UITestCase {
         }
     }
 
+    func testKanaDeckOpens() {
+        launch()
+        openFirstDeck(in: ID.Start.sectionKana)
+        XCTAssertTrue(element(ID.Preview.tile).exists)
+    }
+
+    func testWordDeckOpens() {
+        launch()
+        openFirstDeck(in: ID.Start.sectionWords)
+        XCTAssertTrue(element(ID.Preview.tile).exists)
+    }
+
     func testDeckOpensAndReturnsToStart() {
         launch()
         openFirstDeck()

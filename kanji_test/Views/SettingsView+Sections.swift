@@ -8,6 +8,7 @@ extension SettingsView {
                 VStack(alignment: .leading, spacing: 16) {
                     settingsSection("Примеры предложений") {
                         Toggle("Показывать фуригану в примерах", isOn: $settings.showExampleFurigana)
+                            .accessibilityIdentifier(AccessibilityID.Settings.furigana)
                     }
                     speechSettingsView()
                     deckSelectionView()
@@ -31,6 +32,7 @@ extension SettingsView {
                     Button("Готово") {
                         dismiss()
                     }
+                    .accessibilityIdentifier(AccessibilityID.Settings.done)
                 }
             }
             .sheet(isPresented: $isAboutPresented) {

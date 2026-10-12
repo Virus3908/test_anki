@@ -12,6 +12,7 @@ class UITestCase: XCTestCase {
     }
 
     override func tearDown() {
+        app?.terminate()
         attachTimings()
         app = nil
         super.tearDown()
