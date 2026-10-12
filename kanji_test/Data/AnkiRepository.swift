@@ -163,17 +163,7 @@ actor AnkiRepository: AnkiLibraryPersisting {
 
     func collection(_ summary: AnkiImportSummary) async throws -> AnkiCollection {
         let url = try directory(summary).appendingPathComponent("collection.json")
-        let worker = Task.detached(priority: .userInitiated) {
-            try Task.checkCancellation()
-            var collection = try JSONDecoder().decode(AnkiCollection.self, from: Data(contentsOf: url))
-            try Task.checkCancellation()
-            for index in collection.notes.indices where collection.notes[index].parsedFields == nil {
-                try Task.checkCancellation()
-                collection.notes[index].parsedFields = collection.notes[index].fields.map(AnkiContentParser.parsePreservingSource)
-            }
-            try Task.checkCancellation()
-            return collection
-        }
+        let worker = Task.detached(priority: .userInitiated) { try AnkiCollectionLoader.load(from: url) }
         return try await withTaskCancellationHandler { try await worker.value } onCancel: { worker.cancel() }
     }
 

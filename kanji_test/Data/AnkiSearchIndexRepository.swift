@@ -37,11 +37,7 @@ actor AnkiSearchIndexRepository {
         }
         // Never prepare/save native fields back into collection.json here.
         try Task.checkCancellation()
-        var collection = try JSONDecoder().decode(AnkiCollection.self, from: Data(contentsOf: sourceURL))
-        for index in collection.notes.indices where collection.notes[index].parsedFields == nil {
-            try Task.checkCancellation()
-            collection.notes[index].parsedFields = collection.notes[index].fields.map(AnkiContentParser.parsePreservingSource)
-        }
+        let collection = try AnkiCollectionLoader.load(from: sourceURL)
         let records = try AnkiSearchRecord.records(collection: collection, importID: summary.id, filename: summary.filename)
         try Task.checkCancellation()
         do { try save(records, for: summary) }

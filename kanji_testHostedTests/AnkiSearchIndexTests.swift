@@ -294,6 +294,26 @@ final class AnkiSearchIndexTests: XCTestCase {
         XCTAssertTrue(library.searchUnavailableImports.isEmpty)
     }
 
+    func testCollectionReadCancellationAndNativeProjectionNeverRewriteSource() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        let url = root.appendingPathComponent("collection.json")
+        let source = try JSONEncoder().encode(fixture())
+        try source.write(to: url)
+        var checks = 0
+        XCTAssertThrowsError(try AnkiCollectionLoader.load(from: url, checkCancellation: {
+            checks += 1
+            if checks == 3 { throw CancellationError() } // after the first chunk, before the next read
+        })) { XCTAssertTrue($0 is CancellationError) }
+        XCTAssertEqual(try Data(contentsOf: url), source)
+        let loaded = try AnkiCollectionLoader.load(from: url)
+        XCTAssertEqual(loaded.cards.map(\.id), [7, 8])
+        XCTAssertEqual(loaded.notes.first?.parsedFields?.first?.plainText, "猫")
+        XCTAssertEqual(loaded.noteTypes.first?.css, "body{color:red}")
+        XCTAssertEqual(try Data(contentsOf: url), source)
+    }
+
     func testClozeAndCacheByteLimit() async throws {
         var collection = try fixture()
         let type = collection.noteTypes[0]
