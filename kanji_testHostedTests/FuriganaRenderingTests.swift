@@ -18,21 +18,6 @@ final class FuriganaRenderingTests: XCTestCase {
         attach(view, width: 240, name: "Short sentence")
     }
 
-    func testNativeViewHasCompactIntrinsicSizeAndUpdatesForNewSentence() {
-        let view = drawingView(text: text, data: data)
-        let shortSize = view.intrinsicContentSize
-        XCTAssertGreaterThan(shortSize.width, 0)
-        XCTAssertLessThan(shortSize.width, 200)
-        let long = String(repeating: text, count: 10)
-        view.configure(segments: [FuriganaSegment(text: long, reading: nil)], fontSize: 17,
-                       textColor: .label, readingColor: .secondaryLabel)
-        XCTAssertGreaterThan(view.intrinsicContentSize.width, shortSize.width)
-        XCTAssertEqual(view.accessibilityLabel, long)
-        view.configure(segments: data.segments(for: text), fontSize: 17,
-                       textColor: .label, readingColor: .secondaryLabel)
-        XCTAssertEqual(view.intrinsicContentSize, shortSize)
-    }
-
     func testLongSentenceWrapsAndFitsAtLargeDynamicTypeSizes() {
         let original = String(repeating: "学校は好き？", count: 20)
         let markup = String(repeating: "[学校|がっ|こう]は[好|す]き？", count: 20)

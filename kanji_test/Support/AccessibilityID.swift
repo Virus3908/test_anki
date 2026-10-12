@@ -19,7 +19,6 @@ nonisolated enum AccessibilityID {
     enum Examples {
         static let furigana = "examples.furigana"
         static let plain = "examples.plain"
-        static let source = "examples.source"
     }
     enum Completion {
         static let title = "completion.title"
