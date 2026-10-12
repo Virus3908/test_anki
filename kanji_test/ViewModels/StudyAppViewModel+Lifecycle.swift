@@ -40,6 +40,7 @@ extension StudyAppViewModel {
     func loadSavedState() async {
         guard !hasLoadedSavedState, !isLoadingSavedState else { return }
         isLoadingSavedState = true
+        try? await KanaDataLoader.clearCache()
         do {
             try await trainingSession.loadProgress()
             hasLoadedSavedState = true

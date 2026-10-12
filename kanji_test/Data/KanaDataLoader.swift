@@ -14,6 +14,14 @@ nonisolated enum KanaDataLoader {
     }
 
     static func clearCache() async throws {
-        try await KanaSVGCacheRepository.shared.clearCache()
+        // Migration cleanup only: bundled kana metadata/geometry are immutable.
+        let legacy = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("KanaVGCache", isDirectory: true)
+        let worker = Task.detached(priority: .utility) {
+            if FileManager.default.fileExists(atPath: legacy.path) {
+                try FileManager.default.removeItem(at: legacy)
+            }
+        }
+        try await worker.value
     }
 }
