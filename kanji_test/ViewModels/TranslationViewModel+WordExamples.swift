@@ -12,7 +12,7 @@ extension TranslationViewModel {
         return zip(examples, meanings).map { example, meaning in
             WordUsageExample(sentence: example.sentence, reading: example.reading,
                              meaning: meaning.isEmpty ? nil : meaning, attribution: example.attribution,
-                             translationAttribution: example.translationAttribution)
+                             translationAttribution: example.translationAttribution, furigana: example.furigana)
         }
     }
     func loadAndTranslateWordExamples(for card: WordStudyCard, language: MeaningLanguage) async {

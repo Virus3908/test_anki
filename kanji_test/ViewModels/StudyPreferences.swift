@@ -19,6 +19,9 @@ final class StudyPreferences {
     private var stored: StoredOptions
     private var canSave = true
     private(set) var hiddenKanjiDeckIDs: Set<String>
+    var showExampleFurigana: Bool {
+        didSet { defaults.set(showExampleFurigana, forKey: "showExampleFurigana") }
+    }
     var speechEnabled: Bool {
         didSet { defaults.set(speechEnabled, forKey: Self.speechEnabledKey) }
     }
@@ -34,6 +37,7 @@ final class StudyPreferences {
         self.errors = errors
         stored = StoredOptions(defaults: DeckOptions(), decks: [:])
         hiddenKanjiDeckIDs = Set(defaults.stringArray(forKey: Self.hiddenKanjiDeckIDsKey) ?? [])
+        showExampleFurigana = defaults.object(forKey: "showExampleFurigana") as? Bool ?? true
         speechEnabled = defaults.object(forKey: Self.speechEnabledKey) as? Bool ?? true
         speechVoiceIdentifier = defaults.string(forKey: Self.speechVoiceIdentifierKey) ?? ""
         speechRate = defaults.object(forKey: Self.speechRateKey) as? Float ?? AVSpeechUtteranceDefaultSpeechRate

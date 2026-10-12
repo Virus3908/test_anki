@@ -6,6 +6,9 @@ extension SettingsView {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
+                    settingsSection("Примеры предложений") {
+                        Toggle("Показывать фуригану в примерах", isOn: $settings.showExampleFurigana)
+                    }
                     speechSettingsView()
                     deckSelectionView()
                     cardTypeSettingsView()

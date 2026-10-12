@@ -257,7 +257,19 @@ For drawing correctness bugs, inspect `DrawingSessionViewModel`,
 -   `Services/RussianMeaningDictionary.swift` --- local Russian
     meanings.
 -   Tatoeba files in `Data/` --- remote word examples.
--   `Data/WordExampleCacheRepository.swift` --- example cache.
+-   `Data/WordExampleCacheRepository.swift` --- word and kanji example caches.
+-   `Models/Furigana.swift` --- optional raw Tatoeba transcription metadata,
+    structured segments and strict bracket-markup parser. See `docs/tatoeba-furigana.md`.
+-   `Data/TatoebaFuriganaLoader.swift` --- upgrades old examples by sentence ID,
+    preserving text/attribution; successful empty results are cached, failures retry
+    after one day. Do not replace cached sentences with new search results to add ruby.
+-   `Views/FuriganaText.swift` --- native SwiftUI/Core Text ruby renderer shared
+    by word and kanji examples. `StudyPreferences.showExampleFurigana` controls
+    display immediately; never reload examples merely to toggle it.
+-   Tatoeba `Hrkt`/`altscript` uses `[今日|きょう]` and `[学校|がっ|こう]`,
+    not trusted HTML. Reconstructed UTF-8 must exactly match the source sentence;
+    unknown/missing/malformed readings fall back to original text. Keep optional
+    cache fields backward compatible and preserve transcription editor metadata.
 
 ## Remote kanji data
 

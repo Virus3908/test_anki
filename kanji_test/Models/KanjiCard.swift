@@ -53,20 +53,38 @@ nonisolated struct KanjiCard: Codable, Identifiable, Sendable {
 }
 
 nonisolated struct KanjiExample: Codable, Identifiable, Sendable {
-    var id: String { "\(word)-\(reading)" }
+    var id: String { attribution.map { "tatoeba-\($0.sentenceID)" } ?? "\(word)-\(reading)" }
 
     let word: String
     let reading: String
     let meaning: String
     let attribution: TatoebaAttribution?
     let translationAttribution: TatoebaAttribution?
+    var furigana: ExampleFurigana?
 
     init(word: String, reading: String, meaning: String, attribution: TatoebaAttribution? = nil,
-         translationAttribution: TatoebaAttribution? = nil) {
+         translationAttribution: TatoebaAttribution? = nil, furigana: ExampleFurigana? = nil) {
         self.word = word
         self.reading = reading
         self.meaning = meaning
         self.attribution = attribution
         self.translationAttribution = translationAttribution
+        self.furigana = furigana
+    }
+}
+
+extension KanjiExample {
+    nonisolated private enum CodingKeys: String, CodingKey {
+        case word, reading, meaning, attribution, translationAttribution, furigana
+    }
+
+    nonisolated init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        word = try container.decode(String.self, forKey: .word)
+        reading = try container.decode(String.self, forKey: .reading)
+        meaning = try container.decode(String.self, forKey: .meaning)
+        attribution = try container.decodeIfPresent(TatoebaAttribution.self, forKey: .attribution)
+        translationAttribution = try container.decodeIfPresent(TatoebaAttribution.self, forKey: .translationAttribution)
+        furigana = try? container.decodeIfPresent(ExampleFurigana.self, forKey: .furigana)
     }
 }

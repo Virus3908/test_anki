@@ -10,6 +10,7 @@ extension CardContentRendering {
         detailBlock("Примеры") {
             StudyExamplesContent(
                 examples: examples,
+                showsFurigana: settings.showExampleFurigana,
                 isLoading: translationState.isAutomaticallyLoadingExamples(key)
                     || translationState.isManuallyReloadingExamples(key),
                 loadingText: translationState.isManuallyReloadingExamples(key)
@@ -64,6 +65,7 @@ extension CardContentRendering {
 
 struct StudyExamplesContent<Controls: View>: View {
     let examples: [StudyExample]
+    let showsFurigana: Bool
     let isLoading: Bool
     let loadingText: String
     let emptyText: String
@@ -71,12 +73,14 @@ struct StudyExamplesContent<Controls: View>: View {
 
     init(
         examples: [StudyExample],
+        showsFurigana: Bool = true,
         isLoading: Bool,
         loadingText: String,
         emptyText: String,
         @ViewBuilder controls: () -> Controls
     ) {
         self.examples = examples
+        self.showsFurigana = showsFurigana
         self.isLoading = isLoading
         self.loadingText = loadingText
         self.emptyText = emptyText
@@ -98,7 +102,7 @@ struct StudyExamplesContent<Controls: View>: View {
                 }
             } else {
                 ForEach(Array(examples.enumerated()), id: \.offset) { _, example in
-                    StudyExampleRow(example: example)
+                    StudyExampleRow(example: example, showsFurigana: showsFurigana)
                 }
             }
 
@@ -109,11 +113,12 @@ struct StudyExamplesContent<Controls: View>: View {
 
 private struct StudyExampleRow: View {
     let example: StudyExample
+    let showsFurigana: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
             HStack(alignment: .firstTextBaseline, spacing: 6) {
-                Text(example.text)
+                FuriganaText(text: example.text, furigana: example.furigana, showsFurigana: showsFurigana)
                     .foregroundStyle(AppPalette.text)
                     .fixedSize(horizontal: false, vertical: true)
 

@@ -5,16 +5,25 @@ extension KanjiDataLoader {
         _ card: KanjiCard,
         provider: KanjiProviding = KanjiAPIProvider()
     ) async -> KanjiCard {
-        guard card.englishExamples.isEmpty else {
-            return card
+        let cached = await KanjiExampleCacheRepository.loadExamples(for: card.kanji)
+        if !card.englishExamples.isEmpty {
+            let candidates = card.englishExamples.map { example in
+                cached?.first { $0.attribution?.sentenceID == example.attribution?.sentenceID
+                    && example.attribution != nil && $0.word == example.word } ?? example
+            }
+            let examples = await provider.enrichExamples(candidates)
+            await KanjiExampleCacheRepository.saveExamples(examples, for: card.kanji)
+            return card.withEnglishExamples(examples)
         }
 
-        if let cachedExamples = await KanjiExampleCacheRepository.loadExamples(for: card.kanji),
+        if let cachedExamples = cached,
            !cachedExamples.isEmpty,
            cachedExamples.allSatisfy({
                $0.attribution != nil && ($0.meaning.isEmpty || $0.translationAttribution != nil)
            }) {
-            return card.withEnglishExamples(cachedExamples)
+            let examples = await provider.enrichExamples(cachedExamples)
+            await KanjiExampleCacheRepository.saveExamples(examples, for: card.kanji)
+            return card.withEnglishExamples(examples)
         }
 
         let remoteExamples = await provider.loadExamples(for: card.kanji)
