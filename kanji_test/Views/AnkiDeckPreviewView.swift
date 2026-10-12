@@ -175,38 +175,70 @@ struct AnkiCardPreviewView: View, StudyViewStyling {
     let onPractice: (AnkiStudyCard) -> Void
     let translationState: TranslationViewModel
     let language: MeaningLanguage
+    private let searchRecords: [AnkiSearchRecord]?
+    private let loadSearchCard: (@MainActor (AnkiSearchRecord) async throws -> AnkiStudyCard)?
     @State private var index: Int
+    @State private var searchCard: AnkiStudyCard?
+    @State private var loadError: String?
+    @State private var reload = 0
     @State private var answer = false
     @Environment(\.dismiss) private var dismiss
 
     init(cards: [AnkiStudyCard], initialCard: AnkiStudyCard, translationState: TranslationViewModel,
-         language: MeaningLanguage, onPractice: @escaping (AnkiStudyCard) -> Void) {
+         language: MeaningLanguage, searchRecords: [AnkiSearchRecord]? = nil,
+         loadSearchCard: (@MainActor (AnkiSearchRecord) async throws -> AnkiStudyCard)? = nil,
+         onPractice: @escaping (AnkiStudyCard) -> Void) {
         self.cards = cards
         self.onPractice = onPractice
         self.translationState = translationState
         self.language = language
-        _index = State(initialValue: cards.firstIndex(where: { $0.id == initialCard.id }) ?? 0)
+        self.searchRecords = searchRecords
+        self.loadSearchCard = loadSearchCard
+        _searchCard = State(initialValue: searchRecords == nil ? nil : initialCard)
+        _index = State(initialValue: searchRecords?.firstIndex(where: { $0.id == initialCard.id })
+            ?? cards.firstIndex(where: { $0.id == initialCard.id }) ?? 0)
     }
+
+    private var count: Int { searchRecords?.count ?? cards.count }
+    private var currentCard: AnkiStudyCard? { searchRecords == nil ? cards[safe: index] : searchCard }
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 14) {
-                if let card = cards[safe: index] {
+                if let card = currentCard {
                     AnkiCardContentView(card: card, answer: answer, translationState: translationState, language: language)
-                    HStack {
-                        Button { index -= 1; answer = false } label: { Image(systemName: "chevron.left") }
-                            .disabled(index == 0).accessibilityLabel("Предыдущая карточка")
-                        Spacer()
-                        Button(answer ? "Показать вопрос" : "Показать ответ") { answer.toggle() }
-                        Spacer()
-                        Button { index += 1; answer = false } label: { Image(systemName: "chevron.right") }
-                            .disabled(index + 1 == cards.count).accessibilityLabel("Следующая карточка")
-                    }.buttonStyle(.bordered).tint(AppPalette.accent)
+                } else if let loadError {
+                    Text(loadError)
+                    Button("Повторить") { reload += 1 }
+                } else { ProgressView() }
+                HStack {
+                    Button { index -= 1; answer = false } label: { Image(systemName: "chevron.left") }
+                        .disabled(index == 0).accessibilityLabel("Предыдущая карточка")
+                    Spacer()
+                    Button(answer ? "Показать вопрос" : "Показать ответ") { answer.toggle() }
+                        .disabled(currentCard == nil)
+                    Spacer()
+                    Button { index += 1; answer = false } label: { Image(systemName: "chevron.right") }
+                        .disabled(index + 1 >= count).accessibilityLabel("Следующая карточка")
+                }.buttonStyle(.bordered).tint(AppPalette.accent)
+                if let card = currentCard {
                     primaryActionButton(title: "Практиковать эту карточку", systemImage: "rectangle.on.rectangle", accessibilityIdentifier: AccessibilityID.Preview.practiceCard) { onPractice(card) }
                 }
             }.padding(20).background(AppPalette.background).foregroundStyle(AppPalette.text)
-                .navigationTitle("\(index + 1) / \(cards.count)").navigationBarTitleDisplayMode(.inline)
+                .navigationTitle("\(index + 1) / \(count)").navigationBarTitleDisplayMode(.inline)
                 .toolbar { Button("Готово") { dismiss() } }
+                .task(id: "\(index)-\(reload)") {
+                    guard let record = searchRecords?[safe: index], let loadSearchCard,
+                          searchCard?.id != record.id else { return }
+                    searchCard = nil
+                    loadError = nil
+                    do {
+                        let card = try await loadSearchCard(record)
+                        guard !Task.isCancelled else { return }
+                        searchCard = card
+                    } catch is CancellationError { }
+                    catch { if !Task.isCancelled { loadError = "Не удалось открыть карточку Anki." } }
+                }
         }
     }
 }

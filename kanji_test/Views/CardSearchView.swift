@@ -115,13 +115,15 @@ struct CardSearchView: View, CardContentRendering {
         .sheet(item: $selectedAnkiCard) { card in
             let deck = ankiDeck(for: card)
             AnkiCardPreviewView(
-                cards: [card],
+                cards: [],
                 initialCard: card,
                 translationState: translationState,
-                language: settings.options(for: deck.id).meaningLanguage
+                language: settings.options(for: deck.id).meaningLanguage,
+                searchRecords: model.ankiResults,
+                loadSearchCard: { try await model.resolveAnkiResult($0) }
             ) { selected in
                 selectedAnkiCard = nil
-                onPractice(.anki(deck, [selected], guided: true))
+                onPractice(.anki(ankiDeck(for: selected), [selected], guided: true))
             }
         }
     }

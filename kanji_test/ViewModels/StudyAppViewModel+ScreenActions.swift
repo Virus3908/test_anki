@@ -28,7 +28,9 @@ extension StudyAppViewModel {
         case .kanjiDeck: deckState.closeKanjiPreview()
         case .wordDeck: deckState.closeWordPreview()
         case .kanaDeck: deckState.closeKanaPreview()
-        case .ankiDeck: ankiLibrary.closeDeck()
+        case .ankiDeck:
+            ankiLibrary.closeDeck()
+            if !trainingSession.isActive { catalog.releaseAnkiCards() }
         case .start, .training, .customTraining: break
         }
     }

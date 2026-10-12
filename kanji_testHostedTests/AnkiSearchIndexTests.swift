@@ -54,6 +54,25 @@ final class AnkiSearchIndexTests: XCTestCase {
         XCTAssertEqual(try Data(contentsOf: source), original)
     }
 
+    func testSearchDoesNotDecodeCollectionsUntilOpeningSelectedHit() async throws {
+        let collection = try fixture()
+        let repository = SearchTestLibrary(collection: collection)
+        let library = AnkiLibraryViewModel(repository: repository)
+        let first = try await library.recordsForSearch()
+        let reopened = try await library.recordsForSearch()
+        XCTAssertEqual(first.map(\.id), reopened.map(\.id))
+        let initialLoads = await repository.collectionLoads
+        XCTAssertEqual(initialLoads, 0)
+        let hit = try XCTUnwrap(first.first)
+        let card = try await library.cardForSearchResult(hit)
+        XCTAssertEqual(card.id, hit.id)
+        XCTAssertEqual(card.reviewKey, "anki:fixture:card:7")
+        XCTAssertEqual(card.noteType.css, "body{color:red}")
+        XCTAssertEqual(card.note.fields.last, "пользовательское значение")
+        let openedLoads = await repository.collectionLoads
+        XCTAssertEqual(openedLoads, 1)
+    }
+
     func testClozeAndCacheByteLimit() async throws {
         var collection = try fixture()
         let type = collection.noteTypes[0]
@@ -69,5 +88,28 @@ final class AnkiSearchIndexTests: XCTestCase {
             importedAt: Date(), decks: [], cardCount: 2, noteCount: 1, mediaCount: 0, warnings: [])
         try await cache.save(records, for: summary)
         XCTAssertFalse(FileManager.default.fileExists(atPath: root.path))
+    }
+}
+
+private actor SearchTestLibrary: AnkiLibraryPersisting {
+    let content: AnkiCollection
+    private(set) var collectionLoads = 0
+    let summary: AnkiImportSummary
+    init(collection: AnkiCollection) {
+        content = collection
+        summary = AnkiImportSummary(id: "fixture", directory: UUID().uuidString, filename: "test.apkg",
+            importedAt: Date(), decks: collection.decks, cardCount: collection.cards.count,
+            noteCount: collection.notes.count, mediaCount: 0, warnings: [], deckCardCounts: ["10": 2])
+    }
+    func load() async throws -> [AnkiImportSummary] { [summary] }
+    func hasRecoverableBackup() async -> Bool { false }
+    func restoreBackup() async throws -> [AnkiImportSummary] { [summary] }
+    func importPackage(_ url: URL) async throws -> AnkiImportResult { AnkiImportResult(summary: summary, alreadyImported: true) }
+    func deleteImport(id: String) async throws { }
+    func markSchedulingMigration(importID: String, version: String) async throws { }
+    func collection(_ summary: AnkiImportSummary) async throws -> AnkiCollection { collectionLoads += 1; return content }
+    func mediaDirectory(_ summary: AnkiImportSummary) async throws -> URL { FileManager.default.temporaryDirectory }
+    func searchRecords(_ summary: AnkiImportSummary) async throws -> [AnkiSearchRecord] {
+        try AnkiSearchRecord.records(collection: content, importID: summary.id, filename: summary.filename)
     }
 }

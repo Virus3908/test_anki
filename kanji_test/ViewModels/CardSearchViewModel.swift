@@ -66,7 +66,8 @@ final class CardSearchViewModel {
 
     /// Строит индекс по активному scope. Повторный вызов — мгновенный выход.
     func prepare() async {
-        guard !isPrepared, !isPreparing else { return }
+        if isPrepared { loadError = nil; return }
+        guard !isPreparing else { return }
         isPreparing = true
         loadError = nil
         defer { isPreparing = false }
@@ -125,9 +126,16 @@ final class CardSearchViewModel {
 
     // MARK: Поиск
 
+    func resolveAnkiResult(_ record: AnkiSearchRecord) async throws -> AnkiStudyCard {
+        guard let ankiModel else { throw CocoaError(.fileReadNoSuchFile) }
+        let card = try await ankiModel.cardForSearchResult(record)
+        try Task.checkCancellation()
+        return card
+    }
+
     func openAnkiResult(_ record: AnkiSearchRecord) async -> AnkiStudyCard? {
         do {
-            let card = try await ankiModel?.cardForSearchResult(record)
+            let card = try await resolveAnkiResult(record)
             try Task.checkCancellation()
             return card
         } catch is CancellationError { return nil }

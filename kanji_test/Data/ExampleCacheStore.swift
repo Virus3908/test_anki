@@ -48,7 +48,9 @@ actor ExampleCacheStore<Example: Codable & Sendable & Equatable> {
 
     private func readIfNeeded() {
         guard values == nil else { return }
+        var oversized = false
         if let data = try? Data(contentsOf: url) {
+            oversized = data.count > byteLimit
             if let envelope = try? JSONDecoder().decode(Envelope.self, from: data), envelope.schemaVersion == 1 {
                 values = envelope.payload
             } else {
@@ -57,7 +59,7 @@ actor ExampleCacheStore<Example: Codable & Sendable & Equatable> {
         } else { values = [:] }
         // Legacy files carry no recency metadata: deterministic eviction until
         // the current process observes actual reads.
-        if (values?.count ?? 0) > entryLimit { try? persistBounded() }
+        if oversized || (values?.count ?? 0) > entryLimit { try? persistBounded() }
     }
 
     private func persistBounded() throws {

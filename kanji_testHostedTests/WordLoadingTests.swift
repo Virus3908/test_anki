@@ -36,7 +36,7 @@ final class WordLoadingTests: XCTestCase {
         var seen: Set<String> = []
         XCTAssertEqual(words.map(\.reviewKey), selected.filter { seen.insert($0.id).inserted }.map { "word:\($0.id)" })
         let related = try await WordDataLoader.loadWords(containing: "学", limit: 3)
-        XCTAssertEqual(related.map(\.word), entries.lazy.filter { $0.word.contains("学") }.prefix(3).map(\.word))
+        XCTAssertEqual(related.map(\.word), Array(entries.lazy.filter { $0.word.contains("学") }.prefix(3).map(\.word)))
         XCTAssertEqual(Set(cards.map(\.id)).count, cards.count)
     }
 }

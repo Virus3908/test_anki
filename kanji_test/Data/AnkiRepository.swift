@@ -153,13 +153,18 @@ actor AnkiRepository: AnkiLibraryPersisting {
 
     func collection(_ summary: AnkiImportSummary) async throws -> AnkiCollection {
         let url = try directory(summary).appendingPathComponent("collection.json")
-        return try await Task.detached(priority: .userInitiated) {
+        let worker = Task.detached(priority: .userInitiated) {
+            try Task.checkCancellation()
             var collection = try JSONDecoder().decode(AnkiCollection.self, from: Data(contentsOf: url))
+            try Task.checkCancellation()
             if collection.prepareNativeFields() {
+                try Task.checkCancellation()
                 try JSONEncoder().encode(collection).write(to: url, options: .atomic)
             }
+            try Task.checkCancellation()
             return collection
-        }.value
+        }
+        return try await withTaskCancellationHandler { try await worker.value } onCancel: { worker.cancel() }
     }
 
     func mediaDirectory(_ summary: AnkiImportSummary) async throws -> URL {

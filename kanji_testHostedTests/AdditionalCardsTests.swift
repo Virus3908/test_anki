@@ -43,6 +43,33 @@ final class AdditionalCardsTests: XCTestCase {
         XCTAssertEqual(settings.additionalCardCount(for: "deck", studyDay: next, calendar: calendar), 0)
     }
 
+    func testRestoredSessionUsesExtraLimitAndUndoKeepsGrant() async throws {
+        let suite = "AdditionalCards-" + UUID().uuidString
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let errors = StorageStatus()
+        let settings = StudyPreferences(defaults: defaults, errors: errors)
+        settings.updateOptions(for: "deck") { $0.dailyNewCardLimit = 1 }
+        let repository = GrantTestReviews()
+        let session = TrainingSessionViewModel(repository: repository, catalog: StudyCardCatalog(), settings: settings, errors: errors)
+        try await session.loadProgress()
+        session.addNewCardsToToday(2, for: "deck")
+        let restoredSettings = StudyPreferences(defaults: defaults, errors: errors)
+        let restored = TrainingSessionViewModel(repository: repository, catalog: StudyCardCatalog(), settings: restoredSettings, errors: errors)
+        try await restored.loadProgress()
+        let deck = StudyDeck(id: "deck", title: "Test", mode: .kanji)
+        let started = await restored.start(deck: deck, sourceIDs: ["one", "two", "three", "four"])
+        XCTAssertTrue(started)
+        XCTAssertEqual(restored.sessionTotalCards, 3)
+        XCTAssertEqual(restored.options.dailyNewCardLimit, 3)
+        await restored.submitReview(.good, expectedKey: nil)
+        await restored.moveToPreviousCard()
+        XCTAssertEqual(restoredSettings.additionalCardCount(for: "deck", studyDay: restored.reviewStore.studyDate()), 2)
+        XCTAssertEqual(restoredSettings.options(for: "deck").dailyNewCardLimit, 1)
+        try await restored.advanceStudyDay()
+        XCTAssertEqual(restoredSettings.additionalCardCount(for: "deck", studyDay: restored.reviewStore.studyDate()), 0)
+    }
+
     func testUnreadableGrantDataIsPreserved() throws {
         let suite = "AdditionalCards-" + UUID().uuidString
         let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
@@ -53,4 +80,12 @@ final class AdditionalCardsTests: XCTestCase {
         settings.addAdditionalCards(3, for: "deck", studyDay: Date())
         XCTAssertEqual(defaults.data(forKey: "additionalStudyCards"), bytes)
     }
+}
+
+@MainActor private final class GrantTestReviews: ReviewPersisting {
+    private var progress = StudyProgressStore(records: [:])
+    func load() async throws -> StudyProgressStore { progress }
+    func save(_ progress: StudyProgressStore) async throws { self.progress = progress }
+    func hasRecoverableBackup() async -> Bool { false }
+    func restoreBackup() async throws -> StudyProgressStore { progress }
 }
