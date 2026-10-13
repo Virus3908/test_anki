@@ -3,7 +3,13 @@ import Foundation
 extension TranslationViewModel {
     nonisolated static func grammarEnglishTexts(_ rule: GrammarRule) -> [String] {
         var seen = Set<String>()
-        let texts = [rule.meaning, rule.formation, rule.displayedExplanation ?? ""] + rule.examples.map(\.en)
+        // Translate source English only. `displayedExplanation` may be an authored Russian
+        // localization, so using it here could overwrite the text the lesson presents.
+        let supplementTexts = rule.supplement.map { supplement in
+            [supplement.summary] + supplement.structure + supplement.pitfalls + supplement.examples.map(\.en)
+        } ?? []
+        let texts = [rule.meaning, rule.formation, rule.notes ?? "", rule.teaching?.example.en ?? ""] + rule.examples.map(\.en)
+            + supplementTexts
             + (rule.exercises ?? []).flatMap { [$0.cueEN ?? "", $0.explanationEN ?? ""] }
         return texts.filter { !$0.isEmpty && seen.insert($0).inserted }
     }

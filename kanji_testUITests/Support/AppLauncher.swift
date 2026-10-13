@@ -4,11 +4,13 @@ import XCTest
 enum AppLauncher {
     private final class BundleToken {}
 
-    static func makeApp(importingAnkiFixture: Bool = false, keepingState: Bool = false, largeText: Bool = false) -> XCUIApplication {
+    static func makeApp(importingAnkiFixture: Bool = false, keepingState: Bool = false,
+                        largeText: Bool = false, darkMode: Bool = false) -> XCUIApplication {
         let app = XCUIApplication()
         // Auto-speak off: speech may only come from an explicit tap in tests.
         // Argument-domain values are parsed as plist, so a real Bool needs `<false/>`.
         app.launchArguments = ["-ui-testing", "-speechEnabled", "<false/>"]
+        if darkMode { app.launchEnvironment["UITEST_GRAMMAR_DARK_MODE"] = "1" }
         app.launchEnvironment["UITEST_DISABLE_ANIMATIONS"] = "1"
         if largeText { app.launchEnvironment["UITEST_GRAMMAR_LARGE_TEXT"] = "1" }
         if keepingState {

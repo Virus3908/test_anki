@@ -134,6 +134,13 @@ nonisolated struct StudyExampleSource: Identifiable, Sendable, Hashable {
     let title: String
     let url: URL
 
+    init?(id: String, title: String, url: String) {
+        guard let url = URL(string: url), url.scheme != nil else { return nil }
+        self.id = id
+        self.title = title
+        self.url = url
+    }
+
     init?(_ attribution: TatoebaAttribution?, editors: [String] = []) {
         guard let attribution, let url = attribution.sentenceURL else { return nil }
         self.id = "tatoeba-\(attribution.sentenceID)"

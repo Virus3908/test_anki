@@ -29,6 +29,7 @@ struct ContentView: View {
             }
             #endif
         }
+        .preferredColorScheme(testColorScheme)
         .animation(.easeInOut(duration: 0.3), value: appModel.navigation.presentedTraining)
         .sheet(isPresented: $model.isSettingsPresented) {
             SettingsView(settings: appModel.settings,
@@ -67,6 +68,15 @@ struct ContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged)) { _ in
             Task { await appModel.resume() }
         }
+    }
+
+    private var testColorScheme: ColorScheme? {
+        #if DEBUG
+        if UITestingLaunch.isActive && ProcessInfo.processInfo.environment["UITEST_GRAMMAR_DARK_MODE"] == "1" {
+            return .dark
+        }
+        #endif
+        return nil
     }
 
     private var startScreen: some View {

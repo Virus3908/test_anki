@@ -59,7 +59,16 @@ nonisolated struct GrammarSentenceBank: Codable, Sendable {
                 throw Error.invalid("missing example reference")
             }
             return GrammarExample(ja: sentence.japanese, en: translation.text,
-                furigana: reference.furigana ?? sentence.reading, ru: reference.translationRU ?? sentence.reviewedTranslationRU)
+                furigana: reference.furigana ?? sentence.reading,
+                ru: reference.translationRU ?? sentence.reviewedTranslationRU,
+                sources: sentence.sources.map { source in
+                    GrammarExampleSource(name: source.name, sentenceID: source.sentenceID,
+                        author: source.author, license: source.license, url: source.url,
+                        commit: source.commit, status: sentence.status)
+                },
+                translationSources: [GrammarExampleSource(name: "Перевод \(translation.id)",
+                    sentenceID: translation.id, author: translation.author, license: translation.license,
+                    url: translation.url, commit: nil, status: translation.status)])
         }
     }
     func exercises(_ ids: [String], ruleID: String) throws -> [GrammarExercise] {

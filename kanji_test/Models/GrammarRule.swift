@@ -135,6 +135,8 @@ nonisolated struct GrammarExample: Codable, Sendable {
     let en: String
     let furigana: String?
     let ru: String?
+    var sources: [GrammarExampleSource]? = nil
+    var translationSources: [GrammarExampleSource]? = nil
 
     /// Adapt explicit OpenJLPT braces to the existing strict parser.
     /// No reading inference; byte reconstruction is checked by FuriganaParser.
@@ -146,6 +148,18 @@ nonisolated struct GrammarExample: Codable, Sendable {
         return ExampleFurigana(transcriptions: [TatoebaTranscription(text: transcription,
             script: "Hrkt", type: "altscript")], checkedAt: Date(timeIntervalSince1970: 0))
     }
+}
+
+nonisolated struct GrammarExampleSource: Codable, Sendable, Hashable, Identifiable {
+    let name: String
+    let sentenceID: String
+    let author: String?
+    let license: String
+    let url: String
+    let commit: String?
+    let status: String?
+
+    var id: String { "\(name):\(sentenceID):\(url)" }
 }
 
 nonisolated struct GrammarRelation: Codable, Sendable {
