@@ -44,11 +44,15 @@ nonisolated enum GrammarSessionPlanner {
         let lastStep: Int
         let retryAfter: Int?
         let hasErrors: Bool
+        var sentenceID: String? = nil
     }
-    static func nextRule(_ active: [ActiveRule], previousID: String?, step: Int, seed: String) -> String? {
+    static func nextRule(_ active: [ActiveRule], previousID: String?, step: Int, seed: String,
+                         previousSentenceID: String? = nil) -> String? {
         guard !active.isEmpty else { return nil }
         let cooled = active.filter { ($0.retryAfter ?? 0) <= step }
-        let pool = cooled.isEmpty ? active : cooled
+        let ready = cooled.isEmpty ? active : cooled
+        let freshContext = ready.filter { $0.sentenceID == nil || $0.sentenceID != previousSentenceID }
+        let pool = freshContext.isEmpty ? ready : freshContext
         let alternatives = pool.filter { $0.id != previousID }
         let choices = GrammarExerciseSelection.ordered(alternatives.isEmpty ? pool : alternatives, seed: seed + ":\(step)")
         return choices.sorted { a, b in

@@ -54,6 +54,7 @@ final class GrammarMixedSessionViewModel {
     func advance() {
         guard let current, current.isAnswerVisible else { return }
         let id = current.rule.id
+        let previousSentenceID = current.currentExercise?.sentenceID
         if let result = current.results.last {
             completedExerciseIDs.append(result.exerciseID)
             if !result.isCorrect || result.usedHint { retryAfter[id] = history.count + 3 }
@@ -67,9 +68,11 @@ final class GrammarMixedSessionViewModel {
                 && Set($0.currentExercise?.requiredRuleIDs ?? []).isSubset(of: introduced)
         }.map {
             GrammarSessionPlanner.ActiveRule(id: $0.rule.id, priority: priorities[$0.rule.id] ?? 2,
-                lastStep: lastSteps[$0.rule.id] ?? -1, retryAfter: retryAfter[$0.rule.id], hasErrors: !$0.weakAspects.isEmpty)
+                lastStep: lastSteps[$0.rule.id] ?? -1, retryAfter: retryAfter[$0.rule.id], hasErrors: !$0.weakAspects.isEmpty,
+                sentenceID: $0.currentExercise?.sentenceID)
         }
-        currentRuleID = GrammarSessionPlanner.nextRule(active, previousID: id, step: history.count, seed: seed)
+        currentRuleID = GrammarSessionPlanner.nextRule(active, previousID: id, step: history.count, seed: seed,
+            previousSentenceID: previousSentenceID)
         revision += 1
     }
     func restartAfterUndo(ruleID: String) {

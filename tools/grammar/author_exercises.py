@@ -16,11 +16,17 @@ KIND_NAMES = ('formProduction', 'fillBlank', 'transformSentence', 'assembleSente
 def materials():
     return json.loads(Path(__file__).with_name('lessons.json').read_text())
 
+@lru_cache(maxsize=1)
+def reviewed_exercises():
+    from corpus.publish import approved_material
+    return approved_material()[2]
+
 
 def authored(rule, all_rules):
     lesson = materials().get(rule['id'])
+    approved = [e for e in reviewed_exercises() if e['ruleID'] == rule['id']]
     if not lesson:
-        return []
+        return approved
     result = []
     ruby = json.loads(Path(__file__).with_name('furigana.json').read_text())['texts']
     for index, exercise in enumerate(lesson['exercises']):
@@ -44,4 +50,4 @@ def authored(rule, all_rules):
             value['provenance']['status'] = 'algorithmicallyChecked'
             value['provenance']['method'] = 'explicit-verb-class-conjugation-v1; context-needs-linguistic-review'
         result.append(value)
-    return result
+    return result + approved

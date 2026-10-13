@@ -16,3 +16,4 @@ build/
 
 # Python bytecode produced by grammar resource generation
 tools/grammar/__pycache__/
+tools/grammar/corpus/__pycache__/

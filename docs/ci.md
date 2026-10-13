@@ -103,3 +103,11 @@ XCTest measure в hosted job без произвольного порога вр
 точное восстановление текстов ruby; release job по-прежнему требует полноценные
 уроки всего корпуса. GrammarUITests сохраняет дополнительные screenshots ввода,
 смешанного вопроса, переключения фуриганы, ошибки и результата; экспорт прежний.
+
+Corpus job устанавливает закреплённые SudachiPy/core, повторяет разбор извлечённой
+выборки, проверяет source/translation IDs и direct links по официальному pinned
+Tatoeba snapshot. При смене еженедельной выгрузки downloader явно отказывается
+подменять данные; нужен сохранённый архив или осознанный repin. Publication-boundary
+regressions и GrammarSentenceBankTests выполняются только в Actions. Release gate
+дополнен пятью семантически проверенными контекстами на правило. Coverage/review
+packets сохраняются в grammar-corpus-coverage. [Корпус](grammar-corpus.md).

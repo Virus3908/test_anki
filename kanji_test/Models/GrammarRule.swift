@@ -50,6 +50,8 @@ nonisolated struct GrammarRule: Identifiable, Codable, Sendable, StudyItem {
     var teaching: GrammarTeaching? = nil
     var practiceMetadata: GrammarPracticeMetadata? = nil
     var supplement: GrammarSupplement? = nil
+    var exampleReferences: [GrammarSentenceBank.ExampleReference]? = nil
+    var exerciseTemplateIDs: [String]? = nil
 
     var reviewKey: String { "grammar:\(id)" }
     var categories: [GrammarCategory] { tags.compactMap(GrammarCategory.init(rawValue:)) }
@@ -60,7 +62,15 @@ nonisolated struct GrammarRule: Identifiable, Codable, Sendable, StudyItem {
     func withExercises(_ value: [GrammarExercise]?) -> GrammarRule {
         GrammarRule(id: id, level: level, pattern: pattern, reading: reading, romaji: romaji,
             meaning: meaning, formation: formation, notes: notes, examples: examples, tags: tags,
-            localization: localization, exercises: value, relations: relations, teaching: teaching, practiceMetadata: practiceMetadata, supplement: supplement)
+            localization: localization, exercises: value, relations: relations, teaching: teaching, practiceMetadata: practiceMetadata, supplement: supplement,
+            exampleReferences: exampleReferences, exerciseTemplateIDs: exerciseTemplateIDs)
+    }
+    func withCorpus(examples: [GrammarExample], exercises: [GrammarExercise]?) -> GrammarRule {
+        GrammarRule(id: id, level: level, pattern: pattern, reading: reading, romaji: romaji,
+            meaning: meaning, formation: formation, notes: notes, examples: examples, tags: tags,
+            localization: localization, exercises: exercises, relations: relations, teaching: teaching,
+            practiceMetadata: practiceMetadata, supplement: supplement, exampleReferences: exampleReferences,
+            exerciseTemplateIDs: exerciseTemplateIDs)
     }
 }
 
@@ -77,13 +87,15 @@ extension GrammarRule {
         meaning = try values.decode(String.self, forKey: .meaning)
         formation = try values.decode(String.self, forKey: .formation)
         notes = try values.decodeIfPresent(String.self, forKey: .notes)
-        examples = try values.decode([GrammarExample].self, forKey: .examples)
+        examples = try values.decodeIfPresent([GrammarExample].self, forKey: .examples) ?? []
         tags = try values.decode([String].self, forKey: .tags)
         localization = try values.decodeIfPresent(GrammarLocalization.self, forKey: .localization)
         relations = try values.decodeIfPresent([GrammarRelation].self, forKey: .relations)
         teaching = try values.decodeIfPresent(GrammarTeaching.self, forKey: .teaching)
         practiceMetadata = try values.decodeIfPresent(GrammarPracticeMetadata.self, forKey: .practiceMetadata)
         supplement = try values.decodeIfPresent(GrammarSupplement.self, forKey: .supplement)
+        exampleReferences = try values.decodeIfPresent([GrammarSentenceBank.ExampleReference].self, forKey: .exampleReferences)
+        exerciseTemplateIDs = try values.decodeIfPresent([String].self, forKey: .exerciseTemplateIDs)
         let decoded = try? values.decodeIfPresent([GrammarExercise].self, forKey: .exercises)
         if let decoded, decoded.allSatisfy({ $0.isUsable(for: decodedID) }),
            Set(decoded.map(\.id)).count == decoded.count { exercises = decoded }

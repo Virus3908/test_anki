@@ -5,8 +5,12 @@ actor GrammarDataLoader {
     static let shared = GrammarDataLoader()
     private let resourceURLs: [GrammarLevel: URL]
     private var cached: [GrammarLevel: GrammarResource] = [:]
+    private var sentenceBank: GrammarSentenceBank?
+    private let sentenceBankURL: URL?
 
-    init(resourceURLs: [GrammarLevel: URL]? = nil) {
+    init(resourceURLs: [GrammarLevel: URL]? = nil, sentenceBankURL: URL? = nil) {
+        self.sentenceBankURL = sentenceBankURL ?? Bundle.main.url(forResource: "grammar-sentence-bank", withExtension: "json")
+            ?? Bundle.main.url(forResource: "grammar-sentence-bank", withExtension: "json", subdirectory: "Data/Grammar")
         self.resourceURLs = resourceURLs ?? Dictionary(uniqueKeysWithValues: GrammarLevel.allCases.compactMap { level in
             let name = "grammar-\(level.rawValue.lowercased())"
             guard let url = Bundle.main.url(forResource: name, withExtension: "json")
@@ -29,7 +33,18 @@ actor GrammarDataLoader {
         try Task.checkCancellation()
         if let value = cached[level] { return value }
         guard let url = resourceURLs[level] else { throw Error.missing(level) }
-        let value = try JSONDecoder().decode(GrammarResource.self, from: Data(contentsOf: url))
+        let decoded = try JSONDecoder().decode(GrammarResource.self, from: Data(contentsOf: url))
+        var value = decoded
+        if decoded.rules.contains(where: { $0.exampleReferences != nil || $0.exerciseTemplateIDs != nil }) {
+            let bank = try loadSentenceBank()
+            let rules = try decoded.rules.map { rule in
+                let examples = try rule.exampleReferences.map(bank.examples) ?? rule.examples
+                // Bad referenced exercises disable just their rule, as legacy malformed arrays do.
+                let exercises = rule.exerciseTemplateIDs.map { try? bank.exercises($0, ruleID: rule.id) } ?? rule.exercises
+                return rule.withCorpus(examples: examples, exercises: exercises)
+            }
+            value = GrammarResource(schemaVersion: decoded.schemaVersion, metadata: decoded.metadata, rules: rules)
+        }
         try Self.validate(value, level: level)
         try Task.checkCancellation()
         cached[level] = value
@@ -37,6 +52,14 @@ actor GrammarDataLoader {
     }
 
     func rules(_ level: GrammarLevel) throws -> [GrammarRule] { try resource(level).rules }
+    func loadSentenceBank() throws -> GrammarSentenceBank {
+        if let sentenceBank { return sentenceBank }
+        guard let sentenceBankURL else { throw Error.invalid("не найден банк предложений") }
+        let bank = try JSONDecoder().decode(GrammarSentenceBank.self, from: Data(contentsOf: sentenceBankURL))
+        try bank.validate()
+        sentenceBank = bank
+        return bank
+    }
 
     func allRules() throws -> [GrammarRule] {
         let values = try GrammarLevel.allCases.flatMap { try rules($0) }

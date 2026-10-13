@@ -110,6 +110,10 @@ def generate():
                          'sourceSHA256': hashes[path.name]},
             'rules': rules,
         })
+    from corpus.publish import approved_material
+    _, reviewed_usages, _ = approved_material()
+    reviewed_context_counts = {r['id']: len({u['sentenceID'] for u in reviewed_usages.values()
+        if u['ruleID'] == r['id']}) for r in imported}
     write(OUTPUT / 'grammar-manifest.json', {'schemaVersion': 1, 'commit': SHA,
         'counts': COUNTS, 'sourceSHA256': hashes,
         'totalRules': len(seen), 'totalExamples': examples,
@@ -118,15 +122,16 @@ def generate():
         'classifiedRules': len(practice_metadata),
         'rulesByPracticeKind': {kind: sum(any(e['kind'] == kind for e in r.get('exercises', [])) for r in imported) for kind in KIND_NAMES},
         'rulesWithAuthoredContext': sum(any(e['kind'] == 'chooseContext' for e in r.get('exercises', [])) for r in imported),
-        'linguisticallyReviewedRules': 0,
+        'linguisticallyReviewedRules': sum(count >= 5 for count in reviewed_context_counts.values()),
         'supplementedRules': len(supplements),
         'exercisesByKind': {kind: sum(e['kind'] == kind for r in imported for e in r.get('exercises', []))
             for kind in KIND_NAMES},
         'exercisesByLevel': {level: sum(len(r.get('exercises', [])) for r in imported if r['level'] == level) for level in COUNTS},
         'pendingRules': [r['id'] for r in imported if not r.get('teaching') or len(r.get('exercises', [])) < 4],
         'translationPolicy': 'on-device-en-ru',
-        'releaseReady': all(r.get('teaching') and len(r.get('exercises', [])) >= 4 for r in imported),
-        'manualLinguisticReviewClaimed': False})
+        'releaseReady': all(r.get('teaching') and len(r.get('exercises', [])) >= 4
+            and reviewed_context_counts[r['id']] >= 5 for r in imported),
+        'manualLinguisticReviewClaimed': bool(reviewed_usages)})
     write(OUTPUT / 'grammar-audit.json', {'schemaVersion': 1, 'rules': [{
         'id': r['id'], 'level': r['level'], 'categories': r['tags'],
         'exerciseCount': len(r.get('exercises', [])),
@@ -140,6 +145,14 @@ def generate():
         'needsLinguisticReview': True,
         'furiganaTexts': sum(len(e.get('furigana', {})) for e in r.get('exercises', [])),
     } for r in imported]})
+    from corpus.compile_bank import build
+    bank = build(imported)
+    (OUTPUT / 'grammar-sentence-bank.json').write_text(json.dumps(bank, ensure_ascii=False, separators=(',', ':')) + '\n')
+    for level in COUNTS:
+        path = OUTPUT / f'grammar-{level.lower()}.json'
+        resource = json.loads(path.read_text())
+        resource['rules'] = [r for r in imported if r['level'] == level]
+        write(path, resource)
     print(f'Imported {len(seen)} rules / {examples} examples from {SHA}. Check manifest for localization coverage.')
 
 if __name__ == '__main__':

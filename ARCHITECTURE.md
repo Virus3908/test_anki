@@ -738,3 +738,11 @@ GrammarSessionPlanner объединяет кандидатов прежнего
 четыре правила. TrainingSessionViewModel сохраняет одну оценку каждого завершённого
 правила через прежний ReviewRepository и ReviewUndo. Черновик смешанной попытки
 временный. GrammarExercise.ruby использует прежний FuriganaParser/FuriganaText.
+
+GrammarSentenceBank хранит нормализованные примеры и интернированные тексты
+шаблонов. GrammarDataLoader разрешает exampleReferences/exerciseTemplateIDs на
+actor в прежние модели, поддерживая inline JSON. GrammarExercise.sentenceID
+позволяет планировщикам избегать соседних/внутриурочных повторов одного контекста.
+В tools/grammar/corpus находятся пакетная подготовка Sudachi/Tatoeba и review
+packets всех 526 ID; они не являются app resources. Публикация новых заданий
+требует отдельной проверки смысла/перевода/границ/ключей. FSRS не меняется.

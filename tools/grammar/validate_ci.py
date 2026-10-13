@@ -19,6 +19,8 @@ def check(release=False):
     typed_kinds = {'formProduction', 'fillBlank', 'transformSentence', 'assembleSentence', 'chooseContext', 'correctError', 'distinguishMeaning', 'understandSentence'}
     type_counts = {kind: 0 for kind in sorted(typed_kinds)}
     counts = {}
+    from corpus.compile_bank import hydrate_resource
+    bank = json.loads((DATA / 'grammar-sentence-bank.json').read_text())
     registry = json.loads((ROOT / 'tools/grammar/practice-metadata.json').read_text())
     supplements = json.loads((ROOT / 'tools/grammar/nihongo-mono.json').read_text())
     supplement_pin = json.loads((ROOT / 'tools/grammar/nihongo-snapshot.json').read_text())
@@ -30,7 +32,7 @@ def check(release=False):
         digest = hashlib.sha256(raw).hexdigest()
         assert digest == pin['sourceSHA256'][filename], f'Changed pinned source: {level}'
         source = json.loads(raw)
-        resource = json.loads((DATA / ('grammar-' + filename)).read_text())
+        resource = hydrate_resource(json.loads((DATA / ('grammar-' + filename)).read_text()), bank)
         rules = resource['rules']
         counts[level] = len(rules)
         assert resource['schemaVersion'] == 1
@@ -162,6 +164,13 @@ def check(release=False):
     if release and pending:
         errors.append(f'{len(pending)} rules lack substantive learning content')
     if release:
+        from corpus.publish import approved_material
+        _, reviewed_usages, _ = approved_material()
+        reviewed_counts = {rid: len({u['sentenceID'] for u in reviewed_usages.values()
+            if u['ruleID'] == rid}) for rid in ids}
+        insufficient_contexts = [rid for rid, count in reviewed_counts.items() if count < 5]
+        if insufficient_contexts:
+            errors.append(f'{len(insufficient_contexts)} rules lack five semantically reviewed contexts')
         for kind in sorted(typed_kinds):
             if type_counts[kind] == 0:
                 errors.append(f'Missing required exercise kind: {kind}')

@@ -6,9 +6,11 @@ nonisolated enum GrammarExerciseEngine {
     static let maximumCount = 8
     static func plan(rule: GrammarRule, seed: String, isReview: Bool, attempt: Int, previousRating: ReviewRating?) -> Plan {
         var seen = Set<String>()
+        var seenSentences = Set<String>()
         let available = GrammarExerciseSelection.ordered(rule.exercises ?? [], seed: seed).filter {
             $0.isUsable(for: rule.id) && $0.eligibleForPractice
                 && seen.insert($0.promptRU + "\n" + ($0.japanese ?? "")).inserted
+                && ($0.sentenceID.map { seenSentences.insert($0).inserted } ?? true)
         }
         let complexity = min(3, max(1, rule.teaching?.complexity ?? 2))
         let hasProduction = available.contains { $0.kind == .formProduction }

@@ -50,6 +50,7 @@ nonisolated struct GrammarExercise: Identifiable, Codable, Sendable {
     var furigana: [String: String]? = nil
     var testsReading: Bool? = nil
     var requiredRuleIDs: [String]? = nil
+    var sentenceID: String? = nil
 
     func ruby(for text: String) -> ExampleFurigana? {
         guard testsReading != true, let markup = furigana?[text],
