@@ -54,7 +54,7 @@ final class GrammarPracticeViewModel {
 
     var isSelfAssessment: Bool { isFreePractice }
     var contentError: String? {
-        !isFreePractice && exercises.count < 3 ? "Практика для этого правила ещё готовится. Все объяснения и примеры доступны." : nil
+        !isFreePractice && exercises.isEmpty ? "Практика для этого правила ещё готовится. Все объяснения и примеры доступны." : nil
     }
     var correctCount: Int { results.filter(\.isCorrect).count }
     var proposedRating: ReviewRating? {
@@ -97,7 +97,7 @@ final class GrammarPracticeViewModel {
     }
     func choose(_ optionID: String) {
         guard !isClosed, contentError == nil, !isAnswerVisible, let exercise = currentExercise,
-              exercise.kind != .assembleSentence, exercise.options.contains(where: { $0.id == optionID }) else { return }
+              exercise.kind != .assembleSentence, exercise.kind != .restoreSentence, exercise.options.contains(where: { $0.id == optionID }) else { return }
         selectedOptionID = optionID
         record(correct: exercise.accepts(optionID), answer: optionID)
     }
@@ -114,7 +114,7 @@ final class GrammarPracticeViewModel {
     }
     func checkForm() {
         guard !isClosed, !isAnswerVisible, contentError == nil, let exercise = currentExercise,
-              exercise.kind == .formProduction, !textAnswer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+              (exercise.kind == .formProduction || exercise.kind == .restoreSentence), !textAnswer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         record(correct: GrammarAnswerValidator.accepts(textAnswer, for: exercise), answer: textAnswer)
     }
     private func record(correct: Bool, answer: String) {

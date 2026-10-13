@@ -2,9 +2,10 @@ import Foundation
 
 nonisolated enum GrammarExerciseKind: String, Codable, Sendable, CaseIterable {
     case formProduction, chooseConstruction, fillBlank, identifyConstruction, chooseCorrectSentence, transformSentence
-    case assembleSentence, chooseContext, correctError, distinguishMeaning, understandSentence
+    case restoreSentence, assembleSentence, chooseContext, correctError, distinguishMeaning, understandSentence
     var title: String {
         switch self {
+        case .restoreSentence: "Восстанови исходный пример"
         case .formProduction: "Образование формы"
         case .chooseConstruction: "Выбор конструкции"
         case .fillBlank: "Заполнение пропуска"
@@ -102,7 +103,9 @@ nonisolated struct GrammarExercise: Identifiable, Codable, Sendable {
     func isUsable(for ruleID: String) -> Bool {
         let ids = Set(options.map(\.id))
         let validAnswers: Bool
-        if kind == .assembleSentence {
+        if kind == .restoreSentence {
+            validAnswers = options.count == 1 && acceptedOptionIDs == ids && isScored == false
+        } else if kind == .assembleSentence {
             validAnswers = !(acceptedOrders ?? []).isEmpty && (acceptedOrders ?? []).allSatisfy {
                 !$0.isEmpty && Set($0).count == $0.count && Set($0).isSubset(of: ids)
             }
@@ -111,7 +114,7 @@ nonisolated struct GrammarExercise: Identifiable, Codable, Sendable {
                 && acceptedOptionIDs.count < options.count
         }
         return self.ruleID == ruleID && !id.isEmpty && !promptRU.isEmpty && !explanationRU.isEmpty
-            && options.count >= 2 && ids.count == options.count
+            && options.count >= (kind == .restoreSentence ? 1 : 2) && ids.count == options.count
             && options.allSatisfy { !$0.id.isEmpty && !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
             && Set(options.map { $0.text.trimmingCharacters(in: .whitespacesAndNewlines) }).count == options.count
             && (1...3).contains(difficulty) && validAnswers && validConjugation

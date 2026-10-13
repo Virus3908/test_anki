@@ -95,16 +95,17 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
                             else { practice.isLessonRead = true }
                         }.disabled(session.isPreparingCard)
                 } else if practice.isComplete {
-                    primaryActionButton(title: session.isGrammarResultPending ? "Продолжить" : "Сохранить результат",
+                    primaryActionButton(title: practice.proposedRating == nil && !practice.isSaved ? "Готово" : session.isGrammarResultPending ? "Продолжить" : "Сохранить результат",
                         systemImage: "arrow.right", accessibilityIdentifier: "grammar.training.continue") {
                         operation = Task {
-                            if session.isGrammarResultPending { await session.continueGrammarAfterResult() }
+                            if practice.proposedRating == nil && !practice.isSaved { session.finish() }
+                            else if session.isGrammarResultPending { await session.continueGrammarAfterResult() }
                             else { await saveResult() }
                         }
                     }.disabled(session.isPreparingCard || practice.isSaving)
                 } else if practice.contentError == nil {
                     let assembling = practice.currentExercise?.kind == .assembleSentence && !practice.isAnswerVisible
-                    let forming = practice.currentExercise?.kind == .formProduction && !practice.isAnswerVisible
+                    let forming = (practice.currentExercise?.kind == .formProduction || practice.currentExercise?.kind == .restoreSentence) && !practice.isAnswerVisible
                     primaryActionButton(title: assembling || forming ? "Проверить" : "Продолжить", systemImage: "arrow.right",
                         accessibilityIdentifier: "grammar.training.next") {
                         if assembling { practice.checkAssembly() }
@@ -154,14 +155,19 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
             }
             FuriganaText(text: exercise.promptRU, furigana: exercise.ruby(for: exercise.promptRU), showsFurigana: settings.showExampleFurigana).font(.title3.weight(.medium)).fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier("grammar.training.prompt").accessibilityValue(exerciseAccessibilityValue(exercise))
+            if exercise.kind == .restoreSentence, let cue = exercise.cueEN {
+                Text(cue).font(.title3).padding(16).appSurfaceCard().fixedSize(horizontal: false, vertical: true)
+                Text("Базовая практика: восстановление оригинала. Она не меняет расписание повторений.")
+                    .font(.caption).foregroundStyle(AppPalette.secondaryText)
+            }
             if let japanese = exercise.japanese {
                 FuriganaText(text: japanese, furigana: exercise.ruby(for: japanese), showsFurigana: settings.showExampleFurigana).font(.title2).padding(16).appSurfaceCard().fixedSize(horizontal: false, vertical: true)
                     .textSelection(.enabled).accessibilityIdentifier("grammar.training.japanese")
                     .accessibilityValue(settings.showExampleFurigana && exercise.ruby(for: japanese) != nil ? "furigana" : "plain")
             }
-            if exercise.kind == .formProduction {
+            if exercise.kind == .formProduction || exercise.kind == .restoreSentence {
                 @Bindable var model = practice
-                TextField("Напиши форму по-японски", text: $model.textAnswer)
+                TextField(exercise.kind == .restoreSentence ? "Напиши исходное предложение" : "Напиши форму по-японски", text: $model.textAnswer)
                     .font(.title2).padding(16).appSurfaceCard()
                     .focused($isFormFocused)
                     .autocorrectionDisabled().textInputAutocapitalization(.never)
@@ -232,7 +238,7 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
     private func feedback(_ exercise: GrammarExercise) -> some View {
         let correct = practice.results.last?.isCorrect == true
         return VStack(alignment: .leading, spacing: 8) {
-            Label(correct ? "Правильно" : "Есть ошибка", systemImage: correct ? "checkmark.circle" : "xmark.circle")
+            Label(exercise.kind == .restoreSentence ? (correct ? "Совпадает с оригиналом" : "Отличается от оригинала") : (correct ? "Правильно" : "Есть ошибка"), systemImage: correct ? "checkmark.circle" : "xmark.circle")
                 .foregroundStyle(correct ? AppPalette.success : AppPalette.correction).font(.headline)
             if !correct {
                 FuriganaText(text: exercise.correctAnswer, furigana: exercise.ruby(for: exercise.correctAnswer), showsFurigana: settings.showExampleFurigana).font(.title3)
@@ -246,10 +252,13 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
 
     private var result: some View {
         VStack(alignment: .leading, spacing: 20) {
-            Label(practice.weakAspects.isEmpty ? "Правило закреплено" : "Практика завершена", systemImage: "checkmark.seal")
+            Label(practice.exercises.allSatisfy { $0.isScored == false } ? "Базовая практика завершена" : practice.weakAspects.isEmpty ? "Правило закреплено" : "Практика завершена", systemImage: "checkmark.seal")
                 .font(.title2.bold())
             Text("Готово! \(practice.correctCount) из \(practice.count)")
                 .font(.headline).accessibilityIdentifier("grammar.training.result")
+            if !practice.isSaved && practice.proposedRating == nil {
+                Text("Оценка FSRS не записана: этих заданий недостаточно для проверки самостоятельного применения правила.").font(.callout)
+            }
             ForEach(practice.weakAspects, id: \.self) { Text("Повтори: " + $0).font(.callout) }
             if session.isGrammarResultPending, let record = session.reviewStore.record(for: rule.reviewKey) {
                 Text("Следующее повторение: \(record.dueDate.formatted(date: .abbreviated, time: .shortened))")
@@ -271,6 +280,9 @@ private struct GrammarMixedResultView: View, StudyViewStyling {
                 Text("\(mixed.answered) заданий · \(mixed.correct) правильных")
                     .accessibilityIdentifier("grammar.mixed.result")
                 Text("Повторено правил: \(mixed.repeatedRules) · Изучено новых: \(mixed.newRules)")
+                if mixed.basicCompletedRules > 0 {
+                    Text("Базовая практика: \(mixed.basicCompletedRules) правил без оценки FSRS.")
+                }
                 if !mixed.weakRules.isEmpty {
                     Text("Требует внимания").font(.headline)
                     ForEach(mixed.weakRules) { Text($0.pattern) }

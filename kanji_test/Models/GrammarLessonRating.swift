@@ -5,7 +5,7 @@ nonisolated enum GrammarLessonRating {
     /// Difficulty weights 1/2/3. Below 2/3 weighted accuracy is Again;
     /// any error or assistance is Hard, otherwise Good. Never automatic Easy.
     static func rating(results: [GrammarExerciseResult], exercises: [GrammarExercise]) -> ReviewRating? {
-        guard results.count >= 3, results.count == exercises.count,
+        guard exercises.allSatisfy({ $0.eligibleForPractice }), results.count >= 3, results.count == exercises.count,
               Set(results.map(\.exerciseID)).count == results.count,
               Set(results.map(\.exerciseID)) == Set(exercises.map(\.id)) else { return nil }
         var total = 0, correct = 0

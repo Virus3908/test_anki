@@ -45,11 +45,12 @@ final class GrammarMixedSessionViewModel {
     var total: Int { practices.reduce(0) { $0 + $1.count } }
     var answered: Int { practices.reduce(0) { $0 + $1.results.count } }
     var correct: Int { practices.reduce(0) { $0 + $1.correctCount } }
+    var basicCompletedRules: Int { practices.filter { $0.isComplete && $0.exercises.allSatisfy { $0.isScored == false } }.count }
     var savedRules: Int { practices.filter(\.isSaved).count }
     var newRules: Int { practices.filter { $0.isSaved && !$0.isReview }.count }
     var repeatedRules: Int { practices.filter { $0.isSaved && $0.isReview }.count }
     var weakRules: [GrammarRule] { practices.filter { !$0.weakAspects.isEmpty }.map(\.rule) }
-    var hasUnsavedResults: Bool { practices.contains { $0.isComplete && !$0.isSaved } }
+    var hasUnsavedResults: Bool { practices.contains { $0.isComplete && !$0.isSaved && $0.proposedRating != nil } }
 
     func advance() {
         guard let current, current.isAnswerVisible else { return }

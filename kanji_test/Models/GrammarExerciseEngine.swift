@@ -7,9 +7,9 @@ nonisolated enum GrammarExerciseEngine {
     static func plan(rule: GrammarRule, seed: String, isReview: Bool, attempt: Int, previousRating: ReviewRating?) -> Plan {
         var seen = Set<String>()
         var seenSentences = Set<String>()
-        let available = GrammarExerciseSelection.ordered(rule.exercises ?? [], seed: seed).filter {
-            $0.isUsable(for: rule.id) && $0.eligibleForPractice
-                && seen.insert($0.promptRU + "\n" + ($0.japanese ?? "")).inserted
+        let available = GrammarExerciseSelection.ordered(availableExercises(for: rule), seed: seed).filter {
+            $0.isUsable(for: rule.id) && ($0.eligibleForPractice || $0.kind == .restoreSentence)
+                && seen.insert($0.promptRU + "\n" + ($0.kind == .restoreSentence ? $0.correctAnswer : ($0.japanese ?? ""))).inserted
                 && ($0.sentenceID.map { seenSentences.insert($0).inserted } ?? true)
         }
         let complexity = min(3, max(1, rule.teaching?.complexity ?? 2))
@@ -57,6 +57,38 @@ nonisolated enum GrammarExerciseEngine {
         let selected = Set(initial.map(\.id))
         let reserve = ordered.filter { !selected.contains($0.id) }
         return Plan(exercises: selectedExercises, reserve: reserve)
+    }
+    /// Exact-source recall only: no inferred grammar, distractors, segmentation or semantic rating.
+    static func basicExercises(for rule: GrammarRule) -> [GrammarExercise] {
+        var seen = Set<String>()
+        return rule.examples.enumerated().compactMap { index, example in
+            guard !example.ja.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+                  !example.en.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+                  seen.insert(example.ja).inserted else { return nil }
+            var exercise = GrammarExercise(id: "\(rule.id):source:\(index):restore", ruleID: rule.id,
+                kind: .restoreSentence,
+                promptRU: "Восстанови исходный пример по памяти. Здесь проверяется именно исходная фраза, а не свободный перевод. Можно посмотреть её в подсказке.",
+                options: [.init(id: "source", text: example.ja, feedbackRU: nil)], acceptedOptionIDs: ["source"],
+                explanationRU: "Ответ отличается от исходного примера. Другая формулировка может быть грамматически верной: это задание её не оценивает. Сравни с оригиналом и восстанови его.",
+                difficulty: 1, cueEN: example.ru ?? example.en,
+                provenance: .init(commit: "0d1d3410bec90bd4098a7c72de820543cb4f707c", sourceRuleID: rule.id, exampleIndex: index,
+                    method: "Exact original example restoration; no linguistic review", status: .structurallyChecked),
+                aspect: "Восстановление исходного примера", hintRU: example.ja, isScored: false)
+            exercise.sentenceID = rule.exampleReferences?[safe: index]?.sentenceID
+            // Keep existing verified source markup through the shared renderer.
+            if let ruby = example.ruby, let markup = ruby.transcriptions?.first?.text {
+                exercise.furigana = [example.ja: markup]
+            }
+            return exercise.isUsable(for: rule.id) ? exercise : nil
+        }
+    }
+    static func availableExercises(for rule: GrammarRule) -> [GrammarExercise] {
+        let extended = (rule.exercises ?? []).filter { $0.isUsable(for: rule.id) && $0.eligibleForPractice }
+        return extended.isEmpty ? basicExercises(for: rule) : extended
+    }
+    static func hasPractice(_ rule: GrammarRule) -> Bool { !availableExercises(for: rule).isEmpty }
+    static func hasExtendedPractice(_ rule: GrammarRule) -> Bool {
+        (rule.exercises ?? []).contains { $0.eligibleForPractice && $0.isUsable(for: rule.id) }
     }
     static func stage(_ kind: GrammarExerciseKind) -> Int {
         switch kind {

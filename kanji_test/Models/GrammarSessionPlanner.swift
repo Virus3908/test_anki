@@ -15,8 +15,7 @@ nonisolated enum GrammarSessionPlanner {
         var result: [Candidate] = []
         for level in GrammarLevel.allCases where levels.contains(level) {
             let available = rules.filter { rule in
-                guard rule.level == level, rule.teaching != nil,
-                      (rule.exercises ?? []).filter({ $0.eligibleForPractice && $0.isUsable(for: rule.id) && $0.kind != .distinguishMeaning }).count >= 3 else { return false }
+                guard rule.level == level, GrammarExerciseEngine.availableExercises(for: rule).contains(where: { $0.kind != .distinguishMeaning }) else { return false }
                 let introduced = progress.record(for: rule.reviewKey) != nil || progress.firstShownAt[rule.reviewKey] != nil
                 return scope == .mixed || (scope == .studied ? introduced : !introduced)
             }

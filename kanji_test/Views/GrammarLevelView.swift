@@ -82,7 +82,7 @@ struct GrammarLevelView: View, StudyViewStyling {
                             appModel.startMixedGrammar(levels: Set(GrammarLevel.allCases), scope: .studied)
                         }.accessibilityIdentifier("grammar.mixed.allStudied")
                     }.accessibilityIdentifier("grammar.scope")
-                    Text("Практика: \(rules.filter { $0.teaching != nil }.count) из \(rules.count) правил. Все правила доступны для чтения.").font(.caption).foregroundStyle(AppPalette.secondaryText)
+                    Text("Базовая практика: \(rules.filter { GrammarExerciseEngine.hasPractice($0) }.count) · Расширенная: \(rules.filter { GrammarExerciseEngine.hasExtendedPractice($0) }.count). Остальные расширенные материалы требуют проверки.").font(.caption).foregroundStyle(AppPalette.secondaryText)
                     TextField("Конструкция, чтение, значение", text: $query)
                         .textFieldStyle(.roundedBorder).autocorrectionDisabled().textInputAutocapitalization(.never)
                         .accessibilityIdentifier("grammar.search")

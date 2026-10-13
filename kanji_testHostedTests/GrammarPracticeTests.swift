@@ -54,7 +54,7 @@ final class GrammarPracticeTests: XCTestCase {
             model.close(); XCTAssertNil(model.proposedRating)
         }
     }
-    func testMalformedExerciseDisablesOnlyItsRuleAndNeverFallsBackToRecall() async throws {
+    func testMalformedExtendedExerciseFallsBackToUnscoredSourcePractice() async throws {
         let original = try await loadRule("tai")
         var object = try XCTUnwrap(JSONSerialization.jsonObject(with: JSONEncoder().encode(original)) as? [String: Any])
         var exercises = try XCTUnwrap(object["exercises"] as? [[String: Any]])
@@ -63,7 +63,8 @@ final class GrammarPracticeTests: XCTestCase {
         let rule = try JSONDecoder().decode(GrammarRule.self, from: JSONSerialization.data(withJSONObject: object))
         XCTAssertEqual(rule.examples.count, original.examples.count)
         let practice = GrammarPracticeViewModel(rule: rule, seed: "bad-content")
-        XCTAssertNotNil(practice.contentError); XCTAssertFalse(practice.isSelfAssessment)
+        XCTAssertNil(practice.contentError); XCTAssertFalse(practice.isSelfAssessment)
+        XCTAssertTrue(practice.exercises.allSatisfy { $0.kind == .restoreSentence && $0.isScored == false })
         practice.choose("nonexistent-option"); practice.next()
         XCTAssertTrue(practice.results.isEmpty); XCTAssertNil(practice.proposedRating)
     }
@@ -227,8 +228,49 @@ final class GrammarPracticeTests: XCTestCase {
             XCTAssertTrue(exercises.contains { $0.kind == kind && $0.eligibleForPractice })
         }
         for rule in all where rule.teaching == nil {
-            XCTAssertNotNil(GrammarPracticeViewModel(rule: rule, seed: "offline").contentError)
+            XCTAssertNil(GrammarPracticeViewModel(rule: rule, seed: "offline").contentError)
         }
+    }
+    func testBasicSourcePracticeCoversEveryRuleWithoutFabricatedRatings() async throws {
+        let all = try await GrammarDataLoader.shared.allRules()
+        XCTAssertEqual(all.count, 526)
+        XCTAssertEqual(all.filter { GrammarExerciseEngine.hasPractice($0) }.count, 526)
+        XCTAssertEqual(all.filter { GrammarExerciseEngine.hasExtendedPractice($0) }.count, 10)
+        XCTAssertEqual(all.flatMap { GrammarExerciseEngine.basicExercises(for: $0) }.count, 1526)
+        for rule in all where rule.teaching == nil {
+            let model = GrammarPracticeViewModel(rule: rule, seed: "basic")
+            XCTAssertNil(model.contentError)
+            XCTAssertFalse(model.exercises.isEmpty)
+            XCTAssertEqual(Set(model.exercises.map(\.id)).count, model.count)
+            while let exercise = model.currentExercise {
+                XCTAssertEqual(exercise.kind, .restoreSentence)
+                XCTAssertEqual(exercise.isScored, false)
+                XCTAssertFalse(exercise.eligibleForPractice)
+                XCTAssertEqual(exercise.provenance?.status, .structurallyChecked)
+                XCTAssertNil(exercise.reviewer)
+                XCTAssertTrue(rule.examples.contains { $0.ja == exercise.correctAnswer })
+                XCTAssertFalse(GrammarAnswerValidator.accepts("別の表現です。", for: exercise))
+                model.textAnswer = exercise.correctAnswer
+                model.checkForm(); XCTAssertTrue(model.results.last?.isCorrect == true)
+                model.next()
+            }
+            XCTAssertTrue(model.isComplete)
+            XCTAssertNil(model.proposedRating)
+            XCTAssertNil(model.beginSaving())
+        }
+    }
+    func testSingleSourceExampleIsAvailableAndNeverRated() async throws {
+        let original = try await loadRule("tai")
+        let data = try JSONEncoder().encode(original)
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        object.removeValue(forKey: "teaching"); object.removeValue(forKey: "exercises")
+        object["examples"] = (object["examples"] as? [[String: Any]])?.prefix(1).map { $0 }
+        let rule = try JSONDecoder().decode(GrammarRule.self, from: JSONSerialization.data(withJSONObject: object))
+        let model = GrammarPracticeViewModel(rule: rule, seed: "one")
+        XCTAssertEqual(model.count, 1); XCTAssertNil(model.contentError)
+        model.textAnswer = try XCTUnwrap(model.currentExercise).correctAnswer
+        model.checkForm(); model.next()
+        XCTAssertTrue(model.isComplete); XCTAssertNil(model.proposedRating)
     }
     func testTranslationProtectsJapaneseAndRejectsCorruptTokens() {
         let source = "Verb + てほしい expresses a wish."

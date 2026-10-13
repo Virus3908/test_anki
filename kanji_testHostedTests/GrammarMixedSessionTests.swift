@@ -21,6 +21,25 @@ final class GrammarMixedSessionTests: XCTestCase {
         return GrammarMixedSessionViewModel(candidates: GrammarSessionPlanner.candidates(rules: rules, levels: levels,
             scope: .mixed, progress: progress, options: options), levels: levels, scope: .mixed, progress: progress, seed: seed)
     }
+    func testBasicRulesMixAndFinishWithoutUnsavedFSRSResults() async throws {
+        let source = try await GrammarDataLoader.shared.rules(.n5).filter { $0.teaching == nil }
+        let model = mixed(source)
+        XCTAssertGreaterThan(model.practices.count, 1)
+        while !model.isComplete {
+            let practice = try XCTUnwrap(model.current)
+            practice.isLessonRead = true
+            let exercise = try XCTUnwrap(practice.currentExercise)
+            practice.textAnswer = exercise.correctAnswer
+            practice.checkForm(); model.advance()
+        }
+        XCTAssertFalse(model.hasUnsavedResults)
+        XCTAssertEqual(model.savedRules, 0)
+        XCTAssertEqual(model.newRules, 0)
+        XCTAssertEqual(model.basicCompletedRules, model.practices.count)
+        XCTAssertTrue(model.practices.allSatisfy { $0.proposedRating == nil && !$0.isSaved })
+        XCTAssertEqual(Set(model.completedExerciseIDs).count, model.completedExerciseIDs.count)
+        XCTAssertGreaterThan(Set(model.history).count, 1)
+    }
     func testMultipleRulesAlternateWithNoDuplicateQuestionAndBoundedAttempts() async throws {
         let model = mixed(try await rules().filter { $0.level == .n5 })
         XCTAssertGreaterThan(model.practices.count, 1)

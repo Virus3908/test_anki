@@ -51,8 +51,8 @@ struct GrammarRuleView: View, StudyViewStyling {
                 BottomActionBar {
                     primaryActionButton(title: "Попробовать", systemImage: "checklist",
                         accessibilityIdentifier: "grammar.practice") { onPractice(rule) }
-                        .disabled(rule.teaching == nil || (rule.exercises ?? []).filter(\.eligibleForPractice).count < 3)
-                    if rule.teaching == nil { Text("Практика готовится").font(.caption).foregroundStyle(AppPalette.secondaryText) }
+                        .disabled(!GrammarExerciseEngine.hasPractice(rule))
+                    Text(GrammarExerciseEngine.hasExtendedPractice(rule) ? "Базовая практика · Расширенная практика" : GrammarExerciseEngine.hasPractice(rule) ? "Базовая практика · Расширенная требует проверки" : "Требует проверки").font(.caption).foregroundStyle(AppPalette.secondaryText)
                 }
             }
         }

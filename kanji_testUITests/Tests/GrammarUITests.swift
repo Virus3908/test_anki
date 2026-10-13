@@ -78,6 +78,37 @@ final class GrammarUITests: UITestCase {
         element("grammar.related.katawara").tap()
         XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "〜かたわら")).firstMatch.waitForExistence(timeout: 5))
     }
+    func testSourceOnlyRuleHasBasicPracticeAndCanFinishWithoutFSRS() {
+        launch()
+        tap(ID.Start.search, .openSearch, expecting: ID.Search.field)
+        element(ID.Search.field).tap(); element(ID.Search.field).typeText("katawara")
+        let rule = element("grammar.searchResult.katawara")
+        XCTAssertTrue(rule.waitForExistence(timeout: 15)); rule.tap()
+        XCTAssertTrue(element("grammar.practice").waitForExistence(timeout: 10))
+        XCTAssertTrue(element("grammar.practice").isEnabled)
+        capture("19-basic-rule-available")
+        tap("grammar.practice", .startTraining, expecting: "grammar.training.begin")
+        tap("grammar.training.begin", .startTraining, expecting: "grammar.form.answer")
+        var count = 0
+        while !element("grammar.training.result").exists && count < 8 {
+            let previous = element("grammar.training.prompt").value as? String
+            element("grammar.form.answer").tap(); element("grammar.form.answer").typeText("another wording")
+            tap("grammar.training.next", .revealCard, expecting: "grammar.training.feedback")
+            XCTAssertTrue(app.staticTexts["Отличается от оригинала"].exists)
+            if count == 0 { capture("20-basic-original-feedback") }
+            step(.revealCard, until: {
+                self.element("grammar.training.result").exists ||
+                    (self.element("grammar.training.prompt").value as? String != previous)
+            }) { element("grammar.training.next").tap() }
+            count += 1
+        }
+        XCTAssertTrue(element("grammar.training.result").waitForExistence(timeout: 10))
+        XCTAssertFalse(element("grammar.training.saved").exists)
+        XCTAssertEqual(element("grammar.training.continue").label, "Готово")
+        capture("21-basic-result-without-rating")
+        tap("grammar.training.continue", .exitTraining, expecting: "grammar.practice")
+    }
+
     func testIndependentFormInputAndWrongAnswerExplanation() {
         launch()
         tap(ID.Start.search, .openSearch, expecting: ID.Search.field)

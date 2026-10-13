@@ -17,8 +17,7 @@ extension StudyAppViewModel {
                 let rules = try await GrammarDataLoader.shared.rules(level)
                 try Task.checkCancellation()
                 var source = rules.filter { rule in
-                    guard rule.teaching != nil,
-                          (rule.exercises ?? []).filter({ $0.eligibleForPractice && $0.isUsable(for: rule.id) }).count >= 3 else { return false }
+                    guard GrammarExerciseEngine.hasPractice(rule) else { return false }
                     if reviewsOnly {
                         return self.trainingSession.reviewStore.record(for: rule.reviewKey) != nil
                             || self.trainingSession.reviewStore.firstShownAt[rule.reviewKey] != nil
