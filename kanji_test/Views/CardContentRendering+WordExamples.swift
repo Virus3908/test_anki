@@ -118,9 +118,14 @@ private struct StudyExampleRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
             HStack(alignment: .firstTextBaseline, spacing: 6) {
-                FuriganaText(text: example.text, furigana: example.furigana, showsFurigana: showsFurigana)
-                    .foregroundStyle(AppPalette.text)
-                    .fixedSize(horizontal: false, vertical: true)
+                FuriganaText(
+                    text: example.text,
+                    furigana: example.furigana,
+                    showsFurigana: showsFurigana
+                )
+                .foregroundStyle(AppPalette.text)
+                .fixedSize(horizontal: false, vertical: true)
+                .layoutPriority(-1)
 
                 attributionButton
             }
