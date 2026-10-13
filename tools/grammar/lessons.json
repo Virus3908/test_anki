@@ -289,7 +289,27 @@
         "hintRU": "今日は задаёт тему: сегодня.",
         "difficulty": 1
       }
-    ]
+    ],
+    "referenceExamples": [
+      [
+        "この道は夜も明るいです。",
+        "На этой улице светло и ночью.",
+        "この[道|みち]は[夜|よる]も[明|あか]るいです。",
+        "は"
+      ],
+      [
+        "弟はまだ小学生です。",
+        "Мой младший брат ещё учится в начальной школе.",
+        "[弟|おとうと]はまだ[小学生|しょうがくせい]です。",
+        "は"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜は в контексте, затем сравни с переводом."
+    }
   },
   "tai": {
     "teaching": {
@@ -673,7 +693,27 @@
           "form": "desire"
         }
       }
-    ]
+    ],
+    "referenceExamples": [
+      [
+        "gs:29fde229867c42f832c8e7ba",
+        "Я хочу съесть что-нибудь сладкое.",
+        "[甘|あま]いものが[食|た]べたいです。",
+        "たい"
+      ],
+      [
+        "gs:4699da767533927a3c4df8ba",
+        "Я хочу купить новую обувь.",
+        "[新|あたら]しい[靴|くつ]を[買|か]いたいです。",
+        "たい"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜たい в контексте, затем сравни с переводом."
+    }
   },
   "te-hoshii": {
     "teaching": {
@@ -3146,6 +3186,3192 @@
         "aspect": "て-форма перед разрешением",
         "difficulty": 1
       }
+    ],
+    "referenceExamples": [
+      [
+        "gs:92ee6dd3102890fe4be7ebd2",
+        "Можно писать карандашом.",
+        "[鉛筆|えんぴつ]で[書|か]いてもいいです。",
+        "てもいい"
+      ],
+      [
+        "この写真を友達に見せてもいいですか。",
+        "Можно показать эту фотографию другу?",
+        "この[写真|しゃしん]を[友達|ともだち]に[見|み]せてもいいですか。",
+        "てもいい"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜てもいい в контексте, затем сравни с переводом."
+    }
+  },
+  "ga-subject": {
+    "referenceExamples": [
+      [
+        "向こうからバスが来ました。",
+        "С той стороны подъехал автобус.",
+        "[向|む]こうからバスが[来|き]ました。",
+        "が"
+      ],
+      [
+        "誰がこの絵を描きましたか。",
+        "Кто нарисовал эту картину?",
+        "[誰|だれ]がこの[絵|え]を[描|か]きましたか。",
+        "が"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜が（subject） в контексте, затем сравни с переводом."
+    }
+  },
+  "o": {
+    "referenceExamples": [
+      [
+        "gs:c19473e48f881c3727efafee",
+        "Каждое утро я читаю газету.",
+        "[毎朝|まいあさ][新聞|しんぶん]を[読|よ]みます。",
+        "を"
+      ],
+      [
+        "gs:e7e555ad8ec8ac129cd806f5",
+        "Я гуляю по парку.",
+        "[公園|こうえん]を[散歩|さんぽ]します。",
+        "を"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜を в контексте, затем сравни с переводом."
+    }
+  },
+  "ni-time": {
+    "referenceExamples": [
+      [
+        "会議は午後二時に始まります。",
+        "Совещание начинается в два часа дня.",
+        "[会議|かいぎ]は[午後|ごご][二時|にじ]に[始|はじ]まります。",
+        "に"
+      ],
+      [
+        "金曜日に歯医者へ行きます。",
+        "В пятницу я пойду к стоматологу.",
+        "[金曜日|きんようび]に[歯医者|はいしゃ]へ[行|い]きます。",
+        "に"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜に（time） в контексте, затем сравни с переводом."
+    }
+  },
+  "ni-destination": {
+    "referenceExamples": [
+      [
+        "封筒に手紙を入れました。",
+        "Я положил письмо в конверт.",
+        "[封筒|ふうとう]に[手紙|てがみ]を[入|い]れました。",
+        "に"
+      ],
+      [
+        "バスはもう駅に着きました。",
+        "Автобус уже прибыл на станцию.",
+        "バスはもう[駅|えき]に[着|つ]きました。",
+        "に"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜に（destination） в контексте, затем сравни с переводом."
+    }
+  },
+  "ni-location": {
+    "referenceExamples": [
+      [
+        "切符は財布の中にあります。",
+        "Билет находится в кошельке.",
+        "[切符|きっぷ]は[財布|さいふ]の[中|なか]にあります。",
+        "に"
+      ],
+      [
+        "入口に係の人がいます。",
+        "У входа находится сотрудник.",
+        "[入口|いりぐち]に[係|かかり]の[人|ひと]がいます。",
+        "に"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜に（place of existence） в контексте, затем сравни с переводом."
+    }
+  },
+  "ni-indirect-object": {
+    "referenceExamples": [
+      [
+        "先生に質問しました。",
+        "Я задал вопрос преподавателю.",
+        "[先生|せんせい]に[質問|しつもん]しました。",
+        "に"
+      ],
+      [
+        "祖母に写真を送りました。",
+        "Я отправил бабушке фотографию.",
+        "[祖母|そぼ]に[写真|しゃしん]を[送|おく]りました。",
+        "に"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜に（indirect object） в контексте, затем сравни с переводом."
+    }
+  },
+  "ni-frequency": {
+    "referenceExamples": [
+      [
+        "gs:a03730c5c60723863efd3d53",
+        "Я хожу в спортзал два раза в неделю.",
+        "[私|わたし]は[週|しゅう]に[二回|にかい]ジムに[行|い]きます。",
+        "週に"
+      ],
+      [
+        "gs:6680168619d10bb0f3bab693",
+        "Этот поезд приходит четыре раза в час.",
+        "この[電車|でんしゃ]は[一時間|いちじかん]に[四本|よんほん][来|き]ます。",
+        "一時間に"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜に（frequency） в контексте, затем сравни с переводом."
+    }
+  },
+  "e": {
+    "referenceExamples": [
+      [
+        "gs:25600790641bfdcecc09007f",
+        "Я хочу поехать к морю.",
+        "[海|うみ]へ[行|い]きたいです。",
+        "へ"
+      ],
+      [
+        "gs:4218daaeeed8b1209017d593",
+        "Пора возвращаться домой.",
+        "そろそろうちへ[帰|かえ]ります。",
+        "へ"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜へ в контексте, затем сравни с переводом."
+    }
+  },
+  "de-place": {
+    "referenceExamples": [
+      [
+        "台所で野菜を切ります。",
+        "Я режу овощи на кухне.",
+        "[台所|だいどころ]で[野菜|やさい]を[切|き]ります。",
+        "で"
+      ],
+      [
+        "体育館で試合があります。",
+        "В спортивном зале состоится матч.",
+        "[体育館|たいいくかん]で[試合|しあい]があります。",
+        "で"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜で（place of action） в контексте, затем сравни с переводом."
+    }
+  },
+  "de-means": {
+    "referenceExamples": [
+      [
+        "この紙をはさみで切ってください。",
+        "Разрежьте эту бумагу ножницами.",
+        "この[紙|かみ]をはさみで[切|き]ってください。",
+        "で"
+      ],
+      [
+        "昨日は自転車で病院へ行きました。",
+        "Вчера я ездил в больницу на велосипеде.",
+        "[昨日|きのう]は[自転車|じてんしゃ]で[病院|びょういん]へ[行|い]きました。",
+        "で"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜で（means） в контексте, затем сравни с переводом."
+    }
+  },
+  "to-and": {
+    "referenceExamples": [
+      [
+        "gs:69ba6d804f853004090a7043",
+        "Я купил хлеб и молоко.",
+        "パンと[牛乳|ぎゅうにゅう]を[買|か]いました。",
+        "と"
+      ],
+      [
+        "gs:079318474fa0e19b4a4f00ab",
+        "Мы с младшей сестрой учимся.",
+        "[私|わたし]と[妹|いもうと]は[学生|がくせい]です。",
+        "と"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜と（and） в контексте, затем сравни с переводом."
+    }
+  },
+  "to-with": {
+    "referenceExamples": [
+      [
+        "gs:5a18be659ab1cc1f496dd1cf",
+        "Я путешествую вместе с семьёй.",
+        "[家族|かぞく]と[一緒|いっしょ]に[旅行|りょこう]します。",
+        "と"
+      ],
+      [
+        "先生と日本語で話しました。",
+        "Я разговаривал с преподавателем по-японски.",
+        "[先生|せんせい]と[日本語|にほんご]で[話|はな]しました。",
+        "と"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜と（with） в контексте, затем сравни с переводом."
+    }
+  },
+  "ya": {
+    "referenceExamples": [
+      [
+        "gs:2f57beb2fc5d19fbe3c3c43e",
+        "В холодильнике есть, например, яйца и молоко.",
+        "[冷蔵庫|れいぞうこ]に[卵|たまご]や[牛乳|ぎゅうにゅう]が[入|はい]っています。",
+        "や"
+      ],
+      [
+        "旅行には薬やタオルを持っていきます。",
+        "В поездку я беру, среди прочего, лекарства и полотенце.",
+        "[旅行|りょこう]には[薬|くすり]やタオルを[持|も]っていきます。",
+        "や"
+      ],
+      [
+        "休みの日は掃除や洗濯をします。",
+        "В выходные я занимаюсь, например, уборкой и стиркой.",
+        "[休|やす]みの[日|ひ]は[掃除|そうじ]や[洗濯|せんたく]をします。",
+        "や"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜や в контексте, затем сравни с переводом."
+    }
+  },
+  "ka-or": {
+    "referenceExamples": [
+      [
+        "住所か電話番号を書いてください。",
+        "Напишите адрес или номер телефона.",
+        "[住所|じゅうしょ]か[電話番号|でんわばんごう]を[書|か]いてください。",
+        "か"
+      ],
+      [
+        "昼休みにパンかおにぎりを買います。",
+        "В обеденный перерыв я куплю хлеб или онигири.",
+        "[昼休|ひるやす]みにパンかおにぎりを[買|か]います。",
+        "か"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜か（or） в контексте, затем сравни с переводом."
+    }
+  },
+  "mo": {
+    "referenceExamples": [
+      [
+        "gs:684d56052395351123aa617a",
+        "И Танака, и Ямада — японцы.",
+        "[田中|たなか]さんも[山田|やまだ]さんも[日本人|にほんじん]です。",
+        "田中さんも山田さんも"
+      ],
+      [
+        "この店ではカードも使えます。",
+        "В этом магазине можно также платить картой.",
+        "この[店|みせ]ではカードも[使|つか]えます。",
+        "も"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜も в контексте, затем сравни с переводом."
+    }
+  },
+  "no": {
+    "referenceExamples": [
+      [
+        "これは弟の自転車です。",
+        "Это велосипед моего младшего брата.",
+        "これは[弟|おとうと]の[自転車|じてんしゃ]です。",
+        "の"
+      ],
+      [
+        "木の机を買いました。",
+        "Я купил деревянный стол.",
+        "[木|き]の[机|つくえ]を[買|か]いました。",
+        "の"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜の（possessive） в контексте, затем сравни с переводом."
+    }
+  },
+  "kara-from": {
+    "referenceExamples": [
+      [
+        "この店は朝八時から開いています。",
+        "Этот магазин открыт с восьми утра.",
+        "この[店|みせ]は[朝|あさ][八時|はちじ]から[開|あ]いています。",
+        "から"
+      ],
+      [
+        "空港からホテルまでバスで行きました。",
+        "Я доехал от аэропорта до гостиницы на автобусе.",
+        "[空港|くうこう]からホテルまでバスで[行|い]きました。",
+        "から"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜から（from） в контексте, затем сравни с переводом."
+    }
+  },
+  "made": {
+    "referenceExamples": [
+      [
+        "gs:3f2fc6ab03d988637353e961",
+        "Этот поезд идёт до Иокогамы.",
+        "この[電車|でんしゃ]は[横浜|よこはま]まで[行|い]きます。",
+        "まで"
+      ],
+      [
+        "雨がやむまでここで待ちましょう。",
+        "Подождём здесь, пока не прекратится дождь.",
+        "[雨|あめ]がやむまでここで[待|ま]ちましょう。",
+        "まで"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜まで（until） в контексте, затем сравни с переводом."
+    }
+  },
+  "ka-question": {
+    "referenceExamples": [
+      [
+        "このバスは空港へ行きますか。",
+        "Этот автобус идёт в аэропорт?",
+        "このバスは[空港|くうこう]へ[行|い]きますか。",
+        "か"
+      ],
+      [
+        "予約は必要ですか。",
+        "Нужна ли предварительная запись?",
+        "[予約|よやく]は[必要|ひつよう]ですか。",
+        "か"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜か（question） в контексте, затем сравни с переводом."
+    }
+  },
+  "ne": {
+    "referenceExamples": [
+      [
+        "gs:b63157b68cd234b7d58a8667",
+        "В этом магазине тихо, правда?",
+        "この[店|みせ]は[静|しず]かですね。",
+        "ね"
+      ],
+      [
+        "桜がきれいですね。",
+        "Какая красивая сакура, правда?",
+        "[桜|さくら]がきれいですね。",
+        "ね"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜ね в контексте, затем сравни с переводом."
+    }
+  },
+  "yo": {
+    "referenceExamples": [
+      [
+        "gs:db808399f60281ce2d79de22",
+        "Ключи на столе, если вы их ищете.",
+        "[鍵|かぎ]はテーブルの[上|うえ]にありますよ。",
+        "よ"
+      ],
+      [
+        "その道は危ないですよ。",
+        "Осторожно, эта дорога опасна.",
+        "その[道|みち]は[危|あぶ]ないですよ。",
+        "よ"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜よ в контексте, затем сравни с переводом."
+    }
+  },
+  "yori": {
+    "referenceExamples": [
+      [
+        "gs:f999d1a142503645d4cb8e15",
+        "Сегодня прохладнее, чем вчера.",
+        "[今日|きょう]は[昨日|きのう]より[涼|すず]しいです。",
+        "より"
+      ],
+      [
+        "gs:a0c89c09aa8d260617e8458f",
+        "На поезде добираться быстрее, чем на машине.",
+        "[電車|でんしゃ]で[行|い]くほうが[車|くるま]より[速|はや]いです。",
+        "より"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜より в контексте, затем сравни с переводом."
+    }
+  },
+  "no-hou-ga-yori": {
+    "referenceExamples": [
+      [
+        "手紙より電話の方が早いです。",
+        "Позвонить быстрее, чем написать письмо.",
+        "[手紙|てがみ]より[電話|でんわ]の[方|ほう]が[早|はや]いです。",
+        "電話の方が"
+      ],
+      [
+        "この部屋の方が隣の部屋より広いです。",
+        "Эта комната просторнее соседней.",
+        "この[部屋|へや]の[方|ほう]が[隣|となり]の[部屋|へや]より[広|ひろ]いです。",
+        "この部屋の方が"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜の方が〜より в контексте, затем сравни с переводом."
+    }
+  },
+  "to-to-dochira-ga": {
+    "referenceExamples": [
+      [
+        "gs:4e6eb1bc63b274c7aead441f",
+        "Кого вы больше любите: собак или кошек?",
+        "[犬|いぬ]と[猫|ねこ]と、どちらが[好|す]きですか。",
+        "どちらが"
+      ],
+      [
+        "gs:72d7967faa267bc4faf44d66",
+        "Что быстрее: поезд или автобус?",
+        "[電車|でんしゃ]とバスと、どちらが[速|はや]いですか。",
+        "どちらが"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜と〜とどちらが в контексте, затем сравни с переводом."
+    }
+  },
+  "no-naka-de-ga-ichiban": {
+    "referenceExamples": [
+      [
+        "一年の中で八月が一番暑いです。",
+        "Из всех месяцев года август самый жаркий.",
+        "[一年|いちねん]の[中|なか]で[八月|はちがつ]が[一番|いちばん][暑|あつ]いです。",
+        "一年の中で八月が一番"
+      ],
+      [
+        "家の中で台所が一番明るいです。",
+        "В доме кухня — самое светлое помещение.",
+        "[家|いえ]の[中|なか]で[台所|だいどころ]が[一番|いちばん][明|あか]るいです。",
+        "家の中で台所が一番"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜の中で〜が一番 в контексте, затем сравни с переводом."
+    }
+  },
+  "desu": {
+    "referenceExamples": [
+      [
+        "母は看護師です。",
+        "Моя мать — медсестра.",
+        "[母|はは]は[看護師|かんごし]です。",
+        "です"
+      ],
+      [
+        "この傘は千円です。",
+        "Этот зонт стоит тысячу иен.",
+        "この[傘|かさ]は[千円|せんえん]です。",
+        "です"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜です в контексте, затем сравни с переводом."
+    }
+  },
+  "da": {
+    "referenceExamples": [
+      [
+        "今日は大切な日だ。",
+        "Сегодня важный день.",
+        "[今日|きょう]は[大切|たいせつ]な[日|ひ]だ。",
+        "だ"
+      ],
+      [
+        "ここは昔の学校だ。",
+        "Это бывшая школа.",
+        "ここは[昔|むかし]の[学校|がっこう]だ。",
+        "だ"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜だ в контексте, затем сравни с переводом."
+    }
+  },
+  "de-wa-arimasen-ja-nai": {
+    "referenceExamples": [
+      [
+        "これは出口ではありません。",
+        "Это не выход.",
+        "これは[出口|でぐち]ではありません。",
+        "ではありません"
+      ],
+      [
+        "その話は本当じゃない。",
+        "Эта история неправда.",
+        "その[話|はなし]は[本当|ほんとう]じゃない。",
+        "じゃない"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜ではありません / 〜じゃない в контексте, затем сравни с переводом."
+    }
+  },
+  "deshita": {
+    "referenceExamples": [
+      [
+        "昨日の会議は三時まででした。",
+        "Вчерашнее совещание продолжалось до трёх часов.",
+        "[昨日|きのう]の[会議|かいぎ]は[三時|さんじ]まででした。",
+        "でした"
+      ],
+      [
+        "祖父は郵便局の職員でした。",
+        "Мой дедушка был сотрудником почты.",
+        "[祖父|そふ]は[郵便局|ゆうびんきょく]の[職員|しょくいん]でした。",
+        "でした"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜でした в контексте, затем сравни с переводом."
+    }
+  },
+  "masu": {
+    "referenceExamples": [
+      [
+        "週末は庭の花に水をやります。",
+        "По выходным я поливаю цветы в саду.",
+        "[週末|しゅうまつ]は[庭|にわ]の[花|はな]に[水|みず]をやります。",
+        "ます"
+      ],
+      [
+        "来週からこの会社で働きます。",
+        "Со следующей недели я буду работать в этой компании.",
+        "[来週|らいしゅう]からこの[会社|かいしゃ]で[働|はたら]きます。",
+        "ます"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜ます в контексте, затем сравни с переводом."
+    },
+    "teaching": {
+      "meaningRU": "Вежливая непрошедшая форма глагола",
+      "usageRU": "Для привычных действий и будущего в вежливой речи. Сама форма не различает настоящее и будущее.",
+      "formationRU": "Основа ます + ます; 行く → 行きます, 来る → 来ます.",
+      "example": {
+        "ja": "母は病院で働きます。",
+        "en": "My mother works at a hospital.",
+        "ru": "Мама работает в больнице.",
+        "furigana": null
+      },
+      "parts": [
+        {
+          "text": "母は",
+          "roleRU": "Тема: моя мама."
+        },
+        {
+          "text": "病院で",
+          "roleRU": "Место работы."
+        },
+        {
+          "text": "働きます",
+          "roleRU": "Вежливая непрошедшая форма 働く."
+        }
+      ],
+      "notesRU": [
+        "Проверка формы детерминирована по явно заданному классу глагола. Контексты и русский текст подготовлены ИИ; независимое лингвистическое ревью не выполнено."
+      ],
+      "contrastsRU": [],
+      "complexity": 2
+    },
+    "exercises": [
+      {
+        "slug": "form-0",
+        "kind": "formProduction",
+        "promptRU": "Образуй вежливую непрошедшую форму глагола 食べる (たべる). Вежливая непрошедшая форма глагола.",
+        "japanese": "食べる",
+        "options": [
+          {
+            "id": "correct",
+            "text": "食べます",
+            "feedbackRU": null
+          },
+          {
+            "id": "nai",
+            "text": "食べない",
+            "feedbackRU": "Это обычная отрицательная форма; запрошена утвердительная форма."
+          },
+          {
+            "id": "ta",
+            "text": "食べた",
+            "feedbackRU": "Это обычная прошедшая форма; запрошена другая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 食べる (ichidan) запрошенная форма: 食べます. Основа ます + ます; 行く → 行きます, 来る → 来ます.",
+        "aspect": "Вежливая непрошедшая форма глагола",
+        "hintRU": "Основа ます + ます; 行く → 行きます, 来る → 来ます.",
+        "difficulty": 1,
+        "conjugation": {
+          "verb": {
+            "dictionary": "食べる",
+            "reading": "たべる",
+            "verbClass": "ichidan",
+            "permittedForms": [
+              "masu"
+            ]
+          },
+          "form": "masu"
+        }
+      },
+      {
+        "slug": "context-0",
+        "kind": "fillBlank",
+        "promptRU": "Заполни пропуск правильной формой глагола 食べる. Каждое утро я ем фрукты. Используй вежливую непрошедшую форму.",
+        "japanese": "毎朝、果物を（　）。",
+        "options": [
+          {
+            "id": "correct",
+            "text": "食べます",
+            "feedbackRU": null
+          },
+          {
+            "id": "nai",
+            "text": "食べない",
+            "feedbackRU": "Это обычная отрицательная форма; запрошена утвердительная форма."
+          },
+          {
+            "id": "ta",
+            "text": "食べた",
+            "feedbackRU": "Это обычная прошедшая форма; запрошена другая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 食べる (ichidan) запрошенная форма: 食べます. Основа ます + ます; 行く → 行きます, 来る → 来ます.",
+        "aspect": "Вежливая непрошедшая форма глагола",
+        "hintRU": "Основа ます + ます; 行く → 行きます, 来る → 来ます.",
+        "difficulty": 1,
+        "conjugation": {
+          "verb": {
+            "dictionary": "食べる",
+            "reading": "たべる",
+            "verbClass": "ichidan",
+            "permittedForms": [
+              "masu"
+            ]
+          },
+          "form": "masu"
+        }
+      },
+      {
+        "slug": "form-1",
+        "kind": "formProduction",
+        "promptRU": "Образуй вежливую непрошедшую форму глагола 読む (よむ). Вежливая непрошедшая форма глагола.",
+        "japanese": "読む",
+        "options": [
+          {
+            "id": "correct",
+            "text": "読みます",
+            "feedbackRU": null
+          },
+          {
+            "id": "nai",
+            "text": "読まない",
+            "feedbackRU": "Это обычная отрицательная форма; запрошена утвердительная форма."
+          },
+          {
+            "id": "ta",
+            "text": "読んだ",
+            "feedbackRU": "Это обычная прошедшая форма; запрошена другая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 読む (godanMu) запрошенная форма: 読みます. Основа ます + ます; 行く → 行きます, 来る → 来ます.",
+        "aspect": "Вежливая непрошедшая форма глагола",
+        "hintRU": "Основа ます + ます; 行く → 行きます, 来る → 来ます.",
+        "difficulty": 1,
+        "conjugation": {
+          "verb": {
+            "dictionary": "読む",
+            "reading": "よむ",
+            "verbClass": "godanMu",
+            "permittedForms": [
+              "masu"
+            ]
+          },
+          "form": "masu"
+        }
+      },
+      {
+        "slug": "context-1",
+        "kind": "fillBlank",
+        "promptRU": "Заполни пропуск правильной формой глагола 読む. Каждую неделю я читаю газету. Используй вежливую непрошедшую форму.",
+        "japanese": "毎週、新聞を（　）。",
+        "options": [
+          {
+            "id": "correct",
+            "text": "読みます",
+            "feedbackRU": null
+          },
+          {
+            "id": "nai",
+            "text": "読まない",
+            "feedbackRU": "Это обычная отрицательная форма; запрошена утвердительная форма."
+          },
+          {
+            "id": "ta",
+            "text": "読んだ",
+            "feedbackRU": "Это обычная прошедшая форма; запрошена другая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 読む (godanMu) запрошенная форма: 読みます. Основа ます + ます; 行く → 行きます, 来る → 来ます.",
+        "aspect": "Вежливая непрошедшая форма глагола",
+        "hintRU": "Основа ます + ます; 行く → 行きます, 来る → 来ます.",
+        "difficulty": 1,
+        "conjugation": {
+          "verb": {
+            "dictionary": "読む",
+            "reading": "よむ",
+            "verbClass": "godanMu",
+            "permittedForms": [
+              "masu"
+            ]
+          },
+          "form": "masu"
+        }
+      },
+      {
+        "slug": "form-2",
+        "kind": "formProduction",
+        "promptRU": "Образуй вежливую непрошедшую форму глагола 行く (いく). Вежливая непрошедшая форма глагола.",
+        "japanese": "行く",
+        "options": [
+          {
+            "id": "correct",
+            "text": "行きます",
+            "feedbackRU": null
+          },
+          {
+            "id": "nai",
+            "text": "行かない",
+            "feedbackRU": "Это обычная отрицательная форма; запрошена утвердительная форма."
+          },
+          {
+            "id": "ta",
+            "text": "行った",
+            "feedbackRU": "Это обычная прошедшая форма; запрошена другая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 行く (iku) запрошенная форма: 行きます. Основа ます + ます; 行く → 行きます, 来る → 来ます.",
+        "aspect": "Вежливая непрошедшая форма глагола",
+        "hintRU": "Основа ます + ます; 行く → 行きます, 来る → 来ます.",
+        "difficulty": 2,
+        "conjugation": {
+          "verb": {
+            "dictionary": "行く",
+            "reading": "いく",
+            "verbClass": "iku",
+            "permittedForms": [
+              "masu"
+            ]
+          },
+          "form": "masu"
+        }
+      },
+      {
+        "slug": "context-2",
+        "kind": "fillBlank",
+        "promptRU": "Заполни пропуск правильной формой глагола 行く. На следующей неделе я поеду в Киото. Используй вежливую непрошедшую форму.",
+        "japanese": "来週、京都へ（　）。",
+        "options": [
+          {
+            "id": "correct",
+            "text": "行きます",
+            "feedbackRU": null
+          },
+          {
+            "id": "nai",
+            "text": "行かない",
+            "feedbackRU": "Это обычная отрицательная форма; запрошена утвердительная форма."
+          },
+          {
+            "id": "ta",
+            "text": "行った",
+            "feedbackRU": "Это обычная прошедшая форма; запрошена другая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 行く (iku) запрошенная форма: 行きます. Основа ます + ます; 行く → 行きます, 来る → 来ます.",
+        "aspect": "Вежливая непрошедшая форма глагола",
+        "hintRU": "Основа ます + ます; 行く → 行きます, 来る → 来ます.",
+        "difficulty": 2,
+        "conjugation": {
+          "verb": {
+            "dictionary": "行く",
+            "reading": "いく",
+            "verbClass": "iku",
+            "permittedForms": [
+              "masu"
+            ]
+          },
+          "form": "masu"
+        }
+      },
+      {
+        "slug": "form-3",
+        "kind": "formProduction",
+        "promptRU": "Образуй вежливую непрошедшую форму глагола 来る (くる). Вежливая непрошедшая форма глагола.",
+        "japanese": "来る",
+        "options": [
+          {
+            "id": "correct",
+            "text": "来ます",
+            "feedbackRU": null
+          },
+          {
+            "id": "nai",
+            "text": "来ない",
+            "feedbackRU": "Это обычная отрицательная форма; запрошена утвердительная форма."
+          },
+          {
+            "id": "ta",
+            "text": "来た",
+            "feedbackRU": "Это обычная прошедшая форма; запрошена другая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 来る (kuru) запрошенная форма: 来ます. Основа ます + ます; 行く → 行きます, 来る → 来ます.",
+        "aspect": "Вежливая непрошедшая форма глагола",
+        "hintRU": "Основа ます + ます; 行く → 行きます, 来る → 来ます.",
+        "difficulty": 2,
+        "conjugation": {
+          "verb": {
+            "dictionary": "来る",
+            "reading": "くる",
+            "verbClass": "kuru",
+            "permittedForms": [
+              "masu"
+            ]
+          },
+          "form": "masu"
+        }
+      },
+      {
+        "slug": "context-3",
+        "kind": "fillBlank",
+        "promptRU": "Заполни пропуск правильной формой глагола 来る. Завтра друг придёт ко мне домой. Используй вежливую непрошедшую форму.",
+        "japanese": "明日、友達がうちに（　）。",
+        "options": [
+          {
+            "id": "correct",
+            "text": "来ます",
+            "feedbackRU": null
+          },
+          {
+            "id": "nai",
+            "text": "来ない",
+            "feedbackRU": "Это обычная отрицательная форма; запрошена утвердительная форма."
+          },
+          {
+            "id": "ta",
+            "text": "来た",
+            "feedbackRU": "Это обычная прошедшая форма; запрошена другая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 来る (kuru) запрошенная форма: 来ます. Основа ます + ます; 行く → 行きます, 来る → 来ます.",
+        "aspect": "Вежливая непрошедшая форма глагола",
+        "hintRU": "Основа ます + ます; 行く → 行きます, 来る → 来ます.",
+        "difficulty": 2,
+        "conjugation": {
+          "verb": {
+            "dictionary": "来る",
+            "reading": "くる",
+            "verbClass": "kuru",
+            "permittedForms": [
+              "masu"
+            ]
+          },
+          "form": "masu"
+        }
+      }
     ]
+  },
+  "masen": {
+    "referenceExamples": [
+      [
+        "この電車はその駅に止まりません。",
+        "Этот поезд не останавливается на той станции.",
+        "この[電車|でんしゃ]はその[駅|えき]に[止|と]まりません。",
+        "ません"
+      ],
+      [
+        "今日は買い物をしません。",
+        "Сегодня я не буду делать покупки.",
+        "[今日|きょう]は[買|か]い[物|もの]をしません。",
+        "ません"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜ません в контексте, затем сравни с переводом."
+    }
+  },
+  "mashita": {
+    "referenceExamples": [
+      [
+        "昨日は魚を焼きました。",
+        "Вчера я жарил рыбу.",
+        "[昨日|きのう]は[魚|さかな]を[焼|や]きました。",
+        "ました"
+      ],
+      [
+        "先月、運転を習い始めました。",
+        "В прошлом месяце я начал учиться водить.",
+        "[先月|せんげつ]、[運転|うんてん]を[習|なら]い[始|はじ]めました。",
+        "ました"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜ました в контексте, затем сравни с переводом."
+    }
+  },
+  "masen-deshita": {
+    "referenceExamples": [
+      [
+        "風邪で授業に出ませんでした。",
+        "Из-за простуды я не пошёл на занятие.",
+        "[風邪|かぜ]で[授業|じゅぎょう]に[出|で]ませんでした。",
+        "ませんでした"
+      ],
+      [
+        "昨夜はよく眠れませんでした。",
+        "Прошлой ночью я плохо спал.",
+        "[昨夜|さくや]はよく[眠|ねむ]れませんでした。",
+        "ませんでした"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜ませんでした в контексте, затем сравни с переводом."
+    }
+  },
+  "nai": {
+    "referenceExamples": [
+      [
+        "今日は甘いものを食べない。",
+        "Сегодня я не буду есть сладкое.",
+        "[今日|きょう]は[甘|あま]いものを[食|た]べない。",
+        "ない"
+      ],
+      [
+        "この時計はもう動かない。",
+        "Эти часы больше не идут.",
+        "この[時計|とけい]はもう[動|うご]かない。",
+        "ない"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜ない в контексте, затем сравни с переводом."
+    },
+    "teaching": {
+      "meaningRU": "Обычная отрицательная форма глагола",
+      "usageRU": "Отрицание в обычной речи. Это форма глагола, а не вежливая ません.",
+      "formationRU": "一段: убрать る и добавить ない; 五段: ряд あ + ない (う → わない); する → しない; 来る → 来ない.",
+      "example": {
+        "ja": "私は夜にコーヒーを飲まない。",
+        "en": "I do not drink coffee at night.",
+        "ru": "По вечерам я не пью кофе.",
+        "furigana": null
+      },
+      "parts": [
+        {
+          "text": "私は",
+          "roleRU": "Тема: говорящий."
+        },
+        {
+          "text": "夜に",
+          "roleRU": "Время."
+        },
+        {
+          "text": "コーヒーを",
+          "roleRU": "Объект."
+        },
+        {
+          "text": "飲まない",
+          "roleRU": "Обычное отрицание 飲む."
+        }
+      ],
+      "notesRU": [
+        "Проверка формы детерминирована по явно заданному классу глагола. Контексты и русский текст подготовлены ИИ; независимое лингвистическое ревью не выполнено."
+      ],
+      "contrastsRU": [],
+      "complexity": 2
+    },
+    "exercises": [
+      {
+        "slug": "form-0",
+        "kind": "formProduction",
+        "promptRU": "Образуй обычную отрицательную форму глагола 食べる (たべる). Обычная отрицательная форма глагола.",
+        "japanese": "食べる",
+        "options": [
+          {
+            "id": "correct",
+            "text": "食べない",
+            "feedbackRU": null
+          },
+          {
+            "id": "masu",
+            "text": "食べます",
+            "feedbackRU": "Это вежливая непрошедшая форма; запрошена другая форма."
+          },
+          {
+            "id": "ta",
+            "text": "食べた",
+            "feedbackRU": "Это обычная прошедшая форма; запрошена другая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 食べる (ichidan) запрошенная форма: 食べない. 一段: убрать る и добавить ない; 五段: ряд あ + ない (う → わない); する → しない; 来る → 来ない.",
+        "aspect": "Обычная отрицательная форма глагола",
+        "hintRU": "一段: убрать る и добавить ない; 五段: ряд あ + ない (う → わない); する → しない; 来る → 来ない.",
+        "difficulty": 1,
+        "conjugation": {
+          "verb": {
+            "dictionary": "食べる",
+            "reading": "たべる",
+            "verbClass": "ichidan",
+            "permittedForms": [
+              "nai"
+            ]
+          },
+          "form": "nai"
+        }
+      },
+      {
+        "slug": "context-0",
+        "kind": "fillBlank",
+        "promptRU": "Заполни пропуск правильной формой глагола 食べる. Сегодня я не буду завтракать. Используй обычную отрицательную форму.",
+        "japanese": "今日は朝ご飯を（　）。",
+        "options": [
+          {
+            "id": "correct",
+            "text": "食べない",
+            "feedbackRU": null
+          },
+          {
+            "id": "masu",
+            "text": "食べます",
+            "feedbackRU": "Это вежливая непрошедшая форма; запрошена другая форма."
+          },
+          {
+            "id": "ta",
+            "text": "食べた",
+            "feedbackRU": "Это обычная прошедшая форма; запрошена другая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 食べる (ichidan) запрошенная форма: 食べない. 一段: убрать る и добавить ない; 五段: ряд あ + ない (う → わない); する → しない; 来る → 来ない.",
+        "aspect": "Обычная отрицательная форма глагола",
+        "hintRU": "一段: убрать る и добавить ない; 五段: ряд あ + ない (う → わない); する → しない; 来る → 来ない.",
+        "difficulty": 1,
+        "conjugation": {
+          "verb": {
+            "dictionary": "食べる",
+            "reading": "たべる",
+            "verbClass": "ichidan",
+            "permittedForms": [
+              "nai"
+            ]
+          },
+          "form": "nai"
+        }
+      },
+      {
+        "slug": "form-1",
+        "kind": "formProduction",
+        "promptRU": "Образуй обычную отрицательную форму глагола 読む (よむ). Обычная отрицательная форма глагола.",
+        "japanese": "読む",
+        "options": [
+          {
+            "id": "correct",
+            "text": "読まない",
+            "feedbackRU": null
+          },
+          {
+            "id": "masu",
+            "text": "読みます",
+            "feedbackRU": "Это вежливая непрошедшая форма; запрошена другая форма."
+          },
+          {
+            "id": "ta",
+            "text": "読んだ",
+            "feedbackRU": "Это обычная прошедшая форма; запрошена другая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 読む (godanMu) запрошенная форма: 読まない. 一段: убрать る и добавить ない; 五段: ряд あ + ない (う → わない); する → しない; 来る → 来ない.",
+        "aspect": "Обычная отрицательная форма глагола",
+        "hintRU": "一段: убрать る и добавить ない; 五段: ряд あ + ない (う → わない); する → しない; 来る → 来ない.",
+        "difficulty": 1,
+        "conjugation": {
+          "verb": {
+            "dictionary": "読む",
+            "reading": "よむ",
+            "verbClass": "godanMu",
+            "permittedForms": [
+              "nai"
+            ]
+          },
+          "form": "nai"
+        }
+      },
+      {
+        "slug": "context-1",
+        "kind": "fillBlank",
+        "promptRU": "Заполни пропуск правильной формой глагола 読む. Я не читаю газету перед сном. Используй обычную отрицательную форму.",
+        "japanese": "私は寝る前に新聞を（　）。",
+        "options": [
+          {
+            "id": "correct",
+            "text": "読まない",
+            "feedbackRU": null
+          },
+          {
+            "id": "masu",
+            "text": "読みます",
+            "feedbackRU": "Это вежливая непрошедшая форма; запрошена другая форма."
+          },
+          {
+            "id": "ta",
+            "text": "読んだ",
+            "feedbackRU": "Это обычная прошедшая форма; запрошена другая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 読む (godanMu) запрошенная форма: 読まない. 一段: убрать る и добавить ない; 五段: ряд あ + ない (う → わない); する → しない; 来る → 来ない.",
+        "aspect": "Обычная отрицательная форма глагола",
+        "hintRU": "一段: убрать る и добавить ない; 五段: ряд あ + ない (う → わない); する → しない; 来る → 来ない.",
+        "difficulty": 1,
+        "conjugation": {
+          "verb": {
+            "dictionary": "読む",
+            "reading": "よむ",
+            "verbClass": "godanMu",
+            "permittedForms": [
+              "nai"
+            ]
+          },
+          "form": "nai"
+        }
+      },
+      {
+        "slug": "form-2",
+        "kind": "formProduction",
+        "promptRU": "Образуй обычную отрицательную форму глагола 行く (いく). Обычная отрицательная форма глагола.",
+        "japanese": "行く",
+        "options": [
+          {
+            "id": "correct",
+            "text": "行かない",
+            "feedbackRU": null
+          },
+          {
+            "id": "masu",
+            "text": "行きます",
+            "feedbackRU": "Это вежливая непрошедшая форма; запрошена другая форма."
+          },
+          {
+            "id": "ta",
+            "text": "行った",
+            "feedbackRU": "Это обычная прошедшая форма; запрошена другая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 行く (iku) запрошенная форма: 行かない. 一段: убрать る и добавить ない; 五段: ряд あ + ない (う → わない); する → しない; 来る → 来ない.",
+        "aspect": "Обычная отрицательная форма глагола",
+        "hintRU": "一段: убрать る и добавить ない; 五段: ряд あ + ない (う → わない); する → しない; 来る → 来ない.",
+        "difficulty": 2,
+        "conjugation": {
+          "verb": {
+            "dictionary": "行く",
+            "reading": "いく",
+            "verbClass": "iku",
+            "permittedForms": [
+              "nai"
+            ]
+          },
+          "form": "nai"
+        }
+      },
+      {
+        "slug": "context-2",
+        "kind": "fillBlank",
+        "promptRU": "Заполни пропуск правильной формой глагола 行く. Завтра я не пойду в школу. Используй обычную отрицательную форму.",
+        "japanese": "明日は学校へ（　）。",
+        "options": [
+          {
+            "id": "correct",
+            "text": "行かない",
+            "feedbackRU": null
+          },
+          {
+            "id": "masu",
+            "text": "行きます",
+            "feedbackRU": "Это вежливая непрошедшая форма; запрошена другая форма."
+          },
+          {
+            "id": "ta",
+            "text": "行った",
+            "feedbackRU": "Это обычная прошедшая форма; запрошена другая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 行く (iku) запрошенная форма: 行かない. 一段: убрать る и добавить ない; 五段: ряд あ + ない (う → わない); する → しない; 来る → 来ない.",
+        "aspect": "Обычная отрицательная форма глагола",
+        "hintRU": "一段: убрать る и добавить ない; 五段: ряд あ + ない (う → わない); する → しない; 来る → 来ない.",
+        "difficulty": 2,
+        "conjugation": {
+          "verb": {
+            "dictionary": "行く",
+            "reading": "いく",
+            "verbClass": "iku",
+            "permittedForms": [
+              "nai"
+            ]
+          },
+          "form": "nai"
+        }
+      },
+      {
+        "slug": "form-3",
+        "kind": "formProduction",
+        "promptRU": "Образуй обычную отрицательную форму глагола 来る (くる). Обычная отрицательная форма глагола.",
+        "japanese": "来る",
+        "options": [
+          {
+            "id": "correct",
+            "text": "来ない",
+            "feedbackRU": null
+          },
+          {
+            "id": "masu",
+            "text": "来ます",
+            "feedbackRU": "Это вежливая непрошедшая форма; запрошена другая форма."
+          },
+          {
+            "id": "ta",
+            "text": "来た",
+            "feedbackRU": "Это обычная прошедшая форма; запрошена другая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 来る (kuru) запрошенная форма: 来ない. 一段: убрать る и добавить ない; 五段: ряд あ + ない (う → わない); する → しない; 来る → 来ない.",
+        "aspect": "Обычная отрицательная форма глагола",
+        "hintRU": "一段: убрать る и добавить ない; 五段: ряд あ + ない (う → わない); する → しない; 来る → 来ない.",
+        "difficulty": 2,
+        "conjugation": {
+          "verb": {
+            "dictionary": "来る",
+            "reading": "くる",
+            "verbClass": "kuru",
+            "permittedForms": [
+              "nai"
+            ]
+          },
+          "form": "nai"
+        }
+      },
+      {
+        "slug": "context-3",
+        "kind": "fillBlank",
+        "promptRU": "Заполни пропуск правильной формой глагола 来る. Сегодня сюда никто не придёт. Используй обычную отрицательную форму.",
+        "japanese": "今日は誰もここへ（　）。",
+        "options": [
+          {
+            "id": "correct",
+            "text": "来ない",
+            "feedbackRU": null
+          },
+          {
+            "id": "masu",
+            "text": "来ます",
+            "feedbackRU": "Это вежливая непрошедшая форма; запрошена другая форма."
+          },
+          {
+            "id": "ta",
+            "text": "来た",
+            "feedbackRU": "Это обычная прошедшая форма; запрошена другая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 来る (kuru) запрошенная форма: 来ない. 一段: убрать る и добавить ない; 五段: ряд あ + ない (う → わない); する → しない; 来る → 来ない.",
+        "aspect": "Обычная отрицательная форма глагола",
+        "hintRU": "一段: убрать る и добавить ない; 五段: ряд あ + ない (う → わない); する → しない; 来る → 来ない.",
+        "difficulty": 2,
+        "conjugation": {
+          "verb": {
+            "dictionary": "来る",
+            "reading": "くる",
+            "verbClass": "kuru",
+            "permittedForms": [
+              "nai"
+            ]
+          },
+          "form": "nai"
+        }
+      }
+    ]
+  },
+  "ta": {
+    "referenceExamples": [
+      [
+        "川の向こうに新しい橋ができた。",
+        "На другой стороне реки появился новый мост.",
+        "[川|かわ]の[向|む]こうに[新|あたら]しい[橋|はし]ができた。",
+        "た"
+      ],
+      [
+        "昨夜、台所でコップを割った。",
+        "Прошлой ночью я разбил стакан на кухне.",
+        "[昨夜|さくや]、[台所|だいどころ]でコップを[割|わ]った。",
+        "た"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜た в контексте, затем сравни с переводом."
+    },
+    "teaching": {
+      "meaningRU": "Обычная прошедшая форма глагола",
+      "usageRU": "Сообщение о завершённом действии в обычной речи. Не подменяй её непрошедшей формой или формой て.",
+      "formationRU": "一段: る → た; 五段: звуковые изменения как у て, но た/だ; 行く → 行った; 来る → 来た.",
+      "example": {
+        "ja": "昨夜、友達に電話した。",
+        "en": "I called a friend last night.",
+        "ru": "Прошлой ночью я позвонил другу.",
+        "furigana": null
+      },
+      "parts": [
+        {
+          "text": "昨夜",
+          "roleRU": "Время в прошлом."
+        },
+        {
+          "text": "友達に",
+          "roleRU": "Адресат."
+        },
+        {
+          "text": "電話した",
+          "roleRU": "Обычная прошедшая форма 電話する."
+        }
+      ],
+      "notesRU": [
+        "Проверка формы детерминирована по явно заданному классу глагола. Контексты и русский текст подготовлены ИИ; независимое лингвистическое ревью не выполнено."
+      ],
+      "contrastsRU": [],
+      "complexity": 2
+    },
+    "exercises": [
+      {
+        "slug": "form-0",
+        "kind": "formProduction",
+        "promptRU": "Образуй обычную прошедшую форму глагола 食べる (たべる). Обычная прошедшая форма глагола.",
+        "japanese": "食べる",
+        "options": [
+          {
+            "id": "correct",
+            "text": "食べた",
+            "feedbackRU": null
+          },
+          {
+            "id": "masu",
+            "text": "食べます",
+            "feedbackRU": "Это вежливая непрошедшая форма; запрошена другая форма."
+          },
+          {
+            "id": "te",
+            "text": "食べて",
+            "feedbackRU": "Это соединительная форма て; запрошена обычная прошедшая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 食べる (ichidan) запрошенная форма: 食べた. 一段: る → た; 五段: звуковые изменения как у て, но た/だ; 行く → 行った; 来る → 来た.",
+        "aspect": "Обычная прошедшая форма глагола",
+        "hintRU": "一段: る → た; 五段: звуковые изменения как у て, но た/だ; 行く → 行った; 来る → 来た.",
+        "difficulty": 1,
+        "conjugation": {
+          "verb": {
+            "dictionary": "食べる",
+            "reading": "たべる",
+            "verbClass": "ichidan",
+            "permittedForms": [
+              "ta"
+            ]
+          },
+          "form": "ta"
+        }
+      },
+      {
+        "slug": "context-0",
+        "kind": "fillBlank",
+        "promptRU": "Заполни пропуск правильной формой глагола 食べる. Вчера я ел хлеб на станции. Используй обычную прошедшую форму.",
+        "japanese": "昨日、駅でパンを（　）。",
+        "options": [
+          {
+            "id": "correct",
+            "text": "食べた",
+            "feedbackRU": null
+          },
+          {
+            "id": "masu",
+            "text": "食べます",
+            "feedbackRU": "Это вежливая непрошедшая форма; запрошена другая форма."
+          },
+          {
+            "id": "te",
+            "text": "食べて",
+            "feedbackRU": "Это соединительная форма て; запрошена обычная прошедшая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 食べる (ichidan) запрошенная форма: 食べた. 一段: る → た; 五段: звуковые изменения как у て, но た/だ; 行く → 行った; 来る → 来た.",
+        "aspect": "Обычная прошедшая форма глагола",
+        "hintRU": "一段: る → た; 五段: звуковые изменения как у て, но た/だ; 行く → 行った; 来る → 来た.",
+        "difficulty": 1,
+        "conjugation": {
+          "verb": {
+            "dictionary": "食べる",
+            "reading": "たべる",
+            "verbClass": "ichidan",
+            "permittedForms": [
+              "ta"
+            ]
+          },
+          "form": "ta"
+        }
+      },
+      {
+        "slug": "form-1",
+        "kind": "formProduction",
+        "promptRU": "Образуй обычную прошедшую форму глагола 読む (よむ). Обычная прошедшая форма глагола.",
+        "japanese": "読む",
+        "options": [
+          {
+            "id": "correct",
+            "text": "読んだ",
+            "feedbackRU": null
+          },
+          {
+            "id": "masu",
+            "text": "読みます",
+            "feedbackRU": "Это вежливая непрошедшая форма; запрошена другая форма."
+          },
+          {
+            "id": "te",
+            "text": "読んで",
+            "feedbackRU": "Это соединительная форма て; запрошена обычная прошедшая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 読む (godanMu) запрошенная форма: 読んだ. 一段: る → た; 五段: звуковые изменения как у て, но た/だ; 行く → 行った; 来る → 来た.",
+        "aspect": "Обычная прошедшая форма глагола",
+        "hintRU": "一段: る → た; 五段: звуковые изменения как у て, но た/だ; 行く → 行った; 来る → 来た.",
+        "difficulty": 1,
+        "conjugation": {
+          "verb": {
+            "dictionary": "読む",
+            "reading": "よむ",
+            "verbClass": "godanMu",
+            "permittedForms": [
+              "ta"
+            ]
+          },
+          "form": "ta"
+        }
+      },
+      {
+        "slug": "context-1",
+        "kind": "fillBlank",
+        "promptRU": "Заполни пропуск правильной формой глагола 読む. Прошлой ночью я читал эту книгу. Используй обычную прошедшую форму.",
+        "japanese": "昨夜、この本を（　）。",
+        "options": [
+          {
+            "id": "correct",
+            "text": "読んだ",
+            "feedbackRU": null
+          },
+          {
+            "id": "masu",
+            "text": "読みます",
+            "feedbackRU": "Это вежливая непрошедшая форма; запрошена другая форма."
+          },
+          {
+            "id": "te",
+            "text": "読んで",
+            "feedbackRU": "Это соединительная форма て; запрошена обычная прошедшая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 読む (godanMu) запрошенная форма: 読んだ. 一段: る → た; 五段: звуковые изменения как у て, но た/だ; 行く → 行った; 来る → 来た.",
+        "aspect": "Обычная прошедшая форма глагола",
+        "hintRU": "一段: る → た; 五段: звуковые изменения как у て, но た/だ; 行く → 行った; 来る → 来た.",
+        "difficulty": 1,
+        "conjugation": {
+          "verb": {
+            "dictionary": "読む",
+            "reading": "よむ",
+            "verbClass": "godanMu",
+            "permittedForms": [
+              "ta"
+            ]
+          },
+          "form": "ta"
+        }
+      },
+      {
+        "slug": "form-2",
+        "kind": "formProduction",
+        "promptRU": "Образуй обычную прошедшую форму глагола 行く (いく). Обычная прошедшая форма глагола.",
+        "japanese": "行く",
+        "options": [
+          {
+            "id": "correct",
+            "text": "行った",
+            "feedbackRU": null
+          },
+          {
+            "id": "masu",
+            "text": "行きます",
+            "feedbackRU": "Это вежливая непрошедшая форма; запрошена другая форма."
+          },
+          {
+            "id": "te",
+            "text": "行って",
+            "feedbackRU": "Это соединительная форма て; запрошена обычная прошедшая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 行く (iku) запрошенная форма: 行った. 一段: る → た; 五段: звуковые изменения как у て, но た/だ; 行く → 行った; 来る → 来た.",
+        "aspect": "Обычная прошедшая форма глагола",
+        "hintRU": "一段: る → た; 五段: звуковые изменения как у て, но た/だ; 行く → 行った; 来る → 来た.",
+        "difficulty": 2,
+        "conjugation": {
+          "verb": {
+            "dictionary": "行く",
+            "reading": "いく",
+            "verbClass": "iku",
+            "permittedForms": [
+              "ta"
+            ]
+          },
+          "form": "ta"
+        }
+      },
+      {
+        "slug": "context-2",
+        "kind": "fillBlank",
+        "promptRU": "Заполни пропуск правильной формой глагола 行く. На прошлой неделе я ездил к морю. Используй обычную прошедшую форму.",
+        "japanese": "先週、海へ（　）。",
+        "options": [
+          {
+            "id": "correct",
+            "text": "行った",
+            "feedbackRU": null
+          },
+          {
+            "id": "masu",
+            "text": "行きます",
+            "feedbackRU": "Это вежливая непрошедшая форма; запрошена другая форма."
+          },
+          {
+            "id": "te",
+            "text": "行って",
+            "feedbackRU": "Это соединительная форма て; запрошена обычная прошедшая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 行く (iku) запрошенная форма: 行った. 一段: る → た; 五段: звуковые изменения как у て, но た/だ; 行く → 行った; 来る → 来た.",
+        "aspect": "Обычная прошедшая форма глагола",
+        "hintRU": "一段: る → た; 五段: звуковые изменения как у て, но た/だ; 行く → 行った; 来る → 来た.",
+        "difficulty": 2,
+        "conjugation": {
+          "verb": {
+            "dictionary": "行く",
+            "reading": "いく",
+            "verbClass": "iku",
+            "permittedForms": [
+              "ta"
+            ]
+          },
+          "form": "ta"
+        }
+      },
+      {
+        "slug": "form-3",
+        "kind": "formProduction",
+        "promptRU": "Образуй обычную прошедшую форму глагола 来る (くる). Обычная прошедшая форма глагола.",
+        "japanese": "来る",
+        "options": [
+          {
+            "id": "correct",
+            "text": "来た",
+            "feedbackRU": null
+          },
+          {
+            "id": "masu",
+            "text": "来ます",
+            "feedbackRU": "Это вежливая непрошедшая форма; запрошена другая форма."
+          },
+          {
+            "id": "te",
+            "text": "来て",
+            "feedbackRU": "Это соединительная форма て; запрошена обычная прошедшая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 来る (kuru) запрошенная форма: 来た. 一段: る → た; 五段: звуковые изменения как у て, но た/だ; 行く → 行った; 来る → 来た.",
+        "aspect": "Обычная прошедшая форма глагола",
+        "hintRU": "一段: る → た; 五段: звуковые изменения как у て, но た/だ; 行く → 行った; 来る → 来た.",
+        "difficulty": 2,
+        "conjugation": {
+          "verb": {
+            "dictionary": "来る",
+            "reading": "くる",
+            "verbClass": "kuru",
+            "permittedForms": [
+              "ta"
+            ]
+          },
+          "form": "ta"
+        }
+      },
+      {
+        "slug": "context-3",
+        "kind": "fillBlank",
+        "promptRU": "Заполни пропуск правильной формой глагола 来る. Вчера преподаватель пришёл в класс. Используй обычную прошедшую форму.",
+        "japanese": "昨日、先生が教室に（　）。",
+        "options": [
+          {
+            "id": "correct",
+            "text": "来た",
+            "feedbackRU": null
+          },
+          {
+            "id": "masu",
+            "text": "来ます",
+            "feedbackRU": "Это вежливая непрошедшая форма; запрошена другая форма."
+          },
+          {
+            "id": "te",
+            "text": "来て",
+            "feedbackRU": "Это соединительная форма て; запрошена обычная прошедшая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 来る (kuru) запрошенная форма: 来た. 一段: る → た; 五段: звуковые изменения как у て, но た/だ; 行く → 行った; 来る → 来た.",
+        "aspect": "Обычная прошедшая форма глагола",
+        "hintRU": "一段: る → た; 五段: звуковые изменения как у て, но た/だ; 行く → 行った; 来る → 来た.",
+        "difficulty": 2,
+        "conjugation": {
+          "verb": {
+            "dictionary": "来る",
+            "reading": "くる",
+            "verbClass": "kuru",
+            "permittedForms": [
+              "ta"
+            ]
+          },
+          "form": "ta"
+        }
+      }
+    ]
+  },
+  "mashou": {
+    "referenceExamples": [
+      [
+        "gs:f47817b41f83a68b1567e758",
+        "Давайте пообедаем вместе.",
+        "[一緒|いっしょ]に[昼|ひる]ご[飯|はん]を[食|た]べましょう。",
+        "ましょう"
+      ],
+      [
+        "gs:bd24b8c1a38e99cf812ecba7",
+        "Давайте встретимся на станции в три часа.",
+        "[三時|さんじ]に[駅|えき]で[会|あ]いましょう。",
+        "ましょう"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜ましょう в контексте, затем сравни с переводом."
+    }
+  },
+  "mashou-ka": {
+    "referenceExamples": [
+      [
+        "駅まで案内しましょうか。",
+        "Показать вам дорогу до станции?",
+        "[駅|えき]まで[案内|あんない]しましょうか。",
+        "ましょうか"
+      ],
+      [
+        "gs:405e74d8ab2fec9a3abb65e4",
+        "Может быть, пора возвращаться домой?",
+        "そろそろ[帰|かえ]りましょうか。",
+        "ましょうか"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜ましょうか в контексте, затем сравни с переводом."
+    }
+  },
+  "masen-ka": {
+    "referenceExamples": [
+      [
+        "gs:38774952b3570f5138d64b28",
+        "Не хотите посмотреть фильм на выходных?",
+        "[週末|しゅうまつ]に[映画|えいが]を[見|み]ませんか。",
+        "ませんか"
+      ],
+      [
+        "gs:55727950cc137595137b7154",
+        "Не хотите выпить чаю?",
+        "お[茶|ちゃ]を[飲|の]みませんか。",
+        "ませんか"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜ませんか в контексте, затем сравни с переводом."
+    }
+  },
+  "ga-hoshii": {
+    "referenceExamples": [
+      [
+        "gs:9b1dfa929a5dd107cf3ae6ef",
+        "Я хочу новую сумку.",
+        "[私|わたし]は[新|あたら]しいかばんがほしいです。",
+        "がほしい"
+      ],
+      [
+        "gs:7bd4322e95337f80e7ded7ee",
+        "Сейчас мне нужно время.",
+        "[今|いま]、[時間|じかん]がほしいです。",
+        "がほしい"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜がほしい в контексте, затем сравни с переводом."
+    }
+  },
+  "o-kudasai": {
+    "referenceExamples": [
+      [
+        "gs:06c2491fee6272f4945ee8c9",
+        "Дайте мне это красное яблоко, пожалуйста.",
+        "この[赤|あか]いりんごをください。",
+        "をください"
+      ],
+      [
+        "領収書をください。",
+        "Дайте квитанцию, пожалуйста.",
+        "[領収書|りょうしゅうしょ]をください。",
+        "をください"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜をください в контексте, затем сравни с переводом."
+    }
+  },
+  "te-kudasai": {
+    "referenceExamples": [
+      [
+        "gs:4e6fad36c2132fd1bee95382",
+        "Напишите здесь своё имя, пожалуйста.",
+        "ここに[名前|なまえ]を[書|か]いてください。",
+        "てください"
+      ],
+      [
+        "gs:668b43650a514956ec4311f2",
+        "Скажите ещё раз, пожалуйста.",
+        "もう[一度|いちど][言|い]ってください。",
+        "てください"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜てください в контексте, затем сравни с переводом."
+    }
+  },
+  "naide-kudasai": {
+    "referenceExamples": [
+      [
+        "gs:78174b6c67db02178f3882c9",
+        "Не фотографируйте здесь, пожалуйста.",
+        "ここで[写真|しゃしん]を[撮|と]らないでください。",
+        "ないでください"
+      ],
+      [
+        "この機械に触らないでください。",
+        "Не трогайте этот механизм, пожалуйста.",
+        "この[機械|きかい]に[触|さわ]らないでください。",
+        "ないでください"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜ないでください в контексте, затем сравни с переводом."
+    }
+  },
+  "te-wa-ikenai": {
+    "referenceExamples": [
+      [
+        "gs:65dc837cc589d4f3dcedcc38",
+        "Здесь нельзя фотографировать.",
+        "ここで[写真|しゃしん]を[撮|と]ってはいけません。",
+        "てはいけません"
+      ],
+      [
+        "gs:ab021a8c734b7d3acb75a65f",
+        "Во время занятия нельзя спать.",
+        "[授業中|じゅぎょうちゅう]に[寝|ね]てはいけません。",
+        "てはいけません"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜てはいけない в контексте, затем сравни с переводом."
+    }
+  },
+  "nakereba-naranai-nakute-wa-ikenai": {
+    "referenceExamples": [
+      [
+        "薬を毎日飲まなければなりません。",
+        "Нужно принимать лекарство каждый день.",
+        "[薬|くすり]を[毎日|まいにち][飲|の]まなければなりません。",
+        "なければなりません"
+      ],
+      [
+        "出かける前に窓を閉めなくてはいけません。",
+        "Перед выходом нужно закрыть окно.",
+        "[出|で]かける[前|まえ]に[窓|まど]を[閉|し]めなくてはいけません。",
+        "なくてはいけません"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜なければならない / 〜なくてはいけない в контексте, затем сравни с переводом."
+    }
+  },
+  "nakute-mo-ii": {
+    "referenceExamples": [
+      [
+        "gs:7321fe21d5b97bc982ff5dce",
+        "Завтра можно не приходить.",
+        "[明日|あした]は[来|こ]なくてもいいです。",
+        "なくてもいい"
+      ],
+      [
+        "gs:32feb3a12521750423928fa3",
+        "Не обязательно съедать всё.",
+        "[全部|ぜんぶ][食|た]べなくてもいい。",
+        "なくてもいい"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜なくてもいい в контексте, затем сравни с переводом."
+    }
+  },
+  "te-iru": {
+    "referenceExamples": [
+      [
+        "gs:646fcfd65e2792aa4625a9c9",
+        "Сейчас я слушаю музыку.",
+        "[今|いま]、[音楽|おんがく]を[聞|き]いています。",
+        "ています"
+      ],
+      [
+        "私は毎朝この道を歩いています。",
+        "Я хожу по этой улице каждое утро.",
+        "[私|わたし]は[毎朝|まいあさ]この[道|みち]を[歩|ある]いています。",
+        "ています"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜ている в контексте, затем сравни с переводом."
+    }
+  },
+  "te": {
+    "referenceExamples": [
+      [
+        "電車を降りて、出口へ歩きました。",
+        "Я вышел из поезда и пошёл к выходу.",
+        "[電車|でんしゃ]を[降|お]りて、[出口|でぐち]へ[歩|ある]きました。",
+        "降りて"
+      ],
+      [
+        "パンを切って、皿に載せます。",
+        "Я нарезаю хлеб и кладу его на тарелку.",
+        "パンを[切|き]って、[皿|さら]に[載|の]せます。",
+        "切って"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜て в контексте, затем сравни с переводом."
+    },
+    "teaching": {
+      "meaningRU": "Связывание действий формой て",
+      "usageRU": "Форма て соединяет действия. В этих контекстах сначала выполняют действие до запятой, затем действие после неё.",
+      "formationRU": "一段: る → て; 五段: う/つ/る → って, む/ぶ/ぬ → んで, く → いて, ぐ → いで, す → して; 行く → 行って.",
+      "example": {
+        "ja": "店に入って、注文しました。",
+        "en": "I entered the shop and placed an order.",
+        "ru": "Я вошёл в магазин и сделал заказ.",
+        "furigana": null
+      },
+      "parts": [
+        {
+          "text": "店に",
+          "roleRU": "Место назначения."
+        },
+        {
+          "text": "入って",
+          "roleRU": "Первое действие: вошёл."
+        },
+        {
+          "text": "注文しました",
+          "roleRU": "Следующее действие: сделал заказ."
+        }
+      ],
+      "notesRU": [
+        "Проверка формы детерминирована по явно заданному классу глагола. Контексты и русский текст подготовлены ИИ; независимое лингвистическое ревью не выполнено."
+      ],
+      "contrastsRU": [],
+      "complexity": 2
+    },
+    "exercises": [
+      {
+        "slug": "form-0",
+        "kind": "formProduction",
+        "promptRU": "Образуй соединительную форму て глагола 食べる (たべる). Связывание действий формой て.",
+        "japanese": "食べる",
+        "options": [
+          {
+            "id": "correct",
+            "text": "食べて",
+            "feedbackRU": null
+          },
+          {
+            "id": "masu",
+            "text": "食べます",
+            "feedbackRU": "Это вежливая непрошедшая форма; запрошена другая форма."
+          },
+          {
+            "id": "ta",
+            "text": "食べた",
+            "feedbackRU": "Это обычная прошедшая форма; запрошена другая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 食べる (ichidan) запрошенная форма: 食べて. 一段: る → て; 五段: う/つ/る → って, む/ぶ/ぬ → んで, く → いて, ぐ → いで, す → して; 行く → 行って.",
+        "aspect": "Связывание действий формой て",
+        "hintRU": "一段: る → て; 五段: う/つ/る → って, む/ぶ/ぬ → んで, く → いて, ぐ → いで, す → して; 行く → 行って.",
+        "difficulty": 1,
+        "conjugation": {
+          "verb": {
+            "dictionary": "食べる",
+            "reading": "たべる",
+            "verbClass": "ichidan",
+            "permittedForms": [
+              "te"
+            ]
+          },
+          "form": "te"
+        }
+      },
+      {
+        "slug": "context-0",
+        "kind": "fillBlank",
+        "promptRU": "Заполни пропуск правильной формой глагола 食べる. Я завтракаю, а затем иду в школу. Используй соединительную форму て.",
+        "japanese": "朝ご飯を（　）、学校へ行きます。",
+        "options": [
+          {
+            "id": "correct",
+            "text": "食べて",
+            "feedbackRU": null
+          },
+          {
+            "id": "masu",
+            "text": "食べます",
+            "feedbackRU": "Это вежливая непрошедшая форма; запрошена другая форма."
+          },
+          {
+            "id": "ta",
+            "text": "食べた",
+            "feedbackRU": "Это обычная прошедшая форма; запрошена другая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 食べる (ichidan) запрошенная форма: 食べて. 一段: る → て; 五段: う/つ/る → って, む/ぶ/ぬ → んで, く → いて, ぐ → いで, す → して; 行く → 行って.",
+        "aspect": "Связывание действий формой て",
+        "hintRU": "一段: る → て; 五段: う/つ/る → って, む/ぶ/ぬ → んで, く → いて, ぐ → いで, す → して; 行く → 行って.",
+        "difficulty": 1,
+        "conjugation": {
+          "verb": {
+            "dictionary": "食べる",
+            "reading": "たべる",
+            "verbClass": "ichidan",
+            "permittedForms": [
+              "te"
+            ]
+          },
+          "form": "te"
+        }
+      },
+      {
+        "slug": "form-1",
+        "kind": "formProduction",
+        "promptRU": "Образуй соединительную форму て глагола 読む (よむ). Связывание действий формой て.",
+        "japanese": "読む",
+        "options": [
+          {
+            "id": "correct",
+            "text": "読んで",
+            "feedbackRU": null
+          },
+          {
+            "id": "masu",
+            "text": "読みます",
+            "feedbackRU": "Это вежливая непрошедшая форма; запрошена другая форма."
+          },
+          {
+            "id": "ta",
+            "text": "読んだ",
+            "feedbackRU": "Это обычная прошедшая форма; запрошена другая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 読む (godanMu) запрошенная форма: 読んで. 一段: る → て; 五段: う/つ/る → って, む/ぶ/ぬ → んで, く → いて, ぐ → いで, す → して; 行く → 行って.",
+        "aspect": "Связывание действий формой て",
+        "hintRU": "一段: る → て; 五段: う/つ/る → って, む/ぶ/ぬ → んで, く → いて, ぐ → いで, す → して; 行く → 行って.",
+        "difficulty": 1,
+        "conjugation": {
+          "verb": {
+            "dictionary": "読む",
+            "reading": "よむ",
+            "verbClass": "godanMu",
+            "permittedForms": [
+              "te"
+            ]
+          },
+          "form": "te"
+        }
+      },
+      {
+        "slug": "context-1",
+        "kind": "fillBlank",
+        "promptRU": "Заполни пропуск правильной формой глагола 読む. Прочитайте объяснение и напишите своё имя. Используй соединительную форму て.",
+        "japanese": "説明を（　）、名前を書いてください。",
+        "options": [
+          {
+            "id": "correct",
+            "text": "読んで",
+            "feedbackRU": null
+          },
+          {
+            "id": "masu",
+            "text": "読みます",
+            "feedbackRU": "Это вежливая непрошедшая форма; запрошена другая форма."
+          },
+          {
+            "id": "ta",
+            "text": "読んだ",
+            "feedbackRU": "Это обычная прошедшая форма; запрошена другая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 読む (godanMu) запрошенная форма: 読んで. 一段: る → て; 五段: う/つ/る → って, む/ぶ/ぬ → んで, く → いて, ぐ → いで, す → して; 行く → 行って.",
+        "aspect": "Связывание действий формой て",
+        "hintRU": "一段: る → て; 五段: う/つ/る → って, む/ぶ/ぬ → んで, く → いて, ぐ → いで, す → して; 行く → 行って.",
+        "difficulty": 1,
+        "conjugation": {
+          "verb": {
+            "dictionary": "読む",
+            "reading": "よむ",
+            "verbClass": "godanMu",
+            "permittedForms": [
+              "te"
+            ]
+          },
+          "form": "te"
+        }
+      },
+      {
+        "slug": "form-2",
+        "kind": "formProduction",
+        "promptRU": "Образуй соединительную форму て глагола 行く (いく). Связывание действий формой て.",
+        "japanese": "行く",
+        "options": [
+          {
+            "id": "correct",
+            "text": "行って",
+            "feedbackRU": null
+          },
+          {
+            "id": "masu",
+            "text": "行きます",
+            "feedbackRU": "Это вежливая непрошедшая форма; запрошена другая форма."
+          },
+          {
+            "id": "ta",
+            "text": "行った",
+            "feedbackRU": "Это обычная прошедшая форма; запрошена другая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 行く (iku) запрошенная форма: 行って. 一段: る → て; 五段: う/つ/る → って, む/ぶ/ぬ → んで, く → いて, ぐ → いで, す → して; 行く → 行って.",
+        "aspect": "Связывание действий формой て",
+        "hintRU": "一段: る → て; 五段: う/つ/る → って, む/ぶ/ぬ → んで, く → いて, ぐ → いで, す → して; 行く → 行って.",
+        "difficulty": 2,
+        "conjugation": {
+          "verb": {
+            "dictionary": "行く",
+            "reading": "いく",
+            "verbClass": "iku",
+            "permittedForms": [
+              "te"
+            ]
+          },
+          "form": "te"
+        }
+      },
+      {
+        "slug": "context-2",
+        "kind": "fillBlank",
+        "promptRU": "Заполни пропуск правильной формой глагола 行く. Я пойду на почту и отправлю посылку. Используй соединительную форму て.",
+        "japanese": "郵便局へ（　）、荷物を送ります。",
+        "options": [
+          {
+            "id": "correct",
+            "text": "行って",
+            "feedbackRU": null
+          },
+          {
+            "id": "masu",
+            "text": "行きます",
+            "feedbackRU": "Это вежливая непрошедшая форма; запрошена другая форма."
+          },
+          {
+            "id": "ta",
+            "text": "行った",
+            "feedbackRU": "Это обычная прошедшая форма; запрошена другая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 行く (iku) запрошенная форма: 行って. 一段: る → て; 五段: う/つ/る → って, む/ぶ/ぬ → んで, く → いて, ぐ → いで, す → して; 行く → 行って.",
+        "aspect": "Связывание действий формой て",
+        "hintRU": "一段: る → て; 五段: う/つ/る → って, む/ぶ/ぬ → んで, く → いて, ぐ → いで, す → して; 行く → 行って.",
+        "difficulty": 2,
+        "conjugation": {
+          "verb": {
+            "dictionary": "行く",
+            "reading": "いく",
+            "verbClass": "iku",
+            "permittedForms": [
+              "te"
+            ]
+          },
+          "form": "te"
+        }
+      },
+      {
+        "slug": "form-3",
+        "kind": "formProduction",
+        "promptRU": "Образуй соединительную форму て глагола 来る (くる). Связывание действий формой て.",
+        "japanese": "来る",
+        "options": [
+          {
+            "id": "correct",
+            "text": "来て",
+            "feedbackRU": null
+          },
+          {
+            "id": "masu",
+            "text": "来ます",
+            "feedbackRU": "Это вежливая непрошедшая форма; запрошена другая форма."
+          },
+          {
+            "id": "ta",
+            "text": "来た",
+            "feedbackRU": "Это обычная прошедшая форма; запрошена другая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 来る (kuru) запрошенная форма: 来て. 一段: る → て; 五段: う/つ/る → って, む/ぶ/ぬ → んで, く → いて, ぐ → いで, す → して; 行く → 行って.",
+        "aspect": "Связывание действий формой て",
+        "hintRU": "一段: る → て; 五段: う/つ/る → って, む/ぶ/ぬ → んで, く → いて, ぐ → いで, す → して; 行く → 行って.",
+        "difficulty": 2,
+        "conjugation": {
+          "verb": {
+            "dictionary": "来る",
+            "reading": "くる",
+            "verbClass": "kuru",
+            "permittedForms": [
+              "te"
+            ]
+          },
+          "form": "te"
+        }
+      },
+      {
+        "slug": "context-3",
+        "kind": "fillBlank",
+        "promptRU": "Заполни пропуск правильной формой глагола 来る. Подойдите сюда и сядьте. Используй соединительную форму て.",
+        "japanese": "こちらへ（　）、座ってください。",
+        "options": [
+          {
+            "id": "correct",
+            "text": "来て",
+            "feedbackRU": null
+          },
+          {
+            "id": "masu",
+            "text": "来ます",
+            "feedbackRU": "Это вежливая непрошедшая форма; запрошена другая форма."
+          },
+          {
+            "id": "ta",
+            "text": "来た",
+            "feedbackRU": "Это обычная прошедшая форма; запрошена другая форма."
+          }
+        ],
+        "acceptedOptionIDs": [
+          "correct"
+        ],
+        "explanationRU": "Для 来る (kuru) запрошенная форма: 来て. 一段: る → て; 五段: う/つ/る → って, む/ぶ/ぬ → んで, く → いて, ぐ → いで, す → して; 行く → 行って.",
+        "aspect": "Связывание действий формой て",
+        "hintRU": "一段: る → て; 五段: う/つ/る → って, む/ぶ/ぬ → んで, く → いて, ぐ → いで, す → して; 行く → 行って.",
+        "difficulty": 2,
+        "conjugation": {
+          "verb": {
+            "dictionary": "来る",
+            "reading": "くる",
+            "verbClass": "kuru",
+            "permittedForms": [
+              "te"
+            ]
+          },
+          "form": "te"
+        }
+      }
+    ]
+  },
+  "te-kara": {
+    "referenceExamples": [
+      [
+        "gs:cacbdc1b1fb84f57d07873a9",
+        "После окончания работы я пошёл смотреть фильм.",
+        "[仕事|しごと]が[終|お]わってから、[映画|えいが]を[見|み]に[行|い]きました。",
+        "てから"
+      ],
+      [
+        "電気を消してから寝てください。",
+        "Выключите свет, прежде чем лечь спать.",
+        "[電気|でんき]を[消|け]してから[寝|ね]てください。",
+        "てから"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜てから в контексте, затем сравни с переводом."
+    }
+  },
+  "tari-tari-suru": {
+    "referenceExamples": [
+      [
+        "gs:98a3702dcd200cca8cd1d124",
+        "В комнате я то плакал, то смеялся.",
+        "[部屋|へや]で[泣|な]いたり[笑|わら]ったりしました。",
+        "たり笑ったり"
+      ],
+      [
+        "冬休みはスキーをしたり映画を見たりします。",
+        "На зимних каникулах я, например, катаюсь на лыжах и смотрю фильмы.",
+        "[冬休|ふゆやす]みはスキーをしたり[映画|えいが]を[見|み]たりします。",
+        "たり映画を見たり"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜たり〜たりする в контексте, затем сравни с переводом."
+    }
+  },
+  "ta-koto-ga-aru": {
+    "referenceExamples": [
+      [
+        "gs:ef9455544763063dfdd6f880",
+        "Я уже пробовал суши.",
+        "すしを[食|た]べたことがあります。",
+        "たことがあります"
+      ],
+      [
+        "gs:f5062dfd6140cf1f3f35d8d5",
+        "Я ни разу не опаздывал.",
+        "[一度|いちど]も[遅刻|ちこく]したことがありません。",
+        "たことがありません"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜たことがある в контексте, затем сравни с переводом."
+    }
+  },
+  "mae-ni": {
+    "referenceExamples": [
+      [
+        "gs:b8b7b57dda62b5057fbfb42f",
+        "Перед едой я мою руки.",
+        "[食事|しょくじ]の[前|まえ]に[手|て]を[洗|あら]います。",
+        "前に"
+      ],
+      [
+        "出かける前に天気を調べます。",
+        "Перед выходом я узнаю прогноз погоды.",
+        "[出|で]かける[前|まえ]に[天気|てんき]を[調|しら]べます。",
+        "前に"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜前に в контексте, затем сравни с переводом."
+    }
+  },
+  "ato-de": {
+    "referenceExamples": [
+      [
+        "gs:5b2e907be6eefc6c3e26cfe4",
+        "После выполнения домашнего задания я немного посмотрю телевизор.",
+        "[宿題|しゅくだい]をしたあとで、[少|すこ]しテレビを[見|み]ます。",
+        "あとで"
+      ],
+      [
+        "gs:7d9e4281f0fa6ba6a4aa4e43",
+        "Не хотите выпить кофе после обеда?",
+        "[昼|ひる]ご[飯|はん]のあとで、コーヒーを[飲|の]みませんか。",
+        "あとで"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜後で в контексте, затем сравни с переводом."
+    }
+  },
+  "nagara": {
+    "referenceExamples": [
+      [
+        "gs:b3e25f1af605bc824093e710",
+        "Давайте поговорим за чаем.",
+        "お[茶|ちゃ]を[飲|の]みながら[話|はな]しましょう。",
+        "ながら"
+      ],
+      [
+        "母は歌いながら料理をしています。",
+        "Мама готовит и одновременно поёт.",
+        "[母|はは]は[歌|うた]いながら[料理|りょうり]をしています。",
+        "ながら"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜ながら（while） в контексте, затем сравни с переводом."
+    }
+  },
+  "ni-iku": {
+    "referenceExamples": [
+      [
+        "gs:e7ef4f7b0dcb69427294bc72",
+        "Я иду встретиться с другом.",
+        "[友|とも]だちに[会|あ]いに[行|い]きます。",
+        "会いに行きます"
+      ],
+      [
+        "gs:7c97a1d50d0c37383b825977",
+        "Я пошёл в универмаг за покупками.",
+        "デパートへ[買|か]い[物|もの]に[行|い]きました。",
+        "買い物に行きました"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜に行く в контексте, затем сравни с переводом."
+    }
+  },
+  "ga-suki-ga-kirai": {
+    "referenceExamples": [
+      [
+        "弟は魚が好きです。",
+        "Мой младший брат любит рыбу.",
+        "[弟|おとうと]は[魚|さかな]が[好|す]きです。",
+        "が好き"
+      ],
+      [
+        "私は早起きが嫌いです。",
+        "Я не люблю рано вставать.",
+        "[私|わたし]は[早起|はやお]きが[嫌|きら]いです。",
+        "が嫌い"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜が好き / 〜が嫌い в контексте, затем сравни с переводом."
+    }
+  },
+  "ga-jouzu-ga-heta": {
+    "referenceExamples": [
+      [
+        "父は運転が上手です。",
+        "Мой отец хорошо водит машину.",
+        "[父|ちち]は[運転|うんてん]が[上手|じょうず]です。",
+        "が上手"
+      ],
+      [
+        "弟は泳ぐのが下手です。",
+        "Мой младший брат плохо плавает.",
+        "[弟|おとうと]は[泳|およ]ぐのが[下手|へた]です。",
+        "が下手"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜が上手 / 〜が下手 в контексте, затем сравни с переводом."
+    }
+  },
+  "ga-aru-ga-iru": {
+    "referenceExamples": [
+      [
+        "庭に小さい池があります。",
+        "В саду есть небольшой пруд.",
+        "[庭|にわ]に[小|ちい]さい[池|いけ]があります。",
+        "があります"
+      ],
+      [
+        "受付に店員がいます。",
+        "У стойки есть сотрудник магазина.",
+        "[受付|うけつけ]に[店員|てんいん]がいます。",
+        "がいます"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜がある / 〜がいる в контексте, затем сравни с переводом."
+    }
+  },
+  "kara-reason": {
+    "referenceExamples": [
+      [
+        "お腹がすいたから、パンを買います。",
+        "Я проголодался, поэтому куплю хлеб.",
+        "お[腹|なか]がすいたから、パンを[買|か]います。",
+        "から"
+      ],
+      [
+        "雨ですから、試合はありません。",
+        "Идёт дождь, поэтому матча не будет.",
+        "[雨|あめ]ですから、[試合|しあい]はありません。",
+        "から"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜から（reason） в контексте, затем сравни с переводом."
+    }
+  },
+  "ga-but": {
+    "referenceExamples": [
+      [
+        "この靴は軽いですが、少し高いです。",
+        "Эта обувь лёгкая, но немного дорогая.",
+        "この[靴|くつ]は[軽|かる]いですが、[少|すこ]し[高|たか]いです。",
+        "が"
+      ],
+      [
+        "バスは便利ですが、朝は混みます。",
+        "Автобус удобен, но утром в нём тесно.",
+        "バスは[便利|べんり]ですが、[朝|あさ]は[混|こ]みます。",
+        "が"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜が（but） в контексте, затем сравни с переводом."
+    }
+  },
+  "deshou": {
+    "referenceExamples": [
+      [
+        "gs:b783e802776c7acf90a7988c",
+        "Завтра, вероятно, будет ясно.",
+        "[明日|あした]は[晴|は]れるでしょう。",
+        "でしょう"
+      ],
+      [
+        "この時間は道が混んでいるでしょう。",
+        "В это время дорога, наверное, загружена.",
+        "この[時間|じかん]は[道|みち]が[混|こ]んでいるでしょう。",
+        "でしょう"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜でしょう в контексте, затем сравни с переводом."
+    }
+  },
+  "ku-naru-ni-naru": {
+    "referenceExamples": [
+      [
+        "秋になって、日が短くなりました。",
+        "Наступила осень, и дни стали короче.",
+        "[秋|あき]になって、[日|ひ]が[短|みじか]くなりました。",
+        "短くなりました"
+      ],
+      [
+        "弟は四月に中学生になります。",
+        "В апреле мой младший брат перейдёт в среднюю школу.",
+        "[弟|おとうと]は[四月|しがつ]に[中学生|ちゅうがくせい]になります。",
+        "中学生になります"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜くなる / 〜になる в контексте, затем сравни с переводом."
+    }
+  },
+  "ni-suru": {
+    "referenceExamples": [
+      [
+        "gs:32ccb25f2c7882857ef4ac63",
+        "Я возьму кофе.",
+        "[私|わたし]はコーヒーにします。",
+        "にします"
+      ],
+      [
+        "集合場所は駅の前にしましょう。",
+        "Давайте выберем место встречи перед станцией.",
+        "[集合場所|しゅうごうばしょ]は[駅|えき]の[前|まえ]にしましょう。",
+        "にしましょう"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜にする（decide） в контексте, затем сравни с переводом."
+    }
+  },
+  "mada-te-inai": {
+    "referenceExamples": [
+      [
+        "まだ切符を買っていません。",
+        "Я ещё не купил билет.",
+        "まだ[切符|きっぷ]を[買|か]っていません。",
+        "まだ切符を買っていません"
+      ],
+      [
+        "弟はまだ帰っていません。",
+        "Мой младший брат ещё не вернулся.",
+        "[弟|おとうと]はまだ[帰|かえ]っていません。",
+        "まだ帰っていません"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции まだ〜ていない в контексте, затем сравни с переводом."
+    }
+  },
+  "mou-ta": {
+    "referenceExamples": [
+      [
+        "もう予約しました。",
+        "Я уже забронировал.",
+        "もう[予約|よやく]しました。",
+        "もう予約しました"
+      ],
+      [
+        "お客さんはもう帰った。",
+        "Гости уже ушли.",
+        "お[客|きゃく]さんはもう[帰|かえ]った。",
+        "もう帰った"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции もう〜た в контексте, затем сравни с переводом."
+    }
+  },
+  "amari-nai": {
+    "referenceExamples": [
+      [
+        "gs:90bf19f715771ea39e1e4187",
+        "Этот фильм был не очень интересным.",
+        "この[映画|えいが]はあまり[面白|おもしろ]くなかったです。",
+        "あまり面白くなかった"
+      ],
+      [
+        "gs:7489ad517c7adb99829e6aa6",
+        "В последнее время я мало смотрю телевизор.",
+        "[最近|さいきん]、あまりテレビを[見|み]ません。",
+        "あまりテレビを見ません"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции あまり〜ない в контексте, затем сравни с переводом."
+    }
+  },
+  "zenzen-nai": {
+    "referenceExamples": [
+      [
+        "gs:c2d52bb75b35631a8f95bf7b",
+        "Я совсем не умею читать кандзи.",
+        "[漢字|かんじ]が[全然|ぜんぜん][読|よ]めません。",
+        "全然読めません"
+      ],
+      [
+        "gs:649d275ab6b3b059dbd59a92",
+        "Этот суп совсем не горячий.",
+        "このスープは[全然|ぜんぜん][熱|あつ]くないです。",
+        "全然熱くない"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 全然〜ない в контексте, затем сравни с переводом."
+    }
+  },
+  "dake": {
+    "referenceExamples": [
+      [
+        "gs:b1a88a2811352027f6fd61e5",
+        "Я пил только воду.",
+        "[水|みず]だけ[飲|の]みました。",
+        "だけ"
+      ],
+      [
+        "gs:7d1aae1e7c66cda502ce2169",
+        "Я съел только одно яблоко.",
+        "りんごを[一|ひと]つだけ[食|た]べました。",
+        "だけ"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜だけ в контексте, затем сравни с переводом."
+    }
+  },
+  "kurai-gurai": {
+    "referenceExamples": [
+      [
+        "修理には三日ぐらいかかります。",
+        "Ремонт займёт примерно три дня.",
+        "[修理|しゅうり]には[三日|みっか]ぐらいかかります。",
+        "ぐらい"
+      ],
+      [
+        "教室には二十人くらいいます。",
+        "В классе примерно двадцать человек.",
+        "[教室|きょうしつ]には[二十人|にじゅうにん]くらいいます。",
+        "くらい"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜くらい / 〜ぐらい（approximately） в контексте, затем сравни с переводом."
+    }
+  },
+  "goro": {
+    "referenceExamples": [
+      [
+        "荷物は昼ごろ届きます。",
+        "Посылка придёт около полудня.",
+        "[荷物|にもつ]は[昼|ひる]ごろ[届|とど]きます。",
+        "ごろ"
+      ],
+      [
+        "来年の春ごろ引っ越します。",
+        "Я перееду примерно весной следующего года.",
+        "[来年|らいねん]の[春|はる]ごろ[引|ひ]っ[越|こ]します。",
+        "ごろ"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜ごろ в контексте, затем сравни с переводом."
+    }
+  },
+  "nani-mo-nai-dare-mo-nai": {
+    "referenceExamples": [
+      [
+        "今日は誰も来ませんでした。",
+        "Сегодня никто не пришёл.",
+        "[今日|きょう]は[誰|だれ]も[来|き]ませんでした。",
+        "誰も来ません"
+      ],
+      [
+        "何も持ってきませんでした。",
+        "Я ничего не принёс.",
+        "[何|なに]も[持|も]ってきませんでした。",
+        "何も持ってきません"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 何も〜ない / 誰も〜ない в контексте, затем сравни с переводом."
+    }
+  },
+  "nani-ka-dare-ka-doko-ka": {
+    "referenceExamples": [
+      [
+        "誰かが窓を開けました。",
+        "Кто-то открыл окно.",
+        "[誰|だれ]かが[窓|まど]を[開|あ]けました。",
+        "誰か"
+      ],
+      [
+        "週末はどこかへ出かけたいです。",
+        "На выходных я хочу куда-нибудь сходить.",
+        "[週末|しゅうまつ]はどこかへ[出|で]かけたいです。",
+        "どこか"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 何か / 誰か / どこか в контексте, затем сравни с переводом."
+    }
+  },
+  "kore-sore-are-dore": {
+    "referenceExamples": [
+      [
+        "これを二つください。",
+        "Дайте мне две штуки вот этого.",
+        "これを[二|ふた]つください。",
+        "これ"
+      ],
+      [
+        "それは昨日買った切符です。",
+        "Это у вас — билет, который я купил вчера.",
+        "それは[昨日|きのう][買|か]った[切符|きっぷ]です。",
+        "それ"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции これ / それ / あれ / どれ в контексте, затем сравни с переводом."
+    }
+  },
+  "kono-sono-ano-dono": {
+    "referenceExamples": [
+      [
+        "この席は空いていますか。",
+        "Это место свободно?",
+        "この[席|せき]は[空|あ]いていますか。",
+        "この"
+      ],
+      [
+        "あの橋を渡ってください。",
+        "Перейдите вон тот мост, пожалуйста.",
+        "あの[橋|はし]を[渡|わた]ってください。",
+        "あの"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции この / その / あの / どの в контексте, затем сравни с переводом."
+    }
+  },
+  "koko-soko-asoko-doko": {
+    "referenceExamples": [
+      [
+        "ここに座ってください。",
+        "Сядьте здесь, пожалуйста.",
+        "ここに[座|すわ]ってください。",
+        "ここ"
+      ],
+      [
+        "郵便局はあそこにあります。",
+        "Почта находится вон там.",
+        "[郵便局|ゆうびんきょく]はあそこにあります。",
+        "あそこ"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции ここ / そこ / あそこ / どこ в контексте, затем сравни с переводом."
+    }
+  },
+  "ku-nai-katta-ku-nakatta": {
+    "referenceExamples": [
+      [
+        "昨日は風が強かったです。",
+        "Вчера был сильный ветер.",
+        "[昨日|きのう]は[風|かぜ]が[強|つよ]かったです。",
+        "強かった"
+      ],
+      [
+        "この水は冷たくないです。",
+        "Эта вода не холодная.",
+        "この[水|みず]は[冷|つめ]たくないです。",
+        "冷たくない"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜くない / 〜かった / 〜くなかった в контексте, затем сравни с переводом."
+    }
+  },
+  "na-na-adjective": {
+    "referenceExamples": [
+      [
+        "静かな場所で勉強したいです。",
+        "Я хочу заниматься в тихом месте.",
+        "[静|しず]かな[場所|ばしょ]で[勉強|べんきょう]したいです。",
+        "静かな"
+      ],
+      [
+        "親切な人に道を教えてもらいました。",
+        "Добрый человек подсказал мне дорогу.",
+        "[親切|しんせつ]な[人|ひと]に[道|みち]を[教|おし]えてもらいました。",
+        "親切な"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜な（na-adjective） в контексте, затем сравни с переводом."
+    }
+  },
+  "kute-de": {
+    "referenceExamples": [
+      [
+        "gs:f9e8c66cba5fb876f4de51bd",
+        "Эта комната просторная и светлая.",
+        "この[部屋|へや]は[広|ひろ]くて[明|あか]るいです。",
+        "くて"
+      ],
+      [
+        "gs:d24fa51c44e46cad4074e9b0",
+        "Мой старший брат — учитель, а старшая сестра — врач.",
+        "[兄|あに]は[先生|せんせい]で、[姉|あね]は[医者|いしゃ]です。",
+        "先生で"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜くて / 〜で в контексте, затем сравни с переводом."
+    }
+  },
+  "to-iu-named": {
+    "referenceExamples": [
+      [
+        "近くに「青空」という喫茶店があります。",
+        "Рядом есть кафе под названием «Аодзора».",
+        "[近|ちか]くに「[青空|あおぞら]」という[喫茶店|きっさてん]があります。",
+        "という"
+      ],
+      [
+        "「日本語の森」という本を借りました。",
+        "Я взял книгу под названием «Нихонго но мори».",
+        "「[日本語|にほんご]の[森|もり]」という[本|ほん]を[借|か]りました。",
+        "という"
+      ]
+    ],
+    "referencePreparation": {
+      "status": "assistantPrepared",
+      "translationStatus": "assistantPrepared",
+      "method": "Explicit selection by rule sense; assistant-authored Russian and readings; independent review pending",
+      "skillRU": "Объясни роль конструкции 〜という（named） в контексте, затем сравни с переводом."
+    }
   }
 }

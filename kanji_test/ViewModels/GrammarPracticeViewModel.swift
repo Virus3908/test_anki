@@ -44,7 +44,8 @@ final class GrammarPracticeViewModel {
         let plan = GrammarExerciseEngine.plan(rule: rule, seed: seed, isReview: isReview, attempt: attempt, previousRating: previousRating)
         exercises = plan.exercises; reserve = plan.reserve
         initialExercises = plan.exercises; initialReserve = plan.reserve
-        let example = rule.examples.first ?? GrammarExample(ja: "", en: "", furigana: nil, ru: nil)
+        let example = GrammarExerciseSelection.ordered(rule.examples + rule.studyExamples, seed: seed)
+            .first ?? GrammarExample(ja: "", en: "", furigana: nil, ru: nil)
         recallPrompts = [
             RecallPrompt(id: "\(rule.id):meaning", question: "Объясни смысл в контексте.", cue: rule.pattern, sourceAnswer: rule.displayedMeaning),
             RecallPrompt(id: "\(rule.id):formation", question: "Вспомни образование.", cue: rule.pattern, sourceAnswer: rule.displayedFormation),
@@ -110,7 +111,13 @@ final class GrammarPracticeViewModel {
     func checkAssembly() {
         guard !isClosed, !isAnswerVisible, contentError == nil, let exercise = currentExercise,
               exercise.kind == .assembleSentence, !selectedElements.isEmpty else { return }
-        record(correct: exercise.accepts(order: selectedElements), answer: selectedElements.joined(separator: "|"))
+        let correct = exercise.accepts(order: selectedElements)
+        let permittedElements = Set((exercise.acceptedOrders ?? []).flatMap { $0 })
+        let diagnosed = selectedElements.contains { id in
+            !permittedElements.contains(id) && exercise.options.first { $0.id == id }?.feedbackRU?.isEmpty == false
+        }
+        let assessment: GrammarAnswerValidator.Assessment = correct ? .correct : diagnosed ? .incorrectForm : .differsFromSample
+        record(correct: correct, answer: selectedElements.joined(separator: "|"), assessment: assessment)
     }
     func checkForm() {
         guard !isClosed, !isAnswerVisible, contentError == nil, let exercise = currentExercise,

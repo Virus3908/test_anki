@@ -297,8 +297,9 @@ struct GrammarLessonContent: View, StudyViewStyling {
     }
     private var mainExample: GrammarExample? { rule.teaching?.example ?? rule.examples.first }
     private var additionalExamples: [GrammarExample] {
-        guard let mainExample else { return rule.examples }
-        return rule.examples.filter { $0.ja != mainExample.ja }
+        let examples = rule.examples + rule.studyExamples
+        guard let mainExample else { return examples }
+        return examples.filter { $0.ja != mainExample.ja }
     }
     private var relatedRelations: [GrammarRelation] { rule.relations ?? [] }
     private var practiceAvailability: String {
@@ -331,11 +332,17 @@ struct GrammarLessonContent: View, StudyViewStyling {
         let studyExample = StudyExample(
             id: "grammar-\(rule.id)-\(index)",
             text: example.ja,
-            meaning: language == .russian ? (example.ru ?? translated(example.en)) : translated(example.en),
+            meaning: language == .russian || example.en.isEmpty ? (example.ru ?? translated(example.en)) : translated(example.en),
             sources: exampleSources(example),
             furigana: example.ruby
         )
         return VStack(alignment: .leading, spacing: 6) {
+            if example.preparationStatus == "assistantPrepared" {
+                Text("Учебный контекст · подготовлено ИИ, независимое ревью не выполнено. Перевод и чтения требуют проверки.")
+                    .font(.caption).foregroundStyle(AppPalette.secondaryText)
+                if let target = example.targetConstruction { Text("Конструкция: " + target).font(.callout) }
+                if let skill = example.skillRU { Text(skill).font(.callout) }
+            }
             StudyExamplesContent(
                 examples: [studyExample],
                 showsFurigana: settings.showExampleFurigana,

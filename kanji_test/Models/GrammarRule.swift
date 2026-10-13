@@ -52,6 +52,8 @@ nonisolated struct GrammarRule: Identifiable, Codable, Sendable, StudyItem {
     var supplement: GrammarSupplement? = nil
     var exampleReferences: [GrammarSentenceBank.ExampleReference]? = nil
     var exerciseTemplateIDs: [String]? = nil
+    var studyExampleReferences: [GrammarSentenceBank.ExampleReference]? = nil
+    var studyExamples: [GrammarExample] = []
 
     var reviewKey: String { "grammar:\(id)" }
     var categories: [GrammarCategory] { tags.compactMap(GrammarCategory.init(rawValue:)) }
@@ -63,14 +65,15 @@ nonisolated struct GrammarRule: Identifiable, Codable, Sendable, StudyItem {
         GrammarRule(id: id, level: level, pattern: pattern, reading: reading, romaji: romaji,
             meaning: meaning, formation: formation, notes: notes, examples: examples, tags: tags,
             localization: localization, exercises: value, relations: relations, teaching: teaching, practiceMetadata: practiceMetadata, supplement: supplement,
-            exampleReferences: exampleReferences, exerciseTemplateIDs: exerciseTemplateIDs)
+            exampleReferences: exampleReferences, exerciseTemplateIDs: exerciseTemplateIDs,
+            studyExampleReferences: studyExampleReferences, studyExamples: studyExamples)
     }
-    func withCorpus(examples: [GrammarExample], exercises: [GrammarExercise]?) -> GrammarRule {
+    func withCorpus(examples: [GrammarExample], exercises: [GrammarExercise]?, studyExamples: [GrammarExample] = []) -> GrammarRule {
         GrammarRule(id: id, level: level, pattern: pattern, reading: reading, romaji: romaji,
             meaning: meaning, formation: formation, notes: notes, examples: examples, tags: tags,
             localization: localization, exercises: exercises, relations: relations, teaching: teaching,
             practiceMetadata: practiceMetadata, supplement: supplement, exampleReferences: exampleReferences,
-            exerciseTemplateIDs: exerciseTemplateIDs)
+            exerciseTemplateIDs: exerciseTemplateIDs, studyExampleReferences: studyExampleReferences, studyExamples: studyExamples)
     }
 }
 
@@ -96,6 +99,8 @@ extension GrammarRule {
         supplement = try values.decodeIfPresent(GrammarSupplement.self, forKey: .supplement)
         exampleReferences = try values.decodeIfPresent([GrammarSentenceBank.ExampleReference].self, forKey: .exampleReferences)
         exerciseTemplateIDs = try values.decodeIfPresent([String].self, forKey: .exerciseTemplateIDs)
+        studyExampleReferences = try values.decodeIfPresent([GrammarSentenceBank.ExampleReference].self, forKey: .studyExampleReferences)
+        studyExamples = try values.decodeIfPresent([GrammarExample].self, forKey: .studyExamples) ?? []
         let decoded = try? values.decodeIfPresent([GrammarExercise].self, forKey: .exercises)
         if let decoded, decoded.allSatisfy({ $0.isUsable(for: decodedID) }),
            Set(decoded.map(\.id)).count == decoded.count { exercises = decoded }
@@ -137,6 +142,9 @@ nonisolated struct GrammarExample: Codable, Sendable {
     let ru: String?
     var sources: [GrammarExampleSource]? = nil
     var translationSources: [GrammarExampleSource]? = nil
+    var preparationStatus: String? = nil
+    var targetConstruction: String? = nil
+    var skillRU: String? = nil
 
     /// Adapt explicit OpenJLPT braces to the existing strict parser.
     /// No reading inference; byte reconstruction is checked by FuriganaParser.

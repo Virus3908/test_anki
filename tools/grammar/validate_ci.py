@@ -66,6 +66,19 @@ def check(release=False):
                 assert supplemental['license'] == 'MIT'
                 assert supplemental['summary'] == supplements[rule['id']]['entry']['summary']
                 assert supplemental['examples'] == [{k: e[k] for k in ('ja', 'en')} for e in supplements[rule['id']]['entry']['examples']]
+            for reference, example in zip(rule.get('studyExampleReferences', []), rule.get('studyExamples', [])):
+                import re
+                usage = next(u for u in bank['usages'] if u['id'] == reference['usageID'])
+                assert usage['ruleID'] == rule['id'] and usage['sentenceID'] == reference['sentenceID']
+                assert usage['eligibleForScoring'] is False and usage['status'] == 'assistantPrepared'
+                assert example['status'] == 'assistantPrepared' and nonempty(example['ru'])
+                raw = example['ja'].encode(); span = usage['targetSpan']
+                assert 0 <= span['startUTF8'] < span['endUTF8'] <= len(raw)
+                assert raw[span['startUTF8']:span['endUTF8']].decode() == example['targetConstruction']
+                assert re.sub(r'\[([^\[\]|]+)\|[^\[\]]+\]', lambda m: m[1], example['furigana']).encode() == raw
+                assert not any(e.get('provenance', {}).get('status') == 'assistantPrepared' for e in rule.get('exercises', [])), 'Prepared references must not silently become scored tasks'
+            if level == 'N5':
+                assert len({e['ja'] for e in rule['examples'] + rule.get('studyExamples', [])}) >= 5
             localization = rule.get('localization')
             missing = []
             if localization:

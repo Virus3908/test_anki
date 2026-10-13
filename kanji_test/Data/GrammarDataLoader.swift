@@ -41,7 +41,15 @@ actor GrammarDataLoader {
                 let examples = try rule.exampleReferences.map(bank.examples) ?? rule.examples
                 // Bad referenced exercises disable just their rule, as legacy malformed arrays do.
                 let exercises = rule.exerciseTemplateIDs.map { try? bank.exercises($0, ruleID: rule.id) } ?? rule.exercises
-                return rule.withCorpus(examples: examples, exercises: exercises)
+                let studyExamples = try rule.studyExampleReferences.map(bank.examples) ?? rule.studyExamples
+                for reference in rule.studyExampleReferences ?? [] {
+                    guard let usageID = reference.usageID,
+                          bank.usages.contains(where: { $0.id == usageID && $0.ruleID == rule.id
+                              && $0.sentenceID == reference.sentenceID && !$0.eligibleForScoring }) else {
+                        throw Error.invalid("неверная привязка учебного контекста \(rule.id)")
+                    }
+                }
+                return rule.withCorpus(examples: examples, exercises: exercises, studyExamples: studyExamples)
             }
             value = GrammarResource(schemaVersion: decoded.schemaVersion, metadata: decoded.metadata, rules: rules)
         }
@@ -98,6 +106,10 @@ actor GrammarDataLoader {
                 && nonempty(rule.meaning) && nonempty(rule.formation), "пустые обязательные поля \(rule.id)")
             try require(!rule.examples.isEmpty && rule.examples.allSatisfy { nonempty($0.ja) && nonempty($0.en) },
                 "нет примеров/переводов \(rule.id)")
+            try require(rule.studyExamples.allSatisfy { example in nonempty(example.ja) && example.ru.map(nonempty) == true
+                && example.preparationStatus == "assistantPrepared" && example.ruby != nil
+                && example.targetConstruction.map { nonempty($0) && example.ja.contains($0) } == true && example.skillRU.map(nonempty) == true },
+                "неполный подготовленный контекст \(rule.id)")
             try require(rule.tags.allSatisfy { GrammarCategory(rawValue: $0) != nil }, "неизвестная категория \(rule.id)")
             if let ru = rule.localization {
                 try require([ru.meaningRU, ru.formationRU, ru.formationNotesRU, ru.explanationRU, ru.reviewer].allSatisfy(nonempty)

@@ -8,7 +8,7 @@ final class GrammarMixedSessionTests: XCTestCase {
     }
     private func answer(_ model: GrammarPracticeViewModel, correct: Bool = true) throws {
         let e = try XCTUnwrap(model.currentExercise)
-        if e.kind == .formProduction { model.textAnswer = correct ? e.correctAnswer : "wrong"; model.checkForm() }
+        if e.kind == .formProduction { model.textAnswer = correct ? e.correctAnswer : try XCTUnwrap(e.options.first { !e.accepts($0.id) }?.text); model.checkForm() }
         else if e.kind == .assembleSentence {
             let order = correct ? try XCTUnwrap(e.acceptedOrders?.first) : [e.options.last!.id]
             for id in order { model.toggleElement(id) }
@@ -96,7 +96,9 @@ final class GrammarMixedSessionTests: XCTestCase {
         let source = try await rules().filter { $0.level == .n5 }
         let now = Date()
         var progress = StudyProgressStore(records: [:])
-        _ = try progress.apply(.again, to: "grammar:tai", deckID: "grammar:n5", options: DeckOptions(), now: now.addingTimeInterval(-3600))
+        // Introduce the learning card on the preceding day. A same-day introduction
+        // already consumes the single new-card allowance this fixture is testing.
+        _ = try progress.apply(.again, to: "grammar:tai", deckID: "grammar:n5", options: DeckOptions(), now: now.addingTimeInterval(-86400))
         _ = try progress.apply(.easy, to: "grammar:wa", deckID: "grammar:n5", options: DeckOptions(), now: now.addingTimeInterval(-30 * 86400))
         var options = DeckOptions(); options.dailyNewCardLimit = 0
         let candidates = GrammarSessionPlanner.candidates(rules: source, levels: [.n5], scope: .mixed,

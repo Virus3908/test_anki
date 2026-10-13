@@ -3,6 +3,55 @@ import XCTest
 
 @MainActor
 final class GrammarSentenceBankTests: XCTestCase {
+    func testEveryN5RuleHasFiveDistinctContextsWithOfflinePreparedRussianAndRuby() async throws {
+        let rules = try await GrammarDataLoader().rules(.n5)
+        let bank = try await GrammarDataLoader.shared.loadSentenceBank()
+        XCTAssertEqual(rules.count, 81)
+        XCTAssertEqual(rules.reduce(0) { $0 + $1.studyExamples.count }, 163)
+        for rule in rules {
+            XCTAssertGreaterThanOrEqual(Set((rule.examples + rule.studyExamples).map(\.ja)).count, 5, rule.id)
+            for example in rule.studyExamples {
+                XCTAssertFalse(try XCTUnwrap(example.ru).isEmpty)
+                XCTAssertNotNil(example.ruby)
+                XCTAssertEqual(example.preparationStatus, "assistantPrepared")
+                XCTAssertTrue(example.ja.contains(try XCTUnwrap(example.targetConstruction)))
+                XCTAssertFalse(try XCTUnwrap(example.skillRU).isEmpty)
+                XCTAssertTrue(example.sources?.allSatisfy { !$0.sentenceID.isEmpty && !$0.license.isEmpty && !$0.url.isEmpty } == true)
+                XCTAssertEqual(example.translationSources?.first?.status, "assistantPrepared")
+            }
+            for reference in rule.studyExampleReferences ?? [] {
+                let usage = try XCTUnwrap(bank.usages.first { $0.id == reference.usageID })
+                XCTAssertEqual(usage.ruleID, rule.id); XCTAssertFalse(usage.eligibleForScoring)
+                let sentence = try XCTUnwrap(bank.sentences.first { $0.id == usage.sentenceID })
+                let span = try XCTUnwrap(usage.targetSpan)
+                let target = String(bytes: sentence.japanese.utf8.dropFirst(span.startUTF8)
+                    .prefix(span.endUTF8 - span.startUTF8), encoding: .utf8)
+                XCTAssertEqual(target, reference.targetConstruction)
+            }
+        }
+    }
+    func testNewN5FormLessonsHaveProvenKeysAndRotateContextsWithoutDuplicates() async throws {
+        for id in ["masu", "nai", "ta", "te"] {
+            let loaded = try await GrammarDataLoader.shared.rule(id)
+            let rule = try XCTUnwrap(loaded)
+            let exercises = try XCTUnwrap(rule.exercises)
+            XCTAssertEqual(exercises.count, 8)
+            XCTAssertEqual(Set(exercises.map(\.kind)), [.formProduction, .fillBlank])
+            for exercise in exercises {
+                XCTAssertTrue(exercise.validConjugation)
+                XCTAssertEqual(exercise.provenance?.status, .algorithmicallyChecked)
+                XCTAssertNil(exercise.reviewer)
+                for option in exercise.options where !exercise.accepts(option.id) { XCTAssertNotNil(option.feedbackRU) }
+            }
+            let first = GrammarExerciseEngine.plan(rule: rule, seed: "stable", isReview: true, attempt: 0, previousRating: .good)
+            let next = GrammarExerciseEngine.plan(rule: rule, seed: "stable", isReview: true, attempt: 1, previousRating: .good)
+            for kind in [GrammarExerciseKind.formProduction, .fillBlank] {
+                XCTAssertNotEqual(first.exercises.first { $0.kind == kind }?.id, next.exercises.first { $0.kind == kind }?.id)
+            }
+            let sentenceIDs = (first.exercises + first.reserve).compactMap(\.sentenceID)
+            XCTAssertEqual(Set(sentenceIDs).count, sentenceIDs.count)
+        }
+    }
     func testAllRulesResolveNormalizedExamplesAndExistingExercisesOffline() async throws {
         let loader = GrammarDataLoader()
         let bank = try await loader.loadSentenceBank()

@@ -287,7 +287,7 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
         let correct = practice.results.last?.isCorrect == true
         let unverified = practice.results.last?.assessment == .differsFromSample
         return VStack(alignment: .leading, spacing: 8) {
-            Label(correct ? "Верно" : unverified ? "Отличается от образца" : "Ошибка проверяемой формы", systemImage: correct ? "checkmark.circle" : unverified ? "info.circle" : "xmark.circle")
+            Label(correct ? "Верно" : unverified ? "Отличается от образца" : practice.results.last?.assessment == .incorrectForm ? "Ошибка проверяемой формы" : "Проверяемый ответ неверен", systemImage: correct ? "checkmark.circle" : unverified ? "info.circle" : "xmark.circle")
                 .foregroundStyle(correct ? AppPalette.success : AppPalette.correction).font(.headline)
             if !correct {
                 FuriganaText(text: exercise.correctAnswer, furigana: exercise.ruby(for: exercise.correctAnswer), showsFurigana: settings.showExampleFurigana).font(.title3)

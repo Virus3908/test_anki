@@ -13,7 +13,7 @@ nonisolated enum GrammarAnswerValidator {
     static func assess(_ text: String, for exercise: GrammarExercise) -> Assessment {
         guard exercise.isUsable(for: exercise.ruleID) else { return .differsFromSample }
         if exercise.kind == .restoreSentence {
-            let keys = exercise.acceptedAnswers ?? exercise.options.filter { exercise.accepts($0.id) }.map(\.text)
+            let keys = exercise.options.filter { exercise.accepts($0.id) }.map(\.text) + (exercise.acceptedAnswers ?? [])
             return keys.contains { normalizeSentence($0, testsPunctuation: exercise.testsPunctuation == true)
                 == normalizeSentence(text, testsPunctuation: exercise.testsPunctuation == true) }
                 ? .correct : .differsFromSample

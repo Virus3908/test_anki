@@ -35,9 +35,10 @@ final class GrammarPracticeTests: XCTestCase {
     }
     func testExplicitSentenceAlternativesAreCheckedIndividuallyAndDecode() throws {
         var exercise = sentenceExercise("友達にこの本を読んでほしいです。")
-        exercise.acceptedAnswers = [exercise.correctAnswer, "この本を友達に読んでほしいです。"]
+        exercise.acceptedAnswers = ["この本を友達に読んでほしいです。"]
         let decoded = try JSONDecoder().decode(GrammarExercise.self, from: JSONEncoder().encode(exercise))
         XCTAssertTrue(GrammarAnswerValidator.accepts("この本を友達に読んでほしいです", for: decoded))
+        XCTAssertTrue(GrammarAnswerValidator.accepts(exercise.correctAnswer, for: decoded))
         XCTAssertFalse(GrammarAnswerValidator.accepts("この本に友達を読んでほしいです", for: decoded))
     }
     func testUnverifiedFreeInputCannotProduceFSRSRating() async throws {
@@ -283,7 +284,7 @@ final class GrammarPracticeTests: XCTestCase {
         let all = try await GrammarDataLoader.shared.allRules()
         XCTAssertEqual(all.count, 526)
         XCTAssertEqual(all.filter { GrammarExerciseEngine.hasPractice($0) }.count, 526)
-        XCTAssertEqual(all.filter { GrammarExerciseEngine.hasExtendedPractice($0) }.count, 10)
+        XCTAssertEqual(all.filter { GrammarExerciseEngine.hasExtendedPractice($0) }.count, 14)
         XCTAssertEqual(all.flatMap { GrammarExerciseEngine.basicExercises(for: $0) }.count, 1526)
         for rule in all where rule.teaching == nil {
             let model = GrammarPracticeViewModel(rule: rule, seed: "basic")
@@ -333,7 +334,7 @@ final class GrammarPracticeTests: XCTestCase {
     }
     private func answer(_ model: GrammarPracticeViewModel, exercise: GrammarExercise, correct: Bool) {
         if exercise.kind == .formProduction {
-            model.textAnswer = correct ? exercise.correctAnswer : "неверный ответ"
+            model.textAnswer = correct ? exercise.correctAnswer : (exercise.options.first { !exercise.accepts($0.id) }?.text ?? "неверный ответ")
             model.checkForm()
         } else if exercise.kind == .assembleSentence {
             let order = correct ? exercise.acceptedOrders!.first! : [exercise.options.last!.id]

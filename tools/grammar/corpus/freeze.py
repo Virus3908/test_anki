@@ -43,8 +43,10 @@ def freeze():
                 'meaningEN': rule['meaning'], 'formation': rule['formation'],
                 'candidateContextCount': count, 'targetAnnotatedCandidates': sum(u['targetSpan'] is not None for u in contexts),
                 'existingAuthoredExercises': len(lessons.get(rule['id'], {}).get('exercises', [])),
+                **({'preparedReferenceExamples': len(lessons[rule['id']]['referenceExamples'])}
+                   if lessons.get(rule['id'], {}).get('referenceExamples') else {}),
                 'linguisticallyReviewedContexts': reviewed_count,
-                'readyForScoring': reviewed_count >= 5 and rule['id'] in lessons
+                'readyForScoring': reviewed_count >= 5 and bool(lessons.get(rule['id'], {}).get('teaching'))
                     and len(lessons.get(rule['id'], {}).get('exercises', [])) >= 4,
                 'needed': ['semantic sense/register review', 'verified target span and meaningful segments',
                     'offline Russian explanation/translations', 'diagnostic alternatives and accepted variants'],
@@ -56,7 +58,7 @@ def freeze():
         by_level[level] = {'rules': len(source), 'candidateUsages': sum(p['candidateContextCount'] for p in packets),
             'rulesWithFiveCandidates': sum(p['candidateContextCount'] >= 5 for p in packets),
             'reviewedRules': sum(p['readyForScoring'] for p in packets), 'existingAuthoredExercises': sum(p['existingAuthoredExercises'] for p in packets)}
-        print(level, len(source), by_level[level]['candidateUsages'], 'reviewed=0')
+        print(level, len(source), by_level[level]['candidateUsages'], 'reviewed=' + str(by_level[level]['reviewedRules']))
     known_translations = [t for s in sentences.values() for t in s['translations']]
     rus = sum(any(t['language'] == 'rus' for t in s['translations']) for s in sentences.values())
     report = {'processedRules': len(totals), 'uniqueCandidateSentences': len(sentences),
@@ -74,6 +76,22 @@ def freeze():
     report['publishedExercisesByLevel'] = manifest['exercisesByLevel']
     report['publishedTemplateCount'] = len(bank['templates'])
     report['publishedUniqueSentences'] = len(bank['sentences'])
+    report['preparedReferenceExamples'] = sum(len(l.get('referenceExamples', [])) for l in lessons.values())
+    report['preparedReferencesAreNotLinguisticReview'] = True
+    report['publishedTeachingCoverage'] = {}
+    for level in COUNTS:
+        resource = json.loads((ROOT / 'kanji_test/Data/Grammar' / ('grammar-' + level.lower() + '.json')).read_text())
+        rules = resource['rules']
+        def contexts(rule):
+            return {ref['sentenceID'] for ref in rule.get('exampleReferences', []) + rule.get('studyExampleReferences', [])}
+        report['publishedTeachingCoverage'][level] = {
+            'rules': len(rules),
+            'exampleReferences': sum(len(r.get('exampleReferences', [])) + len(r.get('studyExampleReferences', [])) for r in rules),
+            'rulesWithAtLeastFiveExamples': sum(len(contexts(r)) >= 5 for r in rules),
+            'rulesWithExtendedPractice': sum(bool(r.get('exerciseTemplateIDs')) for r in rules),
+            'scoredExerciseCount': sum(len(r.get('exerciseTemplateIDs', [])) for r in rules),
+            'sourceRestorationCount': sum(len(r.get('exampleReferences', [])) for r in rules if not r.get('exerciseTemplateIDs')),
+            'completeRules': by_level[level]['reviewedRules']}
     report['exerciseFuriganaFraction'] = sum(bool(e.get('furigana')) for e in bank['templates'].values()) / len(bank['templates'])
     report['furiganaFractionDefinition'] = 'At least one explicitly annotated text in an existing authored exercise; not full glyph coverage'
     write(folder / 'excluded-from-scoring.json', {'reason': 'Semantic mapping/translation/segments not reviewed; morphology is not sufficient',

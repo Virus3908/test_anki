@@ -13,6 +13,18 @@ nonisolated enum GrammarExerciseEngine {
                 && ($0.sentenceID.map { seenSentences.insert($0).inserted } ?? true)
         }
         let complexity = min(3, max(1, rule.teaching?.complexity ?? 2))
+        // Attempts come from the existing review record. Rotate contexts within a skill,
+        // independently of changing presentation seeds; never write a synthetic review.
+        var rotationRank: [String: Int] = [:]
+        for kind in GrammarExerciseKind.allCases {
+            for difficulty in 1...3 {
+                let group = available.filter { $0.kind == kind && $0.difficulty == difficulty }
+                    .sorted { ($0.sentenceID ?? $0.id) < ($1.sentenceID ?? $1.id) }
+                for (index, exercise) in group.enumerated() {
+                    rotationRank[exercise.id] = (index - max(0, attempt) % group.count + group.count) % group.count
+                }
+            }
+        }
         let hasProduction = available.contains { $0.kind == .formProduction }
         let target = isReview ? min(4, 2 + complexity + (previousRating == .again ? 1 : 0))
             : min(6, 3 + complexity + (hasProduction ? 1 : 0))
@@ -26,6 +38,9 @@ nonisolated enum GrammarExerciseEngine {
             if !isReview {
                 let pa = stage(a.element.kind), pb = stage(b.element.kind)
                 if pa != pb { return pa < pb }
+            }
+            if rotationRank[a.element.id] != rotationRank[b.element.id] {
+                return (rotationRank[a.element.id] ?? 0) < (rotationRank[b.element.id] ?? 0)
             }
             return a.offset < b.offset
         }.map(\.element)

@@ -29,7 +29,7 @@ def authored(rule, all_rules):
         return approved
     result = []
     ruby = json.loads(Path(__file__).with_name('furigana.json').read_text())['texts']
-    for index, exercise in enumerate(lesson['exercises']):
+    for index, exercise in enumerate(lesson.get('exercises', [])):
         value = dict(exercise)
         value.update(id=f'{rule["id"]}:{exercise["slug"]}', ruleID=rule['id'], isScored=True,
                      provenance={'commit': COMMIT, 'sourceRuleID': rule['id'],

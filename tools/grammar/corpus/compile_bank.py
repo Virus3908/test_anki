@@ -12,10 +12,13 @@ def identity(text, prefix):
 
 def build(rules):
     from corpus.publish import approved_material
+    from author_exercises import materials
     approved_sentences, approved_usages, approved_exercises = approved_material()
     texts, sentences, templates, usages = {}, {}, {}, []
+    candidates = {}
     for line in (Path(__file__).parent / 'source-candidates.jsonl').read_text().splitlines():
         s = json.loads(line)
+        candidates[s['id']] = s
         # Publish existing OpenJLPT examples only; harvesting/review corpus stays outside Bundle.
         sources = [x for x in s['sources'] if x['name'] == 'OpenJLPT']
         if not sources: continue
@@ -52,6 +55,46 @@ def build(rules):
         rule['exampleReferences'] = [{'sentenceID': identity(e['ja'], 'gs:'),
             'translationID': rule['id'] + ':example:' + str(i) + ':en', 'furigana': e.get('furigana'),
             'translationRU': e.get('ru')} for i, e in enumerate(rule['examples'])]
+        lesson = materials().get(rule['id'], {})
+        references = []
+        preparation = lesson.get('referencePreparation', {})
+        for index, (original, russian, reading, target) in enumerate(lesson.get('referenceExamples', [])):
+            if preparation.get('status') != 'assistantPrepared' or not russian or not reading or not target:
+                raise ValueError('Reference preparation must be explicit; it is not independent review')
+            if original.startswith('gs:'):
+                candidate = candidates[original]
+                # This path admits explicit source examples only, never morphology-only/Tatoeba matches.
+                sources = [s for s in candidate['sources'] if s['name'] in ('OpenJLPT', 'Nihongo Mono')]
+                if not sources: raise ValueError('Reference needs an original teaching source')
+                if original not in sentences:
+                    sentences[original] = {k: candidate[k] for k in ('id', 'japanese')}
+                    sentences[original].update(sources=sources, translations=candidate['translations'], status='sourceExample')
+                sid = original
+            else:
+                sid = add_sentence(original, rule)
+            sentence = sentences[sid]
+            ja = sentence['japanese']
+            import re
+            if re.sub(r'\[([^\[\]|]+)\|[^\[\]]+\]', lambda m: m[1], reading).encode() != ja.encode():
+                raise ValueError('Reference ruby must reconstruct exact original bytes')
+            if target not in ja or ja.count(target) != 1:
+                raise ValueError('Reference target must be an explicit unambiguous span: ' + rule['id'])
+            tid = identity(russian, 'ru:')
+            if not any(t['id'] == tid for t in sentence['translations']):
+                sentence['translations'].append({'id': tid, 'language': 'rus', 'text': russian,
+                    'license': 'CC-BY-SA-4.0', 'author': 'test_anki assistant preparation',
+                    'url': 'https://github.com/Virus3908/test_anki/blob/feature/grammar-learning/tools/grammar/lessons.json',
+                    'status': 'assistantPrepared'})
+            uid = rule['id'] + ':reference:' + str(index)
+            start = len(ja[:ja.index(target)].encode())
+            usages.append({'id': uid, 'ruleID': rule['id'], 'sentenceID': sid, 'segments': [],
+                'targetSpan': {'startUTF8': start, 'endUTF8': start + len(target.encode())},
+                'skillRU': preparation['skillRU'], 'status': 'assistantPrepared', 'eligibleForScoring': False,
+                'evidence': preparation['method']})
+            references.append({'sentenceID': sid, 'translationID': tid, 'furigana': reading,
+                'usageID': uid, 'status': 'assistantPrepared', 'targetConstruction': target,
+                'skillRU': preparation['skillRU']})
+        if references: rule['studyExampleReferences'] = references
         ids = []
         for e in rule.get('exercises', []):
             value = json.loads(json.dumps(e))
@@ -122,4 +165,12 @@ def hydrate_resource(resource, bank):
                     'furigana': ref.get('furigana'), 'ru': ref.get('translationRU')})
         if 'exerciseTemplateIDs' in rule:
             rule['exercises'] = [expand(bank['templates'][eid], bank['texts'], sentences) for eid in rule['exerciseTemplateIDs']]
+        if 'studyExampleReferences' in rule:
+            rule['studyExamples'] = []
+            for ref in rule['studyExampleReferences']:
+                sentence = sentences[ref['sentenceID']]
+                translation = next(t for t in sentence['translations'] if t['id'] == ref['translationID'])
+                if translation['language'] != 'rus': raise ValueError('Prepared reference needs Russian translation')
+                rule['studyExamples'].append({'ja': sentence['japanese'], 'ru': translation['text'],
+                    'furigana': ref['furigana'], 'status': ref['status'], 'targetConstruction': ref['targetConstruction']})
     return resource

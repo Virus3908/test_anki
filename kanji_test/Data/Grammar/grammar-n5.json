@@ -104,6 +104,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:dae886409f46a40faa88d931",
+          "translationID": "ru:fd7b6ac5d34a911715e0990a",
+          "furigana": "この[道|みち]は[夜|よる]も[明|あか]るいです。",
+          "usageID": "wa:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "は",
+          "skillRU": "Объясни роль конструкции 〜は в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:f6f1b15fdf89ffa5286dedb6",
+          "translationID": "ru:27ab6d7e7ccf6183407af60b",
+          "furigana": "[弟|おとうと]はまだ[小学生|しょうがくせい]です。",
+          "usageID": "wa:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "は",
+          "skillRU": "Объясни роль конструкции 〜は в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": [
         "wa:topic",
         "wa:context",
@@ -166,6 +186,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:bc3d45bb6a45d2024f1c4aa7",
+          "translationID": "ru:ac15777561abad07f78c1a08",
+          "furigana": "[向|む]こうからバスが[来|き]ました。",
+          "usageID": "ga-subject:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "が",
+          "skillRU": "Объясни роль конструкции 〜が（subject） в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:f5d3a135af57f511f1c2b9b4",
+          "translationID": "ru:f9828035bc94eefa5db12295",
+          "furigana": "[誰|だれ]がこの[絵|え]を[描|か]きましたか。",
+          "usageID": "ga-subject:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "が",
+          "skillRU": "Объясни роль конструкции 〜が（subject） в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -217,6 +257,26 @@
           "translationID": "o:example:2:en",
           "furigana": "{公園|こうえん}を{散歩|さんぽ}しました。",
           "translationRU": null
+        }
+      ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:c19473e48f881c3727efafee",
+          "translationID": "ru:3e75082f6096627603ec6182",
+          "furigana": "[毎朝|まいあさ][新聞|しんぶん]を[読|よ]みます。",
+          "usageID": "o:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "を",
+          "skillRU": "Объясни роль конструкции 〜を в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:e7e555ad8ec8ac129cd806f5",
+          "translationID": "ru:acd6eadbaceffc3791798b43",
+          "furigana": "[公園|こうえん]を[散歩|さんぽ]します。",
+          "usageID": "o:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "を",
+          "skillRU": "Объясни роль конструкции 〜を в контексте, затем сравни с переводом."
         }
       ],
       "exerciseTemplateIDs": []
@@ -274,6 +334,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:2c1b38ed9385d366049ca71b",
+          "translationID": "ru:01b10b86ec3537b69c492596",
+          "furigana": "[会議|かいぎ]は[午後|ごご][二時|にじ]に[始|はじ]まります。",
+          "usageID": "ni-time:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "に",
+          "skillRU": "Объясни роль конструкции 〜に（time） в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:bc751e5622462758a767dcc6",
+          "translationID": "ru:3ea054cd8567fa1e5ec19cb9",
+          "furigana": "[金曜日|きんようび]に[歯医者|はいしゃ]へ[行|い]きます。",
+          "usageID": "ni-time:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "に",
+          "skillRU": "Объясни роль конструкции 〜に（time） в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -325,6 +405,26 @@
           "translationID": "ni-destination:example:2:en",
           "furigana": "{来月|らいげつ}、{姉|あね}が{日本|にほん}に{来|き}ます。",
           "translationRU": null
+        }
+      ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:6cbec1bd090d3368cc74bf21",
+          "translationID": "ru:d6115a67a3e7f634fabe6bbe",
+          "furigana": "[封筒|ふうとう]に[手紙|てがみ]を[入|い]れました。",
+          "usageID": "ni-destination:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "に",
+          "skillRU": "Объясни роль конструкции 〜に（destination） в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:59bcafdb4dc98d6ecb422ceb",
+          "translationID": "ru:ecda8e06ce38244fa1f2f3c4",
+          "furigana": "バスはもう[駅|えき]に[着|つ]きました。",
+          "usageID": "ni-destination:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "に",
+          "skillRU": "Объясни роль конструкции 〜に（destination） в контексте, затем сравни с переводом."
         }
       ],
       "exerciseTemplateIDs": []
@@ -380,6 +480,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:e2d7645af0c02cb4704f9792",
+          "translationID": "ru:cde108655b2b51a3a8724073",
+          "furigana": "[切符|きっぷ]は[財布|さいふ]の[中|なか]にあります。",
+          "usageID": "ni-location:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "に",
+          "skillRU": "Объясни роль конструкции 〜に（place of existence） в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:08c5872819d54a10942b5c99",
+          "translationID": "ru:48ff7a9e174a45cebf3b0f0d",
+          "furigana": "[入口|いりぐち]に[係|かかり]の[人|ひと]がいます。",
+          "usageID": "ni-location:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "に",
+          "skillRU": "Объясни роль конструкции 〜に（place of existence） в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -431,6 +551,26 @@
           "translationID": "ni-indirect-object:example:2:en",
           "furigana": "{友達|ともだち}に{電話|でんわ}をかけました。",
           "translationRU": null
+        }
+      ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:e7dd0d804282e76342abceca",
+          "translationID": "ru:dcfefcb3304872149419fed4",
+          "furigana": "[先生|せんせい]に[質問|しつもん]しました。",
+          "usageID": "ni-indirect-object:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "に",
+          "skillRU": "Объясни роль конструкции 〜に（indirect object） в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:609b09dd79ae4de04ef2192b",
+          "translationID": "ru:19cf1b07e36ffddcb7eb6c25",
+          "furigana": "[祖母|そぼ]に[写真|しゃしん]を[送|おく]りました。",
+          "usageID": "ni-indirect-object:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "に",
+          "skillRU": "Объясни роль конструкции 〜に（indirect object） в контексте, затем сравни с переводом."
         }
       ],
       "exerciseTemplateIDs": []
@@ -488,6 +628,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:a03730c5c60723863efd3d53",
+          "translationID": "ru:cfee6be55d82171de203b01f",
+          "furigana": "[私|わたし]は[週|しゅう]に[二回|にかい]ジムに[行|い]きます。",
+          "usageID": "ni-frequency:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "週に",
+          "skillRU": "Объясни роль конструкции 〜に（frequency） в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:6680168619d10bb0f3bab693",
+          "translationID": "ru:68a1cde4b8301bebed242efa",
+          "furigana": "この[電車|でんしゃ]は[一時間|いちじかん]に[四本|よんほん][来|き]ます。",
+          "usageID": "ni-frequency:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "一時間に",
+          "skillRU": "Объясни роль конструкции 〜に（frequency） в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -541,6 +701,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:25600790641bfdcecc09007f",
+          "translationID": "ru:5521930fd659ac966a855268",
+          "furigana": "[海|うみ]へ[行|い]きたいです。",
+          "usageID": "e:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "へ",
+          "skillRU": "Объясни роль конструкции 〜へ в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:4218daaeeed8b1209017d593",
+          "translationID": "ru:eca86683a7bec6a91e49ba9b",
+          "furigana": "そろそろうちへ[帰|かえ]ります。",
+          "usageID": "e:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "へ",
+          "skillRU": "Объясни роль конструкции 〜へ в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -592,6 +772,26 @@
           "translationID": "de-place:example:2:en",
           "furigana": "{駅|えき}の{前|まえ}で{友達|ともだち}を{待|ま}ちました。",
           "translationRU": null
+        }
+      ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:5ef8bd5db43b7a802da56dbb",
+          "translationID": "ru:4643f09817ed5d4ef4171df7",
+          "furigana": "[台所|だいどころ]で[野菜|やさい]を[切|き]ります。",
+          "usageID": "de-place:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "で",
+          "skillRU": "Объясни роль конструкции 〜で（place of action） в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:c8d5d5eb5a57d2e85c6d671c",
+          "translationID": "ru:d81a95d6776e15ff39b16d8c",
+          "furigana": "[体育館|たいいくかん]で[試合|しあい]があります。",
+          "usageID": "de-place:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "で",
+          "skillRU": "Объясни роль конструкции 〜で（place of action） в контексте, затем сравни с переводом."
         }
       ],
       "exerciseTemplateIDs": []
@@ -649,6 +849,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:3489493bf9a5c500cb2ad0d1",
+          "translationID": "ru:481a91921cdfbb1fb90e73b7",
+          "furigana": "この[紙|かみ]をはさみで[切|き]ってください。",
+          "usageID": "de-means:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "で",
+          "skillRU": "Объясни роль конструкции 〜で（means） в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:4f654c309a1fdaacf624ae8b",
+          "translationID": "ru:5d0b33dfbb3a0c532e4620a9",
+          "furigana": "[昨日|きのう]は[自転車|じてんしゃ]で[病院|びょういん]へ[行|い]きました。",
+          "usageID": "de-means:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "で",
+          "skillRU": "Объясни роль конструкции 〜で（means） в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -704,6 +924,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:69ba6d804f853004090a7043",
+          "translationID": "ru:a7cbb083374e25cecf2087e3",
+          "furigana": "パンと[牛乳|ぎゅうにゅう]を[買|か]いました。",
+          "usageID": "to-and:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "と",
+          "skillRU": "Объясни роль конструкции 〜と（and） в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:079318474fa0e19b4a4f00ab",
+          "translationID": "ru:c2ef4b08d2a88c65687f8569",
+          "furigana": "[私|わたし]と[妹|いもうと]は[学生|がくせい]です。",
+          "usageID": "to-and:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "と",
+          "skillRU": "Объясни роль конструкции 〜と（and） в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -757,6 +997,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:5a18be659ab1cc1f496dd1cf",
+          "translationID": "ru:c8dcf5907eab463b250620f7",
+          "furigana": "[家族|かぞく]と[一緒|いっしょ]に[旅行|りょこう]します。",
+          "usageID": "to-with:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "と",
+          "skillRU": "Объясни роль конструкции 〜と（with） в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:6d01c27dfaf2ac3bb1a293c9",
+          "translationID": "ru:a52492983e05f7733552b831",
+          "furigana": "[先生|せんせい]と[日本語|にほんご]で[話|はな]しました。",
+          "usageID": "to-with:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "と",
+          "skillRU": "Объясни роль конструкции 〜と（with） в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -804,6 +1064,35 @@
           "translationID": "ya:example:1:en",
           "furigana": "スーパーで{肉|にく}や{野菜|やさい}を{買|か}いました。",
           "translationRU": null
+        }
+      ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:2f57beb2fc5d19fbe3c3c43e",
+          "translationID": "ru:2f4a01d61dbc0078a92d887f",
+          "furigana": "[冷蔵庫|れいぞうこ]に[卵|たまご]や[牛乳|ぎゅうにゅう]が[入|はい]っています。",
+          "usageID": "ya:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "や",
+          "skillRU": "Объясни роль конструкции 〜や в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:4f9389512bc460714d65781a",
+          "translationID": "ru:ca1c1125b03027f304a9bcb8",
+          "furigana": "[旅行|りょこう]には[薬|くすり]やタオルを[持|も]っていきます。",
+          "usageID": "ya:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "や",
+          "skillRU": "Объясни роль конструкции 〜や в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:0dc0f4ecb3aa210635c06263",
+          "translationID": "ru:7634e57b800df3f257b8e5fe",
+          "furigana": "[休|やす]みの[日|ひ]は[掃除|そうじ]や[洗濯|せんたく]をします。",
+          "usageID": "ya:reference:2",
+          "status": "assistantPrepared",
+          "targetConstruction": "や",
+          "skillRU": "Объясни роль конструкции 〜や в контексте, затем сравни с переводом."
         }
       ],
       "exerciseTemplateIDs": []
@@ -857,6 +1146,26 @@
           "translationID": "ka-or:example:2:en",
           "furigana": "{駅|えき}までバスかタクシーで{行|い}きます。",
           "translationRU": null
+        }
+      ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:5680593801e6e2a649cef6b4",
+          "translationID": "ru:a063c92a72b788d624760efc",
+          "furigana": "[住所|じゅうしょ]か[電話番号|でんわばんごう]を[書|か]いてください。",
+          "usageID": "ka-or:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "か",
+          "skillRU": "Объясни роль конструкции 〜か（or） в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:edfc4e0086bde5ae33472950",
+          "translationID": "ru:05d2e268e0a78910a2026389",
+          "furigana": "[昼休|ひるやす]みにパンかおにぎりを[買|か]います。",
+          "usageID": "ka-or:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "か",
+          "skillRU": "Объясни роль конструкции 〜か（or） в контексте, затем сравни с переводом."
         }
       ],
       "exerciseTemplateIDs": []
@@ -914,6 +1223,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:684d56052395351123aa617a",
+          "translationID": "ru:26393f86583e926238d1333d",
+          "furigana": "[田中|たなか]さんも[山田|やまだ]さんも[日本人|にほんじん]です。",
+          "usageID": "mo:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "田中さんも山田さんも",
+          "skillRU": "Объясни роль конструкции 〜も в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:30e52b18b246035b3ca09aca",
+          "translationID": "ru:7de0b229f2f208539742b928",
+          "furigana": "この[店|みせ]ではカードも[使|つか]えます。",
+          "usageID": "mo:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "も",
+          "skillRU": "Объясни роль конструкции 〜も в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -965,6 +1294,26 @@
           "translationID": "no:example:2:en",
           "furigana": "{駅|えき}の{近|ちか}くに{新|あたら}しい{店|みせ}があります。",
           "translationRU": null
+        }
+      ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:8e7d21727f43a8a194ce1ad9",
+          "translationID": "ru:71f259cb4869c6c0d54a5628",
+          "furigana": "これは[弟|おとうと]の[自転車|じてんしゃ]です。",
+          "usageID": "no:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "の",
+          "skillRU": "Объясни роль конструкции 〜の（possessive） в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:c33b944dbce65bb694cc5d99",
+          "translationID": "ru:67024e2073a08d0591b70a99",
+          "furigana": "[木|き]の[机|つくえ]を[買|か]いました。",
+          "usageID": "no:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "の",
+          "skillRU": "Объясни роль конструкции 〜の（possessive） в контексте, затем сравни с переводом."
         }
       ],
       "exerciseTemplateIDs": []
@@ -1024,6 +1373,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:7a78c49f5644dbf15aecffe0",
+          "translationID": "ru:c989799e4730a7aa8c74a964",
+          "furigana": "この[店|みせ]は[朝|あさ][八時|はちじ]から[開|あ]いています。",
+          "usageID": "kara-from:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "から",
+          "skillRU": "Объясни роль конструкции 〜から（from） в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:4ed8671f728a36c4ecd8e759",
+          "translationID": "ru:017b3b5f1c62dc11676e5601",
+          "furigana": "[空港|くうこう]からホテルまでバスで[行|い]きました。",
+          "usageID": "kara-from:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "から",
+          "skillRU": "Объясни роль конструкции 〜から（from） в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -1081,6 +1450,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:3f2fc6ab03d988637353e961",
+          "translationID": "ru:07146b9eeee91a9f77ea86a6",
+          "furigana": "この[電車|でんしゃ]は[横浜|よこはま]まで[行|い]きます。",
+          "usageID": "made:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "まで",
+          "skillRU": "Объясни роль конструкции 〜まで（until） в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:ae9f4db95a9ebd1af3896c1b",
+          "translationID": "ru:e70190ebb1c77f7371530daa",
+          "furigana": "[雨|あめ]がやむまでここで[待|ま]ちましょう。",
+          "usageID": "made:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "まで",
+          "skillRU": "Объясни роль конструкции 〜まで（until） в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -1136,6 +1525,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:59d202958583fd22ee175e8b",
+          "translationID": "ru:adea40d482e364ab87698468",
+          "furigana": "このバスは[空港|くうこう]へ[行|い]きますか。",
+          "usageID": "ka-question:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "か",
+          "skillRU": "Объясни роль конструкции 〜か（question） в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:3bb6576ba9362fcf84142705",
+          "translationID": "ru:c0d41f275c33830d2da23a7b",
+          "furigana": "[予約|よやく]は[必要|ひつよう]ですか。",
+          "usageID": "ka-question:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "か",
+          "skillRU": "Объясни роль конструкции 〜か（question） в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -1187,6 +1596,26 @@
           "translationID": "ne:example:2:en",
           "furigana": "{明日|あした}のテストは10{時|じ}からですね。",
           "translationRU": null
+        }
+      ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:b63157b68cd234b7d58a8667",
+          "translationID": "ru:e09201edf853b10fcfd3876c",
+          "furigana": "この[店|みせ]は[静|しず]かですね。",
+          "usageID": "ne:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "ね",
+          "skillRU": "Объясни роль конструкции 〜ね в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:f4dbcb82fce313026c9d0ffd",
+          "translationID": "ru:e643ef3ff226c756b48ddf9f",
+          "furigana": "[桜|さくら]がきれいですね。",
+          "usageID": "ne:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "ね",
+          "skillRU": "Объясни роль конструкции 〜ね в контексте, затем сравни с переводом."
         }
       ],
       "exerciseTemplateIDs": []
@@ -1244,6 +1673,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:db808399f60281ce2d79de22",
+          "translationID": "ru:69a4f07dea5f1ec4a2a9138f",
+          "furigana": "[鍵|かぎ]はテーブルの[上|うえ]にありますよ。",
+          "usageID": "yo:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "よ",
+          "skillRU": "Объясни роль конструкции 〜よ в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:6aef29168ab9fae2260fb5c1",
+          "translationID": "ru:a707ffa3ef3d4612ba53475e",
+          "furigana": "その[道|みち]は[危|あぶ]ないですよ。",
+          "usageID": "yo:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "よ",
+          "skillRU": "Объясни роль конструкции 〜よ в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -1299,6 +1748,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:f999d1a142503645d4cb8e15",
+          "translationID": "ru:3601f85f589325cab0d75c4c",
+          "furigana": "[今日|きょう]は[昨日|きのう]より[涼|すず]しいです。",
+          "usageID": "yori:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "より",
+          "skillRU": "Объясни роль конструкции 〜より в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:a0c89c09aa8d260617e8458f",
+          "translationID": "ru:d534c9e798599fbfb67308e9",
+          "furigana": "[電車|でんしゃ]で[行|い]くほうが[車|くるま]より[速|はや]いです。",
+          "usageID": "yori:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "より",
+          "skillRU": "Объясни роль конструкции 〜より в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -1347,6 +1816,26 @@
           "translationID": "no-hou-ga-yori:example:2:en",
           "furigana": "{夏|なつ}より{冬|ふゆ}の{方|ほう}が{好|す}きです。",
           "translationRU": null
+        }
+      ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:52288b452b01aa7912ecbb81",
+          "translationID": "ru:c69e777bc207ea8e68447fac",
+          "furigana": "[手紙|てがみ]より[電話|でんわ]の[方|ほう]が[早|はや]いです。",
+          "usageID": "no-hou-ga-yori:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "電話の方が",
+          "skillRU": "Объясни роль конструкции 〜の方が〜より в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:bcbe93280dda28e45cb858e0",
+          "translationID": "ru:2162cfe60b07b76e78aee8a7",
+          "furigana": "この[部屋|へや]の[方|ほう]が[隣|となり]の[部屋|へや]より[広|ひろ]いです。",
+          "usageID": "no-hou-ga-yori:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "この部屋の方が",
+          "skillRU": "Объясни роль конструкции 〜の方が〜より в контексте, затем сравни с переводом."
         }
       ],
       "exerciseTemplateIDs": []
@@ -1398,6 +1887,26 @@
           "translationID": "to-to-dochira-ga:example:2:en",
           "furigana": "「{山|やま}と{海|うみ}とどちらがいいですか。」「{海|うみ}の{方|ほう}がいいです。」",
           "translationRU": null
+        }
+      ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:4e6eb1bc63b274c7aead441f",
+          "translationID": "ru:1623813e0bea2b8cc86eaa9e",
+          "furigana": "[犬|いぬ]と[猫|ねこ]と、どちらが[好|す]きですか。",
+          "usageID": "to-to-dochira-ga:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "どちらが",
+          "skillRU": "Объясни роль конструкции 〜と〜とどちらが в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:72d7967faa267bc4faf44d66",
+          "translationID": "ru:59f5daa9dcc71c2affcec28b",
+          "furigana": "[電車|でんしゃ]とバスと、どちらが[速|はや]いですか。",
+          "usageID": "to-to-dochira-ga:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "どちらが",
+          "skillRU": "Объясни роль конструкции 〜と〜とどちらが в контексте, затем сравни с переводом."
         }
       ],
       "exerciseTemplateIDs": []
@@ -1452,6 +1961,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:f99302b167fcc4a5f4da2cd1",
+          "translationID": "ru:a330b4c636c9155b99a826ec",
+          "furigana": "[一年|いちねん]の[中|なか]で[八月|はちがつ]が[一番|いちばん][暑|あつ]いです。",
+          "usageID": "no-naka-de-ga-ichiban:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "一年の中で八月が一番",
+          "skillRU": "Объясни роль конструкции 〜の中で〜が一番 в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:816d6beef6f80a0d7049e2ef",
+          "translationID": "ru:c6b03620ad139864b884d8bf",
+          "furigana": "[家|いえ]の[中|なか]で[台所|だいどころ]が[一番|いちばん][明|あか]るいです。",
+          "usageID": "no-naka-de-ga-ichiban:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "家の中で台所が一番",
+          "skillRU": "Объясни роль конструкции 〜の中で〜が一番 в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -1503,6 +2032,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:89181340e1079c0e65c9cf6a",
+          "translationID": "ru:080b5dc59ecaff53d94eb384",
+          "furigana": "[母|はは]は[看護師|かんごし]です。",
+          "usageID": "desu:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "です",
+          "skillRU": "Объясни роль конструкции 〜です в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:007b4965c7e10ccfe3727883",
+          "translationID": "ru:b0a514887a6c89916aa86f8a",
+          "furigana": "この[傘|かさ]は[千円|せんえん]です。",
+          "usageID": "desu:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "です",
+          "skillRU": "Объясни роль конструкции 〜です в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -1552,6 +2101,26 @@
           "translationID": "da:example:2:en",
           "furigana": "{明日|あした}は{休|やす}みだから、ゆっくり{寝|ね}る。",
           "translationRU": null
+        }
+      ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:2a83c797609b4b032beb13ab",
+          "translationID": "ru:9396d2ccb8c9f373675290a0",
+          "furigana": "[今日|きょう]は[大切|たいせつ]な[日|ひ]だ。",
+          "usageID": "da:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "だ",
+          "skillRU": "Объясни роль конструкции 〜だ в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:4b0a4ed3ed715bfa14550a8f",
+          "translationID": "ru:e25a56de757e9ed68eaa4ca1",
+          "furigana": "ここは[昔|むかし]の[学校|がっこう]だ。",
+          "usageID": "da:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "だ",
+          "skillRU": "Объясни роль конструкции 〜だ в контексте, затем сравни с переводом."
         }
       ],
       "exerciseTemplateIDs": []
@@ -1609,6 +2178,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:7c6863ecbee6b61ab88ab6b0",
+          "translationID": "ru:b92a41529cc4145028e831bc",
+          "furigana": "これは[出口|でぐち]ではありません。",
+          "usageID": "de-wa-arimasen-ja-nai:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "ではありません",
+          "skillRU": "Объясни роль конструкции 〜ではありません / 〜じゃない в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:47e8fb28e161c90a4f2c5d9d",
+          "translationID": "ru:2de66c5461591503b5a3ab60",
+          "furigana": "その[話|はなし]は[本当|ほんとう]じゃない。",
+          "usageID": "de-wa-arimasen-ja-nai:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "じゃない",
+          "skillRU": "Объясни роль конструкции 〜ではありません / 〜じゃない в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -1662,6 +2251,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:61364a68ab74080dfb5ad4e2",
+          "translationID": "ru:8717e9b6cbb60ee246d3ba28",
+          "furigana": "[昨日|きのう]の[会議|かいぎ]は[三時|さんじ]まででした。",
+          "usageID": "deshita:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "でした",
+          "skillRU": "Объясни роль конструкции 〜でした в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:da00d7453ccba30ccd44d896",
+          "translationID": "ru:23470a876e9d7ea9514a5ec9",
+          "furigana": "[祖父|そふ]は[郵便局|ゆうびんきょく]の[職員|しょくいん]でした。",
+          "usageID": "deshita:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "でした",
+          "skillRU": "Объясни роль конструкции 〜でした в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -1690,12 +2299,47 @@
           "correctError",
           "assembleSentence"
         ],
-        "availableKinds": [],
-        "algorithmicForms": [],
+        "availableKinds": [
+          "formProduction",
+          "fillBlank"
+        ],
+        "algorithmicForms": [
+          "masu"
+        ],
         "sourceExampleCount": 3,
-        "status": "plannedNeedsAuthoring",
-        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "status": "algorithmicallyChecked",
+        "basis": "Explicit verb classes and conjugation keys; context authoring requires independent linguistic review",
         "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "teaching": {
+        "meaningRU": "Вежливая непрошедшая форма глагола",
+        "usageRU": "Для привычных действий и будущего в вежливой речи. Сама форма не различает настоящее и будущее.",
+        "formationRU": "Основа ます + ます; 行く → 行きます, 来る → 来ます.",
+        "example": {
+          "ja": "母は病院で働きます。",
+          "en": "My mother works at a hospital.",
+          "ru": "Мама работает в больнице.",
+          "furigana": "[母|はは]は[病院|びょういん]で[働|はたら]きます。"
+        },
+        "parts": [
+          {
+            "text": "母は",
+            "roleRU": "Тема: моя мама."
+          },
+          {
+            "text": "病院で",
+            "roleRU": "Место работы."
+          },
+          {
+            "text": "働きます",
+            "roleRU": "Вежливая непрошедшая форма 働く."
+          }
+        ],
+        "notesRU": [
+          "Проверка формы детерминирована по явно заданному классу глагола. Контексты и русский текст подготовлены ИИ; независимое лингвистическое ревью не выполнено."
+        ],
+        "contrastsRU": [],
+        "complexity": 2
       },
       "exampleReferences": [
         {
@@ -1717,7 +2361,36 @@
           "translationRU": null
         }
       ],
-      "exerciseTemplateIDs": []
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:319d02b5d2375df27d0ef6a9",
+          "translationID": "ru:78b6e02b587270a27d8d5eb9",
+          "furigana": "[週末|しゅうまつ]は[庭|にわ]の[花|はな]に[水|みず]をやります。",
+          "usageID": "masu:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "ます",
+          "skillRU": "Объясни роль конструкции 〜ます в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:42ce68e97241330b80c1353d",
+          "translationID": "ru:0db7efd44d35793ed8e1c6ff",
+          "furigana": "[来週|らいしゅう]からこの[会社|かいしゃ]で[働|はたら]きます。",
+          "usageID": "masu:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "ます",
+          "skillRU": "Объясни роль конструкции 〜ます в контексте, затем сравни с переводом."
+        }
+      ],
+      "exerciseTemplateIDs": [
+        "masu:form-0",
+        "masu:context-0",
+        "masu:form-1",
+        "masu:context-1",
+        "masu:form-2",
+        "masu:context-2",
+        "masu:form-3",
+        "masu:context-3"
+      ]
     },
     {
       "id": "masen",
@@ -1772,6 +2445,26 @@
           "translationID": "masen:example:2:en",
           "furigana": "{今晩|こんばん}はテレビを{見|み}ません。",
           "translationRU": null
+        }
+      ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:dd69fef187d0e3ba706b4cbe",
+          "translationID": "ru:4420c25c158d38ea3e7a7fd7",
+          "furigana": "この[電車|でんしゃ]はその[駅|えき]に[止|と]まりません。",
+          "usageID": "masen:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "ません",
+          "skillRU": "Объясни роль конструкции 〜ません в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:c374e26502c7a41b436e44d8",
+          "translationID": "ru:6d67f9b2fae34c6f18214775",
+          "furigana": "[今日|きょう]は[買|か]い[物|もの]をしません。",
+          "usageID": "masen:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "ません",
+          "skillRU": "Объясни роль конструкции 〜ません в контексте, затем сравни с переводом."
         }
       ],
       "exerciseTemplateIDs": []
@@ -1831,6 +2524,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:bdd651ef9cb34d26d0017c39",
+          "translationID": "ru:2643e03eeb59357ab6617bc2",
+          "furigana": "[昨日|きのう]は[魚|さかな]を[焼|や]きました。",
+          "usageID": "mashita:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "ました",
+          "skillRU": "Объясни роль конструкции 〜ました в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:e633f1c7698051c2ca493707",
+          "translationID": "ru:d7f1abaec43102d142d77dab",
+          "furigana": "[先月|せんげつ]、[運転|うんてん]を[習|なら]い[始|はじ]めました。",
+          "usageID": "mashita:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "ました",
+          "skillRU": "Объясни роль конструкции 〜ました в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -1888,6 +2601,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:ad751fc397f8dddc43b49f83",
+          "translationID": "ru:b435464ea6e335846bfa3e80",
+          "furigana": "[風邪|かぜ]で[授業|じゅぎょう]に[出|で]ませんでした。",
+          "usageID": "masen-deshita:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "ませんでした",
+          "skillRU": "Объясни роль конструкции 〜ませんでした в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:6e208be3302fec6d5a765200",
+          "translationID": "ru:c05f5a06b59628cbee88e3d9",
+          "furigana": "[昨夜|さくや]はよく[眠|ねむ]れませんでした。",
+          "usageID": "masen-deshita:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "ませんでした",
+          "skillRU": "Объясни роль конструкции 〜ませんでした в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -1918,12 +2651,51 @@
           "correctError",
           "assembleSentence"
         ],
-        "availableKinds": [],
-        "algorithmicForms": [],
+        "availableKinds": [
+          "formProduction",
+          "fillBlank"
+        ],
+        "algorithmicForms": [
+          "nai"
+        ],
         "sourceExampleCount": 3,
-        "status": "plannedNeedsAuthoring",
-        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "status": "algorithmicallyChecked",
+        "basis": "Explicit verb classes and conjugation keys; context authoring requires independent linguistic review",
         "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "teaching": {
+        "meaningRU": "Обычная отрицательная форма глагола",
+        "usageRU": "Отрицание в обычной речи. Это форма глагола, а не вежливая ません.",
+        "formationRU": "一段: убрать る и добавить ない; 五段: ряд あ + ない (う → わない); する → しない; 来る → 来ない.",
+        "example": {
+          "ja": "私は夜にコーヒーを飲まない。",
+          "en": "I do not drink coffee at night.",
+          "ru": "По вечерам я не пью кофе.",
+          "furigana": "[私|わたし]は[夜|よる]にコーヒーを[飲|の]まない。"
+        },
+        "parts": [
+          {
+            "text": "私は",
+            "roleRU": "Тема: говорящий."
+          },
+          {
+            "text": "夜に",
+            "roleRU": "Время."
+          },
+          {
+            "text": "コーヒーを",
+            "roleRU": "Объект."
+          },
+          {
+            "text": "飲まない",
+            "roleRU": "Обычное отрицание 飲む."
+          }
+        ],
+        "notesRU": [
+          "Проверка формы детерминирована по явно заданному классу глагола. Контексты и русский текст подготовлены ИИ; независимое лингвистическое ревью не выполнено."
+        ],
+        "contrastsRU": [],
+        "complexity": 2
       },
       "exampleReferences": [
         {
@@ -1945,7 +2717,36 @@
           "translationRU": null
         }
       ],
-      "exerciseTemplateIDs": []
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:f12170f4405b09c27bbf2827",
+          "translationID": "ru:a5f45b0feab02cd7f81caa12",
+          "furigana": "[今日|きょう]は[甘|あま]いものを[食|た]べない。",
+          "usageID": "nai:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "ない",
+          "skillRU": "Объясни роль конструкции 〜ない в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:21c052f89d6a2cb6b43246f7",
+          "translationID": "ru:d6a77e8c018bf5dc42fcce92",
+          "furigana": "この[時計|とけい]はもう[動|うご]かない。",
+          "usageID": "nai:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "ない",
+          "skillRU": "Объясни роль конструкции 〜ない в контексте, затем сравни с переводом."
+        }
+      ],
+      "exerciseTemplateIDs": [
+        "nai:form-0",
+        "nai:context-0",
+        "nai:form-1",
+        "nai:context-1",
+        "nai:form-2",
+        "nai:context-2",
+        "nai:form-3",
+        "nai:context-3"
+      ]
     },
     {
       "id": "ta",
@@ -1975,12 +2776,47 @@
           "correctError",
           "assembleSentence"
         ],
-        "availableKinds": [],
-        "algorithmicForms": [],
+        "availableKinds": [
+          "formProduction",
+          "fillBlank"
+        ],
+        "algorithmicForms": [
+          "ta"
+        ],
         "sourceExampleCount": 3,
-        "status": "plannedNeedsAuthoring",
-        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "status": "algorithmicallyChecked",
+        "basis": "Explicit verb classes and conjugation keys; context authoring requires independent linguistic review",
         "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "teaching": {
+        "meaningRU": "Обычная прошедшая форма глагола",
+        "usageRU": "Сообщение о завершённом действии в обычной речи. Не подменяй её непрошедшей формой или формой て.",
+        "formationRU": "一段: る → た; 五段: звуковые изменения как у て, но た/だ; 行く → 行った; 来る → 来た.",
+        "example": {
+          "ja": "昨夜、友達に電話した。",
+          "en": "I called a friend last night.",
+          "ru": "Прошлой ночью я позвонил другу.",
+          "furigana": "[昨夜|さくや]、[友達|ともだち]に[電話|でんわ]した。"
+        },
+        "parts": [
+          {
+            "text": "昨夜",
+            "roleRU": "Время в прошлом."
+          },
+          {
+            "text": "友達に",
+            "roleRU": "Адресат."
+          },
+          {
+            "text": "電話した",
+            "roleRU": "Обычная прошедшая форма 電話する."
+          }
+        ],
+        "notesRU": [
+          "Проверка формы детерминирована по явно заданному классу глагола. Контексты и русский текст подготовлены ИИ; независимое лингвистическое ревью не выполнено."
+        ],
+        "contrastsRU": [],
+        "complexity": 2
       },
       "relations": [
         {
@@ -2009,7 +2845,36 @@
           "translationRU": null
         }
       ],
-      "exerciseTemplateIDs": []
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:6f71b3b235746175c1af1264",
+          "translationID": "ru:e706e4453d6abc411f825367",
+          "furigana": "[川|かわ]の[向|む]こうに[新|あたら]しい[橋|はし]ができた。",
+          "usageID": "ta:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "た",
+          "skillRU": "Объясни роль конструкции 〜た в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:76109701f79b334929356124",
+          "translationID": "ru:1e97d0b6ee43cb157966dd7f",
+          "furigana": "[昨夜|さくや]、[台所|だいどころ]でコップを[割|わ]った。",
+          "usageID": "ta:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "た",
+          "skillRU": "Объясни роль конструкции 〜た в контексте, затем сравни с переводом."
+        }
+      ],
+      "exerciseTemplateIDs": [
+        "ta:form-0",
+        "ta:context-0",
+        "ta:form-1",
+        "ta:context-1",
+        "ta:form-2",
+        "ta:context-2",
+        "ta:form-3",
+        "ta:context-3"
+      ]
     },
     {
       "id": "mashou",
@@ -2067,6 +2932,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:f47817b41f83a68b1567e758",
+          "translationID": "ru:ca8ec93ac0d702de5e3f8be5",
+          "furigana": "[一緒|いっしょ]に[昼|ひる]ご[飯|はん]を[食|た]べましょう。",
+          "usageID": "mashou:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "ましょう",
+          "skillRU": "Объясни роль конструкции 〜ましょう в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:bd24b8c1a38e99cf812ecba7",
+          "translationID": "ru:3cc0111e5724094e165f0bb9",
+          "furigana": "[三時|さんじ]に[駅|えき]で[会|あ]いましょう。",
+          "usageID": "mashou:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "ましょう",
+          "skillRU": "Объясни роль конструкции 〜ましょう в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -2116,6 +3001,26 @@
           "translationID": "mashou-ka:example:2:en",
           "furigana": "{何|なん}{時|じ}に{会|あ}いましょうか。",
           "translationRU": null
+        }
+      ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:404ea353aa5f1fff3b0dd5d6",
+          "translationID": "ru:6432cfe867481a5590421ebc",
+          "furigana": "[駅|えき]まで[案内|あんない]しましょうか。",
+          "usageID": "mashou-ka:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "ましょうか",
+          "skillRU": "Объясни роль конструкции 〜ましょうか в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:405e74d8ab2fec9a3abb65e4",
+          "translationID": "ru:e740a1960d718ba7589ec1e0",
+          "furigana": "そろそろ[帰|かえ]りましょうか。",
+          "usageID": "mashou-ka:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "ましょうか",
+          "skillRU": "Объясни роль конструкции 〜ましょうか в контексте, затем сравни с переводом."
         }
       ],
       "exerciseTemplateIDs": []
@@ -2172,6 +3077,26 @@
           "translationID": "masen-ka:example:2:en",
           "furigana": "{明日|あした}、{公園|こうえん}を{散歩|さんぽ}しませんか。",
           "translationRU": null
+        }
+      ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:38774952b3570f5138d64b28",
+          "translationID": "ru:a8d3a31342805a4340cef57a",
+          "furigana": "[週末|しゅうまつ]に[映画|えいが]を[見|み]ませんか。",
+          "usageID": "masen-ka:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "ませんか",
+          "skillRU": "Объясни роль конструкции 〜ませんか в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:55727950cc137595137b7154",
+          "translationID": "ru:15ba1a5f1a5ce7ad517f899e",
+          "furigana": "お[茶|ちゃ]を[飲|の]みませんか。",
+          "usageID": "masen-ka:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "ませんか",
+          "skillRU": "Объясни роль конструкции 〜ませんか в контексте, затем сравни с переводом."
         }
       ],
       "exerciseTemplateIDs": []
@@ -2291,6 +3216,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:29fde229867c42f832c8e7ba",
+          "translationID": "ru:c6e94496b9413f8b3675c702",
+          "furigana": "[甘|あま]いものが[食|た]べたいです。",
+          "usageID": "tai:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "たい",
+          "skillRU": "Объясни роль конструкции 〜たい в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:4699da767533927a3c4df8ba",
+          "translationID": "ru:4187dbffaea37bb91e1e8db0",
+          "furigana": "[新|あたら]しい[靴|くつ]を[買|か]いたいです。",
+          "usageID": "tai:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "たい",
+          "skillRU": "Объясни роль конструкции 〜たい в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": [
         "tai:go",
         "tai:context",
@@ -2362,6 +3307,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:9b1dfa929a5dd107cf3ae6ef",
+          "translationID": "ru:8bc1a20fa7b28a69e02a7064",
+          "furigana": "[私|わたし]は[新|あたら]しいかばんがほしいです。",
+          "usageID": "ga-hoshii:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "がほしい",
+          "skillRU": "Объясни роль конструкции 〜がほしい в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:7bd4322e95337f80e7ded7ee",
+          "translationID": "ru:e81a250d3ff8ab514328f8e0",
+          "furigana": "[今|いま]、[時間|じかん]がほしいです。",
+          "usageID": "ga-hoshii:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "がほしい",
+          "skillRU": "Объясни роль конструкции 〜がほしい в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -2413,6 +3378,26 @@
           "translationID": "o-kudasai:example:2:en",
           "furigana": null,
           "translationRU": null
+        }
+      ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:06c2491fee6272f4945ee8c9",
+          "translationID": "ru:71d4b53285d8f864a54257fd",
+          "furigana": "この[赤|あか]いりんごをください。",
+          "usageID": "o-kudasai:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "をください",
+          "skillRU": "Объясни роль конструкции 〜をください в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:0551db2705d8e4764408ecc0",
+          "translationID": "ru:5187f187d37d22597ee9ec1a",
+          "furigana": "[領収書|りょうしゅうしょ]をください。",
+          "usageID": "o-kudasai:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "をください",
+          "skillRU": "Объясни роль конструкции 〜をください в контексте, затем сравни с переводом."
         }
       ],
       "exerciseTemplateIDs": []
@@ -2470,6 +3455,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:4e6fad36c2132fd1bee95382",
+          "translationID": "ru:e7d675c90ae7d4602e2d8e9b",
+          "furigana": "ここに[名前|なまえ]を[書|か]いてください。",
+          "usageID": "te-kudasai:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "てください",
+          "skillRU": "Объясни роль конструкции 〜てください в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:668b43650a514956ec4311f2",
+          "translationID": "ru:bc74de7f0e82cc2079580fbf",
+          "furigana": "もう[一度|いちど][言|い]ってください。",
+          "usageID": "te-kudasai:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "てください",
+          "skillRU": "Объясни роль конструкции 〜てください в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -2523,6 +3528,26 @@
           "translationID": "naide-kudasai:example:2:en",
           "furigana": "{心配|しんぱい}しないでください。",
           "translationRU": null
+        }
+      ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:78174b6c67db02178f3882c9",
+          "translationID": "ru:914474554bede9aedac58a09",
+          "furigana": "ここで[写真|しゃしん]を[撮|と]らないでください。",
+          "usageID": "naide-kudasai:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "ないでください",
+          "skillRU": "Объясни роль конструкции 〜ないでください в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:dd588460e21f353e24e6db18",
+          "translationID": "ru:7133814999e00e32fa45438a",
+          "furigana": "この[機械|きかい]に[触|さわ]らないでください。",
+          "usageID": "naide-kudasai:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "ないでください",
+          "skillRU": "Объясни роль конструкции 〜ないでください в контексте, затем сравни с переводом."
         }
       ],
       "exerciseTemplateIDs": []
@@ -2615,6 +3640,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:92ee6dd3102890fe4be7ebd2",
+          "translationID": "ru:ed8b8b62fbbcb6a0fc1ab5b9",
+          "furigana": "[鉛筆|えんぴつ]で[書|か]いてもいいです。",
+          "usageID": "te-mo-ii:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "てもいい",
+          "skillRU": "Объясни роль конструкции 〜てもいい в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:23733b2b6d78bdf07613afdb",
+          "translationID": "ru:f1ced3017101e36420fd8edf",
+          "furigana": "この[写真|しゃしん]を[友達|ともだち]に[見|み]せてもいいですか。",
+          "usageID": "te-mo-ii:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "てもいい",
+          "skillRU": "Объясни роль конструкции 〜てもいい в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": [
         "te-mo-ii:write",
         "te-mo-ii:context",
@@ -2673,6 +3718,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:65dc837cc589d4f3dcedcc38",
+          "translationID": "ru:275c08ebfa4172287b8d07fd",
+          "furigana": "ここで[写真|しゃしん]を[撮|と]ってはいけません。",
+          "usageID": "te-wa-ikenai:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "てはいけません",
+          "skillRU": "Объясни роль конструкции 〜てはいけない в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:ab021a8c734b7d3acb75a65f",
+          "translationID": "ru:aa5d76490c55ff320dc1130a",
+          "furigana": "[授業中|じゅぎょうちゅう]に[寝|ね]てはいけません。",
+          "usageID": "te-wa-ikenai:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "てはいけません",
+          "skillRU": "Объясни роль конструкции 〜てはいけない в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -2724,6 +3789,26 @@
           "translationID": "nakereba-naranai-nakute-wa-ikenai:example:2:en",
           "furigana": "{日本|にほん}では、{家|いえ}に{入|はい}る{前|まえ}にくつをぬがなければなりません。",
           "translationRU": null
+        }
+      ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:83274240a433b2b0a271ba5f",
+          "translationID": "ru:0ff0d0b0ad818f032c511b95",
+          "furigana": "[薬|くすり]を[毎日|まいにち][飲|の]まなければなりません。",
+          "usageID": "nakereba-naranai-nakute-wa-ikenai:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "なければなりません",
+          "skillRU": "Объясни роль конструкции 〜なければならない / 〜なくてはいけない в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:fe8760db8f8779430e8c1139",
+          "translationID": "ru:9eb316126b12bbdd140c1695",
+          "furigana": "[出|で]かける[前|まえ]に[窓|まど]を[閉|し]めなくてはいけません。",
+          "usageID": "nakereba-naranai-nakute-wa-ikenai:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "なくてはいけません",
+          "skillRU": "Объясни роль конструкции 〜なければならない / 〜なくてはいけない в контексте, затем сравни с переводом."
         }
       ],
       "exerciseTemplateIDs": []
@@ -2781,6 +3866,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:7321fe21d5b97bc982ff5dce",
+          "translationID": "ru:53d53cf996acbb97fc69b8f2",
+          "furigana": "[明日|あした]は[来|こ]なくてもいいです。",
+          "usageID": "nakute-mo-ii:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "なくてもいい",
+          "skillRU": "Объясни роль конструкции 〜なくてもいい в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:32feb3a12521750423928fa3",
+          "translationID": "ru:e1ad5d95916a8b1190c319ee",
+          "furigana": "[全部|ぜんぶ][食|た]べなくてもいい。",
+          "usageID": "nakute-mo-ii:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "なくてもいい",
+          "skillRU": "Объясни роль конструкции 〜なくてもいい в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -2830,6 +3935,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:646fcfd65e2792aa4625a9c9",
+          "translationID": "ru:fb41851a52b3001757b54cd6",
+          "furigana": "[今|いま]、[音楽|おんがく]を[聞|き]いています。",
+          "usageID": "te-iru:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "ています",
+          "skillRU": "Объясни роль конструкции 〜ている в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:acaac87ec31d3164c4722526",
+          "translationID": "ru:e0914c367bb577dd592bd875",
+          "furigana": "[私|わたし]は[毎朝|まいあさ]この[道|みち]を[歩|ある]いています。",
+          "usageID": "te-iru:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "ています",
+          "skillRU": "Объясни роль конструкции 〜ている в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -2852,12 +3977,47 @@
           "understandSentence",
           "distinguishMeaning"
         ],
-        "availableKinds": [],
-        "algorithmicForms": [],
+        "availableKinds": [
+          "formProduction",
+          "fillBlank"
+        ],
+        "algorithmicForms": [
+          "te"
+        ],
         "sourceExampleCount": 3,
-        "status": "plannedNeedsAuthoring",
-        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "status": "algorithmicallyChecked",
+        "basis": "Explicit verb classes and conjugation keys; context authoring requires independent linguistic review",
         "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "teaching": {
+        "meaningRU": "Связывание действий формой て",
+        "usageRU": "Форма て соединяет действия. В этих контекстах сначала выполняют действие до запятой, затем действие после неё.",
+        "formationRU": "一段: る → て; 五段: う/つ/る → って, む/ぶ/ぬ → んで, く → いて, ぐ → いで, す → して; 行く → 行って.",
+        "example": {
+          "ja": "店に入って、注文しました。",
+          "en": "I entered the shop and placed an order.",
+          "ru": "Я вошёл в магазин и сделал заказ.",
+          "furigana": "[店|みせ]に[入|はい]って、[注文|ちゅうもん]しました。"
+        },
+        "parts": [
+          {
+            "text": "店に",
+            "roleRU": "Место назначения."
+          },
+          {
+            "text": "入って",
+            "roleRU": "Первое действие: вошёл."
+          },
+          {
+            "text": "注文しました",
+            "roleRU": "Следующее действие: сделал заказ."
+          }
+        ],
+        "notesRU": [
+          "Проверка формы детерминирована по явно заданному классу глагола. Контексты и русский текст подготовлены ИИ; независимое лингвистическое ревью не выполнено."
+        ],
+        "contrastsRU": [],
+        "complexity": 2
       },
       "exampleReferences": [
         {
@@ -2879,7 +4039,36 @@
           "translationRU": null
         }
       ],
-      "exerciseTemplateIDs": []
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:940aa2a3ab048751dd906091",
+          "translationID": "ru:4cb7aad90eba49da65a7b0c3",
+          "furigana": "[電車|でんしゃ]を[降|お]りて、[出口|でぐち]へ[歩|ある]きました。",
+          "usageID": "te:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "降りて",
+          "skillRU": "Объясни роль конструкции 〜て в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:6423abf253654aa2e15275ed",
+          "translationID": "ru:da77ec097afc1987e7017397",
+          "furigana": "パンを[切|き]って、[皿|さら]に[載|の]せます。",
+          "usageID": "te:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "切って",
+          "skillRU": "Объясни роль конструкции 〜て в контексте, затем сравни с переводом."
+        }
+      ],
+      "exerciseTemplateIDs": [
+        "te:form-0",
+        "te:context-0",
+        "te:form-1",
+        "te:context-1",
+        "te:form-2",
+        "te:context-2",
+        "te:form-3",
+        "te:context-3"
+      ]
     },
     {
       "id": "te-kara",
@@ -2928,6 +4117,26 @@
           "translationID": "te-kara:example:2:en",
           "furigana": "{日本|にほん}に{来|き}てから、{毎日|まいにち}{日本語|にほんご}を{勉強|べんきょう}しています。",
           "translationRU": null
+        }
+      ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:cacbdc1b1fb84f57d07873a9",
+          "translationID": "ru:9663902e992d864f6439a132",
+          "furigana": "[仕事|しごと]が[終|お]わってから、[映画|えいが]を[見|み]に[行|い]きました。",
+          "usageID": "te-kara:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "てから",
+          "skillRU": "Объясни роль конструкции 〜てから в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:312ccdaf6cdd50779ce98d10",
+          "translationID": "ru:829141a8ba780e9367f4993f",
+          "furigana": "[電気|でんき]を[消|け]してから[寝|ね]てください。",
+          "usageID": "te-kara:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "てから",
+          "skillRU": "Объясни роль конструкции 〜てから в контексте, затем сравни с переводом."
         }
       ],
       "exerciseTemplateIDs": []
@@ -2979,6 +4188,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:98a3702dcd200cca8cd1d124",
+          "translationID": "ru:d1f049d113e5d7116ea020d1",
+          "furigana": "[部屋|へや]で[泣|な]いたり[笑|わら]ったりしました。",
+          "usageID": "tari-tari-suru:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "たり笑ったり",
+          "skillRU": "Объясни роль конструкции 〜たり〜たりする в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:b38ca880a0d349ee639b0042",
+          "translationID": "ru:d77ed337e43d7e50ba3d7aaf",
+          "furigana": "[冬休|ふゆやす]みはスキーをしたり[映画|えいが]を[見|み]たりします。",
+          "usageID": "tari-tari-suru:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "たり映画を見たり",
+          "skillRU": "Объясни роль конструкции 〜たり〜たりする в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -3026,6 +4255,26 @@
           "translationID": "ta-koto-ga-aru:example:2:en",
           "furigana": "{私|わたし}は{馬|うま}に{乗|の}ったことがありません。",
           "translationRU": null
+        }
+      ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:ef9455544763063dfdd6f880",
+          "translationID": "ru:e6b441d8d311dd716c5d83d1",
+          "furigana": "すしを[食|た]べたことがあります。",
+          "usageID": "ta-koto-ga-aru:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "たことがあります",
+          "skillRU": "Объясни роль конструкции 〜たことがある в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:f5062dfd6140cf1f3f35d8d5",
+          "translationID": "ru:a95a8593ac923af0c140f012",
+          "furigana": "[一度|いちど]も[遅刻|ちこく]したことがありません。",
+          "usageID": "ta-koto-ga-aru:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "たことがありません",
+          "skillRU": "Объясни роль конструкции 〜たことがある в контексте, затем сравни с переводом."
         }
       ],
       "exerciseTemplateIDs": []
@@ -3080,6 +4329,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:b8b7b57dda62b5057fbfb42f",
+          "translationID": "ru:20aa450147951959254e90e7",
+          "furigana": "[食事|しょくじ]の[前|まえ]に[手|て]を[洗|あら]います。",
+          "usageID": "mae-ni:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "前に",
+          "skillRU": "Объясни роль конструкции 〜前に в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:90c6a65986d740e1b2f4ea6f",
+          "translationID": "ru:2956a3bccb6f85308be22675",
+          "furigana": "[出|で]かける[前|まえ]に[天気|てんき]を[調|しら]べます。",
+          "usageID": "mae-ni:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "前に",
+          "skillRU": "Объясни роль конструкции 〜前に в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -3132,6 +4401,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:5b2e907be6eefc6c3e26cfe4",
+          "translationID": "ru:20d82cb046cd1ef9b9019636",
+          "furigana": "[宿題|しゅくだい]をしたあとで、[少|すこ]しテレビを[見|み]ます。",
+          "usageID": "ato-de:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "あとで",
+          "skillRU": "Объясни роль конструкции 〜後で в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:7d9e4281f0fa6ba6a4aa4e43",
+          "translationID": "ru:251505e64d1f61913d36d3b9",
+          "furigana": "[昼|ひる]ご[飯|はん]のあとで、コーヒーを[飲|の]みませんか。",
+          "usageID": "ato-de:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "あとで",
+          "skillRU": "Объясни роль конструкции 〜後で в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -3179,6 +4468,26 @@
           "translationID": "nagara:example:2:en",
           "furigana": "コーヒーを{飲|の}みながら{話|はな}しましょう。",
           "translationRU": null
+        }
+      ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:b3e25f1af605bc824093e710",
+          "translationID": "ru:69e3c20f49b8eb06aa4c2478",
+          "furigana": "お[茶|ちゃ]を[飲|の]みながら[話|はな]しましょう。",
+          "usageID": "nagara:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "ながら",
+          "skillRU": "Объясни роль конструкции 〜ながら（while） в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:5ddccbb39da5e67d05ee960b",
+          "translationID": "ru:08a417cd399523fbe84637d4",
+          "furigana": "[母|はは]は[歌|うた]いながら[料理|りょうり]をしています。",
+          "usageID": "nagara:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "ながら",
+          "skillRU": "Объясни роль конструкции 〜ながら（while） в контексте, затем сравни с переводом."
         }
       ],
       "exerciseTemplateIDs": []
@@ -3231,6 +4540,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:e7ef4f7b0dcb69427294bc72",
+          "translationID": "ru:a20baabdf37f5748e80bd588",
+          "furigana": "[友|とも]だちに[会|あ]いに[行|い]きます。",
+          "usageID": "ni-iku:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "会いに行きます",
+          "skillRU": "Объясни роль конструкции 〜に行く в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:7c97a1d50d0c37383b825977",
+          "translationID": "ru:7ddcc5268db9fc116bf6d26c",
+          "furigana": "デパートへ[買|か]い[物|もの]に[行|い]きました。",
+          "usageID": "ni-iku:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "買い物に行きました",
+          "skillRU": "Объясни роль конструкции 〜に行く в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -3279,6 +4608,26 @@
           "translationID": "ga-suki-ga-kirai:example:2:en",
           "furigana": "{母|はは}は{料理|りょうり}をするのが{好|す}きです。",
           "translationRU": null
+        }
+      ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:2174882d7f6dbb0d8f03a191",
+          "translationID": "ru:c7ee38ece995d46172cf4774",
+          "furigana": "[弟|おとうと]は[魚|さかな]が[好|す]きです。",
+          "usageID": "ga-suki-ga-kirai:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "が好き",
+          "skillRU": "Объясни роль конструкции 〜が好き / 〜が嫌い в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:5d5a07ac17b500db77b92bef",
+          "translationID": "ru:3d436c24b922da42e32e48d5",
+          "furigana": "[私|わたし]は[早起|はやお]きが[嫌|きら]いです。",
+          "usageID": "ga-suki-ga-kirai:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "が嫌い",
+          "skillRU": "Объясни роль конструкции 〜が好き / 〜が嫌い в контексте, затем сравни с переводом."
         }
       ],
       "exerciseTemplateIDs": []
@@ -3331,6 +4680,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:4af41acf6b8eba8de612a439",
+          "translationID": "ru:1f1e19f17e45233895e288d6",
+          "furigana": "[父|ちち]は[運転|うんてん]が[上手|じょうず]です。",
+          "usageID": "ga-jouzu-ga-heta:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "が上手",
+          "skillRU": "Объясни роль конструкции 〜が上手 / 〜が下手 в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:8712a20a9db2c0a3edf01586",
+          "translationID": "ru:2af4c3c0bc0fcd1afc3807ef",
+          "furigana": "[弟|おとうと]は[泳|およ]ぐのが[下手|へた]です。",
+          "usageID": "ga-jouzu-ga-heta:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "が下手",
+          "skillRU": "Объясни роль конструкции 〜が上手 / 〜が下手 в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -3380,6 +4749,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:4435d8ed2df61ad303d1448d",
+          "translationID": "ru:c1bd2467f7d4b7838f5f7ff3",
+          "furigana": "[庭|にわ]に[小|ちい]さい[池|いけ]があります。",
+          "usageID": "ga-aru-ga-iru:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "があります",
+          "skillRU": "Объясни роль конструкции 〜がある / 〜がいる в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:1d1fed8b5f7128160aa70eb9",
+          "translationID": "ru:9e3bd85428914f52e5fbb93f",
+          "furigana": "[受付|うけつけ]に[店員|てんいん]がいます。",
+          "usageID": "ga-aru-ga-iru:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "がいます",
+          "skillRU": "Объясни роль конструкции 〜がある / 〜がいる в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -3427,6 +4816,26 @@
           "translationID": "kara-reason:example:2:en",
           "furigana": "「どうして{休|やす}みましたか。」「{頭|あたま}が{痛|いた}かったからです。」",
           "translationRU": null
+        }
+      ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:238827b7caa09f48c361d58b",
+          "translationID": "ru:5cd5245eeb8f8e44503e66ec",
+          "furigana": "お[腹|なか]がすいたから、パンを[買|か]います。",
+          "usageID": "kara-reason:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "から",
+          "skillRU": "Объясни роль конструкции 〜から（reason） в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:ab65e9825ced3cdeda43c441",
+          "translationID": "ru:4d3938a27136bf05afd791be",
+          "furigana": "[雨|あめ]ですから、[試合|しあい]はありません。",
+          "usageID": "kara-reason:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "から",
+          "skillRU": "Объясни роль конструкции 〜から（reason） в контексте, затем сравни с переводом."
         }
       ],
       "exerciseTemplateIDs": []
@@ -3484,6 +4893,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:d48ca74e29798acc64405046",
+          "translationID": "ru:4216c2f29cea11fb5f49176f",
+          "furigana": "この[靴|くつ]は[軽|かる]いですが、[少|すこ]し[高|たか]いです。",
+          "usageID": "ga-but:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "が",
+          "skillRU": "Объясни роль конструкции 〜が（but） в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:6b6202aec72438989b9db200",
+          "translationID": "ru:6dec0ae8cfa21746dd47ee37",
+          "furigana": "バスは[便利|べんり]ですが、[朝|あさ]は[混|こ]みます。",
+          "usageID": "ga-but:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "が",
+          "skillRU": "Объясни роль конструкции 〜が（but） в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -3531,6 +4960,26 @@
           "translationID": "deshou:example:2:en",
           "furigana": null,
           "translationRU": null
+        }
+      ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:b783e802776c7acf90a7988c",
+          "translationID": "ru:e60797a23713723610100d59",
+          "furigana": "[明日|あした]は[晴|は]れるでしょう。",
+          "usageID": "deshou:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "でしょう",
+          "skillRU": "Объясни роль конструкции 〜でしょう в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:74850f45abac9f705332d523",
+          "translationID": "ru:b20507e9da513f716fe304c7",
+          "furigana": "この[時間|じかん]は[道|みち]が[混|こ]んでいるでしょう。",
+          "usageID": "deshou:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "でしょう",
+          "skillRU": "Объясни роль конструкции 〜でしょう в контексте, затем сравни с переводом."
         }
       ],
       "exerciseTemplateIDs": []
@@ -3582,6 +5031,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:4efd5fe19cafb6a801718146",
+          "translationID": "ru:790ec11de6278c7ac2b8b56b",
+          "furigana": "[秋|あき]になって、[日|ひ]が[短|みじか]くなりました。",
+          "usageID": "ku-naru-ni-naru:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "短くなりました",
+          "skillRU": "Объясни роль конструкции 〜くなる / 〜になる в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:1bb7894560cfecb5ef38f06a",
+          "translationID": "ru:6c5bc53855b97ddfa066ecb0",
+          "furigana": "[弟|おとうと]は[四月|しがつ]に[中学生|ちゅうがくせい]になります。",
+          "usageID": "ku-naru-ni-naru:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "中学生になります",
+          "skillRU": "Объясни роль конструкции 〜くなる / 〜になる в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -3629,6 +5098,26 @@
           "translationID": "ni-suru:example:2:en",
           "furigana": "{旅行|りょこう}は{来月|らいげつ}にしましょう。",
           "translationRU": null
+        }
+      ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:32ccb25f2c7882857ef4ac63",
+          "translationID": "ru:23a44738fe896f3bbd97e0e1",
+          "furigana": "[私|わたし]はコーヒーにします。",
+          "usageID": "ni-suru:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "にします",
+          "skillRU": "Объясни роль конструкции 〜にする（decide） в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:39a11651686828a4865554d5",
+          "translationID": "ru:2f33b0078d222b4a9c07463d",
+          "furigana": "[集合場所|しゅうごうばしょ]は[駅|えき]の[前|まえ]にしましょう。",
+          "usageID": "ni-suru:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "にしましょう",
+          "skillRU": "Объясни роль конструкции 〜にする（decide） в контексте, затем сравни с переводом."
         }
       ],
       "exerciseTemplateIDs": []
@@ -3686,6 +5175,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:a0c360309714cc615465f5ea",
+          "translationID": "ru:c61794c0254fd6befe5bbbf1",
+          "furigana": "まだ[切符|きっぷ]を[買|か]っていません。",
+          "usageID": "mada-te-inai:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "まだ切符を買っていません",
+          "skillRU": "Объясни роль конструкции まだ〜ていない в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:ab5be70f0f4ce740825443e8",
+          "translationID": "ru:ee4eba014ad0e93caba4463d",
+          "furigana": "[弟|おとうと]はまだ[帰|かえ]っていません。",
+          "usageID": "mada-te-inai:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "まだ帰っていません",
+          "skillRU": "Объясни роль конструкции まだ〜ていない в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -3735,6 +5244,26 @@
           "translationID": "mou-ta:example:2:en",
           "furigana": "{映画|えいが}はもう{始|はじ}まりましたよ。",
           "translationRU": null
+        }
+      ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:575293dfc5571d60d750fa5f",
+          "translationID": "ru:32efd38433eb157844e7ec0b",
+          "furigana": "もう[予約|よやく]しました。",
+          "usageID": "mou-ta:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "もう予約しました",
+          "skillRU": "Объясни роль конструкции もう〜た в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:874d127868827842d3e865d2",
+          "translationID": "ru:0e35fb94875a74ab1e484a18",
+          "furigana": "お[客|きゃく]さんはもう[帰|かえ]った。",
+          "usageID": "mou-ta:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "もう帰った",
+          "skillRU": "Объясни роль конструкции もう〜た в контексте, затем сравни с переводом."
         }
       ],
       "exerciseTemplateIDs": []
@@ -3790,6 +5319,26 @@
           "translationID": "amari-nai:example:2:en",
           "furigana": "{今日|きょう}はあまり{忙|いそが}しくありません。",
           "translationRU": null
+        }
+      ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:90bf19f715771ea39e1e4187",
+          "translationID": "ru:3f652d0ae1ecc4631b98497c",
+          "furigana": "この[映画|えいが]はあまり[面白|おもしろ]くなかったです。",
+          "usageID": "amari-nai:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "あまり面白くなかった",
+          "skillRU": "Объясни роль конструкции あまり〜ない в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:7489ad517c7adb99829e6aa6",
+          "translationID": "ru:ea3db77cda0a39697269e444",
+          "furigana": "[最近|さいきん]、あまりテレビを[見|み]ません。",
+          "usageID": "amari-nai:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "あまりテレビを見ません",
+          "skillRU": "Объясни роль конструкции あまり〜ない в контексте, затем сравни с переводом."
         }
       ],
       "exerciseTemplateIDs": []
@@ -3855,6 +5404,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:c2d52bb75b35631a8f95bf7b",
+          "translationID": "ru:797f5b9cc8073bd1dcab29df",
+          "furigana": "[漢字|かんじ]が[全然|ぜんぜん][読|よ]めません。",
+          "usageID": "zenzen-nai:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "全然読めません",
+          "skillRU": "Объясни роль конструкции 全然〜ない в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:649d275ab6b3b059dbd59a92",
+          "translationID": "ru:a36a6a5e544b846a74460c37",
+          "furigana": "このスープは[全然|ぜんぜん][熱|あつ]くないです。",
+          "usageID": "zenzen-nai:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "全然熱くない",
+          "skillRU": "Объясни роль конструкции 全然〜ない в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -3911,6 +5480,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:b1a88a2811352027f6fd61e5",
+          "translationID": "ru:7e7da95282cda27004dd214a",
+          "furigana": "[水|みず]だけ[飲|の]みました。",
+          "usageID": "dake:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "だけ",
+          "skillRU": "Объясни роль конструкции 〜だけ в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:7d1aae1e7c66cda502ce2169",
+          "translationID": "ru:6540ef4a1ad547063bb01fa8",
+          "furigana": "りんごを[一|ひと]つだけ[食|た]べました。",
+          "usageID": "dake:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "だけ",
+          "skillRU": "Объясни роль конструкции 〜だけ в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -3962,6 +5551,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:35df1edca4d261d73187b632",
+          "translationID": "ru:9bcdbdbcdc9b712bae191f9a",
+          "furigana": "[修理|しゅうり]には[三日|みっか]ぐらいかかります。",
+          "usageID": "kurai-gurai:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "ぐらい",
+          "skillRU": "Объясни роль конструкции 〜くらい / 〜ぐらい（approximately） в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:5c869f8790471040c9b2b65e",
+          "translationID": "ru:5e05aab77db4ab90d527cd78",
+          "furigana": "[教室|きょうしつ]には[二十人|にじゅうにん]くらいいます。",
+          "usageID": "kurai-gurai:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "くらい",
+          "skillRU": "Объясни роль конструкции 〜くらい / 〜ぐらい（approximately） в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -4009,6 +5618,26 @@
           "translationID": "goro:example:2:en",
           "furigana": "{夕方|ゆうがた}6{時|じ}ごろに{家|いえ}に{帰|かえ}ります。",
           "translationRU": null
+        }
+      ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:282015663eb6116746268cc6",
+          "translationID": "ru:7e9617b021d32facab12ea5e",
+          "furigana": "[荷物|にもつ]は[昼|ひる]ごろ[届|とど]きます。",
+          "usageID": "goro:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "ごろ",
+          "skillRU": "Объясни роль конструкции 〜ごろ в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:7a2492cf212a8f7e856f8fd5",
+          "translationID": "ru:9c8399038282e06d072f43db",
+          "furigana": "[来年|らいねん]の[春|はる]ごろ[引|ひ]っ[越|こ]します。",
+          "usageID": "goro:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "ごろ",
+          "skillRU": "Объясни роль конструкции 〜ごろ в контексте, затем сравни с переводом."
         }
       ],
       "exerciseTemplateIDs": []
@@ -4065,6 +5694,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:03543e0d07db7a55e1707ad4",
+          "translationID": "ru:d777b3dae9a1e3e9b8a57b64",
+          "furigana": "[今日|きょう]は[誰|だれ]も[来|き]ませんでした。",
+          "usageID": "nani-mo-nai-dare-mo-nai:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "誰も来ません",
+          "skillRU": "Объясни роль конструкции 何も〜ない / 誰も〜ない в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:4f59378f1e0d2cad7ef78256",
+          "translationID": "ru:09dcae8a639b158bd9d509cb",
+          "furigana": "[何|なに]も[持|も]ってきませんでした。",
+          "usageID": "nani-mo-nai-dare-mo-nai:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "何も持ってきません",
+          "skillRU": "Объясни роль конструкции 何も〜ない / 誰も〜ない в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -4113,6 +5762,26 @@
           "translationID": "nani-ka-dare-ka-doko-ka:example:2:en",
           "furigana": "{夏休|なつやす}みにどこかへ{行|い}きましたか。",
           "translationRU": null
+        }
+      ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:887e40b004f61fc0784a5639",
+          "translationID": "ru:d04cb7f74de2c141378906a2",
+          "furigana": "[誰|だれ]かが[窓|まど]を[開|あ]けました。",
+          "usageID": "nani-ka-dare-ka-doko-ka:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "誰か",
+          "skillRU": "Объясни роль конструкции 何か / 誰か / どこか в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:bc6e57b3e564d1fec881d178",
+          "translationID": "ru:d300788067f05dc5c75d360f",
+          "furigana": "[週末|しゅうまつ]はどこかへ[出|で]かけたいです。",
+          "usageID": "nani-ka-dare-ka-doko-ka:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "どこか",
+          "skillRU": "Объясни роль конструкции 何か / 誰か / どこか в контексте, затем сравни с переводом."
         }
       ],
       "exerciseTemplateIDs": []
@@ -4164,6 +5833,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:ec1e30c99945346b5bb81709",
+          "translationID": "ru:a38e3e6678bb2d88785c34ab",
+          "furigana": "これを[二|ふた]つください。",
+          "usageID": "kore-sore-are-dore:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "これ",
+          "skillRU": "Объясни роль конструкции これ / それ / あれ / どれ в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:4d7248ca20f94566e88d827b",
+          "translationID": "ru:741a8d22ca0cc485abeadd67",
+          "furigana": "それは[昨日|きのう][買|か]った[切符|きっぷ]です。",
+          "usageID": "kore-sore-are-dore:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "それ",
+          "skillRU": "Объясни роль конструкции これ / それ / あれ / どれ в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -4213,6 +5902,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:7ff3842c534ba92ddebc6d13",
+          "translationID": "ru:d0b6e3b6a17ceeec5356ffc1",
+          "furigana": "この[席|せき]は[空|あ]いていますか。",
+          "usageID": "kono-sono-ano-dono:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "この",
+          "skillRU": "Объясни роль конструкции この / その / あの / どの в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:ee9ee1a40f9ad5d68f1617fc",
+          "translationID": "ru:794fbbc80cef0b10e72fe0e4",
+          "furigana": "あの[橋|はし]を[渡|わた]ってください。",
+          "usageID": "kono-sono-ano-dono:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "あの",
+          "skillRU": "Объясни роль конструкции この / その / あの / どの в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -4260,6 +5969,26 @@
           "translationID": "koko-soko-asoko-doko:example:2:en",
           "furigana": "すみません、{駅|えき}はどこですか。",
           "translationRU": null
+        }
+      ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:efc0729bae20fb7117c55665",
+          "translationID": "ru:2f0e3492a103eaadb4b3a6d3",
+          "furigana": "ここに[座|すわ]ってください。",
+          "usageID": "koko-soko-asoko-doko:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "ここ",
+          "skillRU": "Объясни роль конструкции ここ / そこ / あそこ / どこ в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:8517135c62d4d47df06ab529",
+          "translationID": "ru:d1f91d5779721b03dda271ed",
+          "furigana": "[郵便局|ゆうびんきょく]はあそこにあります。",
+          "usageID": "koko-soko-asoko-doko:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "あそこ",
+          "skillRU": "Объясни роль конструкции ここ / そこ / あそこ / どこ в контексте, затем сравни с переводом."
         }
       ],
       "exerciseTemplateIDs": []
@@ -4319,6 +6048,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:eac659267c803a32306981d2",
+          "translationID": "ru:9b8cf6b1640938822b2de988",
+          "furigana": "[昨日|きのう]は[風|かぜ]が[強|つよ]かったです。",
+          "usageID": "ku-nai-katta-ku-nakatta:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "強かった",
+          "skillRU": "Объясни роль конструкции 〜くない / 〜かった / 〜くなかった в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:9b63e98aff0410c571a06580",
+          "translationID": "ru:2d47f9f4f9c43b2c955f7ccb",
+          "furigana": "この[水|みず]は[冷|つめ]たくないです。",
+          "usageID": "ku-nai-katta-ku-nakatta:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "冷たくない",
+          "skillRU": "Объясни роль конструкции 〜くない / 〜かった / 〜くなかった в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -4370,6 +6119,26 @@
           "translationID": "na-na-adjective:example:2:en",
           "furigana": "この{部屋|へや}はあまり{静|しず}かではありません。",
           "translationRU": null
+        }
+      ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:147a43fcb1878221f5fc73d9",
+          "translationID": "ru:c84dcd58a56aeb4afcc34389",
+          "furigana": "[静|しず]かな[場所|ばしょ]で[勉強|べんきょう]したいです。",
+          "usageID": "na-na-adjective:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "静かな",
+          "skillRU": "Объясни роль конструкции 〜な（na-adjective） в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:522d68be04d3275e7bf2cf4a",
+          "translationID": "ru:a4f50c77d630e13b65a02fe5",
+          "furigana": "[親切|しんせつ]な[人|ひと]に[道|みち]を[教|おし]えてもらいました。",
+          "usageID": "na-na-adjective:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "親切な",
+          "skillRU": "Объясни роль конструкции 〜な（na-adjective） в контексте, затем сравни с переводом."
         }
       ],
       "exerciseTemplateIDs": []
@@ -4427,6 +6196,26 @@
           "translationRU": null
         }
       ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:f9e8c66cba5fb876f4de51bd",
+          "translationID": "ru:863f41ad0d5e1bc47a05ea70",
+          "furigana": "この[部屋|へや]は[広|ひろ]くて[明|あか]るいです。",
+          "usageID": "kute-de:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "くて",
+          "skillRU": "Объясни роль конструкции 〜くて / 〜で в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:d24fa51c44e46cad4074e9b0",
+          "translationID": "ru:460b75563799d7a9994b0725",
+          "furigana": "[兄|あに]は[先生|せんせい]で、[姉|あね]は[医者|いしゃ]です。",
+          "usageID": "kute-de:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "先生で",
+          "skillRU": "Объясни роль конструкции 〜くて / 〜で в контексте, затем сравни с переводом."
+        }
+      ],
       "exerciseTemplateIDs": []
     },
     {
@@ -4474,6 +6263,26 @@
           "translationID": "to-iu-named:example:2:en",
           "furigana": "{山田|やまだ}さんという{人|ひと}から{電話|でんわ}がありました。",
           "translationRU": null
+        }
+      ],
+      "studyExampleReferences": [
+        {
+          "sentenceID": "gs:0666801410f79ce92c89baef",
+          "translationID": "ru:3bc289edae92637673befeba",
+          "furigana": "[近|ちか]くに「[青空|あおぞら]」という[喫茶店|きっさてん]があります。",
+          "usageID": "to-iu-named:reference:0",
+          "status": "assistantPrepared",
+          "targetConstruction": "という",
+          "skillRU": "Объясни роль конструкции 〜という（named） в контексте, затем сравни с переводом."
+        },
+        {
+          "sentenceID": "gs:0f4e1f8e05db3ea68faa9cd1",
+          "translationID": "ru:912a7af289ce68d1b48c274f",
+          "furigana": "「[日本語|にほんご]の[森|もり]」という[本|ほん]を[借|か]りました。",
+          "usageID": "to-iu-named:reference:1",
+          "status": "assistantPrepared",
+          "targetConstruction": "という",
+          "skillRU": "Объясни роль конструкции 〜という（named） в контексте, затем сравни с переводом."
         }
       ],
       "exerciseTemplateIDs": []

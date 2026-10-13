@@ -81,6 +81,9 @@ assert len({s['id'] for s in bank['sentences']}) == len(bank['sentences'])
 assert len({s['japanese'] for s in bank['sentences']}) == len(bank['sentences'])
 approved, approved_usages, approved_exercises = approved_material()
 for s in bank['sentences']:
+    assert s['id'] == 'gs:' + hashlib.sha256(s['japanese'].encode()).hexdigest()[:24]
+    assert all(source['license'] in allowed and source['url'] and source['sentenceID'] for source in s['sources'])
+    assert all(t['license'] in allowed and t['url'] and t['text'] for t in s['translations'])
     if any(source['name'] == 'Tatoeba' for source in s['sources']): assert s['id'] in approved
 for level in COUNTS:
     resource = hydrate_resource(json.loads((ROOT / 'kanji_test/Data/Grammar' / ('grammar-' + level.lower() + '.json')).read_text()), bank)

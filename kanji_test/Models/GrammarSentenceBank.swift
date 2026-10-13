@@ -37,12 +37,19 @@ nonisolated struct GrammarSentenceBank: Codable, Sendable {
         let status: String
         let eligibleForScoring: Bool
         let evidence: String
+        var targetSpan: TargetSpan? = nil
+        var skillRU: String? = nil
     }
+    struct TargetSpan: Codable, Sendable { let startUTF8: Int; let endUTF8: Int }
     struct ExampleReference: Codable, Sendable {
         let sentenceID: String
         let translationID: String
         let furigana: String?
         let translationRU: String?
+        var usageID: String? = nil
+        var status: String? = nil
+        var targetConstruction: String? = nil
+        var skillRU: String? = nil
     }
     let schemaVersion: Int
     let texts: [String: String]
@@ -55,12 +62,20 @@ nonisolated struct GrammarSentenceBank: Codable, Sendable {
         let index = Dictionary(uniqueKeysWithValues: sentences.map { ($0.id, $0) })
         return try references.map { reference in
             guard let sentence = index[reference.sentenceID],
-                  let translation = sentence.translations.first(where: { $0.id == reference.translationID && $0.language == "eng" }) else {
+                  let translation = sentence.translations.first(where: { $0.id == reference.translationID && ["eng", "rus"].contains($0.language) }) else {
                 throw Error.invalid("missing example reference")
             }
-            return GrammarExample(ja: sentence.japanese, en: translation.text,
+            if let usageID = reference.usageID {
+                guard let usage = usages.first(where: { $0.id == usageID && $0.sentenceID == sentence.id }),
+                      let span = usage.targetSpan,
+                      String(bytes: sentence.japanese.utf8.dropFirst(span.startUTF8)
+                        .prefix(span.endUTF8 - span.startUTF8), encoding: .utf8) == reference.targetConstruction else {
+                    throw Error.invalid("mismatched reference target")
+                }
+            }
+            return GrammarExample(ja: sentence.japanese, en: translation.language == "eng" ? translation.text : "",
                 furigana: reference.furigana ?? sentence.reading,
-                ru: reference.translationRU ?? sentence.reviewedTranslationRU,
+                ru: reference.translationRU ?? (translation.language == "rus" ? translation.text : sentence.reviewedTranslationRU),
                 sources: sentence.sources.map { source in
                     GrammarExampleSource(name: source.name, sentenceID: source.sentenceID,
                         author: source.author, license: source.license, url: source.url,
@@ -68,7 +83,8 @@ nonisolated struct GrammarSentenceBank: Codable, Sendable {
                 },
                 translationSources: [GrammarExampleSource(name: "Перевод \(translation.id)",
                     sentenceID: translation.id, author: translation.author, license: translation.license,
-                    url: translation.url, commit: nil, status: translation.status)])
+                    url: translation.url, commit: nil, status: translation.status)],
+                preparationStatus: reference.status, targetConstruction: reference.targetConstruction, skillRU: reference.skillRU)
         }
     }
     func exercises(_ ids: [String], ruleID: String) throws -> [GrammarExercise] {
@@ -131,6 +147,14 @@ nonisolated struct GrammarSentenceBank: Codable, Sendable {
         }
         for usage in usages {
             guard ids.contains(usage.sentenceID) else { throw Error.invalid("missing usage sentence") }
+            if usage.status == "assistantPrepared", usage.eligibleForScoring { throw Error.invalid("unreviewed reference is scored") }
+            if let span = usage.targetSpan {
+                let text = sentences.first { $0.id == usage.sentenceID }!.japanese
+                guard span.startUTF8 >= 0, span.endUTF8 > span.startUTF8, span.endUTF8 <= text.utf8.count,
+                      String(bytes: text.utf8.dropFirst(span.startUTF8).prefix(span.endUTF8 - span.startUTF8), encoding: .utf8) != nil else {
+                    throw Error.invalid("invalid target span")
+                }
+            }
             if !usage.segments.isEmpty {
                 let sentence = sentences.first { $0.id == usage.sentenceID }!
                 let count = sentence.japanese.utf8.count

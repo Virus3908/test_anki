@@ -128,7 +128,9 @@ nonisolated struct GrammarExercise: Identifiable, Codable, Sendable {
         guard let conjugation else { return kind != .formProduction }
         guard let answer = GrammarConjugationEngine.conjugate(conjugation.verb, to: conjugation.form) else { return false }
         let accepted = options.filter { acceptedOptionIDs.contains($0.id) }.map(\.text)
-        return !accepted.isEmpty && accepted.allSatisfy { $0 == answer.text || $0 == answer.reading }
+        let forms = [answer.text, answer.reading].map { $0.precomposedStringWithCanonicalMapping }
+        return !accepted.isEmpty && accepted.allSatisfy { forms.contains($0.precomposedStringWithCanonicalMapping) }
+            && (acceptedAnswers ?? []).allSatisfy { forms.contains($0.trimmingCharacters(in: .whitespacesAndNewlines).precomposedStringWithCanonicalMapping) }
     }
 
     var eligibleForPractice: Bool {

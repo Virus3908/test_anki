@@ -73,7 +73,7 @@ def generate():
                 rule['supplement'] = {k: material[k] for k in ('repository', 'commit', 'path', 'license')}
                 rule['supplement'].update({k: entry[k] for k in ('summary', 'structure', 'pitfalls')})
                 rule['supplement']['examples'] = [{k: e[k] for k in ('ja', 'en')} for e in entry['examples']]
-            if rule['id'] in lessons:
+            if lessons.get(rule['id'], {}).get('teaching'):
                 rule['teaching'] = lessons[rule['id']]['teaching']
                 example = rule['teaching']['example']
                 example['furigana'] = ruby.get(example['ja'])
@@ -141,6 +141,8 @@ def generate():
         'explicitAnswerKeys': sum(bool(e.get('acceptedOptionIDs') or e.get('acceptedOrders')) for e in r.get('exercises', [])),
         'algorithmicForms': r['practiceMetadata']['algorithmicForms'],
         'sourceExamples': len(r['examples']),
+        **({'preparedReferenceExamples': len(lessons[r['id']]['referenceExamples'])}
+           if lessons.get(r['id'], {}).get('referenceExamples') else {}),
         'needsAuthoredPractice': not bool(r.get('exercises')),
         'needsLinguisticReview': True,
         'furiganaTexts': sum(len(e.get('furigana', {})) for e in r.get('exercises', [])),

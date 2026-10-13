@@ -8725,11 +8725,16 @@
       "correctError",
       "assembleSentence"
     ],
-    "availableKinds": [],
-    "algorithmicForms": [],
+    "availableKinds": [
+      "formProduction",
+      "fillBlank"
+    ],
+    "algorithmicForms": [
+      "masu"
+    ],
     "sourceExampleCount": 3,
-    "status": "plannedNeedsAuthoring",
-    "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+    "status": "algorithmicallyChecked",
+    "basis": "Explicit verb classes and conjugation keys; context authoring requires independent linguistic review",
     "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
   },
   "masen": {
@@ -8813,11 +8818,16 @@
       "correctError",
       "assembleSentence"
     ],
-    "availableKinds": [],
-    "algorithmicForms": [],
+    "availableKinds": [
+      "formProduction",
+      "fillBlank"
+    ],
+    "algorithmicForms": [
+      "nai"
+    ],
     "sourceExampleCount": 3,
-    "status": "plannedNeedsAuthoring",
-    "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+    "status": "algorithmicallyChecked",
+    "basis": "Explicit verb classes and conjugation keys; context authoring requires independent linguistic review",
     "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
   },
   "ta": {
@@ -8835,11 +8845,16 @@
       "correctError",
       "assembleSentence"
     ],
-    "availableKinds": [],
-    "algorithmicForms": [],
+    "availableKinds": [
+      "formProduction",
+      "fillBlank"
+    ],
+    "algorithmicForms": [
+      "ta"
+    ],
     "sourceExampleCount": 3,
-    "status": "plannedNeedsAuthoring",
-    "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+    "status": "algorithmicallyChecked",
+    "basis": "Explicit verb classes and conjugation keys; context authoring requires independent linguistic review",
     "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
   },
   "mashou": {
@@ -9116,11 +9131,16 @@
       "understandSentence",
       "distinguishMeaning"
     ],
-    "availableKinds": [],
-    "algorithmicForms": [],
+    "availableKinds": [
+      "formProduction",
+      "fillBlank"
+    ],
+    "algorithmicForms": [
+      "te"
+    ],
     "sourceExampleCount": 3,
-    "status": "plannedNeedsAuthoring",
-    "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+    "status": "algorithmicallyChecked",
+    "basis": "Explicit verb classes and conjugation keys; context authoring requires independent linguistic review",
     "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
   },
   "te-kara": {
