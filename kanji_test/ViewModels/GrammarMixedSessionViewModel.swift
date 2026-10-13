@@ -58,7 +58,7 @@ final class GrammarMixedSessionViewModel {
         let previousSentenceID = current.currentExercise?.sentenceID
         if let result = current.results.last {
             completedExerciseIDs.append(result.exerciseID)
-            if !result.isCorrect || result.usedHint { retryAfter[id] = history.count + 3 }
+            if result.hasVerifiedError || result.usedHint { retryAfter[id] = history.count + 3 }
             else { retryAfter[id] = nil }
         }
         history.append(id); lastSteps[id] = history.count - 1

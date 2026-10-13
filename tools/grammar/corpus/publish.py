@@ -67,6 +67,7 @@ def approved_material():
                 proof = proofs.get(option['id'], {})
                 if proof.get('kind') not in ERROR_KINDS or not proof.get('explanationRU'):
                     raise ValueError('Every rejected option needs a reviewed diagnostic criterion')
+                if not option.get('feedbackRU'): option['feedbackRU'] = proof['explanationRU']
         exercise['sentenceID'] = usage['sentenceID']
         exercise['isScored'] = True
         exercise['reviewer'] = usage['reviewer']

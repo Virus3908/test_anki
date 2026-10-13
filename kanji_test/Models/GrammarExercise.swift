@@ -152,6 +152,7 @@ nonisolated struct GrammarExerciseResult: Sendable {
     let isCorrect: Bool
     var usedHint: Bool = false
     var assessment: GrammarAnswerValidator.Assessment? = nil
+    var hasVerifiedError: Bool { !isCorrect && assessment != .differsFromSample }
 }
 
 /// Presentation rotation only. It never submits FSRS ratings or changes stored content.

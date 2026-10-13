@@ -119,6 +119,8 @@ def check(release=False):
                     assert all(len(order) < len(options) for order in orders), 'Assembly needs meaningful alternatives'
                 else:
                     assert accepted and accepted < ids, f'Invalid answer key: {eid}'
+                permitted = {key for order in exercise.get('acceptedOrders', []) for key in order} if exercise['kind'] == 'assembleSentence' else accepted
+                assert all(nonempty(o.get('feedbackRU')) for o in options if o['id'] not in permitted), f'Missing diagnostic alternative: {eid}'
                 assert exercise.get('isScored') is True
                 assert exercise.get('competency') in ('formation', 'application', 'context', 'meaning', 'contrast', 'correction')
                 if exercise['kind'] == 'formProduction':

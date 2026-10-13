@@ -52,6 +52,33 @@ final class GrammarPracticeTests: XCTestCase {
         results[0] = .init(exerciseID: "a", optionID: "unverified", isCorrect: false, assessment: .differsFromSample)
         XCTAssertNil(GrammarLessonRating.rating(results: results, exercises: exercises))
     }
+    func testUnknownFreeFormDoesNotDiagnoseWeakSkillOrAddErrorRemediation() async throws {
+        let model = GrammarPracticeViewModel(rule: try await loadRule("tai"), seed: "unknown-form")
+        XCTAssertEqual(model.currentExercise?.kind, .formProduction)
+        let count = model.count
+        model.textAnswer = "別の言い方"; model.checkForm()
+        XCTAssertEqual(model.results.last?.assessment, .differsFromSample)
+        XCTAssertFalse(model.results.last?.hasVerifiedError == true)
+        XCTAssertTrue(model.weakAspects.isEmpty)
+        XCTAssertEqual(model.count, count)
+        model.next()
+        while !model.isComplete {
+            answer(model, exercise: try XCTUnwrap(model.currentExercise), correct: true); model.next()
+        }
+        XCTAssertNil(model.proposedRating)
+    }
+    func testUnlistedAssemblyOrderIsUnverifiedInsteadOfGrammarError() async throws {
+        let rule = try await loadRule("te-hoshii")
+        let exercise = try XCTUnwrap(rule.exercises?.first { $0.kind == .assembleSentence })
+        let model = GrammarPracticeViewModel(rule: rule.withExercises([exercise]), seed: "order")
+        let unknown = Array(try XCTUnwrap(exercise.acceptedOrders?.first).reversed())
+        XCTAssertFalse(exercise.accepts(order: unknown))
+        for id in unknown { model.toggleElement(id) }
+        model.checkAssembly()
+        XCTAssertEqual(model.results.last?.assessment, .differsFromSample)
+        XCTAssertTrue(model.weakAspects.isEmpty)
+        model.next(); XCTAssertNil(model.proposedRating)
+    }
     func testAnswerIDsNeverDependOnOptionPositionAndUnknownOptionIsWrong() {
         let exercise = fixture()
         XCTAssertTrue(exercise.accepts("yes")); XCTAssertFalse(exercise.accepts("no"))

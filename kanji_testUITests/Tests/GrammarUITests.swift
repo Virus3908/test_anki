@@ -133,7 +133,7 @@ final class GrammarUITests: UITestCase {
         launch()
         tap(ID.Start.search, .openSearch, expecting: ID.Search.field)
         element(ID.Search.field).tap()
-        element(ID.Search.field).typeText("gatera")
+        element(ID.Search.field).typeText("〜がてら")
         let result = element("grammar.searchResult.gatera")
         XCTAssertTrue(result.waitForExistence(timeout: 15))
         result.tap()
@@ -147,7 +147,7 @@ final class GrammarUITests: UITestCase {
     func testSourceOnlyRuleHasBasicPracticeAndCanFinishWithoutFSRS() {
         launch()
         tap(ID.Start.search, .openSearch, expecting: ID.Search.field)
-        element(ID.Search.field).tap(); element(ID.Search.field).typeText("katawara")
+        element(ID.Search.field).tap(); element(ID.Search.field).typeText("〜かたわら")
         let rule = element("grammar.searchResult.katawara")
         XCTAssertTrue(rule.waitForExistence(timeout: 15)); rule.tap()
         XCTAssertTrue(element("grammar.practice").waitForExistence(timeout: 10))
@@ -179,7 +179,7 @@ final class GrammarUITests: UITestCase {
         launch()
         tap(ID.Start.search, .openSearch, expecting: ID.Search.field)
         element(ID.Search.field).tap()
-        element(ID.Search.field).typeText("tai")
+        element(ID.Search.field).typeText("〜たい")
         let rule = element("grammar.searchResult.tai")
         XCTAssertTrue(rule.waitForExistence(timeout: 15)); rule.tap()
         XCTAssertTrue(element("grammar.lesson.title").waitForExistence(timeout: 5))
@@ -350,7 +350,11 @@ final class GrammarUITests: UITestCase {
     }
 
     private func scrollTo(_ identifier: String) {
-        for _ in 0..<10 where !element(identifier).isHittable { app.swipeUp() }
+        for _ in 0..<10 where !element(identifier).isHittable {
+            let target = element(identifier)
+            if target.exists && target.frame.midY < app.frame.midY { app.swipeDown() }
+            else { app.swipeUp() }
+        }
         XCTAssertTrue(element(identifier).isHittable, "Element must be reachable: \(identifier)")
     }
 }

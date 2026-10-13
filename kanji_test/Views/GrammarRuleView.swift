@@ -142,6 +142,7 @@ struct GrammarLessonContent: View, StudyViewStyling {
                             if index < additionalExamples.count - 1 { lessonDivider }
                         }
                     }
+                    .accessibilityElement(children: .contain)
                     .accessibilityIdentifier("grammar.lesson.examples")
                     .frame(maxWidth: .infinity, alignment: .leading)
                 } else {
@@ -165,6 +166,7 @@ struct GrammarLessonContent: View, StudyViewStyling {
                         Text(localized.formationNotesRU)
                             .fixedSize(horizontal: false, vertical: true)
                     }
+                    .accessibilityElement(children: .contain)
                     .accessibilityIdentifier("grammar.lesson.details")
                 } else if let notes = rule.notes, !notes.isEmpty {
                     lessonDivider
@@ -175,6 +177,7 @@ struct GrammarLessonContent: View, StudyViewStyling {
                         translationControls(originalText: notes, allowsRetry: true,
                             identifier: "grammar.translation.explanation")
                     }
+                    .accessibilityElement(children: .contain)
                     .accessibilityIdentifier("grammar.lesson.details")
                 }
 
@@ -255,6 +258,7 @@ struct GrammarLessonContent: View, StudyViewStyling {
                             }
                         }
                     }
+                    .accessibilityElement(children: .contain)
                     .accessibilityIdentifier("grammar.rule.relations")
                 }
 
@@ -272,6 +276,7 @@ struct GrammarLessonContent: View, StudyViewStyling {
                     Text("Уровни JLPT — неофициальная классификация. Учебные адаптации требуют лингвистического ревью.")
                         .font(.caption).fixedSize(horizontal: false, vertical: true)
                 }
+                .accessibilityElement(children: .contain)
                 .accessibilityIdentifier("grammar.lesson.license")
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -357,6 +362,7 @@ struct GrammarLessonContent: View, StudyViewStyling {
                 )
             }
         }
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier(identifier)
     }
 

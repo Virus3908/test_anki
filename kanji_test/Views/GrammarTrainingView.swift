@@ -246,6 +246,8 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
             }.padding(.vertical, 12)
         }
         .buttonStyle(.plain).disabled(practice.isAnswerVisible)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(option.text)
         .accessibilityIdentifier("grammar.option.\(option.id)")
         .accessibilityValue(correct ? "correct" : practice.isAnswerVisible ? (selected ? "selectedIncorrect" : "unavailable") : selected ? "selected" : "available")
     }
@@ -275,19 +277,21 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
                         if let index = practice.selectedElements.firstIndex(of: option.id) { Text("\(index + 1)") }
                     }.padding(.vertical, 10)
                 }.buttonStyle(.plain).disabled(practice.isAnswerVisible)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(option.text)
                     .accessibilityIdentifier("grammar.element.\(option.id)")
                 if index < practice.options.count - 1 {
                     Rectangle().fill(AppPalette.border.opacity(0.5)).frame(height: 1).padding(.leading, 30)
                 }
             }
-        }.accessibilityIdentifier("grammar.assembly")
+        }.accessibilityElement(children: .contain).accessibilityIdentifier("grammar.assembly")
     }
 
     private func feedback(_ exercise: GrammarExercise) -> some View {
         let correct = practice.results.last?.isCorrect == true
         let unverified = practice.results.last?.assessment == .differsFromSample
         return VStack(alignment: .leading, spacing: 8) {
-            Label(correct ? "Верно" : unverified ? "Отличается от образца" : practice.results.last?.assessment == .incorrectForm ? "Ошибка проверяемой формы" : "Проверяемый ответ неверен", systemImage: correct ? "checkmark.circle" : unverified ? "info.circle" : "xmark.circle")
+            Label(correct ? "Верно" : unverified ? "Отличается от образца" : exercise.kind == .formProduction && practice.results.last?.assessment == .incorrectForm ? "Ошибка проверяемой формы" : "Проверяемый ответ неверен", systemImage: correct ? "checkmark.circle" : unverified ? "info.circle" : "xmark.circle")
                 .foregroundStyle(correct ? AppPalette.success : AppPalette.correction).font(.headline)
             if !correct {
                 FuriganaText(text: exercise.correctAnswer, furigana: exercise.ruby(for: exercise.correctAnswer), showsFurigana: settings.showExampleFurigana).font(.title3)
@@ -303,7 +307,7 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
 
     private var result: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Label(practice.exercises.allSatisfy { $0.isScored == false } ? "Базовая практика завершена" : practice.weakAspects.isEmpty ? "Правило закреплено" : "Практика завершена", systemImage: "checkmark.seal")
+            Label(practice.exercises.allSatisfy { $0.isScored == false } ? "Базовая практика завершена" : practice.weakAspects.isEmpty && (practice.proposedRating != nil || practice.isSaved) ? "Правило закреплено" : "Практика завершена", systemImage: "checkmark.seal")
                 .font(.title2.bold())
             Text("Готово! \(practice.correctCount) из \(practice.count)")
                 .font(.headline).accessibilityIdentifier("grammar.training.result")

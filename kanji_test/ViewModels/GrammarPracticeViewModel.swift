@@ -64,7 +64,7 @@ final class GrammarPracticeViewModel {
     }
     var weakAspects: [String] {
         var seen = Set<String>()
-        return results.filter { !$0.isCorrect || $0.usedHint }.compactMap { result in
+        return results.filter { $0.hasVerifiedError || $0.usedHint }.compactMap { result in
             guard let exercise = exercises.first(where: { $0.id == result.exerciseID }),
                   let aspect = exercise.aspect, seen.insert(aspect).inserted else { return nil }
             return aspect
@@ -129,7 +129,7 @@ final class GrammarPracticeViewModel {
         guard let exercise = currentExercise else { return }
         isAnswerVisible = true
         results.append(GrammarExerciseResult(exerciseID: exercise.id, optionID: answer, isCorrect: correct, usedHint: usedHint, assessment: assessment))
-        if (!correct || usedHint), remediationCount < 2, exercises.count < Self.maximumCount,
+        if ((!correct && assessment != .differsFromSample) || usedHint), remediationCount < 2, exercises.count < Self.maximumCount,
            let index = reserve.firstIndex(where: { $0.aspect == exercise.aspect && $0.aspect != nil }) {
             // Another context for the same skill; no repeated question, no unbounded extension.
             exercises.insert(reserve.remove(at: index), at: position + 1)
