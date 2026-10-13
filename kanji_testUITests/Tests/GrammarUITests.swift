@@ -11,6 +11,7 @@ final class GrammarUITests: UITestCase {
             XCTAssertTrue(element("grammar.learn").exists)
             XCTAssertTrue(element("grammar.review").exists)
             if level == "N5" { capture("02-n5-rule-list") }
+            if level == "N1" { capture("22-n1-rule-list") }
             tap(ID.Preview.back, .backToStart, expecting: "grammar.total")
         }
     }

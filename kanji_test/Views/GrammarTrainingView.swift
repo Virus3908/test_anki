@@ -142,33 +142,49 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
     }
 
     private func question(_ exercise: GrammarExercise) -> some View {
-        VStack(alignment: .leading, spacing: 20) {
-            Text("Задание \((mixed?.answered ?? practice.position) + (practice.isAnswerVisible && mixed != nil ? 0 : 1)) из \(mixed?.total ?? practice.count)").font(.subheadline)
-                .foregroundStyle(AppPalette.secondaryText)
-            ProgressView(value: Double(mixed?.answered ?? practice.position), total: Double(mixed?.total ?? practice.count))
-            if mixed != nil { Text("Смешанная практика").font(.caption).foregroundStyle(AppPalette.secondaryText) }
+        VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    Text("ЗАДАНИЕ \((mixed?.answered ?? practice.position) + (practice.isAnswerVisible && mixed != nil ? 0 : 1)) ИЗ \(mixed?.total ?? practice.count)")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(AppPalette.secondaryText)
+                    Spacer(minLength: 8)
+                    if mixed != nil {
+                        Text("Смешанная практика").font(.caption).foregroundStyle(AppPalette.secondaryText)
+                    }
+                }
+                ProgressView(value: Double(mixed?.answered ?? practice.position), total: Double(mixed?.total ?? practice.count))
+                    .tint(AppPalette.accent)
+            }
+            Rectangle().fill(AppPalette.border.opacity(0.65)).frame(height: 1)
             if mixed == nil, exercise.kind == .distinguishMeaning, let contrasts = rule.teaching?.contrastsRU {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Сравни значения").font(.headline)
+                    Text("СРАВНИ ЗНАЧЕНИЯ").font(.caption.weight(.bold)).foregroundStyle(AppPalette.secondaryText)
                     ForEach(contrasts, id: \.self) { Text($0).font(.callout).fixedSize(horizontal: false, vertical: true) }
-                }.padding(16).appSurfaceCard()
+                }
             }
             FuriganaText(text: exercise.promptRU, furigana: exercise.ruby(for: exercise.promptRU), showsFurigana: settings.showExampleFurigana).font(.title3.weight(.medium)).fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier("grammar.training.prompt").accessibilityValue(exerciseAccessibilityValue(exercise))
             if exercise.kind == .restoreSentence, let cue = exercise.cueEN {
-                Text(cue).font(.title3).padding(16).appSurfaceCard().fixedSize(horizontal: false, vertical: true)
-                Text("Базовая практика: восстановление оригинала. Она не меняет расписание повторений.")
-                    .font(.caption).foregroundStyle(AppPalette.secondaryText)
+                Text(cue).font(.title3).fixedSize(horizontal: false, vertical: true)
             }
             if let japanese = exercise.japanese {
-                FuriganaText(text: japanese, furigana: exercise.ruby(for: japanese), showsFurigana: settings.showExampleFurigana).font(.title2).padding(16).appSurfaceCard().fixedSize(horizontal: false, vertical: true)
+                FuriganaText(text: japanese, furigana: exercise.ruby(for: japanese), showsFurigana: settings.showExampleFurigana).font(.title2.weight(.medium)).fixedSize(horizontal: false, vertical: true)
                     .textSelection(.enabled).accessibilityIdentifier("grammar.training.japanese")
                     .accessibilityValue(settings.showExampleFurigana && exercise.ruby(for: japanese) != nil ? "furigana" : "plain")
             }
+            if exercise.kind == .restoreSentence {
+                Text("Базовая практика: восстановление оригинала. Она не меняет расписание повторений.")
+                    .font(.caption).foregroundStyle(AppPalette.secondaryText)
+            }
+            Rectangle().fill(AppPalette.border.opacity(0.65)).frame(height: 1)
             if exercise.kind == .formProduction || exercise.kind == .restoreSentence {
                 @Bindable var model = practice
                 TextField(exercise.kind == .restoreSentence ? "Напиши исходное предложение" : "Напиши форму по-японски", text: $model.textAnswer)
-                    .font(.title2).padding(16).appSurfaceCard()
+                    .font(.title2)
+                    .padding(12)
+                    .background(AppPalette.background, in: RoundedRectangle(cornerRadius: 8))
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(AppPalette.border.opacity(0.7), lineWidth: 1))
                     .focused($isFormFocused)
                     .autocorrectionDisabled().textInputAutocapitalization(.never)
                     .submitLabel(.done).onSubmit { practice.checkForm() }
@@ -177,34 +193,61 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
             } else if exercise.kind == .assembleSentence {
                 assembly(exercise)
             } else {
-                ForEach(practice.options) { option in optionButton(option, exercise: exercise) }
+                VStack(spacing: 0) {
+                    ForEach(practice.options.indices, id: \.self) { index in
+                        let option = practice.options[index]
+                        optionButton(option, exercise: exercise)
+                        if index < practice.options.count - 1 {
+                            Rectangle().fill(AppPalette.border.opacity(0.5)).frame(height: 1).padding(.leading, 34)
+                        }
+                    }
+                }
             }
             if practice.isAnswerVisible {
+                Rectangle().fill(AppPalette.border.opacity(0.65)).frame(height: 1)
                 feedback(exercise)
             } else {
-                Button("Подсказка") { practice.useHint() }.accessibilityIdentifier("grammar.training.hint")
+                Button { practice.useHint() } label: {
+                    Label("Подсказка", systemImage: "lightbulb")
+                        .font(.subheadline.weight(.medium))
+                }.accessibilityIdentifier("grammar.training.hint")
                 if practice.usedHint {
                     let hint = exercise.hintRU ?? exercise.explanationRU
-                    FuriganaText(text: hint, furigana: exercise.ruby(for: hint), showsFurigana: settings.showExampleFurigana).font(.callout)
+                    FuriganaText(text: hint, furigana: exercise.ruby(for: hint), showsFurigana: settings.showExampleFurigana)
+                        .font(.callout).fixedSize(horizontal: false, vertical: true)
                 }
             }
         }
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .appSurfaceCard()
     }
 
     private func optionButton(_ option: GrammarExercise.Option, exercise: GrammarExercise) -> some View {
         let correct = practice.isAnswerVisible && exercise.accepts(option.id)
         let selected = practice.selectedOptionID == option.id
+        let stateText: String? = practice.isAnswerVisible
+            ? (correct ? "Правильный ответ" : selected ? "Ваш ответ" : "Недоступно")
+            : (selected ? "Выбрано" : nil)
+        let stateIcon = practice.isAnswerVisible
+            ? (correct ? "checkmark.circle.fill" : selected ? "xmark.circle.fill" : "circle")
+            : (selected ? "largecircle.fill.circle" : "circle")
         return Button { practice.choose(option.id) } label: {
             HStack(alignment: .top, spacing: 12) {
-                Image(systemName: correct ? "checkmark.circle.fill" : selected ? "xmark.circle.fill" : "circle")
-                    .foregroundStyle(correct ? AppPalette.success : selected ? AppPalette.correction : AppPalette.accent)
+                Image(systemName: stateIcon)
+                    .foregroundStyle(correct ? AppPalette.success : practice.isAnswerVisible && selected ? AppPalette.correction : AppPalette.accent)
+                    .padding(.top, 2)
                 FuriganaText(text: option.text, furigana: exercise.ruby(for: option.text), showsFurigana: settings.showExampleFurigana).font(.title3).fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
-            }.padding(16).appSurfaceCard()
+                if let stateText {
+                    Text(stateText).font(.caption.weight(.medium)).foregroundStyle(AppPalette.secondaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }.padding(.vertical, 12)
         }
         .buttonStyle(.plain).disabled(practice.isAnswerVisible)
         .accessibilityIdentifier("grammar.option.\(option.id)")
-        .accessibilityValue(correct ? "correct" : selected ? "selectedIncorrect" : "available")
+        .accessibilityValue(correct ? "correct" : practice.isAnswerVisible ? (selected ? "selectedIncorrect" : "unavailable") : selected ? "selected" : "available")
     }
     private func exerciseAccessibilityValue(_ exercise: GrammarExercise) -> String {
         #if DEBUG
@@ -215,22 +258,27 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
 
     private func assembly(_ exercise: GrammarExercise) -> some View {
         VStack(alignment: .leading, spacing: 12) {
+            Text("СОБЕРИ ПРЕДЛОЖЕНИЕ").font(.caption.weight(.bold)).foregroundStyle(AppPalette.secondaryText)
             FuriganaText(text: practice.selectedElements.compactMap { id in exercise.options.first { $0.id == id }?.text }.joined(),
                 furigana: exercise.ruby(for: practice.selectedElements), showsFurigana: settings.showExampleFurigana)
                 .font(.title2).frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
                 .accessibilityIdentifier("grammar.assembly.answer")
             Text("Нажимай на элементы по порядку. Повторное нажатие убирает элемент.").font(.caption)
                 .foregroundStyle(AppPalette.secondaryText)
-            // A wrapping vertical layout also works with large text and narrow phones.
-            ForEach(practice.options) { option in
+            Rectangle().fill(AppPalette.border.opacity(0.5)).frame(height: 1)
+            ForEach(practice.options.indices, id: \.self) { index in
+                let option = practice.options[index]
                 Button { practice.toggleElement(option.id) } label: {
                     HStack {
                         FuriganaText(text: option.text, furigana: exercise.ruby(for: option.text), showsFurigana: settings.showExampleFurigana).font(.title3)
                         Spacer()
                         if let index = practice.selectedElements.firstIndex(of: option.id) { Text("\(index + 1)") }
-                    }.padding(12).appSurfaceCard()
+                    }.padding(.vertical, 10)
                 }.buttonStyle(.plain).disabled(practice.isAnswerVisible)
                     .accessibilityIdentifier("grammar.element.\(option.id)")
+                if index < practice.options.count - 1 {
+                    Rectangle().fill(AppPalette.border.opacity(0.5)).frame(height: 1).padding(.leading, 30)
+                }
             }
         }.accessibilityIdentifier("grammar.assembly")
     }
@@ -247,11 +295,11 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
                 } else { FuriganaText(text: exercise.explanationRU, furigana: exercise.ruby(for: exercise.explanationRU), showsFurigana: settings.showExampleFurigana).font(.callout) }
                 Button("Посмотреть правило") { isLessonPresented = true }
             }
-        }.padding(16).appSurfaceCard().accessibilityIdentifier("grammar.training.feedback")
+        }.accessibilityIdentifier("grammar.training.feedback")
     }
 
     private var result: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: 16) {
             Label(practice.exercises.allSatisfy { $0.isScored == false } ? "Базовая практика завершена" : practice.weakAspects.isEmpty ? "Правило закреплено" : "Практика завершена", systemImage: "checkmark.seal")
                 .font(.title2.bold())
             Text("Готово! \(practice.correctCount) из \(practice.count)")
@@ -266,7 +314,7 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
             } else if session.isPreparingCard || practice.isSaving {
                 CenteredLoadingIndicator(title: "Сохраняю результат")
             }
-        }
+        }.padding(18).appSurfaceCard()
     }
 }
 

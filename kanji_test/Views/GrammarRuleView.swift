@@ -64,42 +64,86 @@ struct GrammarRuleView: View, StudyViewStyling {
     }
 }
 
-struct GrammarLessonContent: View {
+struct GrammarLessonContent: View, StudyViewStyling {
     let rule: GrammarRule
     @Bindable var settings: StudyPreferences
     let progress: StudyProgressStore
     let translationState: TranslationViewModel
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            VStack(alignment: .leading, spacing: 10) {
-                Text(rule.pattern).font(.largeTitle.weight(.semibold))
-                    .accessibilityIdentifier("grammar.lesson.title")
-                Text(rule.teaching?.meaningRU ?? translated(rule.displayedMeaning)).font(.title3)
-                if let teaching = rule.teaching {
-                    Text(teaching.usageRU).foregroundStyle(AppPalette.secondaryText)
-                }
-            }.frame(maxWidth: .infinity, alignment: .leading).padding(16).appSurfaceCard()
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Как образуется").font(.headline)
-                Text(rule.teaching?.formationRU ?? translated(rule.displayedFormation))
-                    .fixedSize(horizontal: false, vertical: true)
-            }.frame(maxWidth: .infinity, alignment: .leading).padding(16).appSurfaceCard()
-            if let teaching = rule.teaching {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Пример").font(.headline)
-                    FuriganaText(text: teaching.example.ja, furigana: teaching.example.ruby, showsFurigana: settings.showExampleFurigana).font(.title2)
+        VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 18) {
+                VStack(alignment: .center, spacing: 8) {
+                    Text(rule.pattern)
+                        .font(.largeTitle.weight(.semibold))
+                        .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
-                    Text(teaching.example.ru ?? "").foregroundStyle(AppPalette.secondaryText)
-                }.frame(maxWidth: .infinity, alignment: .leading).padding(16).appSurfaceCard().accessibilityIdentifier("grammar.example")
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Разбор").font(.headline)
-                    ForEach(Array(teaching.parts.enumerated()), id: \.offset) { _, part in
-                        Text(part.text + " — " + part.roleRU).font(.callout)
+                        .frame(maxWidth: .infinity)
+                        .accessibilityIdentifier("grammar.lesson.title")
+                    Text(rule.teaching?.meaningRU ?? translated(rule.displayedMeaning))
+                        .font(.title3)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+                    if let teaching = rule.teaching {
+                        Text(teaching.usageRU)
+                            .font(.callout)
+                            .foregroundStyle(AppPalette.secondaryText)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
-                }.frame(maxWidth: .infinity, alignment: .leading).padding(16).appSurfaceCard()
-            } else if let example = rule.examples.first {
-                exampleView(example)
+                }
+
+                lessonDivider
+
+                detailBlock("Как образуется") {
+                    Text(rule.teaching?.formationRU ?? translated(rule.displayedFormation))
+                        .font(.title3.weight(.medium))
+                        .foregroundStyle(AppPalette.text)
+                }
+
+                if let teaching = rule.teaching {
+                    lessonDivider
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Пример").font(.caption.weight(.bold)).foregroundStyle(AppPalette.secondaryText)
+                        FuriganaText(text: teaching.example.ja, furigana: teaching.example.ruby,
+                                     showsFurigana: settings.showExampleFurigana)
+                            .font(.title2)
+                            .fixedSize(horizontal: false, vertical: true)
+                        if let meaning = teaching.example.ru, !meaning.isEmpty {
+                            Text(meaning).foregroundStyle(AppPalette.secondaryText)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                    .accessibilityIdentifier("grammar.example")
+
+                    lessonDivider
+                    detailBlock("Разбор") {
+                        VStack(alignment: .leading, spacing: 6) {
+                            ForEach(Array(teaching.parts.enumerated()), id: \.offset) { _, part in
+                                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                                    Text(part.text).font(.callout.weight(.medium))
+                                    Text("— " + part.roleRU).font(.callout).foregroundStyle(AppPalette.secondaryText)
+                                }
+                                .fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
+                    }
+                } else if let example = rule.examples.first {
+                    lessonDivider
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Пример").font(.caption.weight(.bold)).foregroundStyle(AppPalette.secondaryText)
+                        FuriganaText(text: example.ja, furigana: example.ruby,
+                                     showsFurigana: settings.showExampleFurigana)
+                            .font(.title2).fixedSize(horizontal: false, vertical: true)
+                        Text(example.ru ?? translated(example.en))
+                            .foregroundStyle(AppPalette.secondaryText)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .accessibilityIdentifier("grammar.example")
+                }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(18)
+            .appSurfaceCard()
+
             DisclosureGroup("Подробное объяснение") {
                 if let text = rule.displayedExplanation {
                     Text(translated(text)).fixedSize(horizontal: false, vertical: true)
@@ -110,7 +154,10 @@ struct GrammarLessonContent: View {
             DisclosureGroup("Дополнительные примеры") {
                 Toggle("Фуригана", isOn: $settings.showExampleFurigana)
                     .accessibilityIdentifier("grammar.furigana")
-                ForEach(Array(rule.examples.enumerated()), id: \.offset) { _, example in exampleView(example) }
+                ForEach(Array(rule.examples.enumerated()), id: \.offset) { index, example in
+                    exampleView(example)
+                    if index < rule.examples.count - 1 { lessonDivider }
+                }
             }.accessibilityIdentifier("grammar.lesson.examples")
             if let teaching = rule.teaching {
                 DisclosureGroup("Особенности употребления") {
@@ -149,7 +196,11 @@ struct GrammarLessonContent: View {
                 Text("Уровни JLPT — неофициальная классификация. Учебные адаптации требуют лингвистического ревью.").font(.caption)
             }
         }
+        .foregroundStyle(AppPalette.text)
         .task(id: "\(rule.id):\(language)") { await translationState.translateGrammarIfNeeded(rule, language: language) }
+    }
+    private var lessonDivider: some View {
+        Rectangle().fill(AppPalette.border.opacity(0.65)).frame(height: 1)
     }
     private var language: MeaningLanguage { settings.options(for: rule.level.deck.id).meaningLanguage }
     private func translated(_ text: String) -> String { translationState.displayedGrammarText(text, rule: rule, language: language) }

@@ -36,6 +36,7 @@ struct GrammarLevelMenu: View {
 
 struct GrammarLevelView: View, StudyViewStyling {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     let level: GrammarLevel
     let appModel: StudyAppViewModel
     @State private var model = GrammarLibraryViewModel()
@@ -91,16 +92,26 @@ struct GrammarLevelView: View, StudyViewStyling {
                         ForEach(categories) { Text($0.title).tag(Optional($0)) }
                     }
                     .pickerStyle(.menu)
-                    LazyVStack(alignment: .leading, spacing: 10) {
+                    LazyVGrid(columns: ruleColumns, alignment: .center, spacing: 10) {
                         ForEach(model.results) { rule in
                             NavigationLink(value: StudyRoute.grammarRule(level, rule.id)) {
-                                VStack(alignment: .leading, spacing: 6) {
-                                    Text(rule.pattern).font(.headline)
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text(rule.pattern)
+                                        .font(.system(size: 25, weight: .regular, design: .serif))
+                                        .multilineTextAlignment(.center)
+                                        .frame(maxWidth: .infinity, minHeight: 48)
+                                        .fixedSize(horizontal: false, vertical: true)
                                     Text(appModel.translationState.displayedGrammarText(rule.displayedMeaning, rule: rule, language: appModel.settings.options(for: level.deck.id).meaningLanguage)).font(.callout)
+                                        .foregroundStyle(AppPalette.secondaryText)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                    Rectangle().fill(AppPalette.border.opacity(0.55)).frame(height: 1)
                                     Text(GrammarStatistics.status(rule, progress: appModel.trainingSession.reviewStore))
-                                        .font(.caption).foregroundStyle(AppPalette.secondaryText)
+                                        .font(.caption.weight(.medium)).foregroundStyle(AppPalette.secondaryText)
+                                        .lineLimit(2)
                                 }
-                                .frame(maxWidth: .infinity, alignment: .leading).padding(16).appSurfaceCard()
+                                .frame(maxWidth: .infinity, minHeight: 150, alignment: .topLeading)
+                                .padding(12)
+                                .appSurfaceCard(borderOpacity: 0.55)
                                 .cardMasteryChrome(CardMastery(record: appModel.trainingSession.reviewStore.record(for: rule.reviewKey),
                                     isExcluded: appModel.trainingSession.reviewStore.isExcluded(rule.reviewKey),
                                     now: appModel.trainingSession.reviewStore.studyDate()))
@@ -134,6 +145,11 @@ struct GrammarLevelView: View, StudyViewStyling {
             guard !Task.isCancelled else { return }
             await model.search(query, level: level, category: category)
         }
+    }
+
+    private var ruleColumns: [GridItem] {
+        let minimum: CGFloat = dynamicTypeSize.isAccessibilitySize ? 230 : 154
+        return [GridItem(.adaptive(minimum: minimum, maximum: 300), spacing: 10)]
     }
 
     private var statistics: some View {
