@@ -52,6 +52,9 @@ nonisolated struct GrammarExercise: Identifiable, Codable, Sendable {
     var testsReading: Bool? = nil
     var requiredRuleIDs: [String]? = nil
     var sentenceID: String? = nil
+    /// Authored alternatives, never inferred from a similar sentence.
+    var acceptedAnswers: [String]? = nil
+    var testsPunctuation: Bool? = nil
 
     func ruby(for text: String) -> ExampleFurigana? {
         guard testsReading != true, let markup = furigana?[text],
@@ -118,6 +121,7 @@ nonisolated struct GrammarExercise: Identifiable, Codable, Sendable {
             && options.allSatisfy { !$0.id.isEmpty && !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
             && Set(options.map { $0.text.trimmingCharacters(in: .whitespacesAndNewlines) }).count == options.count
             && (1...3).contains(difficulty) && validAnswers && validConjugation
+            && (acceptedAnswers.map { !$0.isEmpty && $0.allSatisfy { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty } } ?? true)
     }
 
     var validConjugation: Bool {
@@ -145,6 +149,7 @@ nonisolated struct GrammarExerciseResult: Sendable {
     let optionID: String
     let isCorrect: Bool
     var usedHint: Bool = false
+    var assessment: GrammarAnswerValidator.Assessment? = nil
 }
 
 /// Presentation rotation only. It never submits FSRS ratings or changes stored content.

@@ -6,6 +6,7 @@ nonisolated enum GrammarLessonRating {
     /// any error or assistance is Hard, otherwise Good. Never automatic Easy.
     static func rating(results: [GrammarExerciseResult], exercises: [GrammarExercise]) -> ReviewRating? {
         guard exercises.allSatisfy({ $0.eligibleForPractice }), results.count >= 3, results.count == exercises.count,
+              !results.contains(where: { $0.assessment == .differsFromSample }),
               Set(results.map(\.exerciseID)).count == results.count,
               Set(results.map(\.exerciseID)) == Set(exercises.map(\.id)) else { return nil }
         var total = 0, correct = 0

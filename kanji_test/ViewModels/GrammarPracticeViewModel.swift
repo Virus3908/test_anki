@@ -115,12 +115,13 @@ final class GrammarPracticeViewModel {
     func checkForm() {
         guard !isClosed, !isAnswerVisible, contentError == nil, let exercise = currentExercise,
               (exercise.kind == .formProduction || exercise.kind == .restoreSentence), !textAnswer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
-        record(correct: GrammarAnswerValidator.accepts(textAnswer, for: exercise), answer: textAnswer)
+        let assessment = GrammarAnswerValidator.assess(textAnswer, for: exercise)
+        record(correct: assessment == .correct, answer: textAnswer, assessment: assessment)
     }
-    private func record(correct: Bool, answer: String) {
+    private func record(correct: Bool, answer: String, assessment: GrammarAnswerValidator.Assessment? = nil) {
         guard let exercise = currentExercise else { return }
         isAnswerVisible = true
-        results.append(GrammarExerciseResult(exerciseID: exercise.id, optionID: answer, isCorrect: correct, usedHint: usedHint))
+        results.append(GrammarExerciseResult(exerciseID: exercise.id, optionID: answer, isCorrect: correct, usedHint: usedHint, assessment: assessment))
         if (!correct || usedHint), remediationCount < 2, exercises.count < Self.maximumCount,
            let index = reserve.firstIndex(where: { $0.aspect == exercise.aspect && $0.aspect != nil }) {
             // Another context for the same skill; no repeated question, no unbounded extension.

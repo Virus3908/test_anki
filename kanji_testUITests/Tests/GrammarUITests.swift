@@ -160,7 +160,7 @@ final class GrammarUITests: UITestCase {
             let previous = element("grammar.training.prompt").value as? String
             element("grammar.form.answer").tap(); element("grammar.form.answer").typeText("another wording")
             tap("grammar.training.next", .revealCard, expecting: "grammar.training.feedback")
-            XCTAssertTrue(app.staticTexts["Отличается от оригинала"].exists)
+            XCTAssertTrue(app.staticTexts["Отличается от образца"].exists)
             if count == 0 { capture("20-basic-original-feedback") }
             step(.revealCard, until: {
                 self.element("grammar.training.result").exists ||
@@ -190,7 +190,7 @@ final class GrammarUITests: UITestCase {
         let field = element("grammar.form.answer")
         field.tap(); field.typeText("wrong")
         tap("grammar.training.next", .revealCard, expecting: "grammar.training.feedback")
-        XCTAssertTrue(app.staticTexts["Есть ошибка"].exists)
+        XCTAssertTrue(app.staticTexts["Отличается от образца"].exists)
         capture("13-conjugation-error-explanation")
         tap("grammar.training.theory", .openDeck, expecting: "grammar.lesson.title")
         app.buttons["Закрыть"].tap()

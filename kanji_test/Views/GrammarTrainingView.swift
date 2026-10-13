@@ -285,13 +285,16 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
 
     private func feedback(_ exercise: GrammarExercise) -> some View {
         let correct = practice.results.last?.isCorrect == true
+        let unverified = practice.results.last?.assessment == .differsFromSample
         return VStack(alignment: .leading, spacing: 8) {
-            Label(exercise.kind == .restoreSentence ? (correct ? "Совпадает с оригиналом" : "Отличается от оригинала") : (correct ? "Правильно" : "Есть ошибка"), systemImage: correct ? "checkmark.circle" : "xmark.circle")
+            Label(correct ? "Верно" : unverified ? "Отличается от образца" : "Ошибка проверяемой формы", systemImage: correct ? "checkmark.circle" : unverified ? "info.circle" : "xmark.circle")
                 .foregroundStyle(correct ? AppPalette.success : AppPalette.correction).font(.headline)
             if !correct {
                 FuriganaText(text: exercise.correctAnswer, furigana: exercise.ruby(for: exercise.correctAnswer), showsFurigana: settings.showExampleFurigana).font(.title3)
                 if let option = exercise.options.first(where: { $0.id == practice.selectedOptionID }), let text = option.feedbackRU {
                     FuriganaText(text: text, furigana: exercise.ruby(for: text), showsFurigana: settings.showExampleFurigana).font(.callout)
+                } else if unverified {
+                    Text("Ответ отличается от образца. Это не доказывает грамматическую ошибку; автоматическая оценка FSRS для этой попытки недоступна.").font(.callout)
                 } else { FuriganaText(text: exercise.explanationRU, furigana: exercise.ruby(for: exercise.explanationRU), showsFurigana: settings.showExampleFurigana).font(.callout) }
                 Button("Посмотреть правило") { isLessonPresented = true }
             }

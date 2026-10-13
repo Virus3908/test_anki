@@ -3,6 +3,54 @@ import XCTest
 
 @MainActor
 final class GrammarPracticeTests: XCTestCase {
+    private func sentenceExercise(_ sentence: String) -> GrammarExercise {
+        GrammarExercise(id: "normalization", ruleID: "tai", kind: .restoreSentence,
+            promptRU: "Восстанови пример", options: [.init(id: "source", text: sentence, feedbackRU: nil)],
+            acceptedOptionIDs: ["source"], explanationRU: "Сравни с образцом", difficulty: 1, isScored: false)
+    }
+    func testSentenceNormalizationAcceptsTerminalPeriodsWhitespaceAndNFC() {
+        let exercise = sentenceExercise("日本に行きたいです。")
+        for text in ["日本に行きたいです", "日本に行きたいです.", " \n日本 に 行きたいです。\t", "日本　に行きたいです"] {
+            XCTAssertEqual(GrammarAnswerValidator.assess(text, for: exercise), .correct)
+        }
+        XCTAssertTrue(GrammarAnswerValidator.accepts("は\u{3099}らを見る", for: sentenceExercise("ばらを見る。")))
+        XCTAssertFalse(GrammarAnswerValidator.accepts("ABを見る", for: sentenceExercise("A Bを見る。")))
+        XCTAssertFalse(GrammarAnswerValidator.accepts("Ａを見る", for: sentenceExercise("Aを見る。")))
+        XCTAssertFalse(GrammarAnswerValidator.accepts("日本に行きたいです...", for: exercise))
+        var punctuationTask = exercise
+        punctuationTask.testsPunctuation = true
+        XCTAssertFalse(GrammarAnswerValidator.accepts("日本に行きたいです", for: punctuationTask))
+        XCTAssertFalse(GrammarAnswerValidator.accepts("日本に行きたいです.", for: punctuationTask))
+    }
+    func testSentenceMismatchNeverProvesGrammarErrorOrAcceptsChangedGrammar() {
+        for (source, answer) in [
+            ("日本に行きたいです。", "日本に行きたかったです。"),
+            ("日本に行きたいです。", "日本に行きたくないです。"),
+            ("友達に来てほしいです。", "友達を来てほしいです。"),
+            ("日本に行きたいです。", "日本に行きたい。")
+        ] {
+            XCTAssertFalse(GrammarAnswerValidator.accepts(answer, for: sentenceExercise(source)))
+            XCTAssertEqual(GrammarAnswerValidator.assess(answer, for: sentenceExercise(source)), .differsFromSample)
+        }
+    }
+    func testExplicitSentenceAlternativesAreCheckedIndividuallyAndDecode() throws {
+        var exercise = sentenceExercise("友達にこの本を読んでほしいです。")
+        exercise.acceptedAnswers = [exercise.correctAnswer, "この本を友達に読んでほしいです。"]
+        let decoded = try JSONDecoder().decode(GrammarExercise.self, from: JSONEncoder().encode(exercise))
+        XCTAssertTrue(GrammarAnswerValidator.accepts("この本を友達に読んでほしいです", for: decoded))
+        XCTAssertFalse(GrammarAnswerValidator.accepts("この本に友達を読んでほしいです", for: decoded))
+    }
+    func testUnverifiedFreeInputCannotProduceFSRSRating() async throws {
+        let rule = try await loadRule("tai")
+        let exercise = try XCTUnwrap(rule.exercises?.first { $0.kind == .formProduction })
+        XCTAssertEqual(GrammarAnswerValidator.assess("別の言い方", for: exercise), .differsFromSample)
+        let rejected = try XCTUnwrap(exercise.options.first { !exercise.accepts($0.id) && $0.feedbackRU?.isEmpty == false })
+        XCTAssertEqual(GrammarAnswerValidator.assess(rejected.text, for: exercise), .incorrectForm)
+        let exercises = [fixture(id: "a"), fixture(id: "b"), fixture(id: "c")]
+        var results = exercises.map { GrammarExerciseResult(exerciseID: $0.id, optionID: "yes", isCorrect: true) }
+        results[0] = .init(exerciseID: "a", optionID: "unverified", isCorrect: false, assessment: .differsFromSample)
+        XCTAssertNil(GrammarLessonRating.rating(results: results, exercises: exercises))
+    }
     func testAnswerIDsNeverDependOnOptionPositionAndUnknownOptionIsWrong() {
         let exercise = fixture()
         XCTAssertTrue(exercise.accepts("yes")); XCTAssertFalse(exercise.accepts("no"))
