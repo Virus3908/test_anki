@@ -6688,12 +6688,20 @@
       "correctError",
       "assembleSentence"
     ],
-    "availableKinds": [],
+    "availableKinds": [
+      "fillBlank",
+      "chooseContext",
+      "transformSentence",
+      "assembleSentence",
+      "correctError",
+      "distinguishMeaning",
+      "understandSentence"
+    ],
     "algorithmicForms": [],
     "sourceExampleCount": 3,
-    "status": "plannedNeedsAuthoring",
+    "status": "authoredNeedsReview",
     "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
-    "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+    "limitationRU": "Материал составлен автором и требует лингвистической проверки."
   },
   "yotei": {
     "categories": [
@@ -9011,12 +9019,20 @@
       "correctError",
       "assembleSentence"
     ],
-    "availableKinds": [],
+    "availableKinds": [
+      "fillBlank",
+      "chooseContext",
+      "transformSentence",
+      "assembleSentence",
+      "correctError",
+      "distinguishMeaning",
+      "understandSentence"
+    ],
     "algorithmicForms": [],
     "sourceExampleCount": 3,
-    "status": "plannedNeedsAuthoring",
+    "status": "authoredNeedsReview",
     "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
-    "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+    "limitationRU": "Материал составлен автором и требует лингвистической проверки."
   },
   "te-wa-ikenai": {
     "categories": [

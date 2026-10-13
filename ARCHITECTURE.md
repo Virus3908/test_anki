@@ -712,7 +712,7 @@ Calendar — полночь. Observation обновляет превью при 
 GrammarRule/GrammarTeaching/GrammarExercise отделяют исходники, короткий урок и
 задачи от SRS. GrammarDataLoader кеширует 526 исходных правил и 1526 примеров;
 невалидные упражнения отключают только практику своего правила. Подготовлены
-8 учебных адаптаций / 67 задач; полный корпус остаётся незавершённым.
+10 учебных адаптаций / 83 задачи; полный корпус остаётся незавершённым.
 
 Короткий урок → адаптивная практика → краткий результат → общая очередь.
 Повторение сразу открывает практику. GrammarPracticeViewModel держит ответы,
@@ -731,3 +731,10 @@ GrammarExerciseEngine выбирает урок независимо от SwiftU
 японскую запись или чтение однозначной формы; предложения используют авторские ключи.
 GrammarPracticeMetadata содержит предварительный план по всем 526 ID.
 GrammarSupplement хранит только пять MIT-записей Nihongo Mono, с pinned commit и лицензией.
+
+GrammarSessionPlanner объединяет кандидатов прежнего TrainingSessionEngine
+по выбранным уровням с собственными effectiveOptions. GrammarMixedSessionViewModel
+удерживает прежние модели попыток и чередует вопросы с cooldown/seed; максимум
+четыре правила. TrainingSessionViewModel сохраняет одну оценку каждого завершённого
+правила через прежний ReviewRepository и ReviewUndo. Черновик смешанной попытки
+временный. GrammarExercise.ruby использует прежний FuriganaParser/FuriganaText.

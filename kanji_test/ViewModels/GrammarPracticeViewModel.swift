@@ -32,6 +32,8 @@ final class GrammarPracticeViewModel {
     private var reserve: [GrammarExercise]
     private var remediationCount = 0
     private let previousRating: ReviewRating?
+    private let initialExercises: [GrammarExercise]
+    private let initialReserve: [GrammarExercise]
     static let maximumCount = GrammarExerciseEngine.maximumCount
 
     init(rule: GrammarRule, seed: String, freePractice: Bool = false, isReview: Bool = false, attempt: Int = 0,
@@ -41,6 +43,7 @@ final class GrammarPracticeViewModel {
         self.previousRating = previousRating
         let plan = GrammarExerciseEngine.plan(rule: rule, seed: seed, isReview: isReview, attempt: attempt, previousRating: previousRating)
         exercises = plan.exercises; reserve = plan.reserve
+        initialExercises = plan.exercises; initialReserve = plan.reserve
         let example = rule.examples.first ?? GrammarExample(ja: "", en: "", furigana: nil, ru: nil)
         recallPrompts = [
             RecallPrompt(id: "\(rule.id):meaning", question: "Объясни смысл в контексте.", cue: rule.pattern, sourceAnswer: rule.displayedMeaning),
@@ -67,6 +70,12 @@ final class GrammarPracticeViewModel {
         }
     }
     func close() { isClosed = true }
+    func restartAttempt() {
+        exercises = initialExercises; reserve = initialReserve; remediationCount = 0
+        position = 0; results = []; selectedOptionID = nil; selectedElements = []; textAnswer = ""
+        isAnswerVisible = false; usedHint = false; isSaved = false; isSaving = false; isClosed = false
+        isLessonRead = isReview
+    }
     func beginSaving() -> ReviewRating? {
         guard !isSaving, let rating = proposedRating else { return nil }
         isSaving = true

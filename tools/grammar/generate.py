@@ -27,6 +27,7 @@ def generate():
     lessons = materials()
     practice_metadata = json.loads((SOURCE.parent / 'practice-metadata.json').read_text())
     supplements = json.loads((SOURCE.parent / 'nihongo-mono.json').read_text())
+    ruby = json.loads((SOURCE.parent / 'furigana.json').read_text())['texts']
     all_rules = [rule for level in COUNTS
                  for rule in json.loads((SOURCE / (level.lower() + '.json')).read_text())]
     patterns = {}
@@ -74,6 +75,8 @@ def generate():
                 rule['supplement']['examples'] = [{k: e[k] for k in ('ja', 'en')} for e in entry['examples']]
             if rule['id'] in lessons:
                 rule['teaching'] = lessons[rule['id']]['teaching']
+                example = rule['teaching']['example']
+                example['furigana'] = ruby.get(example['ja'])
             if relations:
                 rule['relations'] = relations
             if rule['id'] in overlay:
@@ -124,6 +127,19 @@ def generate():
         'translationPolicy': 'on-device-en-ru',
         'releaseReady': all(r.get('teaching') and len(r.get('exercises', [])) >= 4 for r in imported),
         'manualLinguisticReviewClaimed': False})
+    write(OUTPUT / 'grammar-audit.json', {'schemaVersion': 1, 'rules': [{
+        'id': r['id'], 'level': r['level'], 'categories': r['tags'],
+        'exerciseCount': len(r.get('exercises', [])),
+        'kinds': sorted({e['kind'] for e in r.get('exercises', [])}),
+        'competencies': sorted({e['competency'] for e in r.get('exercises', [])}),
+        'uniqueContexts': len({(e['promptRU'], e.get('japanese')) for e in r.get('exercises', [])}),
+        'explicitAnswerKeys': sum(bool(e.get('acceptedOptionIDs') or e.get('acceptedOrders')) for e in r.get('exercises', [])),
+        'algorithmicForms': r['practiceMetadata']['algorithmicForms'],
+        'sourceExamples': len(r['examples']),
+        'needsAuthoredPractice': not bool(r.get('exercises')),
+        'needsLinguisticReview': True,
+        'furiganaTexts': sum(len(e.get('furigana', {})) for e in r.get('exercises', [])),
+    } for r in imported]})
     print(f'Imported {len(seen)} rules / {examples} examples from {SHA}. Check manifest for localization coverage.')
 
 if __name__ == '__main__':

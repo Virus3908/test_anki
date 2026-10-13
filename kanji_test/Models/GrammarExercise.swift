@@ -46,6 +46,26 @@ nonisolated struct GrammarExercise: Identifiable, Codable, Sendable {
     var isScored: Bool? = nil
     var conjugation: ConjugationTask? = nil
     var competency: GrammarCompetency? = nil
+    /// Exact text -> explicit bracket markup. Never infer a reading at runtime.
+    var furigana: [String: String]? = nil
+    var testsReading: Bool? = nil
+    var requiredRuleIDs: [String]? = nil
+
+    func ruby(for text: String) -> ExampleFurigana? {
+        guard testsReading != true, let markup = furigana?[text],
+              FuriganaParser.parse(markup, original: text) != nil else { return nil }
+        return ExampleFurigana(transcriptions: [.init(text: markup, script: "Hrkt", type: "altscript")],
+            checkedAt: Date(timeIntervalSince1970: 0))
+    }
+    func ruby(for order: [String]) -> ExampleFurigana? {
+        guard testsReading != true else { return nil }
+        let selected = order.compactMap { id in options.first { $0.id == id } }
+        guard selected.count == order.count else { return nil }
+        let text = selected.map(\.text).joined()
+        let markup = selected.map { furigana?[$0.text] ?? $0.text }.joined()
+        guard FuriganaParser.parse(markup, original: text) != nil else { return nil }
+        return ExampleFurigana(transcriptions: [.init(text: markup, script: "Hrkt", type: "altscript")], checkedAt: Date(timeIntervalSince1970: 0))
+    }
 
     struct ConjugationTask: Codable, Sendable {
         let verb: GrammarConjugationEngine.Verb

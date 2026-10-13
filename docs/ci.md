@@ -97,3 +97,9 @@ XCTest measure в hosted job без произвольного порога вр
 только на GitHub; локально тесты и Simulator не запускаются. Новые Swift-файлы
 автоматически включаются через PBXFileSystemSynchronizedRootGroup. Все три
 существующих jobs сохранены.
+
+Смешанная грамматика: GrammarMixedSessionTests и GrammarFuriganaTests запускаются
+в прежнем hosted job. validate_ci.py проверяет 526 записей grammar-audit.json и
+точное восстановление текстов ruby; release job по-прежнему требует полноценные
+уроки всего корпуса. GrammarUITests сохраняет дополнительные screenshots ввода,
+смешанного вопроса, переключения фуриганы, ошибки и результата; экспорт прежний.

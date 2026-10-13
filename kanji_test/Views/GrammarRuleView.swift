@@ -71,26 +71,32 @@ struct GrammarLessonContent: View {
     let translationState: TranslationViewModel
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            Text(rule.pattern).font(.largeTitle.weight(.semibold))
-                .accessibilityIdentifier("grammar.lesson.title")
-            Text(rule.teaching?.meaningRU ?? translated(rule.displayedMeaning)).font(.title3)
-            if let teaching = rule.teaching {
-                Text(teaching.usageRU).foregroundStyle(AppPalette.secondaryText)
-            }
+            VStack(alignment: .leading, spacing: 10) {
+                Text(rule.pattern).font(.largeTitle.weight(.semibold))
+                    .accessibilityIdentifier("grammar.lesson.title")
+                Text(rule.teaching?.meaningRU ?? translated(rule.displayedMeaning)).font(.title3)
+                if let teaching = rule.teaching {
+                    Text(teaching.usageRU).foregroundStyle(AppPalette.secondaryText)
+                }
+            }.frame(maxWidth: .infinity, alignment: .leading).padding(16).appSurfaceCard()
             VStack(alignment: .leading, spacing: 8) {
                 Text("Как образуется").font(.headline)
                 Text(rule.teaching?.formationRU ?? translated(rule.displayedFormation))
                     .fixedSize(horizontal: false, vertical: true)
-            }
+            }.frame(maxWidth: .infinity, alignment: .leading).padding(16).appSurfaceCard()
             if let teaching = rule.teaching {
                 VStack(alignment: .leading, spacing: 12) {
-                    Text(highlighted(teaching)).font(.title2)
+                    Text("Пример").font(.headline)
+                    FuriganaText(text: teaching.example.ja, furigana: teaching.example.ruby, showsFurigana: settings.showExampleFurigana).font(.title2)
                         .fixedSize(horizontal: false, vertical: true)
                     Text(teaching.example.ru ?? "").foregroundStyle(AppPalette.secondaryText)
+                }.frame(maxWidth: .infinity, alignment: .leading).padding(16).appSurfaceCard().accessibilityIdentifier("grammar.example")
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Разбор").font(.headline)
                     ForEach(Array(teaching.parts.enumerated()), id: \.offset) { _, part in
                         Text(part.text + " — " + part.roleRU).font(.callout)
                     }
-                }.accessibilityIdentifier("grammar.example")
+                }.frame(maxWidth: .infinity, alignment: .leading).padding(16).appSurfaceCard()
             } else if let example = rule.examples.first {
                 exampleView(example)
             }

@@ -41,6 +41,9 @@ struct GrammarLevelView: View, StudyViewStyling {
     @State private var model = GrammarLibraryViewModel()
     @State private var query = ""
     @State private var category: GrammarCategory?
+    @State private var selectedLevels: Set<GrammarLevel> = []
+    @State private var scope: GrammarSessionPlanner.Scope = .mixed
+    private var practiceLevels: Set<GrammarLevel> { selectedLevels.isEmpty ? [level] : selectedLevels }
 
     private var rules: [GrammarRule] { model.rules.filter { $0.level == level } }
     private var categories: [GrammarCategory] {
@@ -62,6 +65,23 @@ struct GrammarLevelView: View, StudyViewStyling {
                 }
                 if !rules.isEmpty {
                     statistics
+                    DisclosureGroup("Область тренировки") {
+                        Picker("Режим", selection: $scope) {
+                            Text("Смешанная тренировка").tag(GrammarSessionPlanner.Scope.mixed)
+                            Text("Новые правила").tag(GrammarSessionPlanner.Scope.newRules)
+                            Text("Повторять изученные").tag(GrammarSessionPlanner.Scope.studied)
+                        }.pickerStyle(.menu)
+                        ForEach(GrammarLevel.allCases) { item in
+                            Toggle(item.rawValue, isOn: Binding(get: { practiceLevels.contains(item) }, set: { enabled in
+                                var next = practiceLevels
+                                if enabled { next.insert(item) } else { next.remove(item) }
+                                if !next.isEmpty { selectedLevels = next }
+                            })).accessibilityIdentifier("grammar.scope.\(item.rawValue)")
+                        }
+                        Button("Все изученные правила") {
+                            appModel.startMixedGrammar(levels: Set(GrammarLevel.allCases), scope: .studied)
+                        }.accessibilityIdentifier("grammar.mixed.allStudied")
+                    }.accessibilityIdentifier("grammar.scope")
                     Text("Практика: \(rules.filter { $0.teaching != nil }.count) из \(rules.count) правил. Все правила доступны для чтения.").font(.caption).foregroundStyle(AppPalette.secondaryText)
                     TextField("Конструкция, чтение, значение", text: $query)
                         .textFieldStyle(.roundedBorder).autocorrectionDisabled().textInputAutocapitalization(.never)
@@ -97,10 +117,10 @@ struct GrammarLevelView: View, StudyViewStyling {
         .background(AppPalette.background.ignoresSafeArea()).toolbar(.hidden, for: .navigationBar)
         .safeAreaInset(edge: .bottom) {
             BottomActionBar {
-                primaryActionButton(title: "Начать обучение", systemImage: "checklist",
-                    accessibilityIdentifier: "grammar.learn") { appModel.startGrammar(level) }
+                primaryActionButton(title: "Смешанная тренировка", systemImage: "checklist",
+                    accessibilityIdentifier: "grammar.learn") { appModel.startMixedGrammar(levels: practiceLevels, scope: scope) }
                 GlassIconButton(systemImage: "arrow.clockwise", accessibilityLabel: "Повторить изученное",
-                    accessibilityIdentifier: "grammar.review") { appModel.startGrammar(level, reviewsOnly: true) }
+                    accessibilityIdentifier: "grammar.review") { appModel.startMixedGrammar(levels: practiceLevels, scope: .studied) }
             }
         }
         .task { await model.load() }

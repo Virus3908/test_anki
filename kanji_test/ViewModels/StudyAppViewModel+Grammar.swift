@@ -4,6 +4,10 @@ extension StudyAppViewModel {
     /// Free rule selection uses the same planner and daily grants as sequential study.
     /// Review-only starts from already introduced rules, including learning/relearning.
     func startGrammar(_ level: GrammarLevel, ruleID: String? = nil, reviewsOnly: Bool = false) {
+        if ruleID == nil {
+            startMixedGrammar(levels: [level], scope: reviewsOnly ? .studied : .mixed)
+            return
+        }
         guard !isSavingReview, !deckState.isLoadingDeck else { return }
         trainingStartTask?.cancel()
         trainingStartTask = Task { [weak self] in
@@ -26,8 +30,7 @@ extension StudyAppViewModel {
                         errors.message = "Практика для этого правила ещё готовится. Объяснение и примеры доступны."
                         return
                     }
-                    let selected = source.remove(at: index)
-                    source.insert(selected, at: 0)
+                    source = [source[index]]
                 }
                 guard !source.isEmpty else {
                     errors.message = reviewsOnly ? "Пока нет изученных правил для повторения." : "Практика этого уровня ещё готовится."
@@ -40,6 +43,26 @@ extension StudyAppViewModel {
                 else if trainingSession.didCompleteToday { isTodayCompletionPresented = true }
             } catch is CancellationError { }
             catch { errors.report("Не удалось загрузить грамматику.", error: error) }
+        }
+    }
+    func startMixedGrammar(levels: Set<GrammarLevel>, scope: GrammarSessionPlanner.Scope = .mixed) {
+        guard !isSavingReview, !deckState.isLoadingDeck, !levels.isEmpty else { return }
+        trainingStartTask?.cancel()
+        trainingStartTask = Task { [weak self] in
+            guard let self else { return }
+            defer { trainingStartTask = nil }
+            do {
+                let rules = try await GrammarDataLoader.shared.allRules()
+                try Task.checkCancellation()
+                _ = catalog.register(rules)
+                let started = await trainingSession.startMixedGrammar(rules: rules, levels: levels, scope: scope)
+                guard started else {
+                    errors.message = "В выбранной области сейчас нет доступных правил с подготовленной практикой. Проверь расписание и дневные лимиты."
+                    return
+                }
+                navigation.beginTraining(.grammar)
+            } catch is CancellationError { }
+            catch { errors.report("Не удалось начать смешанную тренировку.", error: error) }
         }
     }
 }

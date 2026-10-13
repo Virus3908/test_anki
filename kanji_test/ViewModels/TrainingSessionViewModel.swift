@@ -18,6 +18,91 @@ final class TrainingSessionViewModel {
     /// Keeps grammar feedback visible after persistence, until explicit continuation.
     private(set) var isGrammarResultPending = false
     private var grammarPractice: GrammarPracticeViewModel?
+    private(set) var grammarMixed: GrammarMixedSessionViewModel?
+    private var grammarMixedSourceRules: [GrammarRule] = []
+    private var grammarMixedUndo: [ReviewUndo] = []
+
+    func startMixedGrammar(rules: [GrammarRule], levels: Set<GrammarLevel>, scope: GrammarSessionPlanner.Scope) async -> Bool {
+        guard hasLoadedProgress, !isPreparingCard, !levels.isEmpty else { return false }
+        _ = catalog.register(rules)
+        settings.expireAdditionalCards(studyDay: reviewStore.studyDate())
+        let deckOptions = Dictionary(uniqueKeysWithValues: levels.map { ($0, effectiveOptions(for: $0.deck.id)) })
+        let candidates = GrammarSessionPlanner.candidates(rules: rules, levels: levels, scope: scope,
+            progress: reviewStore, options: deckOptions)
+        let existing = grammarMixed
+        let canResume = existing.map { !$0.isComplete && $0.levels == levels && $0.scope == scope
+            && Calendar.current.isDate($0.studyDay, inSameDayAs: reviewStore.studyDate()) } ?? false
+        guard canResume || !candidates.isEmpty else { return false }
+        if !canResume {
+            grammarMixedUndo = []
+            grammarMixed = GrammarMixedSessionViewModel(candidates: candidates, levels: levels, scope: scope,
+                progress: reviewStore, seed: "\(levels.map(\.rawValue).sorted().joined()):\(reviewStore.studyDate().formatted(.iso8601.year().month().day()))")
+        }
+        grammarMixedSourceRules = rules
+        var next = TrainingSessionState()
+        next.deck = GrammarLevel.allCases.first(where: { levels.contains($0) })?.deck
+        next.queue = .make(mode: .grammar, ids: grammarMixed?.sourceIDs ?? [], sourceIDs: rules.map(\.id))
+        next.todayIDs = grammarMixed?.sourceIDs ?? []; next.studyDay = reviewStore.studyDate()
+        // Keep the current in-memory undo chain when resuming this same attempt.
+        if canResume { next.undoHistory = grammarMixedUndo }
+        didCompleteToday = false; isGrammarResultPending = false
+        publish(next)
+        return true
+    }
+
+    /// Introduction reserves a new-card slot through the existing persisted firstShownAt.
+    func introduceMixedGrammarRule() async {
+        guard let mixed = grammarMixed, let practice = mixed.current, !practice.isLessonRead,
+              !isPreparingCard else { return }
+        if hasStudyDayChanged { await refreshForNewDay(); return }
+        isPreparingCard = true; defer { isPreparingCard = false }
+        var progress = reviewStore
+        let rule = practice.rule
+        let allowed = GrammarSessionPlanner.candidates(rules: grammarMixedSourceRules, levels: mixed.levels,
+            scope: mixed.scope, progress: progress,
+            options: Dictionary(uniqueKeysWithValues: mixed.levels.map { ($0, effectiveOptions(for: $0.deck.id)) }))
+        guard progress.firstShownAt[rule.reviewKey] != nil || progress.record(for: rule.reviewKey) != nil
+            || allowed.contains(where: { $0.rule.id == rule.id }) else {
+            grammarMixed = nil; grammarMixedUndo = []
+            publish(TrainingSessionState())
+            errors.message = "Дневной лимит изменился. Начни новую тренировку с текущими настройками."; return
+        }
+        progress.markShown(rule.reviewKey)
+        do { try await repository.save(progress); reviewStore = progress; practice.isLessonRead = true }
+        catch { errors.report("Не удалось начать изучение правила.", error: error) }
+    }
+
+    func advanceMixedGrammar() async {
+        guard mode == .grammar, let mixed = grammarMixed, !isPreparingCard else { return }
+        if hasStudyDayChanged { await refreshForNewDay(); return }
+        mixed.advance()
+        await saveMixedGrammarResults()
+    }
+    func saveMixedGrammarResults() async {
+        guard mode == .grammar, let mixed = grammarMixed, !isPreparingCard else { return }
+        if hasStudyDayChanged { await refreshForNewDay(); return }
+        isPreparingCard = true; defer { isPreparingCard = false }
+        for practice in mixed.practices where practice.isComplete && !practice.isSaved {
+            guard let rating = practice.beginSaving() else { continue }
+            let rule = practice.rule
+            var progress = reviewStore
+            let previous = progress.record(for: rule.reviewKey)
+            do {
+                let logID = try progress.apply(rating, to: rule.reviewKey, deckID: rule.level.deck.id,
+                    options: effectiveOptions(for: rule.level.deck.id))
+                try await repository.save(progress)
+                reviewStore = progress
+                state.undoHistory.append(ReviewUndo(id: rule.id, reviewKey: rule.reviewKey, recordBefore: previous, logID: logID))
+                state.sessionCompletedCards += 1
+                grammarMixedUndo = state.undoHistory
+                practice.finishSaving(success: true)
+            } catch {
+                practice.finishSaving(success: false)
+                errors.report("Результат правила не сохранён. Повтори сохранение.", error: error)
+                break
+            }
+        }
+    }
 
     /// Keep unfinished answers in memory across navigation/settings. No second progress store.
     func practice(for rule: GrammarRule) -> GrammarPracticeViewModel {
@@ -91,6 +176,7 @@ final class TrainingSessionViewModel {
     }
 
     var currentGrammarRule: GrammarRule? {
+        if mode == .grammar, let mixed = grammarMixed { return mixed.current?.rule }
         guard mode == .grammar, let id = queueIDs[safe: currentIndex] else { return nil }
         return catalog.grammar(id)
     }
@@ -153,6 +239,7 @@ final class TrainingSessionViewModel {
         progress.resetProgress(for: keys)
         try await repository.save(progress)
         reviewStore = progress
+        if grammarMixed?.practices.contains(where: { keys.contains($0.rule.reviewKey) }) == true { grammarMixed = nil }
         if let mode, state.queue.value?.sourceIDs.contains(where: { keys.contains(ReviewItem(id: $0, mode: mode).reviewKey) }) == true {
             didCompleteToday = false
             publish(TrainingSessionState())
@@ -177,6 +264,7 @@ final class TrainingSessionViewModel {
     }
     func start(deck: StudyDeck, sourceIDs: [String], guided: Bool = false) async -> Bool {
         guard hasLoadedProgress, !isPreparingCard else { return false }
+        grammarMixed = nil
         didCompleteToday = false
         isGrammarResultPending = false
         isPreparingCard = true
@@ -204,6 +292,7 @@ final class TrainingSessionViewModel {
         }
     }
     func submitReview(_ rating: ReviewRating, expectedKey: String?, holdGrammarResult: Bool = false) async {
+        guard grammarMixed == nil else { return }
         guard hasLoadedProgress, !isPreparingCard, !isGrammarResultPending, let mode, let deck,
               let id = queueIDs[safe: currentIndex] else { return }
         if hasStudyDayChanged { await refreshForNewDay(); return }
@@ -266,12 +355,14 @@ final class TrainingSessionViewModel {
         var next = state
         next.undoHistory.removeLast()
         next.sessionCompletedCards = max(0, next.sessionCompletedCards - 1)
-        rebuild(&next, progress: progress, preferredID: undo.id)
+        if grammarMixed == nil { rebuild(&next, progress: progress, preferredID: undo.id) }
         do {
             try await repository.save(progress)
             reviewStore = progress
             isGrammarResultPending = false
             grammarPractice = nil
+            grammarMixed?.restartAfterUndo(ruleID: undo.id)
+            if grammarMixed != nil { grammarMixedUndo = next.undoHistory }
             publish(next)
         } catch { errors.report("Не удалось отменить ответ.", error: error) }
     }
@@ -304,6 +395,7 @@ final class TrainingSessionViewModel {
     }
     func finish() {
         guard !isPreparingCard else { return }
+        if grammarMixed != nil { grammarMixedUndo = state.undoHistory }
         didCompleteToday = false
         isGrammarResultPending = false
         publish(TrainingSessionState())
@@ -329,6 +421,10 @@ final class TrainingSessionViewModel {
         return !Calendar.current.isDate(day, inSameDayAs: reviewStore.studyDate())
     }
     func refreshForNewDay() async {
+        if grammarMixed != nil {
+            if hasStudyDayChanged { finish(); grammarMixed = nil }
+            return
+        }
         guard isActive, !isPreparingCard, !isGrammarResultPending, !isGuidedSingleKanjiPractice else { return }
         isPreparingCard = true
         defer { isPreparingCard = false }

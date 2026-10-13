@@ -40,7 +40,7 @@ final class GrammarUITests: UITestCase {
         XCTAssertTrue(element("grammar.training.saved").waitForExistence(timeout: 10))
         capture("07-lesson-result")
         XCTAssertTrue(element("grammar.training.result").label.contains("5 из 5"))
-        tap("grammar.training.continue", .rateCard, expecting: "grammar.training.begin")
+        tap("grammar.training.continue", .rateCard, expecting: "grammar.training.next")
         tap("grammar.training.undo", .rateCard, expecting: "grammar.training.begin")
         tap(ID.Preview.back, .exitTraining, expecting: "grammar.practice")
     }
@@ -106,6 +106,71 @@ final class GrammarUITests: UITestCase {
             element("start.sectionSwitcher").swipeLeft()
         }
         tap("start.section.grammar", .switchSection, expecting: "grammar.total")
+    }
+    func testMixedQuestionsIntroductionsFuriganaAndSessionResult() {
+        launch()
+        openGrammar()
+        scrollTo("grammar.level.N5")
+        tap("grammar.level.N5", .openDeck, expecting: "grammar.statistics")
+        tap("grammar.learn", .startTraining, expecting: "grammar.training.begin")
+        capture("14-mixed-first-introduction")
+        var ids: [String] = []
+        var count = 0
+        while !element("grammar.mixed.result").exists && count < 32 {
+            if element("grammar.training.begin").exists {
+                tap("grammar.training.begin", .startTraining, expecting: "grammar.training.prompt")
+            }
+            let prompt = element("grammar.training.prompt")
+            XCTAssertTrue(prompt.waitForExistence(timeout: 10))
+            let id = prompt.value as? String ?? ""
+            ids.append(id.components(separatedBy: ":").first ?? "")
+            XCTAssertFalse(element("grammar.lesson.title").exists)
+            if count == 0 { capture("15-mixed-exercise-furigana") }
+            if element("grammar.form.answer").exists {
+                element("grammar.form.answer").tap()
+                element("grammar.form.answer").typeText("wrong")
+                tap("grammar.training.next", .revealCard, expecting: "grammar.training.feedback")
+            } else if element("grammar.assembly").exists {
+                // The test deliberately submits an incomplete order to exercise remediation.
+                scrollTo("grammar.element.0"); element("grammar.element.0").tap()
+                tap("grammar.training.next", .revealCard, expecting: "grammar.training.feedback")
+            } else {
+                scrollTo("grammar.option.1")
+                tap("grammar.option.1", .revealCard, expecting: "grammar.training.feedback")
+            }
+            if count == 0 { capture("16-mixed-wrong-answer") }
+            scrollTo("grammar.training.next")
+            step(.revealCard, until: {
+                self.element("grammar.mixed.result").exists || self.element("grammar.training.begin").exists ||
+                    (self.element("grammar.training.prompt").value as? String != id)
+            }) { element("grammar.training.next").tap() }
+            count += 1
+        }
+        XCTAssertTrue(element("grammar.mixed.result").waitForExistence(timeout: 10))
+        XCTAssertGreaterThan(Set(ids).count, 1)
+        XCTAssertNotEqual(ids.first, ids.dropFirst().first)
+        XCTAssertTrue(ids.dropFirst(2).contains(ids.first ?? ""))
+        capture("17-mixed-session-result")
+    }
+    func testExerciseFuriganaFollowsExistingToggle() {
+        launch()
+        openWaLesson()
+        scrollTo("grammar.lesson.examples")
+        element("grammar.lesson.examples").tap()
+        scrollTo("grammar.furigana")
+        let toggle = element("grammar.furigana")
+        toggle.tap()
+        tap("grammar.practice", .startTraining, expecting: "grammar.training.begin")
+        tap("grammar.training.begin", .startTraining, expecting: "grammar.training.prompt")
+        XCTAssertEqual(element("grammar.training.japanese").value as? String, "plain")
+        tap("grammar.training.theory", .openDeck, expecting: "grammar.lesson.title")
+        scrollTo("grammar.lesson.examples")
+        element("grammar.lesson.examples").tap()
+        scrollTo("grammar.furigana"); element("grammar.furigana").tap()
+        app.buttons["Закрыть"].tap()
+        XCTAssertTrue(element("grammar.training.japanese").waitForExistence(timeout: 5))
+        XCTAssertEqual(element("grammar.training.japanese").value as? String, "furigana")
+        capture("18-exercise-ruby-enabled")
     }
 
     private func openWaLesson() {

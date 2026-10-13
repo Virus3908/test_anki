@@ -87,6 +87,10 @@
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
           },
+          "furigana": {
+            "兄（　）医者です。": "[兄|あに]（　）医者です。",
+            "兄 — тема; после は сообщается, что брат врач.": "[兄|あに] — тема; после は сообщается, что брат врач."
+          },
           "competency": "formation"
         },
         {
@@ -127,6 +131,11 @@
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
           },
+          "furigana": {
+            "この部屋は静かです。": "この部屋は[静か|しずか]です。",
+            "この部屋は静かではありません。": "この部屋は[静か|しずか]ではありません。",
+            "あの部屋は静かです。": "あの部屋は[静か|しずか]です。"
+          },
           "competency": "context"
         },
         {
@@ -166,6 +175,13 @@
             "exampleIndex": null,
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
+          },
+          "furigana": {
+            "東京 / 大きい町です": "[東京|とうきょう] / 大きい町です",
+            "Сначала тема 東京は, затем новое сообщение 大きい町です.": "Сначала тема [東京|とうきょう]は, затем новое сообщение 大きい町です.",
+            "東京は大きい町です。": "[東京|とうきょう]は大きい町です。",
+            "大きい町は東京です。": "大きい町は[東京|とうきょう]です。",
+            "東京は小さい町です。": "[東京|とうきょう]は小さい町です。"
           },
           "competency": "application"
         },
@@ -216,6 +232,7 @@
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
           },
+          "furigana": {},
           "competency": "application"
         },
         {
@@ -255,6 +272,12 @@
             "exampleIndex": null,
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
+          },
+          "furigana": {
+            "妹を学生です。": "妹を[学生|がくせい]です。",
+            "妹は学生です。": "妹は[学生|がくせい]です。",
+            "妹は先生です。": "妹は[先生|せんせい]です。",
+            "妹に学生です。": "妹に[学生|がくせい]です。"
           },
           "competency": "correction"
         },
@@ -296,6 +319,13 @@
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
           },
+          "furigana": {
+            "誰が来ましたか。": "誰が[来ま|きま]したか。",
+            "田中さんが выделяет того, кто пришёл. Другие ответы сообщают профессию или отрицают приход.": "[田中|たなか]さんが выделяет того, кто пришёл. Другие ответы сообщают профессию или отрицают приход.",
+            "田中さんが来ました。": "[田中|たなか]さんが[来ま|きま]した。",
+            "田中さんは学生です。": "[田中|たなか]さんは[学生|がくせい]です。",
+            "田中さんは来ませんでした。": "[田中|たなか]さんは[来ま|きま]せんでした。"
+          },
           "competency": "contrast"
         },
         {
@@ -335,6 +365,9 @@
             "exampleIndex": null,
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
+          },
+          "furigana": {
+            "この映画は長いです。": "この[映画|えいが]は長いです。"
           },
           "competency": "meaning"
         },
@@ -381,6 +414,10 @@
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
           },
+          "furigana": {
+            "今日（　）休みです。": "[今日|きょう]（　）[休み|やすみ]です。",
+            "今日は задаёт тему: сегодня.": "[今日|きょう]は задаёт тему: сегодня."
+          },
           "competency": "formation"
         }
       ],
@@ -421,7 +458,7 @@
           "ja": "この店は安いです。",
           "en": "This shop is inexpensive.",
           "ru": "Этот магазин недорогой.",
-          "furigana": null
+          "furigana": "この[店|みせ]は安いです。"
         },
         "parts": [
           {
@@ -2458,6 +2495,15 @@
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
           },
+          "furigana": {
+            "日本へ（　）たいです。": "[日本|にほん]へ（　）たいです。",
+            "Хочу поехать в Японию. Выбери форму 行く.": "Хочу поехать в Японию. Выбери форму [行く|いく].",
+            "行きます → 行き + たい: перед たい нужна основа ます.": "[行き|いき]ます → [行き|いき] + たい: перед たい нужна основа ます.",
+            "行き": "[行き|いき]",
+            "行く": "[行く|いく]",
+            "行って": "[行っ|いっ]て",
+            "行った": "[行っ|いっ]た"
+          },
           "competency": "formation"
         },
         {
@@ -2498,6 +2544,12 @@
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
           },
+          "furigana": {
+            "見たい — хочу смотреть; 見ました — смотрел; 見たくない — не хочу смотреть.": "[見たい|みたい] — хочу смотреть; 見ました — смотрел; [見た|みた]くない — не хочу смотреть.",
+            "今夜、映画を見たいです。": "[今夜|こんや]、[映画|えいが]を[見たい|みたい]です。",
+            "今夜、映画を見ました。": "[今夜|こんや]、[映画|えいが]を見ました。",
+            "今夜、映画を見たくないです。": "[今夜|こんや]、[映画|えいが]を[見た|みた]くないです。"
+          },
           "competency": "context"
         },
         {
@@ -2537,6 +2589,13 @@
             "exampleIndex": null,
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
+          },
+          "furigana": {
+            "日本語を勉強します。": "[日本語|にほんご]を[勉強|べんきょう]します。",
+            "勉強します → 勉強したいです: убираем ます и добавляем たいです.": "[勉強|べんきょう]します → [勉強|べんきょう]したいです: убираем ます и добавляем たいです.",
+            "日本語を勉強したいです。": "[日本語|にほんご]を[勉強|べんきょう]したいです。",
+            "日本語を勉強しました。": "[日本語|にほんご]を[勉強|べんきょう]しました。",
+            "日本語を勉強したくないです。": "[日本語|にほんご]を[勉強|べんきょう]したくないです。"
           },
           "competency": "application"
         },
@@ -2598,6 +2657,13 @@
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
           },
+          "furigana": {
+            "買います → 買い; 買いたい — хочу купить.": "[買い|かい]ます → [買い|かい]; [買い|かい]たい — хочу купить.",
+            "車を": "[車|くるま]を",
+            "買い": "[買い|かい]",
+            "買う": "[買う|かう]",
+            "車を買いたいです。": "[車|くるま]を[買い|かい]たいです。"
+          },
           "competency": "application"
         },
         {
@@ -2637,6 +2703,13 @@
             "exampleIndex": null,
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
+          },
+          "furigana": {
+            "この本を読むたいです。": "この[本|ほん]を[読む|よむ]たいです。",
+            "読む → 読みます → 読みたい. Словарная форма перед たい не подходит.": "[読む|よむ] → [読み|よみ]ます → [読み|よみ]たい. Словарная форма перед たい не подходит.",
+            "この本を読みたいです。": "この[本|ほん]を[読み|よみ]たいです。",
+            "この本を読んだです。": "この[本|ほん]を[読ん|よん]だです。",
+            "この本を読みたくないです。": "この[本|ほん]を[読み|よみ]たくないです。"
           },
           "competency": "correction"
         },
@@ -2678,6 +2751,11 @@
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
           },
+          "furigana": {
+            "友達に来てほしいです。": "[友達|ともだち]に[来て|きて]ほしいです。",
+            "友達の家に行きたいです。": "[友達|ともだち]の[家|いえ]に[行き|いき]たいです。",
+            "友達は来ません。": "[友達|ともだち]は[来ま|きま]せん。"
+          },
           "competency": "contrast"
         },
         {
@@ -2717,6 +2795,9 @@
             "exampleIndex": null,
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
+          },
+          "furigana": {
+            "今日は働きたくないです。": "[今日|きょう]は[働き|はたらき]たくないです。"
           },
           "competency": "meaning"
         },
@@ -2762,6 +2843,15 @@
             "exampleIndex": null,
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
+          },
+          "furigana": {
+            "お茶を（　）たいです。": "[お茶|おちゃ]を（　）たいです。",
+            "Хочу выпить чаю. Выбери форму 飲む.": "Хочу выпить чаю. Выбери форму [飲む|のむ].",
+            "飲みます без ます: 飲み + たい.": "[飲み|のみ]ます без ます: [飲み|のみ] + たい.",
+            "飲み": "[飲み|のみ]",
+            "飲む": "[飲む|のむ]",
+            "飲んで": "[飲ん|のん]で",
+            "飲んだ": "[飲ん|のん]だ"
           },
           "competency": "formation"
         },
@@ -2814,6 +2904,12 @@
             "method": "explicit-verb-class-conjugation-v1; context-needs-linguistic-review",
             "status": "algorithmicallyChecked"
           },
+          "furigana": {
+            "食べる": "[食べ|たべ]る",
+            "食べたい": "[食べ|たべ]たい",
+            "食べない": "[食べ|たべ]ない",
+            "食べた": "[食べ|たべ]た"
+          },
           "competency": "formation"
         },
         {
@@ -2864,6 +2960,11 @@
             "exampleIndex": null,
             "method": "explicit-verb-class-conjugation-v1; context-needs-linguistic-review",
             "status": "algorithmicallyChecked"
+          },
+          "furigana": {
+            "読む": "[読む|よむ]",
+            "読みたい": "[読み|よみ]たい",
+            "読んだ": "[読ん|よん]だ"
           },
           "competency": "formation"
         }
@@ -2932,7 +3033,7 @@
           "ja": "新しい靴を買いたいです。",
           "en": "I want to buy new shoes.",
           "ru": "Я хочу купить новые туфли.",
-          "furigana": null
+          "furigana": "[新しい|あたらしい][靴|くつ]を[買い|かい]たいです。"
         },
         "parts": [
           {
@@ -3189,7 +3290,414 @@
         "permission"
       ],
       "notes": "Add ですか to ask for permission. A polite refusal is often just すみません、ちょっと….",
-      "exercises": [],
+      "exercises": [
+        {
+          "kind": "fillBlank",
+          "promptRU": "Разрешено писать карандашом. Выбери форму 書く.",
+          "japanese": "鉛筆で（　）もいいです。",
+          "options": [
+            {
+              "id": "0",
+              "text": "書いて",
+              "feedbackRU": null
+            },
+            {
+              "id": "1",
+              "text": "書き",
+              "feedbackRU": "書く → 書いて. Перед もいい нужна て-форма."
+            },
+            {
+              "id": "2",
+              "text": "書く",
+              "feedbackRU": "書く → 書いて. Перед もいい нужна て-форма."
+            },
+            {
+              "id": "3",
+              "text": "書いた",
+              "feedbackRU": "書く → 書いて. Перед もいい нужна て-форма."
+            }
+          ],
+          "acceptedOptionIDs": [
+            "0"
+          ],
+          "explanationRU": "書く → 書いて. Перед もいい нужна て-форма.",
+          "hintRU": "書く → 書いて. Перед もいい нужна て-форма.",
+          "aspect": "て-форма перед разрешением",
+          "difficulty": 1,
+          "id": "te-mo-ii:write",
+          "ruleID": "te-mo-ii",
+          "isScored": true,
+          "provenance": {
+            "commit": "0d1d3410bec90bd4098a7c72de820543cb4f707c",
+            "sourceRuleID": "te-mo-ii",
+            "exampleIndex": null,
+            "method": "explicit-context-authoring-v2",
+            "status": "automaticallyChecked"
+          },
+          "furigana": {
+            "鉛筆で（　）もいいです。": "[鉛筆|えんぴつ]で（　）もいいです。",
+            "Разрешено писать карандашом. Выбери форму 書く.": "Разрешено писать карандашом. Выбери форму [書く|かく].",
+            "書く → 書いて. Перед もいい нужна て-форма.": "[書く|かく] → [書い|かい]て. Перед もいい нужна て-форма.",
+            "書いて": "[書い|かい]て",
+            "書く": "[書く|かく]",
+            "書いた": "[書い|かい]た"
+          },
+          "competency": "formation"
+        },
+        {
+          "kind": "chooseContext",
+          "promptRU": "Ты спрашиваешь преподавателя, можно ли пользоваться словарём. Выбери просьбу о разрешении.",
+          "japanese": null,
+          "options": [
+            {
+              "id": "0",
+              "text": "辞書を使ってもいいですか。",
+              "feedbackRU": null
+            },
+            {
+              "id": "1",
+              "text": "辞書を使いました。",
+              "feedbackRU": "使ってもいいですか — можно ли пользоваться? Остальные варианты сообщают факт или отсутствие желания."
+            },
+            {
+              "id": "2",
+              "text": "辞書を使いたくないです。",
+              "feedbackRU": "使ってもいいですか — можно ли пользоваться? Остальные варианты сообщают факт или отсутствие желания."
+            }
+          ],
+          "acceptedOptionIDs": [
+            "0"
+          ],
+          "explanationRU": "使ってもいいですか — можно ли пользоваться? Остальные варианты сообщают факт или отсутствие желания.",
+          "hintRU": "使ってもいいですか — можно ли пользоваться? Остальные варианты сообщают факт или отсутствие желания.",
+          "aspect": "Разрешение и факт",
+          "difficulty": 2,
+          "requiredRuleIDs": [
+            "tai"
+          ],
+          "id": "te-mo-ii:context",
+          "ruleID": "te-mo-ii",
+          "isScored": true,
+          "provenance": {
+            "commit": "0d1d3410bec90bd4098a7c72de820543cb4f707c",
+            "sourceRuleID": "te-mo-ii",
+            "exampleIndex": null,
+            "method": "explicit-context-authoring-v2",
+            "status": "automaticallyChecked"
+          },
+          "furigana": {
+            "辞書を使ってもいいですか。": "[辞書|じしょ]を使ってもいいですか。",
+            "辞書を使いました。": "[辞書|じしょ]を使いました。",
+            "辞書を使いたくないです。": "[辞書|じしょ]を使いたくないです。"
+          },
+          "competency": "context"
+        },
+        {
+          "kind": "transformSentence",
+          "promptRU": "Преобразуй сообщение об открытии окна в вопрос о разрешении.",
+          "japanese": "窓を開けます。",
+          "options": [
+            {
+              "id": "0",
+              "text": "窓を開けてもいいですか。",
+              "feedbackRU": null
+            },
+            {
+              "id": "1",
+              "text": "窓を開けてはいけません。",
+              "feedbackRU": "開ける → 開けて + もいいですか. Это вопрос о разрешении."
+            },
+            {
+              "id": "2",
+              "text": "窓を開けました。",
+              "feedbackRU": "開ける → 開けて + もいいですか. Это вопрос о разрешении."
+            }
+          ],
+          "acceptedOptionIDs": [
+            "0"
+          ],
+          "explanationRU": "開ける → 開けて + もいいですか. Это вопрос о разрешении.",
+          "hintRU": "開ける → 開けて + もいいですか. Это вопрос о разрешении.",
+          "aspect": "て-форма перед разрешением",
+          "difficulty": 2,
+          "id": "te-mo-ii:transform",
+          "ruleID": "te-mo-ii",
+          "isScored": true,
+          "provenance": {
+            "commit": "0d1d3410bec90bd4098a7c72de820543cb4f707c",
+            "sourceRuleID": "te-mo-ii",
+            "exampleIndex": null,
+            "method": "explicit-context-authoring-v2",
+            "status": "automaticallyChecked"
+          },
+          "furigana": {
+            "窓を開けます。": "[窓|まど]を[開け|あけ]ます。",
+            "開ける → 開けて + もいいですか. Это вопрос о разрешении.": "[開け|あけ]る → [開け|あけ]て + もいいですか. Это вопрос о разрешении.",
+            "窓を開けてもいいですか。": "[窓|まど]を[開け|あけ]てもいいですか。",
+            "窓を開けてはいけません。": "[窓|まど]を[開け|あけ]てはいけません。",
+            "窓を開けました。": "[窓|まど]を[開け|あけ]ました。"
+          },
+          "competency": "application"
+        },
+        {
+          "kind": "assembleSentence",
+          "promptRU": "Собери: «Можно пить воду». Есть лишние формы.",
+          "japanese": null,
+          "options": [
+            {
+              "id": "0",
+              "text": "水を",
+              "feedbackRU": null
+            },
+            {
+              "id": "1",
+              "text": "飲んで",
+              "feedbackRU": "飲む → 飲んで. 飲んでもいい — разрешено пить."
+            },
+            {
+              "id": "2",
+              "text": "もいい",
+              "feedbackRU": "飲む → 飲んで. 飲んでもいい — разрешено пить."
+            },
+            {
+              "id": "3",
+              "text": "です。",
+              "feedbackRU": "飲む → 飲んで. 飲んでもいい — разрешено пить."
+            },
+            {
+              "id": "4",
+              "text": "飲む",
+              "feedbackRU": "飲む → 飲んで. 飲んでもいい — разрешено пить."
+            },
+            {
+              "id": "5",
+              "text": "はいけない",
+              "feedbackRU": "飲む → 飲んで. 飲んでもいい — разрешено пить."
+            }
+          ],
+          "acceptedOptionIDs": [],
+          "explanationRU": "飲む → 飲んで. 飲んでもいい — разрешено пить.",
+          "hintRU": "飲む → 飲んで. 飲んでもいい — разрешено пить.",
+          "aspect": "て-форма перед разрешением",
+          "difficulty": 2,
+          "acceptedOrders": [
+            [
+              "0",
+              "1",
+              "2",
+              "3"
+            ]
+          ],
+          "id": "te-mo-ii:assemble",
+          "ruleID": "te-mo-ii",
+          "isScored": true,
+          "provenance": {
+            "commit": "0d1d3410bec90bd4098a7c72de820543cb4f707c",
+            "sourceRuleID": "te-mo-ii",
+            "exampleIndex": null,
+            "method": "explicit-context-authoring-v2",
+            "status": "automaticallyChecked"
+          },
+          "furigana": {
+            "飲む → 飲んで. 飲んでもいい — разрешено пить.": "[飲む|のむ] → [飲ん|のん]で. [飲ん|のん]でもいい — разрешено пить.",
+            "水を": "[水|みず]を",
+            "飲んで": "[飲ん|のん]で",
+            "飲む": "[飲む|のむ]",
+            "水を飲んでもいいです。": "[水|みず]を[飲ん|のん]でもいいです。"
+          },
+          "competency": "application"
+        },
+        {
+          "kind": "correctError",
+          "promptRU": "Исправь форму вопроса: ученик просит разрешить уйти.",
+          "japanese": "帰るもいいですか。",
+          "options": [
+            {
+              "id": "0",
+              "text": "帰ってもいいですか。",
+              "feedbackRU": null
+            },
+            {
+              "id": "1",
+              "text": "帰ったもいいですか。",
+              "feedbackRU": "帰る → 帰って. Здесь нужна て-форма, а не словарная форма или основа ます."
+            },
+            {
+              "id": "2",
+              "text": "帰りもいいですか。",
+              "feedbackRU": "帰る → 帰って. Здесь нужна て-форма, а не словарная форма или основа ます."
+            }
+          ],
+          "acceptedOptionIDs": [
+            "0"
+          ],
+          "explanationRU": "帰る → 帰って. Здесь нужна て-форма, а не словарная форма или основа ます.",
+          "hintRU": "帰る → 帰って. Здесь нужна て-форма, а не словарная форма или основа ます.",
+          "aspect": "て-форма перед разрешением",
+          "difficulty": 2,
+          "id": "te-mo-ii:repair",
+          "ruleID": "te-mo-ii",
+          "isScored": true,
+          "provenance": {
+            "commit": "0d1d3410bec90bd4098a7c72de820543cb4f707c",
+            "sourceRuleID": "te-mo-ii",
+            "exampleIndex": null,
+            "method": "explicit-context-authoring-v2",
+            "status": "automaticallyChecked"
+          },
+          "furigana": {
+            "帰るもいいですか。": "[帰る|かえる]もいいですか。",
+            "帰る → 帰って. Здесь нужна て-форма, а не словарная форма или основа ます.": "[帰る|かえる] → [帰っ|かえっ]て. Здесь нужна て-форма, а не словарная форма или основа ます.",
+            "帰ってもいいですか。": "[帰っ|かえっ]てもいいですか。",
+            "帰ったもいいですか。": "[帰っ|かえっ]たもいいですか。",
+            "帰りもいいですか。": "[帰り|かえり]もいいですか。"
+          },
+          "competency": "correction"
+        },
+        {
+          "kind": "distinguishMeaning",
+          "promptRU": "В помещении действует запрет на фотографирование. Передай запрет, а не разрешение.",
+          "japanese": null,
+          "options": [
+            {
+              "id": "0",
+              "text": "ここで写真を撮ってはいけません。",
+              "feedbackRU": null
+            },
+            {
+              "id": "1",
+              "text": "ここで写真を撮ってもいいです。",
+              "feedbackRU": "てはいけません выражает запрет; てもいいです разрешает действие."
+            },
+            {
+              "id": "2",
+              "text": "ここで写真を撮りました。",
+              "feedbackRU": "てはいけません выражает запрет; てもいいです разрешает действие."
+            }
+          ],
+          "acceptedOptionIDs": [
+            "0"
+          ],
+          "explanationRU": "てはいけません выражает запрет; てもいいです разрешает действие.",
+          "hintRU": "てはいけません выражает запрет; てもいいです разрешает действие.",
+          "aspect": "Разрешение и запрет",
+          "difficulty": 3,
+          "id": "te-mo-ii:distinguish",
+          "ruleID": "te-mo-ii",
+          "isScored": true,
+          "provenance": {
+            "commit": "0d1d3410bec90bd4098a7c72de820543cb4f707c",
+            "sourceRuleID": "te-mo-ii",
+            "exampleIndex": null,
+            "method": "explicit-context-authoring-v2",
+            "status": "automaticallyChecked"
+          },
+          "furigana": {
+            "ここで写真を撮ってはいけません。": "ここで[写真|しゃしん]を[撮っ|とっ]てはいけません。",
+            "ここで写真を撮ってもいいです。": "ここで[写真|しゃしん]を[撮っ|とっ]てもいいです。",
+            "ここで写真を撮りました。": "ここで[写真|しゃしん]を撮りました。"
+          },
+          "competency": "contrast"
+        },
+        {
+          "kind": "understandSentence",
+          "promptRU": "Что означает разрешение?",
+          "japanese": "今日は早く帰ってもいいです。",
+          "options": [
+            {
+              "id": "0",
+              "text": "Сегодня можно уйти домой пораньше.",
+              "feedbackRU": null
+            },
+            {
+              "id": "1",
+              "text": "Сегодня обязательно нужно уйти пораньше.",
+              "feedbackRU": "帰ってもいい — разрешено уйти. Это не обязанность и не запрет."
+            },
+            {
+              "id": "2",
+              "text": "Сегодня нельзя уходить пораньше.",
+              "feedbackRU": "帰ってもいい — разрешено уйти. Это не обязанность и не запрет."
+            }
+          ],
+          "acceptedOptionIDs": [
+            "0"
+          ],
+          "explanationRU": "帰ってもいい — разрешено уйти. Это не обязанность и не запрет.",
+          "hintRU": "帰ってもいい — разрешено уйти. Это не обязанность и не запрет.",
+          "aspect": "Разрешение и обязанность",
+          "difficulty": 2,
+          "id": "te-mo-ii:meaning",
+          "ruleID": "te-mo-ii",
+          "isScored": true,
+          "provenance": {
+            "commit": "0d1d3410bec90bd4098a7c72de820543cb4f707c",
+            "sourceRuleID": "te-mo-ii",
+            "exampleIndex": null,
+            "method": "explicit-context-authoring-v2",
+            "status": "automaticallyChecked"
+          },
+          "furigana": {
+            "今日は早く帰ってもいいです。": "[今日|きょう]は[早く|はやく][帰っ|かえっ]てもいいです。",
+            "帰ってもいい — разрешено уйти. Это не обязанность и не запрет.": "[帰っ|かえっ]てもいい — разрешено уйти. Это не обязанность и не запрет."
+          },
+          "competency": "meaning"
+        },
+        {
+          "kind": "fillBlank",
+          "promptRU": "Разрешено читать эту книгу. Выбери форму 読む.",
+          "japanese": "この本を（　）もいいです。",
+          "options": [
+            {
+              "id": "0",
+              "text": "読んで",
+              "feedbackRU": null
+            },
+            {
+              "id": "1",
+              "text": "読み",
+              "feedbackRU": "読む → 読んで. Перед もいい нужна て-форма."
+            },
+            {
+              "id": "2",
+              "text": "読む",
+              "feedbackRU": "読む → 読んで. Перед もいい нужна て-форма."
+            },
+            {
+              "id": "3",
+              "text": "読んだ",
+              "feedbackRU": "読む → 読んで. Перед もいい нужна て-форма."
+            }
+          ],
+          "acceptedOptionIDs": [
+            "0"
+          ],
+          "explanationRU": "読む → 読んで. Перед もいい нужна て-форма.",
+          "hintRU": "読む → 読んで. Перед もいい нужна て-форма.",
+          "aspect": "て-форма перед разрешением",
+          "difficulty": 1,
+          "id": "te-mo-ii:reserve",
+          "ruleID": "te-mo-ii",
+          "isScored": true,
+          "provenance": {
+            "commit": "0d1d3410bec90bd4098a7c72de820543cb4f707c",
+            "sourceRuleID": "te-mo-ii",
+            "exampleIndex": null,
+            "method": "explicit-context-authoring-v2",
+            "status": "automaticallyChecked"
+          },
+          "furigana": {
+            "この本を（　）もいいです。": "この[本|ほん]を（　）もいいです。",
+            "Разрешено читать эту книгу. Выбери форму 読む.": "Разрешено читать эту книгу. Выбери форму [読む|よむ].",
+            "読む → 読んで. Перед もいい нужна て-форма.": "[読む|よむ] → [読ん|よん]で. Перед もいい нужна て-форма.",
+            "読んで": "[読ん|よん]で",
+            "読み": "[読み|よみ]",
+            "読む": "[読む|よむ]",
+            "読んだ": "[読ん|よん]だ"
+          },
+          "competency": "formation"
+        }
+      ],
       "practiceMetadata": {
         "categories": [
           "permission"
@@ -3203,12 +3711,49 @@
           "correctError",
           "assembleSentence"
         ],
-        "availableKinds": [],
+        "availableKinds": [
+          "fillBlank",
+          "chooseContext",
+          "transformSentence",
+          "assembleSentence",
+          "correctError",
+          "distinguishMeaning",
+          "understandSentence"
+        ],
         "algorithmicForms": [],
         "sourceExampleCount": 3,
-        "status": "plannedNeedsAuthoring",
+        "status": "authoredNeedsReview",
         "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
-        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+        "limitationRU": "Материал составлен автором и требует лингвистической проверки."
+      },
+      "teaching": {
+        "meaningRU": "Можно сделать; разрешено",
+        "usageRU": "Сообщаешь о разрешении или спрашиваешь, допустимо ли действие.",
+        "formationRU": "て-форма глагола + もいいです; вопрос: もいいですか",
+        "example": {
+          "ja": "ここに座ってもいいですか。",
+          "en": "May I sit here?",
+          "ru": "Можно здесь сесть?",
+          "furigana": null
+        },
+        "parts": [
+          {
+            "text": "座って",
+            "roleRU": "て-форма 座る."
+          },
+          {
+            "text": "もいいですか",
+            "roleRU": "Вопрос о разрешении."
+          }
+        ],
+        "notesRU": [
+          "てもいい — разрешение, а не требование совершить действие.",
+          "てはいけない — запрет. Различие объясняется до задания на сравнение."
+        ],
+        "contrastsRU": [
+          "ここで写真を撮ってもいい — фотографировать разрешено; 写真を撮ってはいけない — запрещено."
+        ],
+        "complexity": 2
       }
     },
     {

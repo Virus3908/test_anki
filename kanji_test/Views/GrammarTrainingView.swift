@@ -18,7 +18,15 @@ struct GrammarTrainingView: View, StudyViewStyling {
                 }.disabled(!session.canGoBack || session.isPreparingCard)
                 GlassIconButton(systemImage: "gearshape", accessibilityLabel: "Настройки", action: onOpenSettings)
             }
-            if let rule = session.currentGrammarRule {
+            if let mixed = session.grammarMixed {
+                if mixed.isComplete {
+                    GrammarMixedResultView(mixed: mixed, session: session)
+                } else if let practice = mixed.current {
+                    GrammarPracticeCard(rule: practice.rule, session: session, settings: settings,
+                        translationState: translationState, practice: practice, mixed: mixed)
+                        .id("mixed:\(mixed.currentRuleID ?? ""):\(mixed.revision)")
+                }
+            } else if let rule = session.currentGrammarRule {
                 GrammarPracticeCard(rule: rule, session: session, settings: settings, translationState: translationState)
                     .id("\(rule.id):\(session.scrollToTopToken)")
             } else {
@@ -44,14 +52,17 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
     let session: TrainingSessionViewModel
     let settings: StudyPreferences
     let translationState: TranslationViewModel
+    let mixed: GrammarMixedSessionViewModel?
     @State private var practice: GrammarPracticeViewModel
     @State private var isLessonPresented = false
     @FocusState private var isFormFocused: Bool
     @State private var operation: Task<Void, Never>?
 
-    init(rule: GrammarRule, session: TrainingSessionViewModel, settings: StudyPreferences, translationState: TranslationViewModel) {
+    init(rule: GrammarRule, session: TrainingSessionViewModel, settings: StudyPreferences, translationState: TranslationViewModel,
+         practice: GrammarPracticeViewModel? = nil, mixed: GrammarMixedSessionViewModel? = nil) {
         self.rule = rule; self.session = session; self.settings = settings; self.translationState = translationState
-        _practice = State(initialValue: session.practice(for: rule))
+        self.mixed = mixed
+        _practice = State(initialValue: practice ?? session.practice(for: rule))
     }
 
     var body: some View {
@@ -79,7 +90,10 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
             BottomActionBar {
                 if !practice.isLessonRead {
                     primaryActionButton(title: "Попробовать", systemImage: "checklist",
-                        accessibilityIdentifier: "grammar.training.begin") { practice.isLessonRead = true }
+                        accessibilityIdentifier: "grammar.training.begin") {
+                            if mixed != nil { operation = Task { await session.introduceMixedGrammarRule() } }
+                            else { practice.isLessonRead = true }
+                        }.disabled(session.isPreparingCard)
                 } else if practice.isComplete {
                     primaryActionButton(title: session.isGrammarResultPending ? "Продолжить" : "Сохранить результат",
                         systemImage: "arrow.right", accessibilityIdentifier: "grammar.training.continue") {
@@ -95,6 +109,7 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
                         accessibilityIdentifier: "grammar.training.next") {
                         if assembling { practice.checkAssembly() }
                         else if forming { practice.checkForm() }
+                        else if mixed != nil { operation = Task { await session.advanceMixedGrammar() } }
                         else { practice.next() }
                     }.disabled(assembling ? practice.selectedElements.isEmpty : forming ? practice.textAnswer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty : !practice.isAnswerVisible)
                 }
@@ -112,10 +127,10 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
             }
         }
         .task(id: practice.isComplete) {
-            guard practice.isComplete else { return }
+            guard mixed == nil, practice.isComplete else { return }
             await saveResult()
         }
-        .onDisappear { operation?.cancel() }
+        .onDisappear { if mixed == nil { operation?.cancel() } }
         .onChange(of: practice.isAnswerVisible) { if practice.isAnswerVisible { isFormFocused = false } }
     }
 
@@ -127,20 +142,22 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
 
     private func question(_ exercise: GrammarExercise) -> some View {
         VStack(alignment: .leading, spacing: 20) {
-            Text("Задание \(practice.position + 1) из \(practice.count)").font(.subheadline)
+            Text("Задание \((mixed?.answered ?? practice.position) + (practice.isAnswerVisible && mixed != nil ? 0 : 1)) из \(mixed?.total ?? practice.count)").font(.subheadline)
                 .foregroundStyle(AppPalette.secondaryText)
-            ProgressView(value: Double(practice.position), total: Double(practice.count))
-            if exercise.kind == .distinguishMeaning, let contrasts = rule.teaching?.contrastsRU {
+            ProgressView(value: Double(mixed?.answered ?? practice.position), total: Double(mixed?.total ?? practice.count))
+            if mixed != nil { Text("Смешанная практика").font(.caption).foregroundStyle(AppPalette.secondaryText) }
+            if mixed == nil, exercise.kind == .distinguishMeaning, let contrasts = rule.teaching?.contrastsRU {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Сравни значения").font(.headline)
                     ForEach(contrasts, id: \.self) { Text($0).font(.callout).fixedSize(horizontal: false, vertical: true) }
                 }.padding(16).appSurfaceCard()
             }
-            Text(exercise.promptRU).font(.title3.weight(.medium)).fixedSize(horizontal: false, vertical: true)
-                .accessibilityIdentifier("grammar.training.prompt").accessibilityValue(exercise.id)
+            FuriganaText(text: exercise.promptRU, furigana: exercise.ruby(for: exercise.promptRU), showsFurigana: settings.showExampleFurigana).font(.title3.weight(.medium)).fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("grammar.training.prompt").accessibilityValue(exerciseAccessibilityValue(exercise))
             if let japanese = exercise.japanese {
-                Text(japanese).font(.title2).fixedSize(horizontal: false, vertical: true)
+                FuriganaText(text: japanese, furigana: exercise.ruby(for: japanese), showsFurigana: settings.showExampleFurigana).font(.title2).padding(16).appSurfaceCard().fixedSize(horizontal: false, vertical: true)
                     .textSelection(.enabled).accessibilityIdentifier("grammar.training.japanese")
+                    .accessibilityValue(settings.showExampleFurigana && exercise.ruby(for: japanese) != nil ? "furigana" : "plain")
             }
             if exercise.kind == .formProduction {
                 @Bindable var model = practice
@@ -160,7 +177,10 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
                 feedback(exercise)
             } else {
                 Button("Подсказка") { practice.useHint() }.accessibilityIdentifier("grammar.training.hint")
-                if practice.usedHint { Text(exercise.hintRU ?? exercise.explanationRU).font(.callout) }
+                if practice.usedHint {
+                    let hint = exercise.hintRU ?? exercise.explanationRU
+                    FuriganaText(text: hint, furigana: exercise.ruby(for: hint), showsFurigana: settings.showExampleFurigana).font(.callout)
+                }
             }
         }
     }
@@ -172,7 +192,7 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
             HStack(alignment: .top, spacing: 12) {
                 Image(systemName: correct ? "checkmark.circle.fill" : selected ? "xmark.circle.fill" : "circle")
                     .foregroundStyle(correct ? AppPalette.success : selected ? AppPalette.correction : AppPalette.accent)
-                Text(option.text).font(.title3).fixedSize(horizontal: false, vertical: true)
+                FuriganaText(text: option.text, furigana: exercise.ruby(for: option.text), showsFurigana: settings.showExampleFurigana).font(.title3).fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }.padding(16).appSurfaceCard()
         }
@@ -180,10 +200,17 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
         .accessibilityIdentifier("grammar.option.\(option.id)")
         .accessibilityValue(correct ? "correct" : selected ? "selectedIncorrect" : "available")
     }
+    private func exerciseAccessibilityValue(_ exercise: GrammarExercise) -> String {
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-ui-testing") { return exercise.id }
+        #endif
+        return ""
+    }
 
     private func assembly(_ exercise: GrammarExercise) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(practice.selectedElements.compactMap { id in exercise.options.first { $0.id == id }?.text }.joined())
+            FuriganaText(text: practice.selectedElements.compactMap { id in exercise.options.first { $0.id == id }?.text }.joined(),
+                furigana: exercise.ruby(for: practice.selectedElements), showsFurigana: settings.showExampleFurigana)
                 .font(.title2).frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
                 .accessibilityIdentifier("grammar.assembly.answer")
             Text("Нажимай на элементы по порядку. Повторное нажатие убирает элемент.").font(.caption)
@@ -192,7 +219,7 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
             ForEach(practice.options) { option in
                 Button { practice.toggleElement(option.id) } label: {
                     HStack {
-                        Text(option.text).font(.title3)
+                        FuriganaText(text: option.text, furigana: exercise.ruby(for: option.text), showsFurigana: settings.showExampleFurigana).font(.title3)
                         Spacer()
                         if let index = practice.selectedElements.firstIndex(of: option.id) { Text("\(index + 1)") }
                     }.padding(12).appSurfaceCard()
@@ -208,13 +235,13 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
             Label(correct ? "Правильно" : "Есть ошибка", systemImage: correct ? "checkmark.circle" : "xmark.circle")
                 .foregroundStyle(correct ? AppPalette.success : AppPalette.correction).font(.headline)
             if !correct {
-                Text(exercise.correctAnswer).font(.title3)
+                FuriganaText(text: exercise.correctAnswer, furigana: exercise.ruby(for: exercise.correctAnswer), showsFurigana: settings.showExampleFurigana).font(.title3)
                 if let option = exercise.options.first(where: { $0.id == practice.selectedOptionID }), let text = option.feedbackRU {
-                    Text(text).font(.callout)
-                } else { Text(exercise.explanationRU).font(.callout) }
+                    FuriganaText(text: text, furigana: exercise.ruby(for: text), showsFurigana: settings.showExampleFurigana).font(.callout)
+                } else { FuriganaText(text: exercise.explanationRU, furigana: exercise.ruby(for: exercise.explanationRU), showsFurigana: settings.showExampleFurigana).font(.callout) }
                 Button("Посмотреть правило") { isLessonPresented = true }
             }
-        }.accessibilityIdentifier("grammar.training.feedback")
+        }.padding(16).appSurfaceCard().accessibilityIdentifier("grammar.training.feedback")
     }
 
     private var result: some View {
@@ -229,6 +256,34 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
                     .accessibilityIdentifier("grammar.training.saved")
             } else if session.isPreparingCard || practice.isSaving {
                 CenteredLoadingIndicator(title: "Сохраняю результат")
+            }
+        }
+    }
+}
+
+private struct GrammarMixedResultView: View, StudyViewStyling {
+    let mixed: GrammarMixedSessionViewModel
+    let session: TrainingSessionViewModel
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                Label("Практика завершена", systemImage: "checkmark.seal").font(.title2.bold())
+                Text("\(mixed.answered) заданий · \(mixed.correct) правильных")
+                    .accessibilityIdentifier("grammar.mixed.result")
+                Text("Повторено правил: \(mixed.repeatedRules) · Изучено новых: \(mixed.newRules)")
+                if !mixed.weakRules.isEmpty {
+                    Text("Требует внимания").font(.headline)
+                    ForEach(mixed.weakRules) { Text($0.pattern) }
+                }
+                if mixed.hasUnsavedResults { Text("Есть несохранённые результаты. Повтори сохранение.") }
+            }.padding(16).appSurfaceCard().padding(.vertical, 12)
+        }.safeAreaInset(edge: .bottom) {
+            BottomActionBar {
+                primaryActionButton(title: mixed.hasUnsavedResults ? "Сохранить результаты" : "Готово", systemImage: "checkmark",
+                    accessibilityIdentifier: "grammar.mixed.finish") {
+                    if mixed.hasUnsavedResults { Task { await session.saveMixedGrammarResults() } }
+                    else { session.finish() }
+                }.disabled(session.isPreparingCard)
             }
         }
     }

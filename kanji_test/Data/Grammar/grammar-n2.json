@@ -1069,6 +1069,7 @@
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
           },
+          "furigana": {},
           "competency": "formation"
         },
         {
@@ -1109,6 +1110,11 @@
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
           },
+          "furigana": {
+            "試験に合格したものの、仕事はまだ見つからない。": "[試験|しけん]に[合格|ごうかく]したものの、[仕事|しごと]はまだ見つからない。",
+            "試験に合格したので、仕事が見つかった。": "[試験|しけん]に[合格|ごうかく]したので、[仕事|しごと]が見つかった。",
+            "試験に合格しなかった。": "[試験|しけん]に[合格|ごうかく]しなかった。"
+          },
           "competency": "context"
         },
         {
@@ -1148,6 +1154,11 @@
             "exampleIndex": null,
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
+          },
+          "furigana": {
+            "このホテルは便利です。しかし、料金が高いです。": "このホテルは便利です。しかし、料金が[高い|たかい]です。",
+            "このホテルは便利なものの、料金が高いです。": "このホテルは便利なものの、料金が[高い|たかい]です。",
+            "このホテルは便利だものの、料金が高いです。": "このホテルは便利だものの、料金が[高い|たかい]です。"
           },
           "competency": "application"
         },
@@ -1204,6 +1215,10 @@
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
           },
+          "furigana": {
+            "勉強した": "[勉強|べんきょう]した",
+            "勉強したものの、よく分からなかった。": "[勉強|べんきょう]したものの、よく分からなかった。"
+          },
           "competency": "application"
         },
         {
@@ -1243,6 +1258,13 @@
             "exampleIndex": null,
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
+          },
+          "furigana": {
+            "この町は静かだものの、交通が不便だ。": "この町は[静か|しずか]だものの、交通が不便だ。",
+            "静かな + ものの; также возможна форма 静かであるものの.": "[静か|しずか]な + ものの; также возможна форма [静か|しずか]であるものの.",
+            "この町は静かなものの、交通が不便だ。": "この町は[静か|しずか]なものの、交通が不便だ。",
+            "この町は静かをものの、交通が不便だ。": "この町は[静か|しずか]をものの、交通が不便だ。",
+            "この町は静かにものの、交通が不便だ。": "この町は[静か|しずか]にものの、交通が不便だ。"
           },
           "competency": "correction"
         },
@@ -1284,6 +1306,11 @@
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
           },
+          "furigana": {
+            "頑張ったものの、負けた。": "頑張ったものの、[負け|まけ]た。",
+            "頑張ったから、勝った。": "頑張ったから、[勝っ|かっ]た。",
+            "頑張らなかったから、負けた。": "頑張らなかったから、[負け|まけ]た。"
+          },
           "competency": "contrast"
         },
         {
@@ -1324,6 +1351,7 @@
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
           },
+          "furigana": {},
           "competency": "meaning"
         },
         {
@@ -1364,6 +1392,7 @@
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
           },
+          "furigana": {},
           "competency": "formation"
         }
       ],
@@ -1404,7 +1433,7 @@
           "ja": "本を買ったものの、まだ読んでいない。",
           "en": "Although I bought a book, I have not read it yet.",
           "ru": "Хотя я купил книгу, ещё не прочитал её.",
-          "furigana": null
+          "furigana": "[本|ほん]を買ったものの、まだ[読ん|よん]でいない。"
         },
         "parts": [
           {

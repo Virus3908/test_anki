@@ -109,6 +109,11 @@ def check(release=False):
                 if exercise['kind'] == 'formProduction':
                     assert exercise.get('conjugation')
                     assert exercise['provenance']['status'] == 'algorithmicallyChecked'
+                for text, markup in exercise.get('furigana', {}).items():
+                    import re
+                    restored = re.sub(r'\[([^\[\]|]+)\|[^\[\]]*\]', lambda m: m[1], markup)
+                    assert restored.encode() == text.encode(), f'Furigana changes original: {eid}'
+                    assert exercise.get('testsReading') is not True, f'Reading task exposes ruby: {eid}'
                 for option in options:
                     if option['id'] in accepted and len(option['text']) >= 6:
                         assert option['text'] not in exercise['promptRU'], f'Answer leaked in prompt: {eid}'
@@ -139,6 +144,11 @@ def check(release=False):
                 pending.append({'id': rule['id'], 'level': level, 'missing': missing})
         all_rules.extend(rules)
     assert set(registry) == {r['id'] for r in all_rules}
+    audit = json.loads((DATA / 'grammar-audit.json').read_text())['rules']
+    assert {r['id'] for r in audit} == set(registry) and len(audit) == 526
+    for r, entry in zip(all_rules, audit):
+        assert entry['id'] == r['id'] and entry['exerciseCount'] == len(r.get('exercises', []))
+        assert entry['needsAuthoredPractice'] == (not bool(r.get('exercises')))
     assert len(all_rules) == 526 and len({r['id'] for r in all_rules}) == 526
     ids = {rule['id'] for rule in all_rules}
     for rule in all_rules:
