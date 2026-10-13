@@ -55,9 +55,7 @@ private struct NativeFuriganaText: UIViewRepresentable {
     }
 
     func sizeThatFits(_ proposal: ProposedViewSize, uiView: FuriganaDrawingView, context: Context) -> CGSize? {
-        let proposedWidth = proposal.width ?? 320
-        let width = proposedWidth.isFinite ? max(1, proposedWidth) : 320
-        return CGSize(width: width, height: uiView.layout(width: width).height)
+        uiView.fittingSize(proposedWidth: proposal.width)
     }
 }
 
@@ -86,6 +84,22 @@ final class FuriganaDrawingView: UIView {
     private var font = UIFont.systemFont(ofSize: 17)
     private var rubyFont = UIFont.systemFont(ofSize: 8.5)
     private var rubyHeight: CGFloat = 0
+
+    /// Natural width is the longest explicit line, including the width required by ruby.
+    /// It lets short labels remain compact while a finite SwiftUI proposal still wraps sentences.
+    var intrinsicTextWidth: CGFloat {
+        var lineWidth: CGFloat = 0
+        var widestLine: CGFloat = 0
+        for unit in units {
+            if unit.isEmpty {
+                widestLine = max(widestLine, lineWidth)
+                lineWidth = 0
+            } else {
+                lineWidth += unit.reduce(CGFloat.zero) { $0 + $1.width }
+            }
+        }
+        return max(1, max(widestLine, lineWidth))
+    }
 
     func configure(segments: [FuriganaSegment], fontSize: CGFloat, textColor: UIColor, readingColor: UIColor) {
         font = UIFont.systemFont(ofSize: fontSize)
@@ -121,6 +135,19 @@ final class FuriganaDrawingView: UIView {
         if !opening.isEmpty { units.append(opening) }
         invalidateIntrinsicContentSize()
         setNeedsDisplay()
+    }
+
+    /// Uses the same final width for both measurement and drawing. An absent or unbounded
+    /// proposal resolves to the actual intrinsic text width instead of an arbitrary screen width.
+    func fittingSize(proposedWidth: CGFloat?) -> CGSize {
+        let naturalWidth = intrinsicTextWidth
+        let width: CGFloat
+        if let proposedWidth, proposedWidth.isFinite {
+            width = max(1, min(naturalWidth, proposedWidth))
+        } else {
+            width = naturalWidth
+        }
+        return CGSize(width: width, height: layout(width: width).height)
     }
 
     func layout(width: CGFloat) -> TextLayout {

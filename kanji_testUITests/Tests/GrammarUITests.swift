@@ -38,7 +38,18 @@ final class GrammarUITests: UITestCase {
         let exampleRetry = element("grammar.translation.example.0")
         XCTAssertTrue(exampleRetry.waitForExistence(timeout: 5))
         XCTAssertTrue(exampleRetry.isEnabled)
+        let exampleRow = element("study.example.grammar-wa-0")
+        let japanese = exampleRow.descendants(matching: .any)
+            .matching(identifier: "examples.furigana").firstMatch
+        let sourceButton = exampleRow.descendants(matching: .button)
+            .matching(identifier: "study.example.source.grammar-wa-0").firstMatch
+        XCTAssertTrue(japanese.waitForExistence(timeout: 5))
+        XCTAssertTrue(sourceButton.waitForExistence(timeout: 5))
+        XCTAssertTrue(exampleRow.frame.contains(japanese.frame))
+        XCTAssertTrue(exampleRow.frame.contains(sourceButton.frame))
+        XCTAssertFalse(japanese.frame.intersects(sourceButton.frame), "The furigana text and source control must not overlap")
         capture("24-grammar-examples-with-controls")
+        capture("28-grammar-furigana-inline-source")
         XCTAssertTrue(element("grammar.practice").exists)
         XCTAssertTrue(element("grammar.practice").isHittable)
         tap("grammar.practice", .startTraining, expecting: "grammar.training.begin")

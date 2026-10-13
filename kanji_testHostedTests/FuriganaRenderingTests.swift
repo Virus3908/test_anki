@@ -18,6 +18,47 @@ final class FuriganaRenderingTests: XCTestCase {
         attach(view, width: 240, name: "Short sentence")
     }
 
+    func testFittingSizeUsesRubyAwareIntrinsicWidthAndSameDrawGeometry() {
+        let word = "学校"
+        let wordData = ExampleFurigana(transcriptions: [
+            TatoebaTranscription(text: "[学校|がっ|こう]", script: "Hrkt", type: "altscript")
+        ], checkedAt: Date())
+        let shortView = drawingView(text: word, data: wordData)
+        let shortSize = shortView.fittingSize(proposedWidth: 240)
+        XCTAssertLessThan(shortSize.width, 240)
+        XCTAssertGreaterThan(shortSize.width, 0)
+        XCTAssertEqual(shortSize.height, shortView.layout(width: shortSize.width).height)
+        assertNoOverlaps(shortView.layout(width: shortSize.width), width: shortSize.width)
+
+        let longText = String(repeating: "学校は好き？", count: 12)
+        let longMarkup = String(repeating: "[学校|がっ|こう]は[好|す]き？", count: 12)
+        let longView = drawingView(text: longText, data: ExampleFurigana(transcriptions: [
+            TatoebaTranscription(text: longMarkup, script: "Hrkt", type: "altscript")
+        ], checkedAt: Date()))
+        let intrinsic = longView.fittingSize(proposedWidth: nil)
+        let wrapped = longView.fittingSize(proposedWidth: 180)
+        XCTAssertGreaterThan(intrinsic.width, 180)
+        XCTAssertEqual(wrapped.width, 180, accuracy: 0.01)
+        XCTAssertGreaterThan(wrapped.height, intrinsic.height)
+        XCTAssertEqual(wrapped.height, longView.layout(width: wrapped.width).height)
+        assertNoOverlaps(longView.layout(width: wrapped.width), width: wrapped.width)
+    }
+
+    func testIntrinsicWidthUsesWidestExplicitLineAndDynamicTypeScale() {
+        let text = "学校は好き？\n今日も勉強します。"
+        let markup = "[学校|がっ|こう]は[好|す]き？\n[今日|きょう]も[勉強|べん|きょう]します。"
+        let data = ExampleFurigana(transcriptions: [TatoebaTranscription(text: markup, script: "Hrkt", type: "altscript")], checkedAt: Date())
+        for fontSize: CGFloat in [17, 34, 53] {
+            let view = drawingView(text: text, data: data, fontSize: fontSize)
+            let size = view.fittingSize(proposedWidth: nil)
+            let layout = view.layout(width: size.width)
+            XCTAssertEqual(size.height, layout.height)
+            XCTAssertEqual(Set(layout.placements.map { $0.origin.y }).count, 2)
+            assertNoOverlaps(layout, width: size.width)
+            attach(view, width: size.width, name: "Intrinsic multiline at \(fontSize)pt")
+        }
+    }
+
     func testLongSentenceWrapsAndFitsAtLargeDynamicTypeSizes() {
         let original = String(repeating: "学校は好き？", count: 20)
         let markup = String(repeating: "[学校|がっ|こう]は[好|す]き？", count: 20)
