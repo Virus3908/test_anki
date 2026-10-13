@@ -709,25 +709,19 @@ Calendar — полночь. Observation обновляет превью при 
 
 ### Грамматика OpenJLPT N5–N1
 
-GrammarRule/GrammarExample/GrammarExercise отделяют исходники от сессии и SRS.
-Actor GrammarDataLoader кеширует pinned Bundle snapshot всех пяти уровней;
-невалидные упражнения отключают только практику соответствующего правила.
-GrammarLibraryViewModel использует прежний CardSearchIndex вне MainActor.
-Экраны переиспользуют previewHeader, BottomActionBar, appSurfaceCard и AppPalette.
+GrammarRule/GrammarTeaching/GrammarExercise отделяют исходники, короткий урок и
+задачи от SRS. GrammarDataLoader кеширует 526 исходных правил и 1526 примеров;
+невалидные упражнения отключают только практику своего правила. Подготовлены
+6 учебных адаптаций / 48 задач; полный корпус остаётся незавершённым.
 
-526 правил/1526 исходных примеров и 2440 source-aligned заданий. Перевод английских
-полей выполняется на устройстве прежним TranslationViewModel/TranslationRepository
-с grammar-content:<id>:ru; японские части защищены и сохранён оригинал. Учебные
-переводы не выдаются за ручное лингвистическое ревью.
+Короткий урок → адаптивная практика → краткий результат → общая очередь.
+Повторение сразу открывает практику. GrammarPracticeViewModel держит ответы,
+подсказки и сборку в памяти; TrainingSessionViewModel сохраняет незавершённую
+попытку при навигации. GrammarLessonRating назначает одну Again/Hard/Good после
+полной попытки с учётом ошибок и помощи. FSRS-6, JSON и существующие ключи
+не меняются. Undo использует прежний журнал. Вторая система повторения отсутствует.
 
-Первый урок → три задания → разбор результата → одно сохранение FSRS → продолжение.
-Повторение сразу открывает задания. GrammarPracticeViewModel проверяет option ID;
-GrammarLessonRating назначает Again/Again/Hard/Good для 0/1/2/3 правильных.
-Общая TrainingSessionViewModel удерживает сохранённый результат до продолжения;
-Undo восстанавливает record и запускает упражнение заново. Второй сессии/FSRS нет.
-Колоды grammar:n5 … n1, ключ grammar:<upstreamID>. JSON-прогресс, история других
-режимов и формулы FSRS не меняются. Дневные лимиты/дополнительные карточки прежние.
-
-[Формат и обновление](docs/grammar.md), [качество](docs/grammar-quality.md).
-CI проверяет pinned исходники, задания и основу перевода на телефоне; все тесты
-и визуальные артефакты получают только на GitHub-hosted runners.
+UI переиспользует previewHeader, BottomActionBar, BottomScrollMask, appSurfaceCard
+и AppPalette. Дополнительные источники переводит прежний TranslationViewModel;
+русское введение/инструкции готовых адаптаций доступны офлайн.
+[Формат](docs/grammar.md), [качество и незавершённое покрытие](docs/grammar-quality.md).

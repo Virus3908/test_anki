@@ -12,16 +12,25 @@ extension StudyAppViewModel {
             do {
                 let rules = try await GrammarDataLoader.shared.rules(level)
                 try Task.checkCancellation()
-                let source = rules.filter { rule in
-                    if let ruleID { return rule.id == ruleID }
+                var source = rules.filter { rule in
+                    guard rule.teaching != nil,
+                          (rule.exercises ?? []).filter({ $0.eligibleForPractice && $0.isUsable(for: rule.id) }).count >= 3 else { return false }
                     if reviewsOnly {
                         return self.trainingSession.reviewStore.record(for: rule.reviewKey) != nil
                             || self.trainingSession.reviewStore.firstShownAt[rule.reviewKey] != nil
                     }
                     return true
                 }
+                if let ruleID {
+                    guard let index = source.firstIndex(where: { $0.id == ruleID }) else {
+                        errors.message = "Практика для этого правила ещё готовится. Объяснение и примеры доступны."
+                        return
+                    }
+                    let selected = source.remove(at: index)
+                    source.insert(selected, at: 0)
+                }
                 guard !source.isEmpty else {
-                    errors.message = reviewsOnly ? "Пока нет изученных правил для повторения." : "Правило не найдено."
+                    errors.message = reviewsOnly ? "Пока нет изученных правил для повторения." : "Практика этого уровня ещё готовится."
                     return
                 }
                 let started = await trainingSession.start(deck: level.deck, sourceIDs: catalog.register(source))

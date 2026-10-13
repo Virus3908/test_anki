@@ -37,7 +37,7 @@ struct GrammarLevelMenu: View {
 
 struct GrammarContentStatus: View {
     var body: some View {
-        Text("Урок → упражнения → результат → повторение. Английский оригинал переводится системой на устройстве. Задания основаны на OpenJLPT; автоматическая проверка источника не заменяет лингвистическое ревью.")
+        Text("Выбери правило или продолжи обучение.")
             .font(.callout).foregroundStyle(AppPalette.secondaryText)
             .accessibilityIdentifier("grammar.contentStatus")
     }
@@ -71,7 +71,7 @@ struct GrammarLevelView: View, StudyViewStyling {
                 }
                 if !rules.isEmpty {
                     statistics
-                    GrammarContentStatus()
+                    Text("Практика: \(rules.filter { $0.teaching != nil }.count) из \(rules.count) правил. Все правила доступны для чтения.").font(.caption).foregroundStyle(AppPalette.secondaryText)
                     TextField("Конструкция, чтение, значение", text: $query)
                         .textFieldStyle(.roundedBorder).autocorrectionDisabled().textInputAutocapitalization(.never)
                         .accessibilityIdentifier("grammar.search")

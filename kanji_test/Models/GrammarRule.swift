@@ -47,17 +47,18 @@ nonisolated struct GrammarRule: Identifiable, Codable, Sendable, StudyItem {
     let localization: GrammarLocalization?
     let exercises: [GrammarExercise]?
     let relations: [GrammarRelation]?
+    var teaching: GrammarTeaching? = nil
 
     var reviewKey: String { "grammar:\(id)" }
     var categories: [GrammarCategory] { tags.compactMap(GrammarCategory.init(rawValue:)) }
     var displayedMeaning: String { localization?.meaningRU ?? meaning }
     var displayedFormation: String { localization?.formationRU ?? formation }
-    var displayedExplanation: String? { localization?.explanationRU ?? notes ?? exercises?.first?.explanationEN }
+    var displayedExplanation: String? { localization?.explanationRU ?? notes ?? meaning }
 
     func withExercises(_ value: [GrammarExercise]?) -> GrammarRule {
         GrammarRule(id: id, level: level, pattern: pattern, reading: reading, romaji: romaji,
             meaning: meaning, formation: formation, notes: notes, examples: examples, tags: tags,
-            localization: localization, exercises: value, relations: relations)
+            localization: localization, exercises: value, relations: relations, teaching: teaching)
     }
 }
 
@@ -78,11 +79,29 @@ extension GrammarRule {
         tags = try values.decode([String].self, forKey: .tags)
         localization = try values.decodeIfPresent(GrammarLocalization.self, forKey: .localization)
         relations = try values.decodeIfPresent([GrammarRelation].self, forKey: .relations)
+        teaching = try values.decodeIfPresent(GrammarTeaching.self, forKey: .teaching)
         let decoded = try? values.decodeIfPresent([GrammarExercise].self, forKey: .exercises)
         if let decoded, decoded.allSatisfy({ $0.isUsable(for: decodedID) }),
            Set(decoded.map(\.id)).count == decoded.count { exercises = decoded }
         else { exercises = nil }
     }
+}
+
+/// Separate authored learning material; never modifies the immutable source example.
+nonisolated struct GrammarTeaching: Codable, Sendable {
+    struct Part: Codable, Sendable {
+        let text: String
+        let roleRU: String
+        var highlight: Bool? = nil
+    }
+    let meaningRU: String
+    let usageRU: String
+    let formationRU: String
+    let example: GrammarExample
+    let parts: [Part]
+    let notesRU: [String]
+    let contrastsRU: [String]
+    let complexity: Int
 }
 
 nonisolated struct GrammarLocalization: Codable, Sendable {

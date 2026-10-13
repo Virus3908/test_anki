@@ -17,6 +17,20 @@ final class TrainingSessionViewModel {
     private(set) var didCompleteToday = false
     /// Keeps grammar feedback visible after persistence, until explicit continuation.
     private(set) var isGrammarResultPending = false
+    private var grammarPractice: GrammarPracticeViewModel?
+
+    /// Keep unfinished answers in memory across navigation/settings. No second progress store.
+    func practice(for rule: GrammarRule) -> GrammarPracticeViewModel {
+        let attempts = reviewStore.record(for: rule.reviewKey)?.attempts ?? 0
+        if let grammarPractice, grammarPractice.rule.id == rule.id,
+           !grammarPractice.isClosed,
+           grammarPractice.attempt == attempts || isGrammarResultPending { return grammarPractice }
+        let value = GrammarPracticeViewModel(rule: rule, seed: "\(rule.id):\(attempts)",
+            isReview: reviewStore.record(for: rule.reviewKey) != nil, attempt: attempts,
+            previousRating: reviewStore.record(for: rule.reviewKey)?.lastRating)
+        grammarPractice = value
+        return value
+    }
     var drawingSession: DrawingSessionViewModel { presentation.drawing }
     private let repository: any ReviewPersisting
     private let catalog: StudyCardCatalog
@@ -257,6 +271,7 @@ final class TrainingSessionViewModel {
             try await repository.save(progress)
             reviewStore = progress
             isGrammarResultPending = false
+            grammarPractice = nil
             publish(next)
         } catch { errors.report("Не удалось отменить ответ.", error: error) }
     }

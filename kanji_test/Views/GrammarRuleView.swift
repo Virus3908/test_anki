@@ -20,7 +20,7 @@ struct GrammarRuleView: View, StudyViewStyling {
                 } else if let rule = model.rules.first(where: { $0.id == ruleID }) {
                     GrammarLessonContent(rule: rule, settings: settings, progress: progress, translationState: translationState)
                     if !(rule.relations ?? []).isEmpty {
-                        Text("Похожие конструкции и упоминания источника").font(.headline)
+                        DisclosureGroup("Похожие конструкции") {
                         ForEach(rule.relations ?? [], id: \.ruleID) { relation in
                             if let related = model.rules.first(where: { $0.id == relation.ruleID }) {
                                 NavigationLink {
@@ -35,6 +35,7 @@ struct GrammarRuleView: View, StudyViewStyling {
                                 .accessibilityIdentifier("grammar.related.\(related.id)")
                             }
                         }
+                        }.accessibilityIdentifier("grammar.rule.relations")
                     }
 
                 } else if !model.isLoading {
@@ -48,8 +49,10 @@ struct GrammarRuleView: View, StudyViewStyling {
         .safeAreaInset(edge: .bottom) {
             if let rule = model.rules.first(where: { $0.id == ruleID }) {
                 BottomActionBar {
-                    primaryActionButton(title: "Перейти к упражнениям", systemImage: "checklist",
+                    primaryActionButton(title: "Попробовать", systemImage: "checklist",
                         accessibilityIdentifier: "grammar.practice") { onPractice(rule) }
+                        .disabled(rule.teaching == nil || (rule.exercises ?? []).filter(\.eligibleForPractice).count < 3)
+                    if rule.teaching == nil { Text("Практика готовится").font(.caption).foregroundStyle(AppPalette.secondaryText) }
                 }
             }
         }
@@ -62,63 +65,85 @@ struct GrammarRuleView: View, StudyViewStyling {
 }
 
 struct GrammarLessonContent: View {
-    @State private var showsOriginal = false
     let rule: GrammarRule
     @Bindable var settings: StudyPreferences
     let progress: StudyProgressStore
     let translationState: TranslationViewModel
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("\(rule.level.rawValue) · \(rule.pattern)").font(.title2.bold())
+        VStack(alignment: .leading, spacing: 20) {
+            Text(rule.pattern).font(.largeTitle.weight(.semibold))
                 .accessibilityIdentifier("grammar.lesson.title")
-            if let reading = rule.reading { Text(reading) }
-            if let romaji = rule.romaji { Text(romaji).foregroundStyle(AppPalette.secondaryText) }
-            Text(GrammarStatistics.status(rule, progress: progress))
-                .font(.caption).accessibilityIdentifier("grammar.lesson.status")
-            if rule.localization == nil {
-                Text("Английский оригинал. Перевод на русский выполняется системой и сохраняется на устройстве.").font(.caption).foregroundStyle(AppPalette.secondaryText)
-                Button(showsOriginal ? "Показать перевод" : "Показать английский оригинал") { showsOriginal.toggle() }
-                Button("Перевести заново") { translationState.retranslateGrammar(rule) }
+            Text(rule.teaching?.meaningRU ?? translated(rule.displayedMeaning)).font(.title3)
+            if let teaching = rule.teaching {
+                Text(teaching.usageRU).foregroundStyle(AppPalette.secondaryText)
             }
-            block("Значение", text: english(rule.displayedMeaning))
-            block("Формула образования", text: english(rule.displayedFormation))
-            if let notes = rule.localization?.formationNotesRU { block("Пояснения к формуле", text: notes) }
-            if let explanation = rule.displayedExplanation {
-                block("Применение и особенности", text: english(explanation))
-                    .accessibilityIdentifier("grammar.lesson.explanation")
-            } else {
-                Text("В источнике нет отдельного примечания к этому правилу.").font(.caption)
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Как образуется").font(.headline)
+                Text(rule.teaching?.formationRU ?? translated(rule.displayedFormation))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            if let teaching = rule.teaching {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(highlighted(teaching)).font(.title2)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Text(teaching.example.ru ?? "").foregroundStyle(AppPalette.secondaryText)
+                    ForEach(Array(teaching.parts.enumerated()), id: \.offset) { _, part in
+                        Text(part.text + " — " + part.roleRU).font(.callout)
+                    }
+                }.accessibilityIdentifier("grammar.example")
+            } else if let example = rule.examples.first {
+                exampleView(example)
+            }
+            DisclosureGroup("Подробное объяснение") {
+                if let text = rule.displayedExplanation {
+                    Text(translated(text)).fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("grammar.lesson.explanation")
+                }
+                if let text = rule.localization?.formationNotesRU { Text(text) }
+            }.accessibilityIdentifier("grammar.lesson.details")
+            DisclosureGroup("Дополнительные примеры") {
+                Toggle("Фуригана", isOn: $settings.showExampleFurigana)
+                    .accessibilityIdentifier("grammar.furigana")
+                ForEach(Array(rule.examples.enumerated()), id: \.offset) { _, example in exampleView(example) }
+            }.accessibilityIdentifier("grammar.lesson.examples")
+            if let teaching = rule.teaching {
+                DisclosureGroup("Особенности употребления") {
+                    ForEach(teaching.notesRU, id: \.self) { Text($0).font(.callout) }
+                }
+                if !teaching.contrastsRU.isEmpty {
+                    DisclosureGroup("Похожие конструкции") {
+                        ForEach(teaching.contrastsRU, id: \.self) { Text($0).font(.callout) }
+                    }
+                }
             }
             if let localized = rule.localization {
-                ForEach(localized.usageNotesRU, id: \.self) { block("Употребление", text: $0) }
-                ForEach(localized.typicalErrorsRU, id: \.self) { block("Типичная ошибка", text: $0) }
-            }
-            Toggle("Фуригана", isOn: $settings.showExampleFurigana)
-                .accessibilityIdentifier("grammar.furigana")
-            Text("Примеры").font(.headline)
-            ForEach(Array(rule.examples.enumerated()), id: \.offset) { _, example in
-                VStack(alignment: .leading, spacing: 8) {
-                    FuriganaText(text: example.ja, furigana: example.ruby, showsFurigana: settings.showExampleFurigana)
-                    Text(example.ru ?? english(example.en)).foregroundStyle(AppPalette.secondaryText)
+                DisclosureGroup("Типичные ошибки") {
+                    ForEach(localized.typicalErrorsRU, id: \.self) { Text($0) }
                 }
-                .padding(16).appSurfaceCard().accessibilityIdentifier("grammar.example")
             }
-            Text(rule.categories.map(\.title).joined(separator: " · ")).font(.caption)
-            Link("OpenJLPT — исходный материал (CC BY-SA 4.0)",
-                destination: URL(string: "https://github.com/evanclan/OpenJLPT/blob/0d1d3410bec90bd4098a7c72de820543cb4f707c/data/json/grammar/\(rule.level.rawValue.lowercased()).json")!)
-                .font(.caption)
-            Text("OpenJLPT contributors, Evan Clan · 0.3.0 · snapshot 0d1d341. Уровни JLPT — неофициальная классификация.")
-                .font(.caption).foregroundStyle(AppPalette.secondaryText)
+            DisclosureGroup("Источник и лицензия") {
+                Link("OpenJLPT · CC BY-SA 4.0", destination: URL(string: "https://github.com/evanclan/OpenJLPT")!)
+                Text("OpenJLPT contributors, Evan Clan. Исходные материалы и адаптации: CC BY-SA 4.0. Добавлены учебные ситуации и русские пояснения.").font(.caption)
+                Link("Условия лицензии", destination: URL(string: "https://creativecommons.org/licenses/by-sa/4.0/")!)
+                Text("Уровни JLPT — неофициальная классификация. Учебные адаптации требуют лингвистического ревью.").font(.caption)
+            }
         }
         .task(id: "\(rule.id):\(language)") { await translationState.translateGrammarIfNeeded(rule, language: language) }
     }
-    private var language: MeaningLanguage { showsOriginal ? .english : settings.options(for: rule.level.deck.id).meaningLanguage }
-    private func english(_ text: String) -> String { translationState.displayedGrammarText(text, rule: rule, language: language) }
-    private func block(_ title: String, text: String) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(title).font(.headline)
-            Text(text).textSelection(.enabled).fixedSize(horizontal: false, vertical: true)
+    private var language: MeaningLanguage { settings.options(for: rule.level.deck.id).meaningLanguage }
+    private func translated(_ text: String) -> String { translationState.displayedGrammarText(text, rule: rule, language: language) }
+    private func highlighted(_ teaching: GrammarTeaching) -> AttributedString {
+        var text = AttributedString(teaching.example.ja)
+        for part in teaching.parts where part.highlight != false {
+            if let range = text.range(of: part.text) { text[range].foregroundColor = AppPalette.accent }
         }
-        .frame(maxWidth: .infinity, alignment: .leading).padding(16).appSurfaceCard()
+        return text
+    }
+    private func exampleView(_ example: GrammarExample) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            FuriganaText(text: example.ja, furigana: example.ruby, showsFurigana: settings.showExampleFurigana)
+                .font(.title2)
+            Text(example.ru ?? translated(example.en)).foregroundStyle(AppPalette.secondaryText)
+        }.padding(.vertical, 12).accessibilityIdentifier("grammar.example")
     }
 }

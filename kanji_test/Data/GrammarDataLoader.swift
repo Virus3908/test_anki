@@ -84,12 +84,7 @@ actor GrammarDataLoader {
                 try require(nonempty(exercise.id) && exerciseIDs.insert(exercise.id).inserted
                     && exercise.ruleID == rule.id && nonempty(exercise.promptRU)
                     && nonempty(exercise.explanationRU), "неполное задание \(rule.id)")
-                let optionIDs = Set(exercise.options.map(\.id))
-                try require(exercise.options.count >= 2 && optionIDs.count == exercise.options.count
-                    && exercise.options.allSatisfy { nonempty($0.id) && nonempty($0.text) }
-                    && Set(exercise.options.map { $0.text.trimmingCharacters(in: .whitespacesAndNewlines) }).count == exercise.options.count
-                    && !exercise.acceptedOptionIDs.isEmpty && exercise.acceptedOptionIDs.isSubset(of: optionIDs)
-                    && exercise.acceptedOptionIDs.count < exercise.options.count, "неверный ключ ответа \(exercise.id)")
+                try require(exercise.isUsable(for: rule.id), "неверный ключ ответа \(exercise.id)")
             }
         }
     }

@@ -176,6 +176,41 @@ final class GrammarStudyIntegrationTests: XCTestCase {
         XCTAssertTrue(session.reviewStore.reviewLog.isEmpty)
     }
 
+    func testUnfinishedLessonResumesInMemoryAndTheoryDoesNotDiscardAnswers() async throws {
+        let repository = GrammarMemoryReviews()
+        let suite = "GrammarResume-\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suite)!
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let errors = StorageStatus()
+        let settings = StudyPreferences(defaults: defaults, errors: errors)
+        let catalog = StudyCardCatalog()
+        let session = TrainingSessionViewModel(repository: repository, catalog: catalog, settings: settings, errors: errors)
+        let loaded = try await GrammarDataLoader.shared.rule("tai")
+        let rule = try XCTUnwrap(loaded)
+        let ids = catalog.register([rule])
+        try await session.loadProgress()
+        let started = await session.start(deck: GrammarLevel.n5.deck, sourceIDs: ids)
+        XCTAssertTrue(started)
+        let model = session.practice(for: rule)
+        model.isLessonRead = true
+        model.choose(try XCTUnwrap(model.currentExercise?.acceptedOptionIDs.first))
+        model.useHint()
+        XCTAssertEqual(model.results.count, 1)
+        session.finish()
+        XCTAssertTrue(session.reviewStore.reviewLog.isEmpty)
+        let stored = try await repository.load()
+        XCTAssertTrue(stored.reviewLog.isEmpty)
+        let resumed = await session.start(deck: GrammarLevel.n5.deck, sourceIDs: ids)
+        XCTAssertTrue(resumed)
+        let same = session.practice(for: rule)
+        XCTAssertTrue(same === model); XCTAssertEqual(same.results.count, 1)
+        XCTAssertTrue(same.isLessonRead); XCTAssertTrue(same.isAnswerVisible)
+        XCTAssertNil(same.proposedRating)
+        let otherLoaded = try await GrammarDataLoader.shared.rule("wa")
+        let other = try XCTUnwrap(otherLoaded)
+        XCTAssertFalse(session.practice(for: other) === model)
+    }
+
     func testCancelledSearchCannotPublishPreviousResults() async throws {
         let model = GrammarLibraryViewModel()
         await model.load()

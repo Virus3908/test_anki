@@ -3,7 +3,7 @@
 import hashlib
 import json
 import re
-from author_exercises import authored
+from author_exercises import authored, materials, KIND_NAMES
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -24,6 +24,7 @@ def generate():
     hashes = {}
     examples = 0
     imported = []
+    lessons = materials()
     all_rules = [rule for level in COUNTS
                  for rule in json.loads((SOURCE / (level.lower() + '.json')).read_text())]
     patterns = {}
@@ -62,6 +63,8 @@ def generate():
                     relations.append({'ruleID': ids[0], 'kind': 'sourceMention',
                         'explanationRU': 'Конструкция прямо упомянута в исходном примечании. Связь не означает равнозначность.'})
             rule["exercises"] = authored(rule, all_rules)
+            if rule['id'] in lessons:
+                rule['teaching'] = lessons[rule['id']]['teaching']
             if relations:
                 rule['relations'] = relations
             if rule['id'] in overlay:
@@ -101,9 +104,11 @@ def generate():
         'localizedRules': sum('localization' in r for r in imported),
         'sourceAlignedExercises': sum(len(r.get('exercises', [])) for r in imported),
         'exercisesByKind': {kind: sum(e['kind'] == kind for r in imported for e in r.get('exercises', []))
-            for kind in ('chooseConstruction','fillBlank','identifyConstruction','chooseCorrectSentence','transformSentence')},
+            for kind in KIND_NAMES},
+        'exercisesByLevel': {level: sum(len(r.get('exercises', [])) for r in imported if r['level'] == level) for level in COUNTS},
+        'pendingRules': [r['id'] for r in imported if not r.get('teaching') or len(r.get('exercises', [])) < 4],
         'translationPolicy': 'on-device-en-ru',
-        'releaseReady': all(len(r.get('exercises', [])) >= 3 for r in imported),
+        'releaseReady': all(r.get('teaching') and len(r.get('exercises', [])) >= 4 for r in imported),
         'manualLinguisticReviewClaimed': False})
     print(f'Imported {len(seen)} rules / {examples} examples from {SHA}. Check manifest for localization coverage.')
 

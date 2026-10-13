@@ -46,61 +46,58 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
     let translationState: TranslationViewModel
     @State private var practice: GrammarPracticeViewModel
     @State private var isLessonPresented = false
-    @State private var isLessonRead: Bool
     @State private var operation: Task<Void, Never>?
 
     init(rule: GrammarRule, session: TrainingSessionViewModel, settings: StudyPreferences, translationState: TranslationViewModel) {
         self.rule = rule; self.session = session; self.settings = settings; self.translationState = translationState
-        let attempts = session.reviewStore.record(for: rule.reviewKey)?.attempts ?? 0
-        _practice = State(initialValue: GrammarPracticeViewModel(rule: rule, seed: "\(rule.id):\(attempts)"))
-        _isLessonRead = State(initialValue: session.reviewStore.record(for: rule.reviewKey) != nil)
+        _practice = State(initialValue: session.practice(for: rule))
     }
 
     var body: some View {
         ScrollViewReader { proxy in
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                Text(!isLessonRead || practice.isComplete ? "\(rule.level.rawValue) · \(rule.pattern)" : "Грамматика \(rule.level.rawValue)").font(.title2.bold()).id("grammar.practice.top")
-                if !isLessonRead {
-                    Text("1 · Изучи правило → 2 · Выполни задания → 3 · Разбери результат")
-                        .font(.callout).foregroundStyle(AppPalette.secondaryText)
-                    GrammarLessonContent(rule: rule, settings: settings, progress: session.reviewStore, translationState: translationState)
-                } else if let error = practice.contentError {
-                    Label("Упражнения недоступны", systemImage: "exclamationmark.triangle")
-                        .font(.headline).foregroundStyle(AppPalette.correction)
-                    Text(error).accessibilityIdentifier("grammar.training.error")
-                    Button("Посмотреть правило") { isLessonPresented = true }
-                } else if practice.isComplete {
-                    result
-                } else if let exercise = practice.currentExercise {
-                    question(exercise)
-                }
-            }.padding(.horizontal, 4).padding(.bottom, 44)
-        }
-        .mask { BottomScrollMask() }
-        .onChange(of: isLessonRead) { proxy.scrollTo("grammar.practice.top", anchor: .top) }
-        .onChange(of: practice.position) { proxy.scrollTo("grammar.practice.top", anchor: .top) }
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    Color.clear.frame(height: 1).id("grammar.practice.top")
+                    if !practice.isLessonRead {
+                        GrammarLessonContent(rule: rule, settings: settings, progress: session.reviewStore, translationState: translationState)
+                    } else if let error = practice.contentError {
+                        Text(error).accessibilityIdentifier("grammar.training.error")
+                        Button("Посмотреть правило") { isLessonPresented = true }
+                    } else if practice.isComplete {
+                        result
+                    } else if let exercise = practice.currentExercise {
+                        question(exercise)
+                    }
+                }.padding(.horizontal, 8).padding(.bottom, 24)
+            }
+            .mask { BottomScrollMask() }
+            .onChange(of: practice.isLessonRead) { proxy.scrollTo("grammar.practice.top", anchor: .top) }
+            .onChange(of: practice.position) { proxy.scrollTo("grammar.practice.top", anchor: .top) }
         }
         .safeAreaInset(edge: .bottom) {
             BottomActionBar {
-                if !isLessonRead {
-                    primaryActionButton(title: "Перейти к упражнениям", systemImage: "checklist",
-                        accessibilityIdentifier: "grammar.training.begin") { isLessonRead = true }
+                if !practice.isLessonRead {
+                    primaryActionButton(title: "Попробовать", systemImage: "checklist",
+                        accessibilityIdentifier: "grammar.training.begin") { practice.isLessonRead = true }
                 } else if practice.isComplete {
-                    primaryActionButton(title: session.isGrammarResultPending ? "Следующее правило" : "Сохранить результат",
+                    primaryActionButton(title: session.isGrammarResultPending ? "Продолжить" : "Сохранить результат",
                         systemImage: "arrow.right", accessibilityIdentifier: "grammar.training.continue") {
-                        operation?.cancel()
                         operation = Task {
                             if session.isGrammarResultPending { await session.continueGrammarAfterResult() }
                             else { await saveResult() }
                         }
-                    }.disabled(session.isPreparingCard)
+                    }.disabled(session.isPreparingCard || practice.isSaving)
                 } else if practice.contentError == nil {
-                    primaryActionButton(title: "Продолжить", systemImage: "arrow.right",
-                        accessibilityIdentifier: "grammar.training.next") { practice.next() }
-                        .disabled(!practice.isAnswerVisible)
+                    let assembling = practice.currentExercise?.kind == .assembleSentence && !practice.isAnswerVisible
+                    primaryActionButton(title: assembling ? "Проверить" : "Продолжить", systemImage: "arrow.right",
+                        accessibilityIdentifier: "grammar.training.next") {
+                        if assembling { practice.checkAssembly() } else { practice.next() }
+                    }.disabled(assembling ? practice.selectedElements.isEmpty : !practice.isAnswerVisible)
                 }
-                GlassIconButton(systemImage: "book", accessibilityLabel: "Посмотреть правило") { isLessonPresented = true }
+                GlassIconButton(systemImage: "book", accessibilityLabel: "Посмотреть правило",
+                    accessibilityIdentifier: "grammar.training.theory") {
+                    if practice.isLessonRead { practice.useHint() }; isLessonPresented = true
+                }
             }
         }
         .sheet(isPresented: $isLessonPresented) {
@@ -110,88 +107,108 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
                     .toolbar { Button("Закрыть") { isLessonPresented = false } }
             }
         }
-        .task(id: "\(rule.id):\(settings.options(for: rule.level.deck.id).meaningLanguage)") {
-            await translationState.translateGrammarIfNeeded(rule, language: settings.options(for: rule.level.deck.id).meaningLanguage)
-        }
         .task(id: practice.isComplete) {
             guard practice.isComplete else { return }
             await saveResult()
         }
-        .onDisappear { practice.close(); operation?.cancel() }
-    }
-
-    private func english(_ text: String) -> String {
-        translationState.displayedGrammarText(text, rule: rule, language: settings.options(for: rule.level.deck.id).meaningLanguage)
+        .onDisappear { operation?.cancel() }
     }
 
     private func saveResult() async {
-        guard !Task.isCancelled, !session.isGrammarResultPending, let rating = practice.proposedRating else { return }
+        guard !Task.isCancelled, !session.isGrammarResultPending, let rating = practice.beginSaving() else { return }
         await session.submitReview(rating, expectedKey: rule.reviewKey, holdGrammarResult: true)
+        practice.finishSaving(success: session.isGrammarResultPending)
     }
 
     private func question(_ exercise: GrammarExercise) -> some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Задание \(practice.position + 1) из \(practice.count) · \(exercise.kind.title)").font(.headline)
+        VStack(alignment: .leading, spacing: 20) {
+            Text("Задание \(practice.position + 1) из \(practice.count)").font(.subheadline)
+                .foregroundStyle(AppPalette.secondaryText)
             ProgressView(value: Double(practice.position), total: Double(practice.count))
-            Text(exercise.promptRU).font(.title3).fixedSize(horizontal: false, vertical: true)
-            if let cue = exercise.cueEN { Text(english(cue)).font(.title3) }
-            ForEach(practice.options) { option in
-                let correct = practice.isAnswerVisible && exercise.accepts(option.id)
-                let selected = practice.selectedOptionID == option.id
-                Button { practice.choose(option.id) } label: {
-                    HStack(alignment: .top, spacing: 12) {
-                        Image(systemName: correct ? "checkmark.circle.fill" : selected ? "xmark.circle.fill" : "circle")
-                            .foregroundStyle(correct ? AppPalette.success : selected ? AppPalette.correction : AppPalette.accent)
-                        Text(option.text).fixedSize(horizontal: false, vertical: true)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        if correct { Text("Верно").font(.caption) }
-                        else if selected { Text("Твой ответ").font(.caption) }
-                    }.padding(16).appSurfaceCard()
-                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(
-                            correct ? AppPalette.success : selected ? AppPalette.correction : .clear, lineWidth: 2))
-                }
-                .buttonStyle(.plain).disabled(practice.isAnswerVisible)
-                .accessibilityIdentifier("grammar.option.\(option.id)")
-                .accessibilityValue(correct ? "correct" : selected ? "selectedIncorrect" : "available")
+            Text(exercise.promptRU).font(.title3.weight(.medium)).fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("grammar.training.prompt").accessibilityValue(exercise.id)
+            if let japanese = exercise.japanese {
+                Text(japanese).font(.title2).fixedSize(horizontal: false, vertical: true)
+                    .textSelection(.enabled).accessibilityIdentifier("grammar.training.japanese")
+            }
+            if exercise.kind == .assembleSentence {
+                assembly(exercise)
+            } else {
+                ForEach(practice.options) { option in optionButton(option, exercise: exercise) }
             }
             if practice.isAnswerVisible {
-                VStack(alignment: .leading, spacing: 8) {
-                    Label(practice.results.last?.isCorrect == true ? "Правильно" : "Есть ошибка",
-                        systemImage: practice.results.last?.isCorrect == true ? "checkmark.circle" : "xmark.circle")
-                    Text(exercise.explanationRU)
-                    if let explanation = exercise.explanationEN { Text(english(explanation)) }
-                    if let option = exercise.options.first(where: { $0.id == practice.selectedOptionID }),
-                       !exercise.accepts(option.id), let feedback = option.feedbackRU { Text(feedback) }
-                }.padding(16).appSurfaceCard().accessibilityIdentifier("grammar.training.feedback")
+                feedback(exercise)
+            } else {
+                Button("Подсказка") { practice.useHint() }.accessibilityIdentifier("grammar.training.hint")
+                if practice.usedHint { Text(exercise.hintRU ?? exercise.explanationRU).font(.callout) }
             }
         }
     }
 
-    private var result: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Label("Урок завершён", systemImage: "checkmark.seal").font(.title2.bold())
-            Text("Правильных ответов: \(practice.correctCount) из \(practice.count)")
-                .font(.headline).accessibilityIdentifier("grammar.training.result")
-            ForEach(practice.results, id: \.exerciseID) { answer in
-                if let exercise = practice.exercises.first(where: { $0.id == answer.exerciseID }) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Label(exercise.promptRU, systemImage: answer.isCorrect ? "checkmark.circle" : "xmark.circle")
-                        if !answer.isCorrect {
-                            Text("Твой ответ: \(exercise.options.first { $0.id == answer.optionID }?.text ?? "")")
-                            Text("Правильно: \(exercise.options.filter { exercise.accepts($0.id) }.map(\.text).joined(separator: "; "))")
-                        }
-                        Text(exercise.explanationRU)
-                    if let explanation = exercise.explanationEN { Text(english(explanation)).font(.callout) }
-                    }.padding(16).appSurfaceCard()
-                }
+    private func optionButton(_ option: GrammarExercise.Option, exercise: GrammarExercise) -> some View {
+        let correct = practice.isAnswerVisible && exercise.accepts(option.id)
+        let selected = practice.selectedOptionID == option.id
+        return Button { practice.choose(option.id) } label: {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: correct ? "checkmark.circle.fill" : selected ? "xmark.circle.fill" : "circle")
+                    .foregroundStyle(correct ? AppPalette.success : selected ? AppPalette.correction : AppPalette.accent)
+                Text(option.text).font(.title3).fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }.padding(16).appSurfaceCard()
+        }
+        .buttonStyle(.plain).disabled(practice.isAnswerVisible)
+        .accessibilityIdentifier("grammar.option.\(option.id)")
+        .accessibilityValue(correct ? "correct" : selected ? "selectedIncorrect" : "available")
+    }
+
+    private func assembly(_ exercise: GrammarExercise) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(practice.selectedElements.compactMap { id in exercise.options.first { $0.id == id }?.text }.joined())
+                .font(.title2).frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
+                .accessibilityIdentifier("grammar.assembly.answer")
+            Text("Нажимай на элементы по порядку. Повторное нажатие убирает элемент.").font(.caption)
+                .foregroundStyle(AppPalette.secondaryText)
+            // A wrapping vertical layout also works with large text and narrow phones.
+            ForEach(practice.options) { option in
+                Button { practice.toggleElement(option.id) } label: {
+                    HStack {
+                        Text(option.text).font(.title3)
+                        Spacer()
+                        if let index = practice.selectedElements.firstIndex(of: option.id) { Text("\(index + 1)") }
+                    }.padding(12).appSurfaceCard()
+                }.buttonStyle(.plain).disabled(practice.isAnswerVisible)
+                    .accessibilityIdentifier("grammar.element.\(option.id)")
             }
+        }.accessibilityIdentifier("grammar.assembly")
+    }
+
+    private func feedback(_ exercise: GrammarExercise) -> some View {
+        let correct = practice.results.last?.isCorrect == true
+        return VStack(alignment: .leading, spacing: 8) {
+            Label(correct ? "Правильно" : "Есть ошибка", systemImage: correct ? "checkmark.circle" : "xmark.circle")
+                .foregroundStyle(correct ? AppPalette.success : AppPalette.correction).font(.headline)
+            if !correct {
+                Text(exercise.correctAnswer).font(.title3)
+                if let option = exercise.options.first(where: { $0.id == practice.selectedOptionID }), let text = option.feedbackRU {
+                    Text(text).font(.callout)
+                } else { Text(exercise.explanationRU).font(.callout) }
+                Button("Посмотреть правило") { isLessonPresented = true }
+            }
+        }.accessibilityIdentifier("grammar.training.feedback")
+    }
+
+    private var result: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            Label(practice.weakAspects.isEmpty ? "Правило закреплено" : "Практика завершена", systemImage: "checkmark.seal")
+                .font(.title2.bold())
+            Text("Готово! \(practice.correctCount) из \(practice.count)")
+                .font(.headline).accessibilityIdentifier("grammar.training.result")
+            ForEach(practice.weakAspects, id: \.self) { Text("Повтори: " + $0).font(.callout) }
             if session.isGrammarResultPending, let record = session.reviewStore.record(for: rule.reviewKey) {
                 Text("Следующее повторение: \(record.dueDate.formatted(date: .abbreviated, time: .shortened))")
-                Text("Результат сохранён. Одно прохождение — одна запись повторения.").font(.caption).accessibilityIdentifier("grammar.training.saved")
-            } else if session.isPreparingCard {
+                    .accessibilityIdentifier("grammar.training.saved")
+            } else if session.isPreparingCard || practice.isSaving {
                 CenteredLoadingIndicator(title: "Сохраняю результат")
-            } else {
-                Text("Оценка: \(practice.proposedRating?.title ?? "—"). Сохраняем результат всего урока.").font(.callout)
             }
         }
     }

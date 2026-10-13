@@ -47,7 +47,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v6
-      - name: Require on-device localization source and three exercises per rule
+      - name: Require substantive practice and offline Russian introduction for every rule
         run: python3 tools/grammar/validate_ci.py --release
       - name: Upload unresolved content requirements
         if: always()

@@ -16,7 +16,7 @@ def check(release=False):
     pin = json.loads((ROOT / 'tools/grammar/snapshot.json').read_text())
     errors, pending, all_rules = [], [], []
     exercise_ids = set()
-    typed_kinds = {'chooseConstruction', 'fillBlank', 'identifyConstruction', 'chooseCorrectSentence', 'transformSentence'}
+    typed_kinds = {'fillBlank', 'transformSentence', 'assembleSentence', 'chooseContext', 'correctError', 'distinguishMeaning', 'understandSentence'}
     type_counts = {kind: 0 for kind in sorted(typed_kinds)}
     counts = {}
     for level, expected in pin['counts'].items():
@@ -57,8 +57,16 @@ def check(release=False):
                 if not all(nonempty(e.get('ru')) for e in rule['examples']):
                     errors.append(f'Incomplete example translations: {rule["id"]}')
             exercises = rule.get('exercises', [])
-            if len(exercises) < 3:
-                missing.append('three source-backed exercises')
+            if len(exercises) < 4:
+                missing.append('four substantive application exercises')
+            teaching = rule.get('teaching')
+            if not teaching:
+                missing.append('offline Russian introduction and worked example')
+            else:
+                assert all(nonempty(teaching.get(k)) for k in ('meaningRU', 'usageRU', 'formationRU'))
+                assert nonempty(teaching['example']['ja']) and nonempty(teaching['example']['ru'])
+                assert teaching['parts'] and all(nonempty(p['text']) and p['text'] in teaching['example']['ja'] and nonempty(p['roleRU']) for p in teaching['parts'])
+                assert 1 <= teaching['complexity'] <= 3
             local_ids = set()
             for exercise in exercises:
                 eid = exercise['id']
@@ -70,11 +78,19 @@ def check(release=False):
                 assert all(nonempty(exercise.get(k)) for k in ('promptRU', 'explanationRU'))
                 options = exercise['options']
                 ids = {o['id'] for o in options}
-                assert len(ids) == len(options) == 4
+                assert len(ids) == len(options) and len(options) >= 2
                 assert all(nonempty(o['id']) and nonempty(o['text']) for o in options)
                 assert len({o['text'].strip() for o in options}) == len(options)
                 accepted = set(exercise['acceptedOptionIDs'])
-                assert accepted and accepted < ids, f'Invalid answer key: {eid}'
+                if exercise['kind'] == 'assembleSentence':
+                    orders = exercise.get('acceptedOrders', [])
+                    assert orders and all(order and len(set(order)) == len(order) and set(order) <= ids for order in orders)
+                    assert all(len(order) < len(options) for order in orders), 'Assembly needs meaningful alternatives'
+                else:
+                    assert accepted and accepted < ids, f'Invalid answer key: {eid}'
+                assert exercise.get('isScored') is True
+                assert nonempty(exercise.get('aspect')) and nonempty(exercise.get('hintRU'))
+                assert 1 <= exercise['difficulty'] <= 3
                 assert isinstance(exercise['difficulty'], int)
                 provenance = exercise['provenance']
                 assert provenance['commit'] == pin['commit'] and provenance['sourceRuleID'] == rule['id']
@@ -83,22 +99,19 @@ def check(release=False):
                 if provenance['status'] == 'linguisticallyReviewed':
                     assert nonempty(exercise.get('reviewer')), 'Linguistic review requires an actual reviewer'
                 if provenance.get('exampleIndex') is not None:
-                    idx = provenance['exampleIndex']
-                    assert 0 <= idx < len(original['examples'])
-                    example = original['examples'][idx]
-                    if exercise['kind'] == 'identifyConstruction':
-                        assert example['ja'] in exercise['promptRU'] and exercise['cueEN'] == example['en']
-                    if exercise['kind'] == 'chooseCorrectSentence':
-                        assert example['ja'] in {o['text'] for o in options if o['id'] in accepted}
-                    if exercise['kind'] == 'fillBlank':
-                        for option in options:
-                            if option['id'] in accepted:
-                                assert example['ja'] in exercise['promptRU'].replace('（　）', option['text'])
-                assert nonempty(exercise.get('explanationEN'))
+                    assert 0 <= provenance['exampleIndex'] < len(original['examples'])
+                if exercise['kind'] == 'fillBlank':
+                    assert (exercise.get('japanese') or '').count('（　）') == 1
+                if exercise['kind'] in ('correctError', 'transformSentence', 'understandSentence'):
+                    assert nonempty(exercise.get('japanese'))
+                if teaching and exercise.get('japanese'):
+                    assert exercise['japanese'] != teaching['example']['ja'], 'Practice must transfer to a new context'
+            signatures = {(e['promptRU'], e.get('japanese')) for e in exercises}
+            assert len(signatures) == len(exercises), f'Duplicate question: {rule["id"]}'
             if len({e['kind'] for e in exercises}) < 2:
                 missing.append('two exercise kinds')
-            if not nonempty(rule.get('notes')) and not any(nonempty(e.get('explanationEN')) for e in exercises):
-                missing.append('usage explanation for on-device translation')
+            if not teaching and not nonempty(rule.get('notes')):
+                missing.append('usage explanation')
             if missing:
                 pending.append({'id': rule['id'], 'level': level, 'missing': missing})
         all_rules.extend(rules)
@@ -113,14 +126,15 @@ def check(release=False):
         assert nonempty((DATA / name).read_text())
     assert 'CC-BY-SA-4.0' in (DATA / 'Grammar-NOTICE.txt').read_text() or 'CC BY-SA 4.0' in (DATA / 'Grammar-NOTICE.txt').read_text()
     if release and pending:
-        errors.append(f'{len(pending)} rules lack required required learning content for on-device localization')
+        errors.append(f'{len(pending)} rules lack substantive learning content')
     if release:
-        for kind in ('chooseConstruction', 'fillBlank', 'identifyConstruction', 'chooseCorrectSentence', 'transformSentence'):
+        for kind in sorted(typed_kinds):
             if type_counts[kind] == 0:
                 errors.append(f'Missing required exercise kind: {kind}')
     report = {'commit': pin['commit'], 'counts': counts, 'rules': len(all_rules),
               'examples': sum(len(r['examples']) for r in all_rules),
               'exercisesByKind': type_counts, 'pendingRules': pending, 'errors': errors,
+              'expertReviewNeeded': [e['id'] for r in all_rules for e in r.get('exercises', []) if e['provenance']['status'] != 'linguisticallyReviewed'],
               'translationPolicy': 'on-device-en-ru', 'manualLinguisticReviewClaimed': False, 'releaseReady': not pending and not errors}
     artifacts = ROOT / 'artifacts'
     artifacts.mkdir(exist_ok=True)
