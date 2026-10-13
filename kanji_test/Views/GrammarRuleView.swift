@@ -355,11 +355,11 @@ struct GrammarLessonContent: View, StudyViewStyling {
                 loadingText: "Перевожу пример",
                 emptyText: "Пример недоступен"
             ) {
-                translationControls(
+                if !example.en.isEmpty { translationControls(
                     originalText: example.en,
                     allowsRetry: language == .russian && example.ru == nil,
                     identifier: "grammar.translation.example.\(index)"
-                )
+                ) }
             }
         }
         .accessibilityElement(children: .contain)

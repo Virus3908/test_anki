@@ -172,7 +172,8 @@ final class GrammarUITests: UITestCase {
         XCTAssertFalse(element("grammar.training.saved").exists)
         XCTAssertEqual(element("grammar.training.continue").label, "Готово")
         capture("21-basic-result-without-rating")
-        tap("grammar.training.continue", .exitTraining, expecting: "grammar.practice")
+        // Search practice closes its sheets and opens the selected level as the return route.
+        tap("grammar.training.continue", .exitTraining, expecting: "grammar.statistics")
     }
 
     func testIndependentFormInputAndWrongAnswerExplanation() {
@@ -257,6 +258,7 @@ final class GrammarUITests: UITestCase {
         scrollTo("grammar.furigana")
         let toggle = element("grammar.furigana")
         toggle.tap()
+        XCTAssertEqual(toggle.value as? String, "0")
         tap("grammar.practice", .startTraining, expecting: "grammar.training.begin")
         tap("grammar.training.begin", .startTraining, expecting: "grammar.training.prompt")
         XCTAssertEqual(element("grammar.training.japanese").value as? String, "plain")
@@ -350,9 +352,16 @@ final class GrammarUITests: UITestCase {
     }
 
     private func scrollTo(_ identifier: String) {
-        for _ in 0..<10 where !element(identifier).isHittable {
+        for _ in 0..<10 {
             let target = element(identifier)
-            if target.exists && target.frame.midY < app.frame.midY { app.swipeDown() }
+            let fixedControl = ["grammar.training.next", "grammar.training.continue", "grammar.practice",
+                "grammar.training.theory", "grammar.mixed.finish"].contains(identifier)
+            if fixedControl && target.isHittable { return }
+            let viewport = app.scrollViews.allElementsBoundByIndex.last { $0.isHittable }?.frame ?? app.frame
+            let top = viewport.minY + 12, bottom = viewport.maxY - 44
+            let safelyVisible = target.exists && target.frame.minY >= top && target.frame.maxY <= bottom
+            if target.isHittable && (fixedControl || safelyVisible) { return }
+            if target.exists && target.frame.minY < top { app.swipeDown() }
             else { app.swipeUp() }
         }
         XCTAssertTrue(element(identifier).isHittable, "Element must be reachable: \(identifier)")

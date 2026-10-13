@@ -146,6 +146,7 @@ private struct StudyExampleRow: View {
                 }
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("study.example.\(example.id)")
     }
@@ -163,7 +164,8 @@ private struct StudyExampleRow: View {
                     .foregroundStyle(AppPalette.secondaryText)
                     .accessibilityLabel("Источник и лицензия")
             }
-            .fixedSize()
+            .frame(width: 44, height: 44)
+            .contentShape(Rectangle())
             .accessibilityIdentifier("study.example.source.\(example.id)")
         }
     }

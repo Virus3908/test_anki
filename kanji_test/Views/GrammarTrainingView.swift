@@ -194,10 +194,9 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
                 assembly(exercise)
             } else {
                 VStack(spacing: 0) {
-                    ForEach(practice.options.indices, id: \.self) { index in
-                        let option = practice.options[index]
+                    ForEach(Array(practice.options.enumerated()), id: \.element.id) { index, option in
                         optionButton(option, exercise: exercise)
-                        if index < practice.options.count - 1 {
+                        if index < exercise.options.count - 1 {
                             Rectangle().fill(AppPalette.border.opacity(0.5)).frame(height: 1).padding(.leading, 34)
                         }
                     }
@@ -243,7 +242,7 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
                     Text(stateText).font(.caption.weight(.medium)).foregroundStyle(AppPalette.secondaryText)
                         .fixedSize(horizontal: false, vertical: true)
                 }
-            }.padding(.vertical, 12)
+            }.padding(.vertical, 12).contentShape(Rectangle())
         }
         .buttonStyle(.plain).disabled(practice.isAnswerVisible)
         .accessibilityElement(children: .ignore)
@@ -268,19 +267,19 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
             Text("Нажимай на элементы по порядку. Повторное нажатие убирает элемент.").font(.caption)
                 .foregroundStyle(AppPalette.secondaryText)
             Rectangle().fill(AppPalette.border.opacity(0.5)).frame(height: 1)
-            ForEach(practice.options.indices, id: \.self) { index in
-                let option = practice.options[index]
+            ForEach(Array(practice.options.enumerated()), id: \.element.id) { index, option in
                 Button { practice.toggleElement(option.id) } label: {
                     HStack {
                         FuriganaText(text: option.text, furigana: exercise.ruby(for: option.text), showsFurigana: settings.showExampleFurigana).font(.title3)
                         Spacer()
                         if let index = practice.selectedElements.firstIndex(of: option.id) { Text("\(index + 1)") }
-                    }.padding(.vertical, 10)
+                    }.padding(.vertical, 10).contentShape(Rectangle())
                 }.buttonStyle(.plain).disabled(practice.isAnswerVisible)
                     .accessibilityElement(children: .ignore)
                     .accessibilityLabel(option.text)
+                    .accessibilityValue(practice.selectedElements.firstIndex(of: option.id).map { "Позиция \($0 + 1)" } ?? "Не выбран")
                     .accessibilityIdentifier("grammar.element.\(option.id)")
-                if index < practice.options.count - 1 {
+                if index < exercise.options.count - 1 {
                     Rectangle().fill(AppPalette.border.opacity(0.5)).frame(height: 1).padding(.leading, 30)
                 }
             }
@@ -292,7 +291,7 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
         let unverified = practice.results.last?.assessment == .differsFromSample
         return VStack(alignment: .leading, spacing: 8) {
             Label(correct ? "Верно" : unverified ? "Отличается от образца" : exercise.kind == .formProduction && practice.results.last?.assessment == .incorrectForm ? "Ошибка проверяемой формы" : "Проверяемый ответ неверен", systemImage: correct ? "checkmark.circle" : unverified ? "info.circle" : "xmark.circle")
-                .foregroundStyle(correct ? AppPalette.success : AppPalette.correction).font(.headline)
+                .foregroundStyle(correct ? AppPalette.success : unverified ? AppPalette.secondaryText : AppPalette.correction).font(.headline)
             if !correct {
                 FuriganaText(text: exercise.correctAnswer, furigana: exercise.ruby(for: exercise.correctAnswer), showsFurigana: settings.showExampleFurigana).font(.title3)
                 if let option = exercise.options.first(where: { $0.id == practice.selectedOptionID }), let text = option.feedbackRU {
