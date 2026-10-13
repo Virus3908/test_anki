@@ -35,6 +35,7 @@ final class CardSearchViewModel {
     private(set) var kanjiResults: [KanjiCard] = []
     private(set) var wordResults: [WordStudyCard] = []
     private(set) var kanaResults: [KanaStudyCard] = []
+    private(set) var grammarResults: [GrammarRule] = []
     private(set) var ankiResults: [AnkiSearchRecord] = []
     /// Сколько всего нашлось (до капа на показ).
     private(set) var totalFound = 0
@@ -50,6 +51,7 @@ final class CardSearchViewModel {
         let words: CardSearchMatches<WordSearchRecord>?
         let kana: CardSearchMatches<KanaSearchRecord>?
         let anki: CardSearchMatches<AnkiSearchRecord>?
+        let grammar: CardSearchMatches<GrammarSearchRecord>?
         let wordCards: [WordStudyCard]
     }
 
@@ -59,6 +61,7 @@ final class CardSearchViewModel {
     private var kanjiIndex: CardSearchIndex<KanjiSearchRecord>?
     private var wordIndex: CardSearchIndex<WordSearchRecord>?
     private var kanaIndex: CardSearchIndex<KanaSearchRecord>?
+    private var grammarIndex: CardSearchIndex<GrammarSearchRecord>?
     private var ankiIndex: CardSearchIndex<AnkiSearchRecord>?
 
     /// Переводы: из них берутся сохранённые рус. значения кандзи.
@@ -92,6 +95,8 @@ final class CardSearchViewModel {
                 try await prepareWords()
                 try Task.checkCancellation()
                 try await prepareKana()
+                let grammar = try await GrammarDataLoader.shared.allRules()
+                grammarIndex = await Self.buildIndex(records: grammar.map(GrammarSearchRecord.init))
                 try Task.checkCancellation()
                 if let ankiModel {
                     let records = try await ankiModel.recordsForSearch()
@@ -225,17 +230,19 @@ final class CardSearchViewModel {
         let request = generation
         guard !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             kanjiResults = []; wordResults = []; kanaResults = []; ankiResults = []
+            grammarResults = []
             totalFound = 0
             return
         }
         guard isPrepared, !isClosed, !Task.isCancelled else { return }
-        let kanji = kanjiIndex, words = wordIndex, kana = kanaIndex, anki = ankiIndex
+        let kanji = kanjiIndex, words = wordIndex, kana = kanaIndex, anki = ankiIndex, grammar = grammarIndex
         let limit = Self.resultLimit
         let worker = Task.detached(priority: .userInitiated) {
             let foundKanji = try kanji?.search(query, limit: limit)
             let foundWords = try words?.search(query, limit: limit)
             let foundKana = try kana?.search(query, limit: limit)
             let foundAnki = try anki?.search(query, limit: limit)
+            let foundGrammar = try grammar?.search(query, limit: limit)
             let entries = foundWords?.records.map(\.entry) ?? []
             let characters = WordDataLoader.requiredKanjiCharacters(in: entries)
             let cards = (try? await BundledStudyData.shared.bundledKanjiCards(characters: characters)) ?? []
@@ -244,7 +251,7 @@ final class CardSearchViewModel {
                 cardsByCharacter: Dictionary(cards.map { ($0.kanji, $0) }, uniquingKeysWith: { first, _ in first }))
             try Task.checkCancellation()
             return SearchResults(kanji: foundKanji, words: foundWords,
-                                 kana: foundKana, anki: foundAnki, wordCards: wordCards)
+                                 kana: foundKana, anki: foundAnki, grammar: foundGrammar, wordCards: wordCards)
         }
         searchTask = worker
         do {
@@ -256,8 +263,9 @@ final class CardSearchViewModel {
             wordResults = found.wordCards
             kanaResults = found.kana?.records.map(\.card) ?? []
             ankiResults = found.anki?.records ?? []
+            grammarResults = found.grammar?.records.map(\.rule) ?? []
             totalFound = (found.kanji?.totalFound ?? 0) + (found.words?.totalFound ?? 0)
-                + (found.kana?.totalFound ?? 0) + (found.anki?.totalFound ?? 0)
+                + (found.kana?.totalFound ?? 0) + (found.anki?.totalFound ?? 0) + (found.grammar?.totalFound ?? 0)
             searchTask = nil
         } catch is CancellationError {
             // A cancelled query must never publish partial results.

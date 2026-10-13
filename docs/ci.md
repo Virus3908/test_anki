@@ -14,9 +14,24 @@ Workflow [Tests](https://github.com/Virus3908/test_anki/actions/workflows/tests.
   поиск/просмотр, тренировка, рисование, озвучивание, фуригана/настройка,
   импорт небольшой локальной Anki-фикстуры, сохранение прогресса и завершение дня.
 
+Дополнительно два job на Ubuntu: **Grammar source integrity** проверяет pinned
+OpenJLPT snapshot, исходные ID/порядок/поля, JSON, атрибуцию, ссылки и
+воспроизводимость; **Grammar Russian content readiness** требует русские уроки
+и английскую основу для системного перевода на телефоне, минимум четыре прикладных задания/два
+типа у каждого из 526 правил, уникальные варианты и источник ключей.
+Дополнительно проверяются метаданные всех ID, MIT-выборка Nihongo Mono, её hash
+и отсутствие полного ответа в условии. Hosted проверяет ключи спряжений,
+исключения, ввод каны/кандзи и взвешенную оценку. Это
+изменение модели перевода следует уточнению пользователя; job не отключён,
+порог упражнений не уменьшен. Оба сохраняют
+grammar-quality.json. validate_ci.py предназначен только для GitHub Actions.
+В hosted/UI targets добавлены GrammarDataTests, GrammarPracticeTests,
+GrammarStudyIntegrationTests и GrammarUITests. См. [грамматику](grammar.md).
+
 `scripts/ci-select-simulator.py` выбирает доступный iPhone с установленным
 runtime iOS >= 26.5. Если подходящего устройства нет, job явно падает;
-он не скачивает дополнительные runtime. Скрипт предназначен только для CI.
+он не скачивает дополнительные runtime. UI job передаёт --compact для выбора
+наиболее компактного доступного iPhone с актуальным runtime. Скрипт только для CI.
 
 iOS jobs сначала выполняют `build-for-testing`, ждут загрузки выбранного устройства
 через `simctl bootstatus -b`, затем выполняют `test-without-building`. Подготовка
@@ -41,6 +56,9 @@ UI-режим и очистка тестового состояния досту
 - `anki-import-test-log`;
 - `ios-hosted-test-results`: `hosted-build.log`, `hosted-tests.log`,
   `hosted-tests.xcresult`;
+- `grammar-ui-screenshots`: экспортированные screenshot attachments этапов урока
+  (главная, N5, объяснение, задание, правильный/ошибочный ответ, результат),
+  включая отдельный сценарий с accessibility3 Dynamic Type;
 - `ios-ui-test-results`: `ui-build.log`, `ui-tests.log`, `ui-tests.xcresult`.
 
 В iOS artifacts также включён отдельный `*-simulator-boot.log`.
@@ -79,3 +97,17 @@ XCTest measure в hosted job без произвольного порога вр
 только на GitHub; локально тесты и Simulator не запускаются. Новые Swift-файлы
 автоматически включаются через PBXFileSystemSynchronizedRootGroup. Все три
 существующих jobs сохранены.
+
+Смешанная грамматика: GrammarMixedSessionTests и GrammarFuriganaTests запускаются
+в прежнем hosted job. validate_ci.py проверяет 526 записей grammar-audit.json и
+точное восстановление текстов ruby; release job по-прежнему требует полноценные
+уроки всего корпуса. GrammarUITests сохраняет дополнительные screenshots ввода,
+смешанного вопроса, переключения фуриганы, ошибки и результата; экспорт прежний.
+
+Corpus job устанавливает закреплённые SudachiPy/core, повторяет разбор извлечённой
+выборки, проверяет source/translation IDs и direct links по официальному pinned
+Tatoeba snapshot. При смене еженедельной выгрузки downloader явно отказывается
+подменять данные; нужен сохранённый архив или осознанный repin. Publication-boundary
+regressions и GrammarSentenceBankTests выполняются только в Actions. Release gate
+дополнен пятью семантически проверенными контекстами на правило. Coverage/review
+packets сохраняются в grammar-corpus-coverage. [Корпус](grammar-corpus.md).

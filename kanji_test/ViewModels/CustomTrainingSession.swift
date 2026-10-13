@@ -86,7 +86,7 @@ final class CustomTrainingSession {
             case .kana:
                 guard let reading = catalog.kana(id)?.reading, !reading.isEmpty else { return nil }
                 return [reading]
-            case .anki: return nil
+            case .anki, .grammar: return nil
             }
         }.flatMap { $0 }
     }

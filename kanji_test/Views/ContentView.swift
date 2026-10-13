@@ -22,6 +22,14 @@ struct ContentView: View {
             }
             trainingScreen
         }
+        .transformEnvironment(\.dynamicTypeSize) { size in
+            #if DEBUG
+            if UITestingLaunch.isActive && ProcessInfo.processInfo.environment["UITEST_GRAMMAR_LARGE_TEXT"] == "1" {
+                size = .accessibility3
+            }
+            #endif
+        }
+        .preferredColorScheme(testColorScheme)
         .animation(.easeInOut(duration: 0.3), value: appModel.navigation.presentedTraining)
         .sheet(isPresented: $model.isSettingsPresented) {
             SettingsView(settings: appModel.settings,
@@ -62,6 +70,15 @@ struct ContentView: View {
         }
     }
 
+    private var testColorScheme: ColorScheme? {
+        #if DEBUG
+        if UITestingLaunch.isActive && ProcessInfo.processInfo.environment["UITEST_GRAMMAR_DARK_MODE"] == "1" {
+            return .dark
+        }
+        #endif
+        return nil
+    }
+
     private var startScreen: some View {
         StartView(practiceMode: Binding(get: { appModel.practiceMode }, set: { appModel.practiceMode = $0 }),
                   isLoading: appModel.deckState.isLoadingDeck, onOpen: appModel.openDeck,
@@ -81,6 +98,13 @@ struct ContentView: View {
 
     @ViewBuilder private func deckPreview(for route: StudyRoute) -> some View {
         switch route {
+        case .grammarLevel(let level):
+            GrammarLevelView(level: level, appModel: appModel)
+        case .grammarRule(_, let ruleID):
+            GrammarRuleView(ruleID: ruleID, settings: appModel.settings,
+                progress: appModel.trainingSession.reviewStore, translationState: appModel.translationState) { rule in
+                    appModel.startGrammar(rule.level, ruleID: rule.id)
+                }
         case .ankiDeck(let deck):
             AnkiDeckPreviewView(deck: deck, model: appModel.ankiLibrary, settings: appModel.settings,
                 translationState: appModel.translationState,
@@ -111,6 +135,12 @@ struct ContentView: View {
     /// свайп-назад не должен случайно её прерывать.
     @ViewBuilder private var trainingScreen: some View {
         switch appModel.navigation.presentedTraining {
+        case .training(.grammar):
+            GrammarTrainingView(session: appModel.trainingSession, settings: appModel.settings, translationState: appModel.translationState,
+                onOpenSettings: openSettings)
+                .background(AppPalette.background.ignoresSafeArea())
+                .transition(.move(edge: .trailing))
+                .zIndex(1)
         case .training:
             TrainingView(trainingSession: appModel.trainingSession, settings: appModel.settings,
                          translationState: appModel.translationState, coordinator: appModel.coordinator, onPractice: appModel.practice,

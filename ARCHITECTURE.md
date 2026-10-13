@@ -7,13 +7,14 @@
 
 ## 1. Что сейчас представляет собой приложение
 
-Приложение уже не только тренажёр кандзи. Сейчас в нём четыре режима
+Приложение уже не только тренажёр кандзи. Сейчас в нём пять режимов
 учебного материала:
 
 -   кандзи;
 -   слова;
 -   кана;
 -   импортированные колоды Anki.
+-   грамматика OpenJLPT (исходный английский материал; русский курс не завершён).
 
 В `kanji_test` сейчас примерно **154 Swift-файла и \~10 000 строк
 Swift**, плюс отдельный локальный Swift Package `Packages/AnkiImport`,
@@ -69,6 +70,7 @@ Swift**, плюс отдельный локальный Swift Package `Packages/
 -   `.words`;
 -   `.kana`;
 -   `.anki`.
+-   `.grammar`.
 
 `StudyCardCatalog` --- центральное место, через которое тренировочная
 часть получает конкретные карточки разных типов.
@@ -79,6 +81,7 @@ Swift**, плюс отдельный локальный Swift Package `Packages/
 -   слова имеют `word:...`;
 -   кана --- `kana:...`;
 -   Anki --- `anki:...`.
+-   грамматика --- `grammar:<upstreamID>`.
 
 Это не даёт прогрессу разных типов карточек пересекаться.
 
@@ -703,3 +706,43 @@ hosted и UI jobs для PR, push в main и ручного запуска. См
 Anki. Базовые настройки и review JSON не изменяются. Сохранённые разрешения
 восстанавливаются после перезапуска; studyDate учитывает ручной сдвиг дня,
 Calendar — полночь. Observation обновляет превью при изменении разрешения.
+
+### Грамматика OpenJLPT N5–N1
+
+GrammarRule/GrammarTeaching/GrammarExercise отделяют исходники, короткий урок и
+задачи от SRS. GrammarDataLoader кеширует 526 исходных правил и 1526 примеров;
+невалидные упражнения отключают только практику своего правила. Подготовлены
+10 учебных адаптаций / 83 задачи; полный корпус остаётся незавершённым.
+
+Короткий урок → адаптивная практика → краткий результат → общая очередь.
+Повторение сразу открывает практику. GrammarPracticeViewModel держит ответы,
+подсказки и сборку в памяти; TrainingSessionViewModel сохраняет незавершённую
+попытку при навигации. GrammarLessonRating назначает одну Again/Hard/Good после
+полной попытки с учётом ошибок и помощи. FSRS-6, JSON и существующие ключи
+не меняются. Undo использует прежний журнал. Вторая система повторения отсутствует.
+
+UI переиспользует previewHeader, BottomActionBar, BottomScrollMask, appSurfaceCard
+и AppPalette. Дополнительные источники переводит прежний TranslationViewModel;
+русское введение/инструкции готовых адаптаций доступны офлайн.
+[Формат](docs/grammar.md), [качество и незавершённое покрытие](docs/grammar-quality.md).
+
+GrammarExerciseEngine выбирает урок независимо от SwiftUI; GrammarConjugationEngine
+вычисляет формы только по явному классу/разрешениям. GrammarAnswerValidator принимает
+японскую запись или чтение однозначной формы; предложения используют авторские ключи.
+GrammarPracticeMetadata содержит предварительный план по всем 526 ID.
+GrammarSupplement хранит только пять MIT-записей Nihongo Mono, с pinned commit и лицензией.
+
+GrammarSessionPlanner объединяет кандидатов прежнего TrainingSessionEngine
+по выбранным уровням с собственными effectiveOptions. GrammarMixedSessionViewModel
+удерживает прежние модели попыток и чередует вопросы с cooldown/seed; максимум
+четыре правила. TrainingSessionViewModel сохраняет одну оценку каждого завершённого
+правила через прежний ReviewRepository и ReviewUndo. Черновик смешанной попытки
+временный. GrammarExercise.ruby использует прежний FuriganaParser/FuriganaText.
+
+GrammarSentenceBank хранит нормализованные примеры и интернированные тексты
+шаблонов. GrammarDataLoader разрешает exampleReferences/exerciseTemplateIDs на
+actor в прежние модели, поддерживая inline JSON. GrammarExercise.sentenceID
+позволяет планировщикам избегать соседних/внутриурочных повторов одного контекста.
+В tools/grammar/corpus находятся пакетная подготовка Sudachi/Tatoeba и review
+packets всех 526 ID; они не являются app resources. Публикация новых заданий
+требует отдельной проверки смысла/перевода/границ/ключей. FSRS не меняется.

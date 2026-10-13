@@ -21,6 +21,72 @@ env:
   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
 
 jobs:
+  grammar-corpus:
+    name: Grammar corpus integrity and morphology
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install pinned preparation analyzer
+        run: python -m pip install -r tools/grammar/corpus/requirements.txt
+      - name: Validate pinned sources and morphological candidates
+        run: python tools/grammar/corpus/validate_corpus_ci.py
+      - name: Test publication boundaries and compact reference resolution
+        run: python tools/grammar/corpus/quality_tests_ci.py
+      - name: Fetch exact official source snapshot outside app resources
+        run: python tools/grammar/corpus/download.py --destination "$RUNNER_TEMP/grammar-tatoeba"
+      - name: Verify actual source IDs and translation links
+        run: python tools/grammar/corpus/validate_provenance_ci.py --snapshot-dir "$RUNNER_TEMP/grammar-tatoeba"
+      - name: Upload coverage and semantic review deficits
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: grammar-corpus-coverage
+          path: |
+            tools/grammar/corpus/coverage-report.json
+            tools/grammar/corpus/*-coverage.json
+            tools/grammar/corpus/*-review-packet.json
+            tools/grammar/corpus/snapshot.json
+          retention-days: 14
+  grammar-data:
+    name: Grammar source integrity
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - name: Validate pinned grammar snapshot and resources
+        run: python3 tools/grammar/validate_ci.py
+      - name: Check reproducible generation
+        run: |
+          python3 tools/grammar/generate.py
+          git diff --exit-code -- kanji_test/Data/Grammar
+      - name: Upload grammar integrity report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: grammar-integrity-report
+          path: artifacts/grammar-quality.json
+          retention-days: 14
+
+  grammar-release:
+    name: Grammar Russian content readiness
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - name: Require substantive practice and offline Russian introduction for every rule
+        run: python3 tools/grammar/validate_ci.py --release
+      - name: Upload unresolved content requirements
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: grammar-release-report
+          path: artifacts/grammar-quality.json
+          retention-days: 14
+
   anki-import:
     name: AnkiImport package tests
     runs-on: macos-26
@@ -110,7 +176,7 @@ jobs:
       - name: Show Xcode and available simulators
         run: |
           xcodebuild -version
-          python3 scripts/ci-select-simulator.py
+          python3 scripts/ci-select-simulator.py --compact
       - name: Build ui tests
         run: |
           set -euo pipefail
@@ -144,6 +210,20 @@ jobs:
             -resultBundlePath artifacts/ui-tests.xcresult \
             CODE_SIGNING_ALLOWED=NO \
             2>&1 | tee artifacts/ui-tests.log
+      - name: Export screenshots and other UI attachments
+        if: always()
+        run: |
+          if [ -d artifacts/ui-tests.xcresult ]; then
+            xcrun xcresulttool export attachments --path artifacts/ui-tests.xcresult --output-path artifacts/grammar-ui-screenshots
+          fi
+      - name: Upload grammar screenshots for visual review
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: grammar-ui-screenshots
+          path: artifacts/grammar-ui-screenshots
+          if-no-files-found: warn
+          retention-days: 14
       - name: Upload ui test results
         if: always()
         uses: actions/upload-artifact@v7

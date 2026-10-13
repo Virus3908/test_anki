@@ -4,18 +4,23 @@ struct TranslationRetryControls: View {
     let originalText: String
     let isLoading: Bool
     let action: () -> Void
+    var showsRetryAction = true
+    var accessibilityIdentifier: String?
 
     @State private var isOriginalPresented = false
 
     var body: some View {
         HStack(spacing: 8) {
-            Button(action: action) {
-                Label(
-                    isLoading ? "Перевожу" : "Перевести заново",
-                    systemImage: isLoading ? "hourglass" : "arrow.clockwise"
-                )
+            if showsRetryAction {
+                Button(action: action) {
+                    Label(
+                        isLoading ? "Перевожу" : "Перевести заново",
+                        systemImage: isLoading ? "hourglass" : "arrow.clockwise"
+                    )
+                }
+                .disabled(isLoading)
+                .accessibilityIdentifier(accessibilityIdentifier ?? "translation.retry")
             }
-            .disabled(isLoading)
 
             Button {
                 isOriginalPresented = true
@@ -23,6 +28,7 @@ struct TranslationRetryControls: View {
                 Image(systemName: "info.circle")
             }
             .accessibilityLabel("Показать оригинал")
+            .accessibilityIdentifier(accessibilityIdentifier.map { "\($0).original" } ?? "translation.original")
             .popover(isPresented: $isOriginalPresented, arrowEdge: .bottom) {
                 ScrollView {
                     Text(originalText.isEmpty ? "Оригинал пустой" : originalText)
@@ -31,8 +37,9 @@ struct TranslationRetryControls: View {
                         .fixedSize(horizontal: false, vertical: true)
                         .textSelection(.enabled)
                         .padding(14)
-                        .frame(width: 320, alignment: .leading)
+                        .frame(maxWidth: 300, alignment: .leading)
                 }
+                .frame(maxHeight: 360)
                 .background(AppPalette.surface)
                 .presentationCompactAdaptation(.popover)
             }

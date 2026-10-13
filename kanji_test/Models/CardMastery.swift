@@ -5,6 +5,8 @@ import FSRS
 /// основного обучения колоды в одно число для подсветки на экране выбора.
 /// 1 — уверенно знает, 0 — проваливается; `untrained` — карточку ещё не тренировали.
 nonisolated enum CardMastery: Equatable, Sendable {
+    /// Same confidence boundary used by the existing deck tile presentation.
+    static let knownFloor = 0.55
     case untrained
     case score(Double)
     case excluded

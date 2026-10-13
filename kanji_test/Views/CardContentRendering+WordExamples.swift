@@ -121,6 +121,9 @@ private struct StudyExampleRow: View {
                 FuriganaText(text: example.text, furigana: example.furigana, showsFurigana: showsFurigana)
                     .foregroundStyle(AppPalette.text)
                     .fixedSize(horizontal: false, vertical: true)
+                    // Keep the source control's compact width reserved when a long
+                    // furigana sentence needs to wrap inside this row.
+                    .layoutPriority(-1)
 
                 attributionButton
             }
@@ -143,6 +146,9 @@ private struct StudyExampleRow: View {
                 }
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("study.example.\(example.id)")
     }
 
     @ViewBuilder
@@ -158,7 +164,9 @@ private struct StudyExampleRow: View {
                     .foregroundStyle(AppPalette.secondaryText)
                     .accessibilityLabel("Источник и лицензия")
             }
-            .fixedSize()
+            .frame(width: 44, height: 44)
+            .contentShape(Rectangle())
+            .accessibilityIdentifier("study.example.source.\(example.id)")
         }
     }
 }

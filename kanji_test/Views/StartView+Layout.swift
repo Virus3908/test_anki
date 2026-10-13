@@ -15,7 +15,9 @@ extension StartView {
                     Text(startSubtitle)
                         .foregroundStyle(AppPalette.secondaryText)
 
-                    if selectedSection == .anki {
+                    if selectedSection == .grammar {
+                        GrammarLevelMenu(reviewStore: reviewStore, onOpen: onOpen)
+                    } else if selectedSection == .anki {
                         AnkiLibraryView(model: ankiModel, isBusy: isLoading, onOpen: onOpen)
                     } else if practiceMode == .kana {
                         ForEach(KanaDeck.allCases) { deck in
@@ -54,7 +56,7 @@ extension StartView {
                 .padding(.horizontal, 4)
                 .padding(.top, 8)
                 // запас под закреплённый внизу переключатель и кнопку поиска
-                .padding(.bottom, 150)
+                .padding(.bottom, max(150, sectionBarHeight + 90))
             }
             .mask {
                 BottomScrollMask()
@@ -93,11 +95,17 @@ extension StartView {
     /// liquid glass капсула, по которой скользит стеклянный «бабл»
     /// (второй слой glass, без цветной заливки).
     private var sectionSwitcher: some View {
-        HStack(spacing: 4) {
-            ForEach(StartMenuSection.allCases) { section in
-                sectionSegment(for: section)
+        ScrollViewReader { proxy in
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 4) {
+                ForEach(StartMenuSection.allCases) { section in
+                    sectionSegment(for: section).id(section.id)
+                }
             }
         }
+        .frame(height: sectionBarHeight)
+        .accessibilityIdentifier("start.sectionSwitcher")
+        .onChange(of: selectedSection) { _, section in proxy.scrollTo(section.id, anchor: .center) }
         .padding(5)
         .frame(maxWidth: .infinity)
         .glassEffect(in: Capsule())
@@ -114,6 +122,7 @@ extension StartView {
             }
         }
     }
+    }
 
     private func sectionSegment(for section: StartMenuSection) -> some View {
         let isSelected = selectedSection == section
@@ -127,7 +136,9 @@ extension StartView {
             Text(section.title)
                 .font(.subheadline.weight(isSelected ? .semibold : .medium))
                 .foregroundStyle(isSelected ? AppPalette.text : AppPalette.secondaryText)
-                .frame(maxWidth: .infinity, minHeight: 42)
+                .padding(.horizontal, 12)
+                .frame(minHeight: 44)
+                .fixedSize(horizontal: true, vertical: false)
                 .contentShape(Rectangle())
                 .background {
                     if isSelected {

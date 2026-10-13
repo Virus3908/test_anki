@@ -5,6 +5,20 @@ see [LICENSE](LICENSE). The licenses below apply independently to third-party
 data and dependencies. Imported Anki deck content retains its original rights
 and is not covered by the project's MIT License.
 
+## Grammar Data
+
+OpenJLPT 0.3.0, OpenJLPT contributors and Evan Clan, pinned commit
+`0d1d3410bec90bd4098a7c72de820543cb4f707c`.
+[Source](https://github.com/evanclan/OpenJLPT),
+[CC BY-SA 4.0 license](kanji_test/Data/Grammar/OpenJLPT-LICENSE.txt),
+[upstream notices](kanji_test/Data/Grammar/OpenJLPT-NOTICE.txt),
+[modifications](kanji_test/Data/Grammar/Grammar-NOTICE.txt).
+The original grammar data and derivative learning resources retain CC BY-SA 4.0.
+The project's Swift code retains MIT. Original snapshot and CITATION.cff are
+preserved in tools/grammar/upstream. No additional Tatoeba sentences are imported
+for grammar. Russian adaptations and reviewed choice exercises remain unfinished;
+see [content quality report](docs/grammar-quality.md).
+
 ## Dictionary Data
 
 This project uses dictionary data derived from JMdict and KANJIDIC.

@@ -68,6 +68,7 @@ struct TrainingView: View, CardContentRendering {
         case .words: return "Слова: \(selectedWordDeck.title)"
         case .kana: return selectedKanaDeck.title
         case .anki: return "Анки"
+        case .grammar: return "Грамматика"
         }
     }
     func finishTraining() {

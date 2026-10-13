@@ -1,0 +1,5410 @@
+{
+  "schemaVersion": 1,
+  "metadata": {
+    "source": "OpenJLPT",
+    "repository": "https://github.com/evanclan/OpenJLPT",
+    "commit": "0d1d3410bec90bd4098a7c72de820543cb4f707c",
+    "version": "0.3.0",
+    "license": "CC-BY-SA-4.0",
+    "authors": [
+      "OpenJLPT contributors",
+      "Evan Clan"
+    ],
+    "modifications": "Resource envelope, explicit source-note reference links, and any separately authored Russian adaptations; stable source IDs and original texts retained.",
+    "sourceSHA256": "7b388b8636ab7d9eaed02484d7d6be1c2468885f2354e28c02a29c2dfeb8d70d"
+  },
+  "rules": [
+    {
+      "id": "ageru-kureru-morau",
+      "pattern": "あげる / くれる / もらう",
+      "romaji": "ageru / kureru / morau",
+      "level": "N4",
+      "meaning": "give (to someone else); give (to me or my group); receive",
+      "formation": "Noun (receiver) + に + Noun + を + あげる / Noun (giver) + が + Noun + を + くれる / Noun (giver) + に + Noun + を + もらう",
+      "tags": [
+        "giving-receiving"
+      ],
+      "notes": "くれる is used only when the receiver is the speaker or someone in the speaker's group. With もらう the giver can be marked with に or から.",
+      "practiceMetadata": {
+        "categories": [
+          "giving-receiving"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:a0b124228b57bb3dd10968dc",
+          "translationID": "ageru-kureru-morau:example:0:en",
+          "furigana": "{私|わたし}は{弟|おとうと}に{古|ふる}いゲームをあげた。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:f2feea3952accdef3c1b0b35",
+          "translationID": "ageru-kureru-morau:example:1:en",
+          "furigana": "{姉|あね}が{誕生|たんじょう}{日|び}にかわいいかばんをくれました。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:3dd0b77660575512953937c2",
+          "translationID": "ageru-kureru-morau:example:2:en",
+          "furigana": "{友達|ともだち}から{旅行|りょこう}のおみやげをもらった。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "te-ageru",
+      "pattern": "〜てあげる",
+      "romaji": "te ageru",
+      "level": "N4",
+      "meaning": "do something for someone (as a favor)",
+      "formation": "Verb-te + あげる",
+      "tags": [
+        "giving-receiving"
+      ],
+      "notes": "Said directly to a superior it can sound condescending; use the humble お〜しましょうか (お持ちしましょうか) instead.",
+      "practiceMetadata": {
+        "categories": [
+          "giving-receiving"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:afca394ed5ca0673e35cb6c2",
+          "translationID": "te-ageru:example:0:en",
+          "furigana": "{妹|いもうと}の{宿題|しゅくだい}を{手伝|てつだ}ってあげました。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:ec885f04ebbfa7ae7b1f997b",
+          "translationID": "te-ageru:example:1:en",
+          "furigana": "{道|みち}に{迷|まよ}っている{人|ひと}に、{駅|えき}までの{行|い}き{方|かた}を{教|おし}えてあげた。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:4bc10b1fcc03b930a47c33c8",
+          "translationID": "te-ageru:example:2:en",
+          "furigana": "{重|おも}そうだね。{持|も}ってあげようか。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "te-kureru",
+      "pattern": "〜てくれる",
+      "romaji": "te kureru",
+      "level": "N4",
+      "meaning": "someone does something for me (or my group)",
+      "formation": "Verb-te + くれる",
+      "tags": [
+        "giving-receiving"
+      ],
+      "notes": "The subject is the person doing the favor; the one who benefits is the speaker or someone close to them.",
+      "practiceMetadata": {
+        "categories": [
+          "giving-receiving"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:59dfc9df27874161c72b4f0a",
+          "translationID": "te-kureru:example:0:en",
+          "furigana": "{友達|ともだち}が{引|ひ}っ{越|こ}しを{手伝|てつだ}ってくれた。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:c14a2c3c1621d7dd9d2b9723",
+          "translationID": "te-kureru:example:1:en",
+          "furigana": "{父|ちち}が{駅|えき}まで{車|くるま}で{送|おく}ってくれました。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:19eb688ee0a1339ce17ad6bf",
+          "translationID": "te-kureru:example:2:en",
+          "furigana": "{母|はは}が{毎朝|まいあさ}お{弁当|べんとう}を{作|つく}ってくれます。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "te-morau",
+      "pattern": "〜てもらう",
+      "romaji": "te morau",
+      "level": "N4",
+      "meaning": "have someone do something (for me); get someone to do",
+      "formation": "Verb-te + もらう",
+      "tags": [
+        "giving-receiving"
+      ],
+      "notes": "The receiver of the favor is the subject, and the person who does the action is marked with に.",
+      "practiceMetadata": {
+        "categories": [
+          "giving-receiving"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:9f28b0b82f8c85118c01add8",
+          "translationID": "te-morau:example:0:en",
+          "furigana": "{先輩|せんぱい}にレポートを{見|み}てもらった。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:1ce04e95377e2e4d2b3e8aca",
+          "translationID": "te-morau:example:1:en",
+          "furigana": "{友達|ともだち}に{写真|しゃしん}を{撮|と}ってもらった。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:337b9ddff5be3d9cd608aa53",
+          "translationID": "te-morau:example:2:en",
+          "furigana": "{分|わ}からないところを{先生|せんせい}に{説明|せつめい}してもらいました。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "te-kudasaru-te-itadaku",
+      "pattern": "〜てくださる / 〜ていただく",
+      "romaji": "te kudasaru / te itadaku",
+      "level": "N4",
+      "meaning": "(honorific) someone kindly does for me; (humble) I receive the favor of someone doing",
+      "formation": "Verb-te + くださる / Verb-te + いただく",
+      "tags": [
+        "giving-receiving",
+        "honorific",
+        "humble"
+      ],
+      "notes": "くださる is the honorific version of くれる (ます-form: くださいます); いただく is the humble version of もらう.",
+      "practiceMetadata": {
+        "categories": [
+          "giving-receiving",
+          "honorific",
+          "humble"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:d193cb63e7a447861225ed5e",
+          "translationID": "te-kudasaru-te-itadaku:example:0:en",
+          "furigana": "{先生|せんせい}が{私|わたし}の{作文|さくぶん}を{直|なお}してくださいました。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:801747865c632b48c3725111",
+          "translationID": "te-kudasaru-te-itadaku:example:1:en",
+          "furigana": "ホテルの{方|かた}に、おいしい{店|みせ}を{教|おし}えていただきました。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:256d21d8566b336b7430892e",
+          "translationID": "te-kudasaru-te-itadaku:example:2:en",
+          "furigana": "{今日|きょう}は{来|き}ていただいて、ありがとうございました。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "te-iku",
+      "pattern": "〜ていく",
+      "romaji": "te iku",
+      "level": "N4",
+      "meaning": "do something and go; go on doing (from now into the future)",
+      "formation": "Verb-te + いく",
+      "tags": [
+        "change",
+        "sequence"
+      ],
+      "notes": "Movement or change away from the speaker, or from now toward the future. Compare 〜てくる.",
+      "practiceMetadata": {
+        "categories": [
+          "change",
+          "sequence"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "relations": [
+        {
+          "ruleID": "te-kuru",
+          "kind": "sourceMention",
+          "explanationRU": "Конструкция прямо упомянута в исходном примечании. Связь не означает равнозначность."
+        }
+      ],
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:819668b6323349be2dbb72c0",
+          "translationID": "te-iku:example:0:en",
+          "furigana": "{雨|あめ}が{降|ふ}りそうだから、{傘|かさ}を{持|も}っていきます。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:424b6fdb81558ced61d84b02",
+          "translationID": "te-iku:example:1:en",
+          "furigana": "これからもっと{寒|さむ}くなっていくでしょう。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:1ea508d109292820b286f969",
+          "translationID": "te-iku:example:2:en",
+          "furigana": "{時間|じかん}があるなら、お{茶|ちゃ}を{飲|の}んでいきませんか。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "te-kuru",
+      "pattern": "〜てくる",
+      "romaji": "te kuru",
+      "level": "N4",
+      "meaning": "do something and come back; come doing; (change) up to now; start to",
+      "formation": "Verb-te + くる",
+      "tags": [
+        "change",
+        "sequence"
+      ],
+      "notes": "Movement or change toward the speaker, or from the past up to now. 行ってきます literally means 'I'll go and come back.'",
+      "practiceMetadata": {
+        "categories": [
+          "change",
+          "sequence"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:7d05ae6272a9d4f04c15f0ff",
+          "translationID": "te-kuru:example:0:en",
+          "furigana": "ちょっとコンビニに{行|い}ってきます。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:34f9132c4c3b1890d66a565c",
+          "translationID": "te-kuru:example:1:en",
+          "furigana": "{日本語|にほんご}が{少|すこ}しずつ{分|わ}かってきた。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:5f268efb291d17aebda6f8e6",
+          "translationID": "te-kuru:example:2:en",
+          "furigana": null,
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "te-shimau-chau",
+      "pattern": "〜てしまう / 〜ちゃう",
+      "romaji": "te shimau / chau",
+      "level": "N4",
+      "meaning": "finish completely; do by accident; end up doing (with regret)",
+      "formation": "Verb-te + しまう",
+      "tags": [
+        "completion",
+        "regret",
+        "casual"
+      ],
+      "notes": "In speech 〜てしまう contracts to 〜ちゃう, and 〜でしまう to 〜じゃう (飲んじゃう).",
+      "practiceMetadata": {
+        "categories": [
+          "completion",
+          "regret",
+          "casual"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:29120dc7703c6ea470efd488",
+          "translationID": "te-shimau-chau:example:0:en",
+          "furigana": "{電車|でんしゃ}に{傘|かさ}を{忘|わす}れてしまいました。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:c3b8ddfb2be0c85d32553a0c",
+          "translationID": "te-shimau-chau:example:1:en",
+          "furigana": "この{本|ほん}はおもしろくて、{一晩|ひとばん}で{読|よ}んでしまった。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:4526ba234e358ff136e11d5a",
+          "translationID": "te-shimau-chau:example:2:en",
+          "furigana": "あ、ケーキを{全部|ぜんぶ}{食|た}べちゃった。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "te-oku",
+      "pattern": "〜ておく",
+      "romaji": "te oku",
+      "level": "N4",
+      "meaning": "do in advance (to prepare); do and leave as is",
+      "formation": "Verb-te + おく",
+      "tags": [
+        "purpose",
+        "state"
+      ],
+      "notes": "In casual speech 〜ておく often becomes 〜とく (買っとく), and 〜でおく becomes 〜どく (読んどく).",
+      "practiceMetadata": {
+        "categories": [
+          "purpose",
+          "state"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:08d2a98fc78b14a39366955f",
+          "translationID": "te-oku:example:0:en",
+          "furigana": "{旅行|りょこう}の{前|まえ}に、ホテルを{予約|よやく}しておきます。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:22a9f574bbab4642548c51d9",
+          "translationID": "te-oku:example:1:en",
+          "furigana": "パーティーのために、{飲|の}み{物|もの}を{冷|ひ}やしておいた。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:26e81607b2227acdf8174f5a",
+          "translationID": "te-oku:example:2:en",
+          "furigana": null,
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "te-miru",
+      "pattern": "〜てみる",
+      "romaji": "te miru",
+      "level": "N4",
+      "meaning": "try doing (to see what it is like)",
+      "formation": "Verb-te + みる",
+      "tags": [
+        "attempt"
+      ],
+      "notes": "Means trying something out to see the result, not making an effort to do something difficult.",
+      "practiceMetadata": {
+        "categories": [
+          "attempt"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:2bca1dae5e05f8f1b9a8464b",
+          "translationID": "te-miru:example:0:en",
+          "furigana": "このシャツ、{着|き}てみてもいいですか。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:60edcf03127b8687eb7964d9",
+          "translationID": "te-miru:example:1:en",
+          "furigana": "{新|あたら}しくできたラーメン{屋|や}に{行|い}ってみた。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:20694ac75547523a368e74c0",
+          "translationID": "te-miru:example:2:en",
+          "furigana": "{日本|にほん}の{料理|りょうり}を{自分|じぶん}で{作|つく}ってみたいです。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "te-aru",
+      "pattern": "〜てある",
+      "romaji": "te aru",
+      "level": "N4",
+      "meaning": "has been done (and stays that way); resulting state of a deliberate action",
+      "formation": "Verb-te + ある",
+      "tags": [
+        "state",
+        "result"
+      ],
+      "notes": "Used with transitive verbs, and the object usually takes が. It implies someone did it on purpose, unlike 〜ている with intransitive verbs (窓が開いている).",
+      "practiceMetadata": {
+        "categories": [
+          "state",
+          "result"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "relations": [
+        {
+          "ruleID": "te-iru",
+          "kind": "sourceMention",
+          "explanationRU": "Конструкция прямо упомянута в исходном примечании. Связь не означает равнозначность."
+        }
+      ],
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:cf264dbfd21cc65b7cc6cf9f",
+          "translationID": "te-aru:example:0:en",
+          "furigana": "{入|い}り{口|ぐち}に{地図|ちず}がはってあります。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:d6dac823cfd8b53a23ba2924",
+          "translationID": "te-aru:example:1:en",
+          "furigana": "テーブルの{上|うえ}にお{皿|さら}が{並|なら}べてあった。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:babe2cc241b83748c484e368",
+          "translationID": "te-aru:example:2:en",
+          "furigana": "ビールなら{冷蔵庫|れいぞうこ}に{入|い}れてあるよ。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "toki",
+      "pattern": "〜とき",
+      "romaji": "toki",
+      "level": "N4",
+      "meaning": "when; at the time when",
+      "formation": "Verb-plain / i-Adj / na-Adj + な / Noun + の + とき",
+      "tags": [
+        "time",
+        "sequence"
+      ],
+      "notes": "The verb's tense shows the order: 行くとき means before or on the way (the going isn't finished yet); 行ったとき means after arriving. Often written 時 in kanji.",
+      "practiceMetadata": {
+        "categories": [
+          "time",
+          "sequence"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:11548adbfcfce214e4add96f",
+          "translationID": "toki:example:0:en",
+          "furigana": "{子|こ}どものとき、よく{川|かわ}で{泳|およ}ぎました。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:83c0a1e493f4a1f5337ab803",
+          "translationID": "toki:example:1:en",
+          "furigana": "{日本|にほん}へ{行|い}くとき、{新|あたら}しいかばんを{買|か}いました。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:c1d22f3fe1fe24a8a4ec8da8",
+          "translationID": "toki:example:2:en",
+          "furigana": "{日本|にほん}へ{行|い}ったとき、{友達|ともだち}にお{土産|みやげ}を{買|か}いました。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "aida-aida-ni",
+      "pattern": "〜間 / 〜間に",
+      "reading": "〜あいだ / 〜あいだに",
+      "romaji": "aida / aida ni",
+      "level": "N4",
+      "meaning": "while; during (the whole time); at some point during",
+      "formation": "Verb-te + いる / Verb-dict / Noun + の + 間（に）",
+      "tags": [
+        "time",
+        "simultaneity"
+      ],
+      "notes": "間 means the action continues through the whole period; 間に means it happens at some point within the period.",
+      "practiceMetadata": {
+        "categories": [
+          "time",
+          "simultaneity"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:66e480481b593bc77cf088cf",
+          "translationID": "aida-aida-ni:example:0:en",
+          "furigana": "{夏休|なつやす}みの{間|あいだ}、{祖父|そふ}の{家|いえ}にいました。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:24546ae01fdc36023300a550",
+          "translationID": "aida-aida-ni:example:1:en",
+          "furigana": "{母|はは}が{寝|ね}ている{間|あいだ}に、{部屋|へや}を{掃除|そうじ}した。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:2c0309d4eda6b14fb4d2505e",
+          "translationID": "aida-aida-ni:example:2:en",
+          "furigana": "{電車|でんしゃ}を{待|ま}っている{間|あいだ}、ずっと{本|ほん}を{読|よ}んでいた。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "sou-da-appearance",
+      "pattern": "〜そうだ（appearance）",
+      "romaji": "sou da (appearance)",
+      "level": "N4",
+      "meaning": "looks like; seems; looks about to",
+      "formation": "Verb-stem / i-Adj stem / na-Adj + そうだ",
+      "tags": [
+        "appearance",
+        "conjecture"
+      ],
+      "notes": "A judgment from what you see. いい → よさそう, ない → なさそう. Not used with adjectives for plainly visible traits (赤い, かわいい); かわいそう means 'pitiful'.",
+      "practiceMetadata": {
+        "categories": [
+          "appearance",
+          "conjecture"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:db0a22b1b1f7c04394222935",
+          "translationID": "sou-da-appearance:example:0:en",
+          "furigana": "そのカレー、{辛|から}そうだね。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:c8511e79afb7f576c639b7ac",
+          "translationID": "sou-da-appearance:example:1:en",
+          "furigana": "{空|そら}が{暗|くら}いですね。{雨|あめ}が{降|ふ}りそうです。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:784a6a2c35bd8b103cb00ca2",
+          "translationID": "sou-da-appearance:example:2:en",
+          "furigana": "{久|ひさ}しぶりに{会|あ}った{祖父|そふ}は{元気|げんき}そうだった。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "sou-da-hearsay",
+      "pattern": "〜そうだ（hearsay）",
+      "romaji": "sou da (hearsay)",
+      "level": "N4",
+      "meaning": "I heard that; they say that",
+      "formation": "Verb-plain / i-Adj + そうだ / na-Adj + だ + そうだ / Noun + だ + そうだ",
+      "tags": [
+        "hearsay"
+      ],
+      "notes": "Attaches to full plain forms, unlike the 'looks like' そうだ, which attaches to stems. It has no past or negative form.",
+      "practiceMetadata": {
+        "categories": [
+          "hearsay"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:706bb21479d2806f04885358",
+          "translationID": "sou-da-hearsay:example:0:en",
+          "furigana": "{天気|てんき}{予報|よほう}では、{明日|あした}は{雪|ゆき}が{降|ふ}るそうです。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:d09f21bb1b2613bc3638547f",
+          "translationID": "sou-da-hearsay:example:1:en",
+          "furigana": "{駅前|えきまえ}の{本屋|ほんや}は{来月|らいげつ}なくなるそうだ。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:16ea423a28dbc49bc60aa660",
+          "translationID": "sou-da-hearsay:example:2:en",
+          "furigana": "リンさんのお{兄|にい}さんは{医者|いしゃ}だそうです。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "rashii",
+      "pattern": "〜らしい（hearsay/conjecture）",
+      "romaji": "rashii",
+      "level": "N4",
+      "meaning": "apparently; it seems; I hear",
+      "formation": "Verb-plain / i-Adj / na-Adj / Noun + らしい",
+      "tags": [
+        "hearsay",
+        "conjecture"
+      ],
+      "notes": "Based on something heard or read, so the speaker sounds a little detached. The 'typical of' らしい (男らしい) is a separate N3 point.",
+      "practiceMetadata": {
+        "categories": [
+          "hearsay",
+          "conjecture"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:71404d33b2245fe55afe2026",
+          "translationID": "rashii:example:0:en",
+          "furigana": "{駅|えき}の{近|ちか}くに{新|あたら}しいカフェができたらしい。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:04e3e61a552dd9f9801fe2fb",
+          "translationID": "rashii:example:1:en",
+          "furigana": "{部屋|へや}の{電気|でんき}が{消|き}えている。もう{寝|ね}たらしい。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:910d14c0514efffaa8b0ddb9",
+          "translationID": "rashii:example:2:en",
+          "furigana": "あの{店|みせ}のラーメンはとても{有名|ゆうめい}らしいです。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "you-da",
+      "pattern": "〜ようだ",
+      "romaji": "you da",
+      "level": "N4",
+      "meaning": "it seems; it appears (judging from evidence)",
+      "formation": "Verb-plain / i-Adj + ようだ / na-Adj + な + ようだ / Noun + の + ようだ",
+      "tags": [
+        "conjecture",
+        "appearance"
+      ],
+      "notes": "A somewhat formal way to state a judgment from what you observe or feel; みたいだ is the casual equivalent. The 'like, as if' use is covered at N3.",
+      "practiceMetadata": {
+        "categories": [
+          "conjecture",
+          "appearance"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:5a41d2d74f480c353680557c",
+          "translationID": "you-da:example:0:en",
+          "furigana": "{誰|だれ}もいないようですね。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:43022b43b0d21d78ec12d395",
+          "translationID": "you-da:example:1:en",
+          "furigana": "かぜをひいたようで、{朝|あさ}からのどが{痛|いた}い。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:d5f3d4416458ec8c17f321e4",
+          "translationID": "you-da:example:2:en",
+          "furigana": "{外|そと}は{寒|さむ}いようだ。みんなコートを{着|き}ている。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "mitai",
+      "pattern": "〜みたい",
+      "romaji": "mitai",
+      "level": "N4",
+      "meaning": "seems like; looks like; like (casual)",
+      "formation": "Verb-plain / i-Adj / na-Adj / Noun + みたい",
+      "tags": [
+        "conjecture",
+        "appearance",
+        "casual"
+      ],
+      "notes": "Casual equivalent of ようだ. It attaches directly to nouns and na-adjectives (静かみたい) without な or の. Before a noun it becomes みたいな.",
+      "practiceMetadata": {
+        "categories": [
+          "conjecture",
+          "appearance",
+          "casual"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:27a3e3f6c6bab8d7e77fa4b4",
+          "translationID": "mitai:example:0:en",
+          "furigana": "{隣|となり}の{部屋|へや}に{誰|だれ}か{来|き}たみたい。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:ced19aea58120b3b68f600f5",
+          "translationID": "mitai:example:1:en",
+          "furigana": "{今日|きょう}の{彼女|かのじょ}は{元気|げんき}がないみたいだね。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:87eaeb440aa09f94c176d1ef",
+          "translationID": "mitai:example:2:en",
+          "furigana": "このケーキ、お{店|みせ}のケーキみたい！",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "sugiru",
+      "pattern": "〜すぎる",
+      "romaji": "sugiru",
+      "level": "N4",
+      "meaning": "too; too much; excessively",
+      "formation": "Verb-stem / i-Adj stem / na-Adj + すぎる",
+      "tags": [
+        "degree"
+      ],
+      "notes": "Conjugates like a Group 2 verb (すぎた, すぎて). いい → よすぎる, and the adjective ない → なさすぎる.",
+      "practiceMetadata": {
+        "categories": [
+          "degree"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:360ae3301bb6f87dab3a684f",
+          "translationID": "sugiru:example:0:en",
+          "furigana": "ゆうべ{飲|の}みすぎて、{頭|あたま}が{痛|いた}い。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:75863b0e4fd2c9d5806cff65",
+          "translationID": "sugiru:example:1:en",
+          "furigana": "この{靴|くつ}は{私|わたし}には{大|おお}きすぎます。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:30a609bf4aceca605298a6dd",
+          "translationID": "sugiru:example:2:en",
+          "furigana": "この{問題|もんだい}は{簡単|かんたん}すぎて、つまらない。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "kata",
+      "pattern": "〜方",
+      "reading": "〜かた",
+      "romaji": "kata",
+      "level": "N4",
+      "meaning": "how to; way of doing",
+      "formation": "Verb-stem + 方",
+      "tags": [
+        "manner",
+        "nominalization"
+      ],
+      "notes": "The result is a noun, so the object takes の instead of を (日本語の話し方). With する-verbs: 勉強のしかた.",
+      "practiceMetadata": {
+        "categories": [
+          "manner",
+          "nominalization"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:69b1b9f500962fdf62db8579",
+          "translationID": "kata:example:0:en",
+          "furigana": "この{機械|きかい}の{使|つか}い{方|かた}を{教|おし}えてください。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:e8928c506b7654feba54c96e",
+          "translationID": "kata:example:1:en",
+          "furigana": "この{漢字|かんじ}の{読|よ}み{方|かた}が{分|わ}かりません。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:431220ec7fb11e100628b873",
+          "translationID": "kata:example:2:en",
+          "furigana": "{祖母|そぼ}においしいみそ{汁|しる}の{作|つく}り{方|かた}を{習|なら}った。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "chuu-juu",
+      "pattern": "〜中",
+      "reading": "〜ちゅう / 〜じゅう",
+      "romaji": "chuu / juu",
+      "level": "N4",
+      "meaning": "in the middle of; during (ちゅう); throughout; all over (じゅう)",
+      "formation": "Noun + 中",
+      "tags": [
+        "time",
+        "range"
+      ],
+      "notes": "ちゅう marks an ongoing activity or a period (会議中, 午前中, 今週中); じゅう means 'throughout' a time or place (一日中, 世界中).",
+      "practiceMetadata": {
+        "categories": [
+          "time",
+          "range"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:01f769025eb2b156ef8a4f9f",
+          "translationID": "chuu-juu:example:0:en",
+          "furigana": "{父|ちち}は{今|いま}、{電話|でんわ}{中|ちゅう}です。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:6afbef06eb3752821a1753cf",
+          "translationID": "chuu-juu:example:1:en",
+          "furigana": "{昨日|きのう}は{一日中|いちにちじゅう}{雨|あめ}が{降|ふ}っていた。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:93f2159bc7a48e76cefacf20",
+          "translationID": "chuu-juu:example:2:en",
+          "furigana": "この{歌|うた}は{世界中|せかいじゅう}で{知|し}られている。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "tsumori",
+      "pattern": "〜つもり",
+      "romaji": "tsumori",
+      "level": "N4",
+      "meaning": "intend to; plan to",
+      "formation": "Verb-dict / Verb-nai + つもり",
+      "tags": [
+        "intention"
+      ],
+      "notes": "States a firm personal intention. 〜つもりはない means 'have no intention of'. Asking a superior 〜つもりですか can sound blunt.",
+      "practiceMetadata": {
+        "categories": [
+          "intention"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [
+          "fillBlank",
+          "chooseContext",
+          "transformSentence",
+          "assembleSentence",
+          "correctError",
+          "distinguishMeaning",
+          "understandSentence"
+        ],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "authoredNeedsReview",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Материал составлен автором и требует лингвистической проверки."
+      },
+      "teaching": {
+        "meaningRU": "Намереваться сделать; планировать",
+        "usageRU": "Сообщаешь о принятом намерении совершить или не совершать действие.",
+        "formationRU": "Словарная форма / ない-форма + つもりです",
+        "example": {
+          "ja": "来年、日本に留学するつもりです。",
+          "en": "I intend to study in Japan next year.",
+          "ru": "В следующем году я намерен поехать учиться в Японию.",
+          "furigana": "[来年|らいねん]、[日本|にほん]に[留学|りゅうがく]するつもりです。"
+        },
+        "parts": [
+          {
+            "text": "留学する",
+            "roleRU": "Действие в словарной форме."
+          },
+          {
+            "text": "つもりです",
+            "roleRU": "Моё намерение."
+          }
+        ],
+        "notesRU": [
+          "たい — желание, つもり — намерение. Желание не обязательно означает, что решение принято.",
+          "行かないつもり — намерен не ехать; 行くつもりはない — не намерен ехать. Не смешивай эти области отрицания."
+        ],
+        "contrastsRU": [
+          "買いたいです — хочу купить; 買うつもりです — намерен купить. Перед たい нужна основа ます; перед つもり — обычная форма."
+        ],
+        "complexity": 2
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:fd8ce80bff4abff7ae1f7f4e",
+          "translationID": "tsumori:example:0:en",
+          "furigana": "{夏休|なつやす}みは{北海道|ほっかいどう}を{旅行|りょこう}するつもりです。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:2cf12edc3a48f26f271b6c15",
+          "translationID": "tsumori:example:1:en",
+          "furigana": "{今日|きょう}はお{酒|さけ}を{飲|の}まないつもりです。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:3b05d86b7b3698c9e1812da9",
+          "translationID": "tsumori:example:2:en",
+          "furigana": "{大学|だいがく}を{出|で}たら、どうするつもりですか。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": [
+        "tsumori:go",
+        "tsumori:context",
+        "tsumori:transform",
+        "tsumori:assemble",
+        "tsumori:repair",
+        "tsumori:distinguish",
+        "tsumori:meaning",
+        "tsumori:reserve"
+      ]
+    },
+    {
+      "id": "yotei",
+      "pattern": "〜予定",
+      "reading": "〜よてい",
+      "romaji": "yotei",
+      "level": "N4",
+      "meaning": "plan to; be scheduled to",
+      "formation": "Verb-dict + 予定 / Noun + の + 予定",
+      "tags": [
+        "intention",
+        "time"
+      ],
+      "notes": "Refers to a fixed schedule or arrangement, often involving other people; more objective than つもり.",
+      "practiceMetadata": {
+        "categories": [
+          "intention",
+          "time"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:4005c69cefb5a812debea92c",
+          "translationID": "yotei:example:0:en",
+          "furigana": "{来月|らいげつ}、{大阪|おおさか}に{引|ひ}っ{越|こ}す{予定|よてい}です。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:1ead52394f4e3fa4389afaf6",
+          "translationID": "yotei:example:1:en",
+          "furigana": "{会議|かいぎ}は{三|さん}{時|じ}に{終|お}わる{予定|よてい}です。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:023401914006ceab23325f88",
+          "translationID": "yotei:example:2:en",
+          "furigana": "{出発|しゅっぱつ}は{朝|あさ}{八|はち}{時|じ}の{予定|よてい}です。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "koto-ni-suru",
+      "pattern": "〜ことにする",
+      "romaji": "koto ni suru",
+      "level": "N4",
+      "meaning": "decide to",
+      "formation": "Verb-dict / Verb-nai + ことにする",
+      "tags": [
+        "decision"
+      ],
+      "notes": "A decision made by the speaker; compare 〜ことになる. 〜ことにしている (N3) means 'make it a rule to'.",
+      "practiceMetadata": {
+        "categories": [
+          "decision"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "relations": [
+        {
+          "ruleID": "koto-ni-naru",
+          "kind": "sourceMention",
+          "explanationRU": "Конструкция прямо упомянута в исходном примечании. Связь не означает равнозначность."
+        },
+        {
+          "ruleID": "koto-ni-shite-iru",
+          "kind": "sourceMention",
+          "explanationRU": "Конструкция прямо упомянута в исходном примечании. Связь не означает равнозначность."
+        }
+      ],
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:4e63cfbf5fd237757983fdb6",
+          "translationID": "koto-ni-suru:example:0:en",
+          "furigana": "{健康|けんこう}のために、{毎朝|まいあさ}{歩|ある}くことにした。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:8a36011ce83a75e44a8707dc",
+          "translationID": "koto-ni-suru:example:1:en",
+          "furigana": "{高|たか}かったので、{買|か}わないことにしました。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:70c8d24c0698c47d428820ab",
+          "translationID": "koto-ni-suru:example:2:en",
+          "furigana": "もう{遅|おそ}いから、タクシーで{帰|かえ}ることにしよう。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "koto-ni-naru",
+      "pattern": "〜ことになる",
+      "romaji": "koto ni naru",
+      "level": "N4",
+      "meaning": "it has been decided that; it turns out that",
+      "formation": "Verb-dict / Verb-nai + ことになる",
+      "tags": [
+        "decision",
+        "result"
+      ],
+      "notes": "Presents a decision as made by others or by circumstances. People also use it for their own decisions to sound less assertive.",
+      "practiceMetadata": {
+        "categories": [
+          "decision",
+          "result"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:e5663e5b03d45488dd72ba27",
+          "translationID": "koto-ni-naru:example:0:en",
+          "furigana": "{来年|らいねん}の{春|はる}から、{名古屋|なごや}の{店|みせ}で{働|はたら}くことになりました。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:ef3c4bddf9a7ca3c3192e719",
+          "translationID": "koto-ni-naru:example:1:en",
+          "furigana": "{今度|こんど}の{日曜日|にちようび}、クラスのみんなでバーベキューをすることになった。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:17f31329238aee20d3c9ba72",
+          "translationID": "koto-ni-naru:example:2:en",
+          "furigana": "{友達|ともだち}の{結婚式|けっこんしき}で、{私|わたし}がスピーチをすることになりました。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "koto-ga-dekiru",
+      "pattern": "〜ことができる",
+      "romaji": "koto ga dekiru",
+      "level": "N4",
+      "meaning": "can; be able to; be possible to",
+      "formation": "Verb-dict + ことができる",
+      "tags": [
+        "ability",
+        "possibility"
+      ],
+      "notes": "A bit more formal than the potential form. Also used for what is possible or allowed (ここでたばこを吸うことはできません).",
+      "practiceMetadata": {
+        "categories": [
+          "ability",
+          "possibility"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:760d1f4a12aac250fad49b6b",
+          "translationID": "koto-ga-dekiru:example:0:en",
+          "furigana": "この{図書館|としょかん}では、{本|ほん}を{二|に}{週間|しゅうかん}{借|か}りることができます。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:dba86ce935c0c2c24c388d51",
+          "translationID": "koto-ga-dekiru:example:1:en",
+          "furigana": "{妹|いもうと}はピアノを{弾|ひ}くことができる。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:02ff71c3883f7359b88e8e97",
+          "translationID": "koto-ga-dekiru:example:2:en",
+          "furigana": "ここからは{富士山|ふじさん}を{見|み}ることができません。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "eru-rareru-potential",
+      "pattern": "〜える / 〜られる（potential）",
+      "romaji": "eru / rareru (potential)",
+      "level": "N4",
+      "meaning": "can; be able to (potential form)",
+      "formation": "Verb-dict (Group 1: final u → e) + る / Verb-nai stem + られる (Group 2)",
+      "tags": [
+        "ability",
+        "conjugation"
+      ],
+      "notes": "Irregular: する → できる, 来る → 来られる. The object often takes が instead of を. In casual speech Group 2 verbs often drop ら (見れる).",
+      "practiceMetadata": {
+        "categories": [
+          "ability",
+          "conjugation"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:b9a93446c08c22b12ea52520",
+          "translationID": "eru-rareru-potential:example:0:en",
+          "furigana": "{私|わたし}は{漢字|かんじ}が{二|に}{百|ひゃく}ぐらい{読|よ}めます。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:e9189e7fd3f939969deaccf7",
+          "translationID": "eru-rareru-potential:example:1:en",
+          "furigana": "{兄|あに}は{辛|から}い{料理|りょうり}が{食|た}べられない。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:0e0ded8ea29b657e4ac8507a",
+          "translationID": "eru-rareru-potential:example:2:en",
+          "furigana": "{明日|あした}のパーティーに{来|こ}られますか。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "reru-rareru-passive",
+      "pattern": "〜れる / 〜られる（passive）",
+      "romaji": "reru / rareru (passive)",
+      "level": "N4",
+      "meaning": "be done (by someone); passive voice",
+      "formation": "Verb-nai stem + れる (Group 1) / Verb-nai stem + られる (Group 2)",
+      "tags": [
+        "voice",
+        "conjugation"
+      ],
+      "notes": "Irregular: する → される, 来る → 来られる. The doer is marked with に. Often shows that the subject was troubled by someone's action (雨に降られた).",
+      "practiceMetadata": {
+        "categories": [
+          "voice",
+          "conjugation"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:05c9fade73e46adfb6080747",
+          "translationID": "reru-rareru-passive:example:0:en",
+          "furigana": "{先生|せんせい}に{作文|さくぶん}をほめられました。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:523cbcaf3e6bd5b9c0209d88",
+          "translationID": "reru-rareru-passive:example:1:en",
+          "furigana": "{電車|でんしゃ}の{中|なか}で{足|あし}を{踏|ふ}まれた。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:c1d276bfa475a129739da711",
+          "translationID": "reru-rareru-passive:example:2:en",
+          "furigana": "この{寺|てら}は{六百|ろっぴゃく}{年|ねん}{前|まえ}に{建|た}てられました。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "seru-saseru",
+      "pattern": "〜せる / 〜させる",
+      "romaji": "seru / saseru",
+      "level": "N4",
+      "meaning": "make someone do; let someone do (causative)",
+      "formation": "Verb-nai stem + せる (Group 1) / Verb-nai stem + させる (Group 2)",
+      "tags": [
+        "voice",
+        "conjugation"
+      ],
+      "notes": "Irregular: する → させる, 来る → 来させる. With intransitive verbs the person takes を; with transitive verbs, に. Context decides 'make' or 'let'.",
+      "practiceMetadata": {
+        "categories": [
+          "voice",
+          "conjugation"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:491038a35a45de14e8a8c11d",
+          "translationID": "seru-saseru:example:0:en",
+          "furigana": "{母|はは}は{毎日|まいにち}{弟|おとうと}に{野菜|やさい}を{食|た}べさせる。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:9ad2603714b7f55ab49993c6",
+          "translationID": "seru-saseru:example:1:en",
+          "furigana": "コーチは{毎日|まいにち}、{選手|せんしゅ}たちを{走|はし}らせた。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:f5061d3d740659bfc24851a9",
+          "translationID": "seru-saseru:example:2:en",
+          "furigana": "{息子|むすこ}が{行|い}きたいと{言|い}ったので、{一人|ひとり}で{旅行|りょこう}に{行|い}かせました。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "serareru-saserareru",
+      "pattern": "〜せられる / 〜させられる",
+      "romaji": "serareru / saserareru",
+      "level": "N4",
+      "meaning": "be made to do (against one's will)",
+      "formation": "Verb-nai stem + せられる (Group 1; short form される) / Verb-nai stem + させられる (Group 2)",
+      "tags": [
+        "voice",
+        "conjugation"
+      ],
+      "notes": "Irregular: する → させられる, 来る → 来させられる. The short Group 1 form (待たされる) is common in speech, but not with verbs ending in す (話させられる).",
+      "practiceMetadata": {
+        "categories": [
+          "voice",
+          "conjugation"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:056a9f420da1e4a0637449c5",
+          "translationID": "serareru-saserareru:example:0:en",
+          "furigana": "{子|こ}どものころ、{母|はは}に{毎日|まいにち}ピアノを{練習|れんしゅう}させられた。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:d39b7e3d8e33b4d6acfcb00e",
+          "translationID": "serareru-saserareru:example:1:en",
+          "furigana": "{駅|えき}で{三十分|さんじゅっぷん}も{待|ま}たされました。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:af8bc24b1236e846457fac38",
+          "translationID": "serareru-saserareru:example:2:en",
+          "furigana": "{会社|かいしゃ}の{飲|の}み{会|かい}で{歌|うた}を{歌|うた}わされた。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "ou-you",
+      "pattern": "〜おう / 〜よう",
+      "romaji": "ou / you",
+      "level": "N4",
+      "meaning": "let's (casual); I'll (volitional form)",
+      "formation": "Verb-dict (Group 1: final u → o) + う / Verb-stem + よう (Group 2)",
+      "tags": [
+        "conjugation",
+        "invitation",
+        "intention"
+      ],
+      "notes": "Irregular: する → しよう, 来る → 来よう. The plain equivalent of 〜ましょう.",
+      "practiceMetadata": {
+        "categories": [
+          "conjugation",
+          "invitation",
+          "intention"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "relations": [
+        {
+          "ruleID": "mashou",
+          "kind": "sourceMention",
+          "explanationRU": "Конструкция прямо упомянута в исходном примечании. Связь не означает равнозначность."
+        }
+      ],
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:8f1e24707542941631aa3cd6",
+          "translationID": "ou-you:example:0:en",
+          "furigana": "{疲|つか}れたね。{少|すこ}し{休|やす}もう。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:82ef27a76e415da29a625aa4",
+          "translationID": "ou-you:example:1:en",
+          "furigana": "{週末|しゅうまつ}、{一緒|いっしょ}に{映画|えいが}を{見|み}ようよ。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:b470749c054a876cf29e0bad",
+          "translationID": "ou-you:example:2:en",
+          "furigana": "よし、{今日|きょう}から{毎日|まいにち}{日記|にっき}を{書|か}こう。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "you-to-omou",
+      "pattern": "〜(よ)うと思う",
+      "reading": "〜(よ)うとおもう",
+      "romaji": "you to omou",
+      "level": "N4",
+      "meaning": "be thinking of doing; plan to",
+      "formation": "Verb-volitional + と思う",
+      "tags": [
+        "intention"
+      ],
+      "notes": "〜と思う often reports a decision made just now; 〜と思っている shows a plan held for some time. Softer than つもり.",
+      "practiceMetadata": {
+        "categories": [
+          "intention"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "relations": [
+        {
+          "ruleID": "to-omou",
+          "kind": "sourceMention",
+          "explanationRU": "Конструкция прямо упомянута в исходном примечании. Связь не означает равнозначность."
+        }
+      ],
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:b809d9d1cff50d294d849752",
+          "translationID": "you-to-omou:example:0:en",
+          "furigana": "{今年|ことし}の{夏|なつ}は{海|うみ}に{行|い}こうと{思|おも}っています。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:4a1ceebcd65e74ec2d3dc7da",
+          "translationID": "you-to-omou:example:1:en",
+          "furigana": "{明日|あした}は{早|はや}く{起|お}きて、{公園|こうえん}を{走|はし}ろうと{思|おも}う。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:6fe0247323d3cfe8563ca220",
+          "translationID": "you-to-omou:example:2:en",
+          "furigana": "{新|あたら}しいパソコンを{買|か}おうと{思|おも}ったけど、やめました。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "e-ro",
+      "pattern": "〜え / 〜ろ",
+      "romaji": "e / ro",
+      "level": "N4",
+      "meaning": "do it! (imperative form; blunt command)",
+      "formation": "Verb-dict (Group 1: final u → e) / Verb-stem + ろ (Group 2)",
+      "tags": [
+        "command",
+        "conjugation"
+      ],
+      "notes": "Irregular: する → しろ, 来る → 来い, くれる → くれ. Very blunt; heard mainly from men, on signs, in emergencies and in cheering (がんばれ).",
+      "practiceMetadata": {
+        "categories": [
+          "command",
+          "conjugation"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:46bdcc75c3cdf3fc3006bf32",
+          "translationID": "e-ro:example:0:en",
+          "furigana": "{早|はや}く{起|お}きろ！{遅刻|ちこく}するぞ。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:ba6d423b5651b893813ffedf",
+          "translationID": "e-ro:example:1:en",
+          "furigana": "{危|あぶ}ない！{止|と}まれ！",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:4ba2fe3f40037189c9f8c776",
+          "translationID": "e-ro:example:2:en",
+          "furigana": "がんばれ！あと{少|すこ}しだ！",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "na-prohibition",
+      "pattern": "〜な（prohibition）",
+      "romaji": "na (prohibition)",
+      "level": "N4",
+      "meaning": "don't! (strong prohibition)",
+      "formation": "Verb-dict + な",
+      "tags": [
+        "prohibition",
+        "command"
+      ],
+      "notes": "Very strong and blunt. Do not confuse it with the sentence-ending な that expresses feeling (いいな).",
+      "practiceMetadata": {
+        "categories": [
+          "prohibition",
+          "command"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:a876f3eed097c3006ef820c6",
+          "translationID": "na-prohibition:example:0:en",
+          "furigana": "{危|あぶ}ないから、この{川|かわ}では{泳|およ}ぐな。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:481212d22ef66678e54b55a6",
+          "translationID": "na-prohibition:example:1:en",
+          "furigana": "もう{泣|な}くな。{大丈夫|だいじょうぶ}だよ。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:129eb71811d92b732a193658",
+          "translationID": "na-prohibition:example:2:en",
+          "furigana": "{壁|かべ}に「ここにごみを{捨|す}てるな」と{書|か}いてある。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "nasai",
+      "pattern": "〜なさい",
+      "romaji": "nasai",
+      "level": "N4",
+      "meaning": "do (instruction from a parent, teacher, etc.)",
+      "formation": "Verb-stem + なさい",
+      "tags": [
+        "command"
+      ],
+      "notes": "Softer than the imperative form but still a firm instruction; used by parents, teachers and in exam directions, never toward superiors.",
+      "practiceMetadata": {
+        "categories": [
+          "command"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:050e416d246134b746cc4b66",
+          "translationID": "nasai:example:0:en",
+          "furigana": "もう{九|く}{時|じ}よ。{早|はや}く{寝|ね}なさい。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:d30c58ecfa64f5dc69e723be",
+          "translationID": "nasai:example:1:en",
+          "furigana": "{次|つぎ}の{文|ぶん}を{読|よ}んで、{質問|しつもん}に{答|こた}えなさい。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:39679f0ecb111c41edc199e2",
+          "translationID": "nasai:example:2:en",
+          "furigana": "ご{飯|はん}の{前|まえ}に{手|て}を{洗|あら}いなさい。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "ba",
+      "pattern": "〜ば",
+      "romaji": "ba",
+      "level": "N4",
+      "meaning": "if",
+      "formation": "Verb-ba / i-Adj stem + ければ / na-Adj + なら / Noun + なら",
+      "tags": [
+        "condition"
+      ],
+      "notes": "Focuses on the condition needed for a result. When the main clause is a request or invitation, たら is usually more natural unless the ば-clause is a state (ある, いる, adjectives).",
+      "practiceMetadata": {
+        "categories": [
+          "condition"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:babe6fca4c5bd3641cd8631d",
+          "translationID": "ba:example:0:en",
+          "furigana": "この{道|みち}をまっすぐ{行|い}けば、{駅|えき}に{着|つ}きます。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:08c6acb1b30a4c058596e41f",
+          "translationID": "ba:example:1:en",
+          "furigana": "{安|やす}ければ、{買|か}いたいです。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:a6da864e19a603a364d6b08c",
+          "translationID": "ba:example:2:en",
+          "furigana": "{分|わ}からないことがあれば、いつでも{聞|き}いてください。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "tara",
+      "pattern": "〜たら",
+      "romaji": "tara",
+      "level": "N4",
+      "meaning": "if; when; after",
+      "formation": "Verb-ta + ら / i-Adj stem + かったら / na-Adj + だったら / Noun + だったら",
+      "tags": [
+        "condition",
+        "time"
+      ],
+      "notes": "The most versatile conditional and very common in speech. With events certain to happen it means 'when/after'.",
+      "practiceMetadata": {
+        "categories": [
+          "condition",
+          "time"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:ad92ba3a77ed4a48e2e27369",
+          "translationID": "tara:example:0:en",
+          "furigana": "{駅|えき}に{着|つ}いたら、{電話|でんわ}してください。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:6170d8ecdf12c27b135ff4b9",
+          "translationID": "tara:example:1:en",
+          "furigana": "もし{明日|あした}{雨|あめ}だったら、{家|いえ}で{映画|えいが}を{見|み}よう。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:69216af160e03e7e18caa47c",
+          "translationID": "tara:example:2:en",
+          "furigana": "{暑|あつ}かったら、{窓|まど}を{開|あ}けてもいいですよ。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "nara",
+      "pattern": "〜なら",
+      "romaji": "nara",
+      "level": "N4",
+      "meaning": "if (it's the case that); if you're talking about",
+      "formation": "Verb-plain / i-Adj / na-Adj / Noun + なら",
+      "tags": [
+        "condition",
+        "topic"
+      ],
+      "notes": "Takes up what the listener said or a situation assumed to be true, then gives advice or an opinion. Unlike たら, the main action can come before the なら-clause.",
+      "practiceMetadata": {
+        "categories": [
+          "condition",
+          "topic"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:adff6b14ff026017a4f64345",
+          "translationID": "nara:example:0:en",
+          "furigana": "{京都|きょうと}へ{行|い}くなら、{秋|あき}がいいですよ。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:4dd07acf260bb2ca03270b47",
+          "translationID": "nara:example:1:en",
+          "furigana": "パソコンのことなら、{兄|あに}に{聞|き}くといいよ。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:c3136bc24a092bdef02ad433",
+          "translationID": "nara:example:2:en",
+          "furigana": "そんなに{眠|ねむ}いなら、{今日|きょう}は{早|はや}く{寝|ね}たら？",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "to",
+      "pattern": "〜と（conditional）",
+      "romaji": "to",
+      "level": "N4",
+      "meaning": "when; if; whenever (natural or automatic result)",
+      "formation": "Verb-dict / Verb-nai / i-Adj + と / na-Adj + だ + と / Noun + だ + と",
+      "tags": [
+        "condition"
+      ],
+      "notes": "For natural results, how machines work, directions and habits. The main clause cannot be a request, wish or invitation.",
+      "practiceMetadata": {
+        "categories": [
+          "condition"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:f85b74205575a1278aec3538",
+          "translationID": "to:example:0:en",
+          "furigana": "このボタンを{押|お}すと、お{茶|ちゃ}が{出|で}ます。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:ba412f845a12cbfb53860eed",
+          "translationID": "to:example:1:en",
+          "furigana": "{春|はる}になると、{桜|さくら}が{咲|さ}きます。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:687f3ea009ac746d87e4b6b2",
+          "translationID": "to:example:2:en",
+          "furigana": "この{道|みち}を{右|みぎ}に{曲|ま}がると、{左|ひだり}に{郵便|ゆうびん}{局|きょく}があります。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "te-mo-de-mo",
+      "pattern": "〜ても / 〜でも",
+      "romaji": "te mo / de mo",
+      "level": "N4",
+      "meaning": "even if; even though",
+      "formation": "Verb-te + も / i-Adj-ku + ても / na-Adj + でも / Noun + でも",
+      "tags": [
+        "concession",
+        "condition"
+      ],
+      "notes": "With question words or いくら it means 'no matter ...' (何を食べても, いくら待っても).",
+      "practiceMetadata": {
+        "categories": [
+          "concession",
+          "condition"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:c960b35b757bb10244a1120e",
+          "translationID": "te-mo-de-mo:example:0:en",
+          "furigana": "{雨|あめ}が{降|ふ}っても、{試合|しあい}はあります。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:b1d92136a48b070135faab30",
+          "translationID": "te-mo-de-mo:example:1:en",
+          "furigana": "いくら{練習|れんしゅう}しても、なかなか{上手|じょうず}になりません。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:e8188e143a9579450d68d26a",
+          "translationID": "te-mo-de-mo:example:2:en",
+          "furigana": "{日曜日|にちようび}でも、この{店|みせ}は{開|あ}いています。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "noni-although",
+      "pattern": "〜のに（although）",
+      "romaji": "noni (although)",
+      "level": "N4",
+      "meaning": "although; even though (with surprise or dissatisfaction)",
+      "formation": "Verb-plain / i-Adj + のに / na-Adj + な + のに / Noun + な + のに",
+      "tags": [
+        "concession",
+        "criticism"
+      ],
+      "notes": "Carries surprise, disappointment or complaint. The main clause cannot be a request or intention; use けど or ても there.",
+      "practiceMetadata": {
+        "categories": [
+          "concession",
+          "criticism"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:56f4159ca554bef3e3107527",
+          "translationID": "noni-although:example:0:en",
+          "furigana": "{一生懸命|いっしょうけんめい}{勉強|べんきょう}したのに、{試験|しけん}に{落|お}ちてしまった。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:8e32597d99b8bc1bd81dc26e",
+          "translationID": "noni-although:example:1:en",
+          "furigana": "{日曜日|にちようび}なのに、{会社|かいしゃ}に{行|い}かなければならない。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:76c3d0b73b2d3a7d396c67ea",
+          "translationID": "noni-although:example:2:en",
+          "furigana": "{約束|やくそく}したのに、{彼|かれ}は{来|こ}なかった。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "noni-purpose",
+      "pattern": "〜のに（purpose）",
+      "romaji": "noni (purpose)",
+      "level": "N4",
+      "meaning": "for; in order to (with use, time or cost)",
+      "formation": "Verb-dict + のに / Noun + に",
+      "tags": [
+        "purpose"
+      ],
+      "notes": "Usually followed by words like 使う, いい, 便利, 必要 or かかる. With a noun, just に is used (旅行に便利).",
+      "practiceMetadata": {
+        "categories": [
+          "purpose"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:46e17d938f6f2c81515b012e",
+          "translationID": "noni-purpose:example:0:en",
+          "furigana": "このかばんは{旅行|りょこう}に{行|い}くのに{便利|べんり}です。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:a2f53437b10159fcf9ef389c",
+          "translationID": "noni-purpose:example:1:en",
+          "furigana": "{家|いえ}から{駅|えき}まで{歩|ある}くのに{二十分|にじゅっぷん}かかります。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:e192c64a964fe72d2537122e",
+          "translationID": "noni-purpose:example:2:en",
+          "furigana": "{引|ひ}っ{越|こ}しするのに{十|じゅう}{万|まん}{円|えん}ぐらいかかった。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "node",
+      "pattern": "〜ので",
+      "romaji": "node",
+      "level": "N4",
+      "meaning": "because; since",
+      "formation": "Verb-plain / i-Adj + ので / na-Adj + な + ので / Noun + な + ので",
+      "tags": [
+        "reason"
+      ],
+      "notes": "Sounds softer and more objective than から, so it is preferred when giving reasons politely or apologizing.",
+      "practiceMetadata": {
+        "categories": [
+          "reason"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:fe7fbaef9ac79190a0c65429",
+          "translationID": "node:example:0:en",
+          "furigana": "{頭|あたま}が{痛|いた}いので、{今日|きょう}は{早|はや}く{帰|かえ}ります。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:5d270711411434a758bc2a21",
+          "translationID": "node:example:1:en",
+          "furigana": "{明日|あした}はテストなので、{今夜|こんや}は{勉強|べんきょう}します。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:2491da09393fe859b5b02a3e",
+          "translationID": "node:example:2:en",
+          "furigana": "{道|みち}がこんでいたので、{少|すこ}し{遅|おく}れました。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "te-reason",
+      "pattern": "〜て（reason）",
+      "romaji": "te (reason)",
+      "level": "N4",
+      "meaning": "because; so (cause of a feeling or state)",
+      "formation": "Verb-te / i-Adj stem + くて / na-Adj + で / Noun + で",
+      "tags": [
+        "reason"
+      ],
+      "notes": "The second part is usually a feeling, a potential form or a result, not a request or intention (use から or ので for those). Negative: 〜なくて (会えなくて寂しい).",
+      "practiceMetadata": {
+        "categories": [
+          "reason"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:07f671cba056e90fcca2e107",
+          "translationID": "te-reason:example:0:en",
+          "furigana": "ニュースを{聞|き}いて、びっくりしました。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:89a71659e1dd8afa46d5a98f",
+          "translationID": "te-reason:example:1:en",
+          "furigana": "このスープは{熱|あつ}くて、{飲|の}めません。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:1dcadeb84c79bae0d8b7447e",
+          "translationID": "te-reason:example:2:en",
+          "furigana": "かぜで{学校|がっこう}を{休|やす}みました。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "shi",
+      "pattern": "〜し",
+      "romaji": "shi",
+      "level": "N4",
+      "meaning": "and what's more; and besides (listing reasons)",
+      "formation": "Verb-plain / i-Adj + し / na-Adj + だ + し / Noun + だ + し",
+      "tags": [
+        "reason",
+        "addition"
+      ],
+      "notes": "Lists several reasons or points. A single し hints that there are other reasons too.",
+      "practiceMetadata": {
+        "categories": [
+          "reason",
+          "addition"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:80c36ea2523c6a4549a2f9a2",
+          "translationID": "shi:example:0:en",
+          "furigana": "この{部屋|へや}は{広|ひろ}いし、{駅|えき}から{近|ちか}いし、とても{気|き}に{入|い}っています。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:4fde8f453fe2a83203367ac4",
+          "translationID": "shi:example:1:en",
+          "furigana": "{今日|きょう}は{雨|あめ}だし、{疲|つか}れているし、どこにも{行|い}きたくない。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:07cfd96bb2ff43ac4c9efcd2",
+          "translationID": "shi:example:2:en",
+          "furigana": "もう{遅|おそ}いし、そろそろ{帰|かえ}ろうか。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "kedo-keredomo",
+      "pattern": "〜けど / 〜けれども",
+      "romaji": "kedo / keredomo",
+      "level": "N4",
+      "meaning": "but; although; (soft lead-in)",
+      "formation": "Sentence + けど / けれども",
+      "tags": [
+        "contrast",
+        "casual"
+      ],
+      "notes": "More conversational than が; けれども is a little more formal than けど. Often used as a soft lead-in before a question or request.",
+      "practiceMetadata": {
+        "categories": [
+          "contrast",
+          "casual"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:469d85fdeb24bc06655f6ad6",
+          "translationID": "kedo-keredomo:example:0:en",
+          "furigana": "この{店|みせ}は{高|たか}いけど、おいしい。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:689819f86fa80dae1e84c550",
+          "translationID": "kedo-keredomo:example:1:en",
+          "furigana": "すみません、{駅|えき}に{行|い}きたいんですけど、どう{行|い}けばいいですか。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:ece626e55a67aa2a1339d422",
+          "translationID": "kedo-keredomo:example:2:en",
+          "furigana": "{何|なん}{度|ど}も{電話|でんわ}したけれども、{誰|だれ}も{出|で}なかった。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "tame-ni",
+      "pattern": "〜ために",
+      "romaji": "tame ni",
+      "level": "N4",
+      "meaning": "in order to; for (the sake of); because of",
+      "formation": "Verb-dict / Verb-ta / Noun + の + ために",
+      "tags": [
+        "purpose",
+        "reason"
+      ],
+      "notes": "For purpose, the verb must be something the subject can control (compare 〜ように). The 'because of' use sounds fairly formal.",
+      "practiceMetadata": {
+        "categories": [
+          "purpose",
+          "reason"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:99cf591c0c4fe4645ebc2e91",
+          "translationID": "tame-ni:example:0:en",
+          "furigana": "{日本|にほん}の{大学|だいがく}に{入|はい}るために、{毎日|まいにち}{勉強|べんきょう}しています。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:88771bab33b287e0e84cf938",
+          "translationID": "tame-ni:example:1:en",
+          "furigana": "{家族|かぞく}のために、{一生懸命|いっしょうけんめい}{働|はたら}いている。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:e5d026a6f7a4638d562957c3",
+          "translationID": "tame-ni:example:2:en",
+          "furigana": "{大雪|おおゆき}のために、{電車|でんしゃ}が{止|と}まりました。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "you-ni",
+      "pattern": "〜ように（purpose）",
+      "romaji": "you ni",
+      "level": "N4",
+      "meaning": "so that; in order that",
+      "formation": "Verb-dict / Verb-nai + ように",
+      "tags": [
+        "purpose"
+      ],
+      "notes": "Used with verbs the subject can't directly control: potential forms, 分かる, 見える, negatives. For deliberate actions use ために.",
+      "practiceMetadata": {
+        "categories": [
+          "purpose"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:e1a91c0412b2b4a582ac0b67",
+          "translationID": "you-ni:example:0:en",
+          "furigana": "{後|うし}ろの{人|ひと}にも{聞|き}こえるように、{大|おお}きな{声|こえ}で{話|はな}してください。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:c7d870ea4f5a85248fc41ddf",
+          "translationID": "you-ni:example:1:en",
+          "furigana": "{忘|わす}れないように、{手|て}にメモを{書|か}いた。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:426e262cd76c7804c380e55b",
+          "translationID": "you-ni:example:2:en",
+          "furigana": "かぜをひかないように、{暖|あたた}かくして{寝|ね}てください。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "you-ni-suru",
+      "pattern": "〜ようにする",
+      "romaji": "you ni suru",
+      "level": "N4",
+      "meaning": "try to; make sure to; make a habit of",
+      "formation": "Verb-dict / Verb-nai + ようにする",
+      "tags": [
+        "attempt",
+        "intention"
+      ],
+      "notes": "〜ようにしている describes a habit you keep up. Compare 〜ようになる, a change that comes about.",
+      "practiceMetadata": {
+        "categories": [
+          "attempt",
+          "intention"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [
+          "fillBlank",
+          "chooseContext",
+          "transformSentence",
+          "assembleSentence",
+          "correctError",
+          "distinguishMeaning",
+          "understandSentence"
+        ],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "authoredNeedsReview",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Материал составлен автором и требует лингвистической проверки."
+      },
+      "supplement": {
+        "repository": "https://github.com/stndaru/nihongo-mono",
+        "commit": "ec0ba4a0ce1611c568b0e4f8a223eb8029249a25",
+        "path": "src/data/grammar/n4.json",
+        "license": "MIT",
+        "summary": "ようにする says you deliberately arrange your behavior so a certain thing happens (or does not). It expresses making an effort or keeping a conscious habit: 毎日運動するようにする = 'make a point of exercising daily'. With ている (ようにしている) it stresses an ongoing habit you keep up.",
+        "structure": [
+          "Verb［dictionary form］＋ ようにする",
+          "Verb［ない form］＋ ようにする"
+        ],
+        "pitfalls": [
+          "ようにする is a conscious effort you make; ようになる is a change that happens on its own. 早起きするようにする (I make myself get up early) vs 早起きするようになった (I've come to get up early).",
+          "For a firm one-time decision, ことにする fits better; ようにする leans toward ongoing effort or habit.",
+          "The ている form ようにしている marks a habit you are keeping up, not a single act."
+        ],
+        "examples": [
+          {
+            "ja": "健康のために、甘い物を食べすぎないようにしています。",
+            "en": "For my health, I try not to eat too many sweets."
+          },
+          {
+            "ja": "約束の時間には遅れないようにします。",
+            "en": "I'll make sure not to be late for our appointment."
+          }
+        ]
+      },
+      "teaching": {
+        "meaningRU": "Стараться делать; взять за привычку",
+        "usageRU": "Сознательно прикладываешь усилия, чтобы регулярно делать или не делать что-то.",
+        "formationRU": "Словарная форма / ない-форма + ようにする",
+        "example": {
+          "ja": "毎朝、早く起きるようにしています。",
+          "en": "I make an effort to get up early every morning.",
+          "ru": "Я стараюсь каждое утро вставать рано.",
+          "furigana": "[毎朝|まいあさ]、[早く|はやく][起き|おき]るようにしています。"
+        },
+        "parts": [
+          {
+            "text": "起きる",
+            "roleRU": "Действие, которое стараюсь выполнять."
+          },
+          {
+            "text": "ようにしています",
+            "roleRU": "Продолжающееся сознательное усилие."
+          }
+        ],
+        "notesRU": [
+          "ようにしています показывает постоянное усилие; ようにしました — принятое изменение.",
+          "Перед ように используется обычная форма, а не ます."
+        ],
+        "contrastsRU": [
+          "ようにする — сознательно стараться; ようになる — изменение способности или состояния без такого значения усилия. 読めるようになった — теперь могу читать."
+        ],
+        "complexity": 2
+      },
+      "relations": [
+        {
+          "ruleID": "you-ni-naru",
+          "kind": "sourceMention",
+          "explanationRU": "Конструкция прямо упомянута в исходном примечании. Связь не означает равнозначность."
+        }
+      ],
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:2db80f3487c9739bbc8cd423",
+          "translationID": "you-ni-suru:example:0:en",
+          "furigana": "{毎日|まいにち}{野菜|やさい}を{食|た}べるようにしています。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:464e5989497fa6d07ae1533f",
+          "translationID": "you-ni-suru:example:1:en",
+          "furigana": "これからは{遅刻|ちこく}しないようにします。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:d53a0401463d4c1689168669",
+          "translationID": "you-ni-suru:example:2:en",
+          "furigana": "{寝|ね}る{前|まえ}にスマホを{見|み}ないようにしている。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": [
+        "you-ni-suru:negative",
+        "you-ni-suru:habit",
+        "you-ni-suru:transform",
+        "you-ni-suru:assemble",
+        "you-ni-suru:repair",
+        "you-ni-suru:contrast",
+        "you-ni-suru:meaning",
+        "you-ni-suru:reserve"
+      ]
+    },
+    {
+      "id": "you-ni-naru",
+      "pattern": "〜ようになる",
+      "romaji": "you ni naru",
+      "level": "N4",
+      "meaning": "come to; reach the point where (change in ability or habit)",
+      "formation": "Verb-dict / Verb-nai + ようになる",
+      "tags": [
+        "change",
+        "ability"
+      ],
+      "notes": "Often used with potential verbs. For 'no longer', 〜なくなる is usually more natural than 〜ないようになる.",
+      "practiceMetadata": {
+        "categories": [
+          "change",
+          "ability"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:1a2d94ea983caf695988fa27",
+          "translationID": "you-ni-naru:example:0:en",
+          "furigana": "{練習|れんしゅう}して、{自転車|じてんしゃ}に{乗|の}れるようになりました。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:53f0f165936001131142e7fe",
+          "translationID": "you-ni-naru:example:1:en",
+          "furigana": "{日本|にほん}に{来|き}てから、{朝|あさ}ご{飯|はん}を{食|た}べるようになった。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:4cda35452f2e4cf5a8788bb8",
+          "translationID": "you-ni-naru:example:2:en",
+          "furigana": "{赤|あか}ちゃんが{少|すこ}しずつ{話|はな}せるようになってきた。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "te-hoshii",
+      "pattern": "〜てほしい",
+      "romaji": "te hoshii",
+      "level": "N4",
+      "meaning": "want someone to do",
+      "formation": "Verb-te + ほしい / Verb-nai + で + ほしい",
+      "tags": [
+        "desire",
+        "request"
+      ],
+      "notes": "The person you want to act is marked with に. Said to a superior it can sound demanding; 〜ていただきたいです is more polite.",
+      "practiceMetadata": {
+        "categories": [
+          "desire",
+          "request"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence",
+          "formProduction"
+        ],
+        "availableKinds": [
+          "fillBlank",
+          "chooseContext",
+          "transformSentence",
+          "assembleSentence",
+          "correctError",
+          "understandSentence",
+          "distinguishMeaning",
+          "formProduction"
+        ],
+        "algorithmicForms": [
+          "te"
+        ],
+        "sourceExampleCount": 3,
+        "status": "authoredNeedsReview",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Материал составлен автором и требует лингвистической проверки."
+      },
+      "supplement": {
+        "repository": "https://github.com/stndaru/nihongo-mono",
+        "commit": "ec0ba4a0ce1611c568b0e4f8a223eb8029249a25",
+        "path": "src/data/grammar/n4.json",
+        "license": "MIT",
+        "summary": "てほしい expresses wanting another person to do something. The person you want to act is marked with に, and ほしい inflects like an い-adjective. The negative 'want you NOT to' is 〜ないでほしい.",
+        "structure": [
+          "Noun［person］＋ に ＋ Verb［て form］＋ ほしい",
+          "Verb［ない form］＋ でほしい［negative］"
+        ],
+        "pitfalls": [
+          "The subject differs from 〜たい: 〜たい = I want to do it myself; てほしい = I want another person to do it.",
+          "Mark the person you want to act with に: 君に来てほしい.",
+          "'Want you not to' is 〜ないでほしい (来ないでほしい = I want you not to come)."
+        ],
+        "examples": [
+          {
+            "ja": "明日は早く来てほしいです。",
+            "en": "I want you to come early tomorrow."
+          },
+          {
+            "ja": "私のことを忘れないでほしい。",
+            "en": "I don't want you to forget me."
+          }
+        ]
+      },
+      "teaching": {
+        "meaningRU": "Хочу, чтобы кто-то что-то сделал",
+        "usageRU": "Выражаешь своё желание относительно действия другого человека.",
+        "formationRU": "Человек + に + て-форма + ほしい; не хочу: ない-форма + でほしい",
+        "example": {
+          "ja": "友達に手伝ってほしいです。",
+          "en": "I want my friend to help me.",
+          "ru": "Хочу, чтобы друг мне помог.",
+          "furigana": "[友達|ともだち]に[手伝|てつだ]ってほしいです。"
+        },
+        "parts": [
+          {
+            "text": "友達に",
+            "roleRU": "От кого ожидается действие."
+          },
+          {
+            "text": "手伝って",
+            "roleRU": "Действие в て-форме."
+          },
+          {
+            "text": "ほしい",
+            "roleRU": "Желание говорящего."
+          }
+        ],
+        "notesRU": [
+          "Отрицание действия: 買わないでほしい — хочу, чтобы не покупал. Обращение к старшему может звучать требовательно."
+        ],
+        "contrastsRU": [
+          "話したい — хочу говорить сам; 話してほしい — хочу, чтобы говорил другой."
+        ],
+        "complexity": 2
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:dbb41285fc5b4537f795d1f0",
+          "translationID": "te-hoshii:example:0:en",
+          "furigana": "もう{少|すこ}しゆっくり{話|はな}してほしいです。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:eaac6eb211b91f1b4f46a49e",
+          "translationID": "te-hoshii:example:1:en",
+          "furigana": "この{話|はなし}は{誰|だれ}にも{言|い}わないでほしい。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:af09636974c082bc7f3995b9",
+          "translationID": "te-hoshii:example:2:en",
+          "furigana": "{早|はや}く{春|はる}が{来|き}てほしいなあ。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": [
+        "te-hoshii:speak",
+        "te-hoshii:context",
+        "te-hoshii:transform",
+        "te-hoshii:buy",
+        "te-hoshii:repair",
+        "te-hoshii:negative",
+        "te-hoshii:distinguish",
+        "te-hoshii:write",
+        "te-hoshii:form-go"
+      ]
+    },
+    {
+      "id": "tagaru",
+      "pattern": "〜たがる",
+      "romaji": "tagaru",
+      "level": "N4",
+      "meaning": "(someone else) wants to",
+      "formation": "Verb-stem + たがる",
+      "tags": [
+        "desire"
+      ],
+      "notes": "Used for other people, since you can't directly know their wishes. Current wishes are usually expressed with 〜たがっている.",
+      "practiceMetadata": {
+        "categories": [
+          "desire"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:a7696d7ace6bb6614663c449",
+          "translationID": "tagaru:example:0:en",
+          "furigana": "{子|こ}どもたちは{外|そと}で{遊|あそ}びたがっている。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:1808a83270e41385d7a319f2",
+          "translationID": "tagaru:example:1:en",
+          "furigana": "{弟|おとうと}はいつも{私|わたし}のゲームをやりたがる。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:ff451b3a1eb240f4a83a4928",
+          "translationID": "tagaru:example:2:en",
+          "furigana": "{犬|いぬ}が{散歩|さんぽ}に{行|い}きたがっています。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "garu",
+      "pattern": "〜がる",
+      "romaji": "garu",
+      "level": "N4",
+      "meaning": "(someone else) feels; shows signs of feeling",
+      "formation": "i-Adj stem / na-Adj + がる",
+      "tags": [
+        "emotion",
+        "appearance"
+      ],
+      "notes": "Turns feeling adjectives (怖い, 寂しい, ほしい) into verbs describing how others seem to feel. The object of the feeling takes を.",
+      "practiceMetadata": {
+        "categories": [
+          "emotion",
+          "appearance"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:037e46c5fbb7c9aea337584c",
+          "translationID": "garu:example:0:en",
+          "furigana": "{妹|いもうと}は{暗|くら}い{所|ところ}を{怖|こわ}がる。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:26046050de691f32eed57402",
+          "translationID": "garu:example:1:en",
+          "furigana": "{祖母|そぼ}は{孫|まご}に{会|あ}えなくて{寂|さび}しがっている。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:19112d9f88d5445cdb1b8007",
+          "translationID": "garu:example:2:en",
+          "furigana": "{息子|むすこ}は{新|あたら}しい{自転車|じてんしゃ}をほしがっている。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "kamo-shirenai",
+      "pattern": "〜かもしれない",
+      "romaji": "kamo shirenai",
+      "level": "N4",
+      "meaning": "might; may; possibly",
+      "formation": "Verb-plain / i-Adj / na-Adj / Noun + かもしれない",
+      "tags": [
+        "possibility",
+        "conjecture"
+      ],
+      "notes": "About 50% certainty or less. In casual speech it is often shortened to かも.",
+      "practiceMetadata": {
+        "categories": [
+          "possibility",
+          "conjecture"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:08e9dbe0a1d6b1434316da73",
+          "translationID": "kamo-shirenai:example:0:en",
+          "furigana": "{午後|ごご}から{雨|あめ}が{降|ふ}るかもしれません。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:ab7fdd4a64d17bafb19a1a03",
+          "translationID": "kamo-shirenai:example:1:en",
+          "furigana": "かぎがない。{電車|でんしゃ}の{中|なか}で{落|お}としたかもしれない。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:035f0c3d5e712361ef613b85",
+          "translationID": "kamo-shirenai:example:2:en",
+          "furigana": "その{話|はなし}は{本当|ほんとう}かもしれない。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "darou",
+      "pattern": "〜だろう",
+      "romaji": "darou",
+      "level": "N4",
+      "meaning": "probably; I suppose (plain form of でしょう)",
+      "formation": "Verb-plain / i-Adj / na-Adj / Noun + だろう",
+      "tags": [
+        "conjecture"
+      ],
+      "notes": "Common in writing and in men's casual speech; でしょう is the polite form. Often used with たぶん or きっと, or as 〜だろうと思う.",
+      "practiceMetadata": {
+        "categories": [
+          "conjecture"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:490d655c96fe4f3273806534",
+          "translationID": "darou:example:0:en",
+          "furigana": "{明日|あした}はたぶん{晴|は}れるだろう。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:598109246a98f162420a2e89",
+          "translationID": "darou:example:1:en",
+          "furigana": "{彼女|かのじょ}はもう{家|いえ}に{着|つ}いただろう。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:8d69bf985fd159dd99123649",
+          "translationID": "darou:example:2:en",
+          "furigana": "この{問題|もんだい}は{子|こ}どもには{難|むずか}しいだろうと{思|おも}います。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "hazu-da",
+      "pattern": "〜はずだ",
+      "romaji": "hazu da",
+      "level": "N4",
+      "meaning": "should be; is expected to (based on reasoning)",
+      "formation": "Verb-plain / i-Adj + はずだ / na-Adj + な + はずだ / Noun + の + はずだ",
+      "tags": [
+        "conjecture"
+      ],
+      "notes": "A confident expectation based on facts or logic, not a guess. It does not mean 'should' as a duty.",
+      "practiceMetadata": {
+        "categories": [
+          "conjecture"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:9b19dbaca90689d45cc20b48",
+          "translationID": "hazu-da:example:0:en",
+          "furigana": "{荷物|にもつ}は{明日|あした}{届|とど}くはずです。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:3cba18d5b61a4c2dbec5bff7",
+          "translationID": "hazu-da:example:1:en",
+          "furigana": "{彼|かれ}は{十|じゅう}{年|ねん}もアメリカに{住|す}んでいたから、{英語|えいご}が{上手|じょうず}なはずだ。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:dd5686d9c7a10a34926c0485",
+          "translationID": "hazu-da:example:2:en",
+          "furigana": "おかしいな。かぎはここに{置|お}いたはずなのに。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "hazu-ga-nai",
+      "pattern": "〜はずがない",
+      "romaji": "hazu ga nai",
+      "level": "N4",
+      "meaning": "can't be; there's no way that",
+      "formation": "Verb-plain / i-Adj + はずがない / na-Adj + な + はずがない / Noun + の + はずがない",
+      "tags": [
+        "conjecture",
+        "negation"
+      ],
+      "notes": "Strong denial based on reasoning. 〜ないはずだ ('should not be') is a milder expectation.",
+      "practiceMetadata": {
+        "categories": [
+          "conjecture",
+          "negation"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:99579bc8267b149287179fc4",
+          "translationID": "hazu-ga-nai:example:0:en",
+          "furigana": "あんなにまじめな{人|ひと}がうそをつくはずがない。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:0b61fb7295b7ac08f93a7fad",
+          "translationID": "hazu-ga-nai:example:1:en",
+          "furigana": "{今日|きょう}は{日曜日|にちようび}だから、{銀行|ぎんこう}が{開|あ}いているはずがない。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:0e8db6d9b2013a32d0e42321",
+          "translationID": "hazu-ga-nai:example:2:en",
+          "furigana": "かぎはちゃんとかけたから、ドアが{開|あ}いているはずがない。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "n-desu-no-desu",
+      "pattern": "〜んです / 〜のです",
+      "romaji": "n desu / no desu",
+      "level": "N4",
+      "meaning": "it's that ...; (explaining or asking for an explanation)",
+      "formation": "Verb-plain / i-Adj + んです / na-Adj + な + んです / Noun + な + んです",
+      "tags": [
+        "reason",
+        "emphasis"
+      ],
+      "notes": "Adds a sense of explaining a situation or asking for the background. Casual forms are 〜んだ and 〜の. Overusing it can sound pushy.",
+      "practiceMetadata": {
+        "categories": [
+          "reason",
+          "emphasis"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:9becd032c86f876d5bd705eb",
+          "translationID": "n-desu-no-desu:example:0:en",
+          "furigana": "どうしたんですか。{顔色|かおいろ}が{悪|わる}いですよ。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:a773a57b78896901f1831080",
+          "translationID": "n-desu-no-desu:example:1:en",
+          "furigana": "すみません、{遅|おく}れました。{電車|でんしゃ}が{止|と}まっていたんです。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:2e3f78d21a572de083c864cb",
+          "translationID": "n-desu-no-desu:example:2:en",
+          "furigana": "{日本語|にほんご}で{手紙|てがみ}を{書|か}きたいんですが、{手伝|てつだ}ってくれませんか。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "ka-dou-ka",
+      "pattern": "〜かどうか",
+      "romaji": "ka dou ka",
+      "level": "N4",
+      "meaning": "whether or not",
+      "formation": "Verb-plain / i-Adj / na-Adj / Noun + かどうか",
+      "tags": [
+        "question"
+      ],
+      "notes": "Embeds a yes-no question in a sentence. For questions with a question word, use 〜か alone (何時に来るか).",
+      "practiceMetadata": {
+        "categories": [
+          "question"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:8b9a257136775e7c1d472e64",
+          "translationID": "ka-dou-ka:example:0:en",
+          "furigana": "{明日|あした}{行|い}けるかどうか、まだ{分|わ}かりません。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:365a8300c1aecd6e7e0f7597",
+          "translationID": "ka-dou-ka:example:1:en",
+          "furigana": "この{服|ふく}が{似合|にあ}うかどうか、ちょっと{着|き}てみます。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:cbe822a7fb8709aeeb511540",
+          "translationID": "ka-dou-ka:example:2:en",
+          "furigana": "そのレストランがおいしいかどうか、{友達|ともだち}に{聞|き}いてみよう。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "ka-embedded-question",
+      "pattern": "〜か（embedded question）",
+      "romaji": "ka (embedded question)",
+      "level": "N4",
+      "meaning": "embedded question (what, where, who, etc.)",
+      "formation": "Question word + ... + Verb-plain / i-Adj / na-Adj / Noun + か",
+      "tags": [
+        "question"
+      ],
+      "notes": "After a noun or na-adjective, だ is dropped (誰の傘か知らない).",
+      "practiceMetadata": {
+        "categories": [
+          "question"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:a6a424de7cca08d3d54a2f35",
+          "translationID": "ka-embedded-question:example:0:en",
+          "furigana": "{会議|かいぎ}が{何|なん}{時|じ}に{始|はじ}まるか、{教|おし}えてください。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:159069d326df2bc46a9b6976",
+          "translationID": "ka-embedded-question:example:1:en",
+          "furigana": "どこで{財布|さいふ}をなくしたか、{覚|おぼ}えていません。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:0e102d120dcf3c86c6ba077e",
+          "translationID": "ka-embedded-question:example:2:en",
+          "furigana": "{誰|だれ}が{窓|まど}を{割|わ}ったか、{知|し}っていますか。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "to-omou",
+      "pattern": "〜と思う",
+      "reading": "〜とおもう",
+      "romaji": "to omou",
+      "level": "N4",
+      "meaning": "I think that",
+      "formation": "Verb-plain / i-Adj + と思う / na-Adj + だ + と思う / Noun + だ + と思う",
+      "tags": [
+        "quotation",
+        "conjecture"
+      ],
+      "notes": "Japanese usually negates the quoted clause (来ないと思う) rather than 思う. For another person's opinion, use 〜と思っている.",
+      "practiceMetadata": {
+        "categories": [
+          "quotation",
+          "conjecture"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:8fdf1ab18c70aa4758c2a536",
+          "translationID": "to-omou:example:0:en",
+          "furigana": "この{映画|えいが}はきっと{人気|にんき}が{出|で}ると{思|おも}う。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:df5baf460d83bd44b6104017",
+          "translationID": "to-omou:example:1:en",
+          "furigana": "{彼女|かのじょ}は{今日|きょう}は{来|こ}ないと{思|おも}います。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:4ec229ea29f8f5b22b1af4d0",
+          "translationID": "to-omou:example:2:en",
+          "furigana": "{日本|にほん}の{電車|でんしゃ}はとても{便利|べんり}だと{思|おも}います。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "to-iu-say",
+      "pattern": "〜と言う",
+      "reading": "〜という",
+      "romaji": "to iu (say)",
+      "level": "N4",
+      "meaning": "say that; tell (quotation)",
+      "formation": "「Sentence」 + と言う / Sentence (plain) + と言う",
+      "tags": [
+        "quotation"
+      ],
+      "notes": "Direct quotes go inside 「」; indirect quotes use plain forms. 〜と言っていた is common when passing on what someone said.",
+      "practiceMetadata": {
+        "categories": [
+          "quotation"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:2b4de89c8251ddd9453635cc",
+          "translationID": "to-iu-say:example:0:en",
+          "furigana": "{先生|せんせい}は「{明日|あした}はテストがあります」と{言|い}いました。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:a86cf855e5085e7dc6acf415",
+          "translationID": "to-iu-say:example:1:en",
+          "furigana": "{兄|あに}は{今晩|こんばん}、{帰|かえ}りが{遅|おそ}くなると{言|い}っていた。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:8b49afb4495952b116713994",
+          "translationID": "to-iu-say:example:2:en",
+          "furigana": "{日本|にほん}では{食|た}べる{前|まえ}に「いただきます」と{言|い}います。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "shika-nai",
+      "pattern": "〜しか〜ない",
+      "romaji": "shika ... nai",
+      "level": "N4",
+      "meaning": "only; nothing but",
+      "formation": "Noun + しか + Verb-nai",
+      "tags": [
+        "limitation",
+        "negation"
+      ],
+      "notes": "Always paired with a negative verb. Compared with だけ, it stresses that the amount is small or not enough.",
+      "practiceMetadata": {
+        "categories": [
+          "limitation",
+          "negation"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:ffdf15258805e496645e7c18",
+          "translationID": "shika-nai:example:0:en",
+          "furigana": "{財布|さいふ}に{五|ご}{百|ひゃく}{円|えん}しかない。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:c425ed64e4406e0d43cce4a4",
+          "translationID": "shika-nai:example:1:en",
+          "furigana": "このことは、あなたにしか{話|はな}していません。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:9cca44289de1ca41c61cc4e3",
+          "translationID": "shika-nai:example:2:en",
+          "furigana": "{朝|あさ}はコーヒーしか{飲|の}みません。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "bakari",
+      "pattern": "〜ばかり",
+      "romaji": "bakari",
+      "level": "N4",
+      "meaning": "nothing but; only; all",
+      "formation": "Noun + ばかり",
+      "tags": [
+        "limitation",
+        "criticism"
+      ],
+      "notes": "Often implies there is too much of one thing. 〜てばかりいる (N3) and 〜たばかり ('just did') are separate points.",
+      "practiceMetadata": {
+        "categories": [
+          "limitation",
+          "criticism"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "relations": [
+        {
+          "ruleID": "ta-bakari",
+          "kind": "sourceMention",
+          "explanationRU": "Конструкция прямо упомянута в исходном примечании. Связь не означает равнозначность."
+        },
+        {
+          "ruleID": "te-bakari-iru",
+          "kind": "sourceMention",
+          "explanationRU": "Конструкция прямо упомянута в исходном примечании. Связь не означает равнозначность."
+        }
+      ],
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:23ad7036c726eb6c4872c48d",
+          "translationID": "bakari:example:0:en",
+          "furigana": "{弟|おとうと}は{肉|にく}ばかり{食|た}べて、{野菜|やさい}を{食|た}べない。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:5f6bce3d754bf87fe9f90691",
+          "translationID": "bakari:example:1:en",
+          "furigana": "このクラスは{女|おんな}の{子|こ}ばかりだ。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:42751239caa08759399d980f",
+          "translationID": "bakari:example:2:en",
+          "furigana": "{最近|さいきん}は{雨|あめ}の{日|ひ}ばかりで、{洗濯|せんたく}ができない。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "ta-bakari",
+      "pattern": "〜たばかり",
+      "romaji": "ta bakari",
+      "level": "N4",
+      "meaning": "have just done",
+      "formation": "Verb-ta + ばかり",
+      "tags": [
+        "time",
+        "completion"
+      ],
+      "notes": "Shows the speaker feels little time has passed, even if it was weeks ago. 〜たところ refers to only moments ago.",
+      "practiceMetadata": {
+        "categories": [
+          "time",
+          "completion"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "relations": [
+        {
+          "ruleID": "ta-tokoro",
+          "kind": "sourceMention",
+          "explanationRU": "Конструкция прямо упомянута в исходном примечании. Связь не означает равнозначность."
+        }
+      ],
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:e0d8b81d86bd0260ba4f98ea",
+          "translationID": "ta-bakari:example:0:en",
+          "furigana": "{日本|にほん}に{来|き}たばかりなので、まだ{日本語|にほんご}がよく{分|わ}かりません。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:9f306026dd9686d8ef264faa",
+          "translationID": "ta-bakari:example:1:en",
+          "furigana": "さっき{昼|ひる}ご{飯|はん}を{食|た}べたばかりだから、おなかがいっぱいだ。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:a624807b24557bede4a6ddf1",
+          "translationID": "ta-bakari:example:2:en",
+          "furigana": "{買|か}ったばかりの{傘|かさ}をなくしてしまった。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "tokoro-da",
+      "pattern": "〜ところだ",
+      "romaji": "tokoro da",
+      "level": "N4",
+      "meaning": "be about to; be in the middle of; have just done",
+      "formation": "Verb-dict / Verb-te + いる / Verb-ta + ところだ",
+      "tags": [
+        "time",
+        "state"
+      ],
+      "notes": "Dictionary form: about to. 〜ているところ: in the middle of. 〜たところ: just finished. It pinpoints the stage of an action.",
+      "practiceMetadata": {
+        "categories": [
+          "time",
+          "state"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "relations": [
+        {
+          "ruleID": "ta-tokoro",
+          "kind": "sourceMention",
+          "explanationRU": "Конструкция прямо упомянута в исходном примечании. Связь не означает равнозначность."
+        }
+      ],
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:676ff881f486ee5c2fe7a096",
+          "translationID": "tokoro-da:example:0:en",
+          "furigana": "{今|いま}から{出|で}かけるところです。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:efe3e73d59bbd8f4faaaff61",
+          "translationID": "tokoro-da:example:1:en",
+          "furigana": "{今|いま}、{晩|ばん}ご{飯|はん}を{作|つく}っているところだから、{後|あと}で{電話|でんわ}するね。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:25210119fb8f899e3456cd9a",
+          "translationID": "tokoro-da:example:2:en",
+          "furigana": "ちょうど{今|いま}、{駅|えき}に{着|つ}いたところです。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "yasui-nikui",
+      "pattern": "〜やすい / 〜にくい",
+      "romaji": "yasui / nikui",
+      "level": "N4",
+      "meaning": "easy to; hard to",
+      "formation": "Verb-stem + やすい / Verb-stem + にくい",
+      "tags": [
+        "degree",
+        "tendency"
+      ],
+      "notes": "Both conjugate like i-adjectives. やすい can also mean 'tends to' (この服は汚れやすい).",
+      "practiceMetadata": {
+        "categories": [
+          "degree",
+          "tendency"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:bb363d0d9c2fc2452ee5c6cc",
+          "translationID": "yasui-nikui:example:0:en",
+          "furigana": "このペンは{書|か}きやすいです。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:2ea040eb752a27eb0406a867",
+          "translationID": "yasui-nikui:example:1:en",
+          "furigana": "{先生|せんせい}の{説明|せつめい}は{分|わ}かりやすい。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:3c392d1311f54c3aa214e5df",
+          "translationID": "yasui-nikui:example:2:en",
+          "furigana": "この{魚|さかな}は{骨|ほね}が{多|おお}くて{食|た}べにくい。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "hajimeru-owaru-tsuzukeru",
+      "pattern": "〜始める / 〜終わる / 〜続ける",
+      "reading": "〜はじめる / 〜おわる / 〜つづける",
+      "romaji": "hajimeru / owaru / tsuzukeru",
+      "level": "N4",
+      "meaning": "start doing; finish doing; keep doing",
+      "formation": "Verb-stem + 始める / Verb-stem + 終わる / Verb-stem + 続ける",
+      "tags": [
+        "time",
+        "sequence"
+      ],
+      "notes": "〜終わる is used with actions that have a clear end (読む, 食べる, 書く). 〜終える is a more formal alternative.",
+      "practiceMetadata": {
+        "categories": [
+          "time",
+          "sequence"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:9fc59292979ab7325fb682b9",
+          "translationID": "hajimeru-owaru-tsuzukeru:example:0:en",
+          "furigana": "{去年|きょねん}からギターを{習|なら}い{始|はじ}めました。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:06525c8b73d9a8e44f2b2c67",
+          "translationID": "hajimeru-owaru-tsuzukeru:example:1:en",
+          "furigana": "その{本|ほん}、{読|よ}み{終|お}わったら{貸|か}してくれない？",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:e92c57192b030267aea46292",
+          "translationID": "hajimeru-owaru-tsuzukeru:example:2:en",
+          "furigana": "{三|さん}{時間|じかん}も{歩|ある}き{続|つづ}けて、{足|あし}が{痛|いた}くなった。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "dasu",
+      "pattern": "〜出す",
+      "reading": "〜だす",
+      "romaji": "dasu",
+      "level": "N4",
+      "meaning": "suddenly start doing; burst out",
+      "formation": "Verb-stem + 出す",
+      "tags": [
+        "time",
+        "surprise"
+      ],
+      "notes": "Implies a sudden, often uncontrolled start. Unlike 〜始める, it is not used for planned actions or in requests.",
+      "practiceMetadata": {
+        "categories": [
+          "time",
+          "surprise"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:eb73cdc2ccb484dcb7bd662c",
+          "translationID": "dasu:example:0:en",
+          "furigana": "{赤|あか}ちゃんが{急|きゅう}に{泣|な}き{出|だ}した。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:1957cacc705e27d05fac488d",
+          "translationID": "dasu:example:1:en",
+          "furigana": "さっきまで{晴|は}れていたのに、{急|きゅう}に{雨|あめ}が{降|ふ}り{出|だ}した。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "hodo-nai",
+      "pattern": "〜ほど〜ない",
+      "romaji": "hodo ... nai",
+      "level": "N4",
+      "meaning": "not as ... as",
+      "formation": "Noun / Verb-plain + ほど + i-Adj-ku + ない / na-Adj + ではない",
+      "tags": [
+        "comparison",
+        "negation"
+      ],
+      "notes": "The item before ほど is the standard of comparison. Always followed by a negative.",
+      "practiceMetadata": {
+        "categories": [
+          "comparison",
+          "negation"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:998acbb06cfb42799241640e",
+          "translationID": "hodo-nai:example:0:en",
+          "furigana": "{今年|ことし}の{夏|なつ}は{去年|きょねん}ほど{暑|あつ}くない。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:30ea61158aec7cf94112181a",
+          "translationID": "hodo-nai:example:1:en",
+          "furigana": "{私|わたし}の{町|まち}は{東京|とうきょう}ほどにぎやかではありません。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:0f8ced8de431fae2267ecc23",
+          "translationID": "hodo-nai:example:2:en",
+          "furigana": "テストは{思|おも}ったほど{難|むずか}しくなかった。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "nakanaka-nai",
+      "pattern": "なかなか〜ない",
+      "romaji": "nakanaka ... nai",
+      "level": "N4",
+      "meaning": "not easily; just won't; not readily",
+      "formation": "なかなか + Verb-nai",
+      "tags": [
+        "negation",
+        "degree"
+      ],
+      "notes": "Shows that something doesn't happen as quickly or easily as hoped. With a positive form, なかなか means 'quite' (なかなかおいしい).",
+      "practiceMetadata": {
+        "categories": [
+          "negation",
+          "degree"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:6e6b7243e94b0b88aee42c7c",
+          "translationID": "nakanaka-nai:example:0:en",
+          "furigana": "バスがなかなか{来|こ}ない。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:d30a9846697bbb82677561d9",
+          "translationID": "nakanaka-nai:example:1:en",
+          "furigana": "{漢字|かんじ}がなかなか{覚|おぼ}えられません。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:81a2e54189c5090c07044188",
+          "translationID": "nakanaka-nai:example:2:en",
+          "furigana": "{子|こ}どもがなかなか{寝|ね}てくれない。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "zutsu",
+      "pattern": "〜ずつ",
+      "romaji": "zutsu",
+      "level": "N4",
+      "meaning": "each; at a time; little by little",
+      "formation": "Noun (quantity) + ずつ",
+      "tags": [
+        "quantity"
+      ],
+      "practiceMetadata": {
+        "categories": [
+          "quantity"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:8662042bb730089362ad187c",
+          "translationID": "zutsu:example:0:en",
+          "furigana": "りんごを{一人|ひとり}に{二|ふた}つずつ{配|くば}った。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:f10ccc7cef98175d7633c58c",
+          "translationID": "zutsu:example:1:en",
+          "furigana": "{毎日|まいにち}{少|すこ}しずつ{漢字|かんじ}を{覚|おぼ}えています。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:dbb5d773d66788c3744e552b",
+          "translationID": "zutsu:example:2:en",
+          "furigana": "{一人|ひとり}ずつ{部屋|へや}に{入|はい}ってください。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "mo-emphasis",
+      "pattern": "〜も（emphasis）",
+      "romaji": "mo (emphasis)",
+      "level": "N4",
+      "meaning": "as many as; as much as; (with a negative) not even one",
+      "formation": "Noun (number + counter) + も",
+      "tags": [
+        "emphasis",
+        "quantity"
+      ],
+      "notes": "Shows the speaker feels the amount is large. With 一 + counter and a negative verb, it means 'not even one'.",
+      "practiceMetadata": {
+        "categories": [
+          "emphasis",
+          "quantity"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:d8d634a2b92a8e00612f1ed9",
+          "translationID": "mo-emphasis:example:0:en",
+          "furigana": "{昨日|きのう}は{十|じゅう}{時間|じかん}も{寝|ね}てしまった。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:46be6aeae4976c7efec74000",
+          "translationID": "mo-emphasis:example:1:en",
+          "furigana": "このかばんは{五|ご}{万|まん}{円|えん}もするんですか。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:55438ab9d7b4d0dce3515260",
+          "translationID": "mo-emphasis:example:2:en",
+          "furigana": "{財布|さいふ}の{中|なか}に{一|いち}{円|えん}もない。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "made-ni",
+      "pattern": "〜までに",
+      "romaji": "made ni",
+      "level": "N4",
+      "meaning": "by (a deadline); before",
+      "formation": "Noun / Verb-dict + までに",
+      "tags": [
+        "time"
+      ],
+      "notes": "までに marks a deadline for a one-time action; まで marks how long something continues (六時まで働く).",
+      "practiceMetadata": {
+        "categories": [
+          "time"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:708e4b9ba3001281c23738b2",
+          "translationID": "made-ni:example:0:en",
+          "furigana": "レポートは{金曜日|きんようび}までに{出|だ}してください。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:579d5908b3f10f29f8ed3bd2",
+          "translationID": "made-ni:example:1:en",
+          "furigana": "{六|ろく}{時|じ}までに{家|いえ}に{帰|かえ}らなければならない。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:cd284c1bf5e1c0ce6b72f037",
+          "translationID": "made-ni:example:2:en",
+          "furigana": "{暗|くら}くなるまでに{山|やま}を{下|お}りよう。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "koto-ga-aru",
+      "pattern": "〜ことがある",
+      "romaji": "koto ga aru",
+      "level": "N4",
+      "meaning": "sometimes; there are times when",
+      "formation": "Verb-dict / Verb-nai + ことがある",
+      "tags": [
+        "tendency",
+        "time"
+      ],
+      "notes": "Takes the dictionary or ない form. With the past form (〜たことがある) it means 'have done before' instead.",
+      "practiceMetadata": {
+        "categories": [
+          "tendency",
+          "time"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "relations": [
+        {
+          "ruleID": "ta-koto-ga-aru",
+          "kind": "sourceMention",
+          "explanationRU": "Конструкция прямо упомянута в исходном примечании. Связь не означает равнозначность."
+        }
+      ],
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:c534bee912ab0a13357182c9",
+          "translationID": "koto-ga-aru:example:0:en",
+          "furigana": "{忙|いそが}しいときは、{朝|あさ}ご{飯|はん}を{食|た}べないことがあります。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:58763d13de3658bc37080b0f",
+          "translationID": "koto-ga-aru:example:1:en",
+          "furigana": "この{道|みち}は{冬|ふゆ}になると、{雪|ゆき}で{通|とお}れなくなることがある。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:95912071727896353f51de74",
+          "translationID": "koto-ga-aru:example:2:en",
+          "furigana": "{週末|しゅうまつ}は{家族|かぞく}で{料理|りょうり}をすることがある。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "nai-to-ikenai-nakucha",
+      "pattern": "〜ないといけない / 〜なくちゃ",
+      "romaji": "nai to ikenai / nakucha",
+      "level": "N4",
+      "meaning": "have to; must (conversational)",
+      "formation": "Verb-nai + といけない / Verb-nai stem + なくちゃ",
+      "tags": [
+        "obligation",
+        "casual"
+      ],
+      "notes": "Everyday alternatives to なければならない. なくちゃ comes from なくては; なきゃ (from なければ) is also very common.",
+      "practiceMetadata": {
+        "categories": [
+          "obligation",
+          "casual"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:a5eb0bffd5e82cabfc555524",
+          "translationID": "nai-to-ikenai-nakucha:example:0:en",
+          "furigana": "{明日|あした}は{早|はや}いから、もう{寝|ね}ないといけない。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:c3e418690bf931bdff9b66a8",
+          "translationID": "nai-to-ikenai-nakucha:example:1:en",
+          "furigana": "あ、もうこんな{時間|じかん}！{帰|かえ}らなくちゃ。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:95d180bed4b8ada4de10cb14",
+          "translationID": "nai-to-ikenai-nakucha:example:2:en",
+          "furigana": "この{薬|くすり}は{毎日|まいにち}{飲|の}まないといけません。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "sasete-kudasai",
+      "pattern": "〜させてください",
+      "romaji": "sasete kudasai",
+      "level": "N4",
+      "meaning": "please let me (do)",
+      "formation": "Verb-nai stem + せてください (Group 1) / Verb-nai stem + させてください (Group 2)",
+      "tags": [
+        "request",
+        "permission"
+      ],
+      "notes": "Built on the causative て-form (する → させて). 〜させていただけませんか is more polite.",
+      "practiceMetadata": {
+        "categories": [
+          "request",
+          "permission"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:1e73e4e61b94baa397bb6f86",
+          "translationID": "sasete-kudasai:example:0:en",
+          "furigana": "{少|すこ}し{考|かんが}えさせてください。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:73a51eb047deb0ccb90e57e2",
+          "translationID": "sasete-kudasai:example:1:en",
+          "furigana": "{今日|きょう}は{私|わたし}に{払|はら}わせてください。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:ceb2a5116a9882f13e3b91d7",
+          "translationID": "sasete-kudasai:example:2:en",
+          "furigana": "{体|からだ}の{調子|ちょうし}が{悪|わる}いので、{今日|きょう}は{早|はや}く{帰|かえ}らせてください。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "sonkeigo",
+      "pattern": "尊敬語",
+      "reading": "そんけいご",
+      "romaji": "sonkeigo",
+      "level": "N4",
+      "meaning": "honorific verbs; respectful language for others' actions",
+      "formation": "いらっしゃる（行く・来る・いる） / 召し上がる（食べる・飲む） / おっしゃる（言う） / なさる（する） / ご覧になる（見る） / くださる（くれる）",
+      "tags": [
+        "honorific",
+        "politeness"
+      ],
+      "notes": "Raises the actions of people you respect, such as customers, teachers and superiors. Never use it for your own actions.",
+      "practiceMetadata": {
+        "categories": [
+          "honorific",
+          "politeness"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:2d93c5361241acf73bcb6061",
+          "translationID": "sonkeigo:example:0:en",
+          "furigana": "{社長|しゃちょう}は{何|なん}{時|じ}ごろいらっしゃいますか。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:85769153bb3ab09cd801f571",
+          "translationID": "sonkeigo:example:1:en",
+          "furigana": "{先生|せんせい}、どうぞ{召|め}し{上|あ}がってください。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:6aefe40b85b8123c4f9003a9",
+          "translationID": "sonkeigo:example:2:en",
+          "furigana": "{部長|ぶちょう}は{会議|かいぎ}でそうおっしゃいました。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "kenjougo",
+      "pattern": "謙譲語",
+      "reading": "けんじょうご",
+      "romaji": "kenjougo",
+      "level": "N4",
+      "meaning": "humble verbs; modest language for one's own actions",
+      "formation": "参る（行く・来る） / おる（いる） / いただく（食べる・飲む・もらう） / 申す（言う） / いたす（する） / 拝見する（見る） / 伺う（聞く・訪ねる）",
+      "tags": [
+        "humble",
+        "politeness"
+      ],
+      "notes": "Lowers your own actions, or your group's, toward someone you respect. 参る, おる, 申す and いたす also make speech sound formal in general.",
+      "practiceMetadata": {
+        "categories": [
+          "humble",
+          "politeness"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:e276771dd502a8aae457350a",
+          "translationID": "kenjougo:example:0:en",
+          "furigana": "{明日|あした}の{午後|ごご}、そちらに{伺|うかが}います。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:8be3bf463ce1e9ddaf3bbe95",
+          "translationID": "kenjougo:example:1:en",
+          "furigana": "{初|はじ}めまして。リンと{申|もう}します。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:52b9235ee2770c8444123460",
+          "translationID": "kenjougo:example:2:en",
+          "furigana": "お{手紙|てがみ}、{拝見|はいけん}しました。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "o-ni-naru",
+      "pattern": "お〜になる",
+      "romaji": "o ... ni naru",
+      "level": "N4",
+      "meaning": "(honorific) someone respected does",
+      "formation": "お + Verb-stem + になる",
+      "tags": [
+        "honorific"
+      ],
+      "notes": "Not used with one-syllable stems (見る, 寝る) or verbs that have special forms (行く → いらっしゃる). する-nouns take ご + Noun + になる (ご利用になる).",
+      "practiceMetadata": {
+        "categories": [
+          "honorific"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:e145923e8432ba94db4e1666",
+          "translationID": "o-ni-naru:example:0:en",
+          "furigana": "{先生|せんせい}はもうお{帰|かえ}りになりました。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:96fe5b12a16d614a2c54fcea",
+          "translationID": "o-ni-naru:example:1:en",
+          "furigana": "この{本|ほん}をお{読|よ}みになりましたか。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:2b662e84a80163e1aee46457",
+          "translationID": "o-ni-naru:example:2:en",
+          "furigana": "{社長|しゃちょう}はいつもこのホテルにお{泊|と}まりになります。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "o-suru",
+      "pattern": "お〜する",
+      "romaji": "o ... suru",
+      "level": "N4",
+      "meaning": "(humble) I do (for someone respected)",
+      "formation": "お + Verb-stem + する / ご + Noun + する",
+      "tags": [
+        "humble"
+      ],
+      "notes": "Only for actions that affect or benefit the other person. お〜いたします is even more formal.",
+      "practiceMetadata": {
+        "categories": [
+          "humble"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:659eb69b07b58aa15ddfecbe",
+          "translationID": "o-suru:example:0:en",
+          "furigana": "{重|おも}そうですね。お{持|も}ちしましょうか。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:5dce6e6abc44d708300ee89f",
+          "translationID": "o-suru:example:1:en",
+          "furigana": "{後|あと}で{詳|くわ}しくご{説明|せつめい}します。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:6d8bac7294cb801358d00796",
+          "translationID": "o-suru:example:2:en",
+          "furigana": "{駅|えき}までお{送|おく}りします。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "de-gozaimasu",
+      "pattern": "〜でございます",
+      "romaji": "de gozaimasu",
+      "level": "N4",
+      "meaning": "is; am; are (very polite copula)",
+      "formation": "Noun / na-Adj + でございます",
+      "tags": [
+        "politeness",
+        "formal"
+      ],
+      "notes": "The very polite version of です, typical of shop and hotel staff speaking to customers. ございます on its own is the polite form of あります.",
+      "practiceMetadata": {
+        "categories": [
+          "politeness",
+          "formal"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:40e4c14100d5b970779a9512",
+          "translationID": "de-gozaimasu:example:0:en",
+          "furigana": "お{手洗|てあら}いはあちらでございます。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:728d5b51ce68b0c1af5e53ea",
+          "translationID": "de-gozaimasu:example:1:en",
+          "furigana": "こちらが、お{部屋|へや}のかぎでございます。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:c86927c4c9414eb2e8daf881",
+          "translationID": "de-gozaimasu:example:2:en",
+          "furigana": "はい、{山田|やまだ}{商店|しょうてん}でございます。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "te-mo-kamawanai",
+      "pattern": "〜ても構わない",
+      "reading": "〜てもかまわない",
+      "romaji": "te mo kamawanai",
+      "level": "N4",
+      "meaning": "don't mind if; it's fine if",
+      "formation": "Verb-te + も構わない / i-Adj-ku + ても構わない / na-Adj + でも構わない / Noun + でも構わない",
+      "tags": [
+        "permission"
+      ],
+      "notes": "A little more formal than 〜てもいい. 〜なくても構わない means 'it's fine not to'.",
+      "practiceMetadata": {
+        "categories": [
+          "permission"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "relations": [
+        {
+          "ruleID": "te-mo-ii",
+          "kind": "sourceMention",
+          "explanationRU": "Конструкция прямо упомянута в исходном примечании. Связь не означает равнозначность."
+        }
+      ],
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:984ebab2234cc409342427c8",
+          "translationID": "te-mo-kamawanai:example:0:en",
+          "furigana": "ここに{荷物|にもつ}を{置|お}いても{構|かま}いませんか。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:d31565998373c61a762f6de1",
+          "translationID": "te-mo-kamawanai:example:1:en",
+          "furigana": "{少|すこ}しぐらい{高|たか}くても{構|かま}わないから、いい{辞書|じしょ}を{買|か}いたい。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:5449277d0a59d05c9f742d3d",
+          "translationID": "te-mo-kamawanai:example:2:en",
+          "furigana": "{返事|へんじ}は{明日|あした}でも{構|かま}いませんよ。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "no-koto-nominalizer",
+      "pattern": "〜の / 〜こと（nominalizer）",
+      "romaji": "no / koto (nominalizer)",
+      "level": "N4",
+      "meaning": "the act of doing (turns a verb phrase into a noun)",
+      "formation": "Verb-plain + の / Verb-plain + こと",
+      "tags": [
+        "nominalization"
+      ],
+      "notes": "の is preferred with perception verbs (見る, 聞こえる) and in casual speech; こと is needed before です/だ and in set patterns such as 〜ことができる.",
+      "practiceMetadata": {
+        "categories": [
+          "nominalization"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "relations": [
+        {
+          "ruleID": "koto-ga-dekiru",
+          "kind": "sourceMention",
+          "explanationRU": "Конструкция прямо упомянута в исходном примечании. Связь не означает равнозначность."
+        }
+      ],
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:bc254315903c301f7581ddc2",
+          "translationID": "no-koto-nominalizer:example:0:en",
+          "furigana": "{私|わたし}は{写真|しゃしん}を{撮|と}るのが{好|す}きです。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:ed02e26eed43369da4b76994",
+          "translationID": "no-koto-nominalizer:example:1:en",
+          "furigana": "{趣味|しゅみ}は{古|ふる}い{映画|えいが}を{見|み}ることです。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:0d8afbd74836551bf4bf51e1",
+          "translationID": "no-koto-nominalizer:example:2:en",
+          "furigana": "かぎをかけるのを{忘|わす}れました。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "ba-yokatta",
+      "pattern": "〜ばよかった",
+      "romaji": "ba yokatta",
+      "level": "N4",
+      "meaning": "should have (done); I wish I had",
+      "formation": "Verb-ba + よかった / Verb-nai stem + なければよかった",
+      "tags": [
+        "regret"
+      ],
+      "notes": "Expresses regret about the past. 〜たらよかった is a common conversational alternative.",
+      "practiceMetadata": {
+        "categories": [
+          "regret"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:102fcaf049f3a0e60b5fa89b",
+          "translationID": "ba-yokatta:example:0:en",
+          "furigana": "もっと{早|はや}く{家|いえ}を{出|で}ればよかった。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:bf338d00482af17874a03a90",
+          "translationID": "ba-yokatta:example:1:en",
+          "furigana": "あんなこと、{言|い}わなければよかった。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:86e27ccbd49b6a2d8f978a90",
+          "translationID": "ba-yokatta:example:2:en",
+          "furigana": "{傘|かさ}を{持|も}ってくればよかったなあ。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "tara-dou",
+      "pattern": "〜たらどう",
+      "romaji": "tara dou",
+      "level": "N4",
+      "meaning": "why don't you ...?; how about ...?",
+      "formation": "Verb-ta + らどう",
+      "tags": [
+        "suggestion",
+        "advice"
+      ],
+      "notes": "Often shortened to 〜たら？. Can sound pushy toward superiors; 〜たらいかがですか is the polite version.",
+      "practiceMetadata": {
+        "categories": [
+          "suggestion",
+          "advice"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "relations": [
+        {
+          "ruleID": "tara",
+          "kind": "sourceMention",
+          "explanationRU": "Конструкция прямо упомянута в исходном примечании. Связь не означает равнозначность."
+        }
+      ],
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:3d7c68a1ce70594607be3927",
+          "translationID": "tara-dou:example:0:en",
+          "furigana": "{疲|つか}れているなら、{少|すこ}し{休|やす}んだらどう？",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:7b612db9f91ae2087eb55c39",
+          "translationID": "tara-dou:example:1:en",
+          "furigana": "{分|わ}からなければ、{先生|せんせい}に{聞|き}いてみたらどうですか。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "hou-ga-ii",
+      "pattern": "〜ほうがいい",
+      "romaji": "hou ga ii",
+      "level": "N4",
+      "meaning": "had better; should",
+      "formation": "Verb-ta / Verb-nai + ほうがいい",
+      "tags": [
+        "advice"
+      ],
+      "notes": "For advice, the past form (行ったほうがいい) is the usual choice and sounds stronger. The negative uses the ない form, not the past.",
+      "practiceMetadata": {
+        "categories": [
+          "advice"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:b20f87575e57ed77c3feaf23",
+          "translationID": "hou-ga-ii:example:0:en",
+          "furigana": "{熱|ねつ}があるなら、{病院|びょういん}に{行|い}ったほうがいいですよ。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:1a2feda504db641a7b1c9731",
+          "translationID": "hou-ga-ii:example:1:en",
+          "furigana": "{夜|よる}{遅|おそ}くに{一人|ひとり}で{歩|ある}かないほうがいい。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:0af3e420d1587e7d3f9eb00a",
+          "translationID": "hou-ga-ii:example:2:en",
+          "furigana": "{大事|だいじ}な{書類|しょるい}は、コピーしておいたほうがいいですよ。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "toka-toka",
+      "pattern": "〜とか〜とか",
+      "romaji": "toka ... toka",
+      "level": "N4",
+      "meaning": "things like A and B; A, B and so on (casual)",
+      "formation": "Noun + とか + Noun + とか / Verb-dict + とか + Verb-dict + とか",
+      "tags": [
+        "example",
+        "casual"
+      ],
+      "notes": "More casual than 〜や〜など, and it can also list verbs or whole phrases.",
+      "practiceMetadata": {
+        "categories": [
+          "example",
+          "casual"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "relations": [
+        {
+          "ruleID": "nado",
+          "kind": "sourceMention",
+          "explanationRU": "Конструкция прямо упомянута в исходном примечании. Связь не означает равнозначность."
+        }
+      ],
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:c4bdfce3a622a3da4d63f1b5",
+          "translationID": "toka-toka:example:0:en",
+          "furigana": "{冷蔵庫|れいぞうこ}に{卵|たまご}とか{牛乳|ぎゅうにゅう}とかが{入|はい}っています。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:2a1e0daedf9f5aa2949b85da",
+          "translationID": "toka-toka:example:1:en",
+          "furigana": "{休|やす}みの{日|ひ}は、{映画|えいが}とか{買|か}い{物|もの}とかに{行|い}きます。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:e7f72e2eaef34f2c24c3fb7c",
+          "translationID": "toka-toka:example:2:en",
+          "furigana": "{健康|けんこう}のために、{野菜|やさい}を{食|た}べるとか{運動|うんどう}するとか、{何|なに}かしたほうがいい。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "nado",
+      "pattern": "〜など",
+      "romaji": "nado",
+      "level": "N4",
+      "meaning": "etc.; and so on; such as",
+      "formation": "Noun + など",
+      "tags": [
+        "example"
+      ],
+      "notes": "Often paired with や (AやBなど). After a single noun it softens a suggestion.",
+      "practiceMetadata": {
+        "categories": [
+          "example"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:b0f1fd52819bee53efd0d4a7",
+          "translationID": "nado:example:0:en",
+          "furigana": "{机|つくえ}の{上|うえ}に{本|ほん}やノートなどがあります。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:450334a13133188f192e0198",
+          "translationID": "nado:example:1:en",
+          "furigana": "{夏休|なつやす}みに{京都|きょうと}や{奈良|なら}などに{行|い}きました。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:15f92f1a3566276f4c43da2e",
+          "translationID": "nado:example:2:en",
+          "furigana": "お{茶|ちゃ}など、いかがですか。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "de-mo-suggestion",
+      "pattern": "〜でも（suggestion）",
+      "romaji": "de mo (suggestion)",
+      "level": "N4",
+      "meaning": "or something (softening a suggestion)",
+      "formation": "Noun + でも",
+      "tags": [
+        "suggestion",
+        "example"
+      ],
+      "notes": "Offers one example while leaving other options open, which makes invitations and advice sound less pushy.",
+      "practiceMetadata": {
+        "categories": [
+          "suggestion",
+          "example"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:a078663ae9092496f31e3d0f",
+          "translationID": "de-mo-suggestion:example:0:en",
+          "furigana": "ちょっと{休|やす}んで、コーヒーでも{飲|の}みませんか。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:0ff401491b3b79aa93934ede",
+          "translationID": "de-mo-suggestion:example:1:en",
+          "furigana": "{雨|あめ}だから、{家|いえ}でゲームでもしよう。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:641c3acfdc660b9f8faf53d3",
+          "translationID": "de-mo-suggestion:example:2:en",
+          "furigana": "{暇|ひま}なら、{本|ほん}でも{読|よ}んだら？",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "sa",
+      "pattern": "〜さ",
+      "romaji": "sa",
+      "level": "N4",
+      "meaning": "-ness (turns an adjective into a noun of degree)",
+      "formation": "i-Adj stem + さ / na-Adj + さ",
+      "tags": [
+        "nominalization",
+        "degree"
+      ],
+      "notes": "いい becomes よさ. Common for measurements (高さ, 重さ, 大きさ, 長さ).",
+      "practiceMetadata": {
+        "categories": [
+          "nominalization",
+          "degree"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:f604afe6e80af4496b1aa66d",
+          "translationID": "sa:example:0:en",
+          "furigana": "この{橋|はし}の{長|なが}さはどのくらいですか。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:9c3985c538729c2eda65c2e7",
+          "translationID": "sa:example:1:en",
+          "furigana": "{山|やま}の{上|うえ}の{寒|さむ}さにびっくりした。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:f5c25d29189cabd7e824416d",
+          "translationID": "sa:example:2:en",
+          "furigana": "この{仕事|しごと}の{大変|たいへん}さは、やってみないと{分|わ}からない。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "me",
+      "pattern": "〜目",
+      "reading": "〜め",
+      "romaji": "me",
+      "level": "N4",
+      "meaning": "-th (ordinal: first, second, third ...)",
+      "formation": "Noun (number + counter) + 目",
+      "tags": [
+        "quantity"
+      ],
+      "practiceMetadata": {
+        "categories": [
+          "quantity"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:92dd49303e59a4fb5a744544",
+          "translationID": "me:example:0:en",
+          "furigana": "{右|みぎ}から{三|みっ}つ{目|め}の{建物|たてもの}が{図書館|としょかん}です。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:e00b54d169ee19cc9d326a1c",
+          "translationID": "me:example:1:en",
+          "furigana": "{日本|にほん}に{来|く}るのは{今回|こんかい}で{二|に}{回|かい}{目|め}です。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:8564e90b1d5a29d227e35d07",
+          "translationID": "me:example:2:en",
+          "furigana": "{二|ふた}つ{目|め}の{角|かど}を{左|ひだり}に{曲|ま}がってください。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "oki-ni",
+      "pattern": "〜おきに",
+      "romaji": "oki ni",
+      "level": "N4",
+      "meaning": "every other; at intervals of",
+      "formation": "Noun (number + counter) + おきに",
+      "tags": [
+        "time",
+        "quantity"
+      ],
+      "notes": "With days (一日おき) it skips one unit, meaning 'every other day'. With minutes or distances it usually just means 'every X'.",
+      "practiceMetadata": {
+        "categories": [
+          "time",
+          "quantity"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:a22a1cc1ccc476c473b12df6",
+          "translationID": "oki-ni:example:0:en",
+          "furigana": "このバスは{十|じゅう}{五|ご}{分|ふん}おきに{来|き}ます。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:4c05712ec19b8725768a6713",
+          "translationID": "oki-ni:example:1:en",
+          "furigana": "{一|いち}{日|にち}おきにジョギングをしています。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:43aceb9f133496de58232bd6",
+          "translationID": "oki-ni:example:2:en",
+          "furigana": "{道|みち}の{両側|りょうがわ}に、{木|き}が{五|ご}メートルおきに{植|う}えてある。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "ku-suru-ni-suru",
+      "pattern": "〜くする / 〜にする（make）",
+      "romaji": "ku suru / ni suru",
+      "level": "N4",
+      "meaning": "make (something) ...; change something to a state",
+      "formation": "i-Adj-ku + する / na-Adj + に + する / Noun + に + する",
+      "tags": [
+        "change"
+      ],
+      "notes": "Someone deliberately changes something. Compare 〜くなる / 〜になる, where the change happens by itself.",
+      "practiceMetadata": {
+        "categories": [
+          "change"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:acef323fc26d388b6889766c",
+          "translationID": "ku-suru-ni-suru:example:0:en",
+          "furigana": "テレビの{音|おと}を{小|ちい}さくしてください。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:81e07a25dbdefb1622c354de",
+          "translationID": "ku-suru-ni-suru:example:1:en",
+          "furigana": "お{客|きゃく}さんが{来|く}るから、{部屋|へや}をきれいにしよう。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:1462bf3b7db29612439d2430",
+          "translationID": "ku-suru-ni-suru:example:2:en",
+          "furigana": "{暑|あつ}いので、{髪|かみ}を{短|みじか}くしました。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "ga-suru",
+      "pattern": "〜がする",
+      "romaji": "ga suru",
+      "level": "N4",
+      "meaning": "(a smell, sound, taste or feeling) is perceived",
+      "formation": "Noun + がする",
+      "tags": [
+        "state",
+        "emotion"
+      ],
+      "notes": "Used with におい, 音, 声, 味 and 気 (〜気がする: 'have a feeling that').",
+      "practiceMetadata": {
+        "categories": [
+          "state",
+          "emotion"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "relations": [
+        {
+          "ruleID": "ki-ga-suru",
+          "kind": "sourceMention",
+          "explanationRU": "Конструкция прямо упомянута в исходном примечании. Связь не означает равнозначность."
+        }
+      ],
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:994773491f3b1fe7dd6f6e2d",
+          "translationID": "ga-suru:example:0:en",
+          "furigana": "{台所|だいどころ}からいいにおいがする。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:f22b367fe04e3c018d2856b7",
+          "translationID": "ga-suru:example:1:en",
+          "furigana": "{外|そと}で{変|へん}な{音|おと}がしました。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:911c4db56021d38ab61c6f35",
+          "translationID": "ga-suru:example:2:en",
+          "furigana": "このお{茶|ちゃ}は{少|すこ}し{甘|あま}い{味|あじ}がする。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "kana-kashira",
+      "pattern": "〜かな / 〜かしら",
+      "romaji": "kana / kashira",
+      "level": "N4",
+      "meaning": "I wonder",
+      "formation": "Verb-plain / i-Adj / na-Adj / Noun + かな / かしら",
+      "tags": [
+        "question",
+        "casual"
+      ],
+      "notes": "A soft question, often said to oneself. かしら sounds feminine and a little old-fashioned. 〜ないかな can express a wish (早く来ないかな).",
+      "practiceMetadata": {
+        "categories": [
+          "question",
+          "casual"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:a660be4abe67db9cc77d4677",
+          "translationID": "kana-kashira:example:0:en",
+          "furigana": "{明日|あした}は{晴|は}れるかな。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:4f123ce282d402d2f17b2d1d",
+          "translationID": "kana-kashira:example:1:en",
+          "furigana": "このお{菓子|かし}、{誰|だれ}が{買|か}ってきたのかな。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:201eb411917ffbb0bda369d9",
+          "translationID": "kana-kashira:example:2:en",
+          "furigana": "この{服|ふく}、{私|わたし}に{似合|にあ}うかしら。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "te-kuremasen-ka-te-itadakemasen-ka",
+      "pattern": "〜てくれませんか / 〜ていただけませんか",
+      "romaji": "te kuremasen ka / te itadakemasen ka",
+      "level": "N4",
+      "meaning": "could you please ...? (polite request)",
+      "formation": "Verb-te + くれませんか / Verb-te + いただけませんか",
+      "tags": [
+        "request",
+        "politeness"
+      ],
+      "notes": "Softer than 〜てください. Politeness rises from 〜てくれませんか to 〜てもらえませんか to 〜ていただけませんか.",
+      "practiceMetadata": {
+        "categories": [
+          "request",
+          "politeness"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "relations": [
+        {
+          "ruleID": "te-kudasai",
+          "kind": "sourceMention",
+          "explanationRU": "Конструкция прямо упомянута в исходном примечании. Связь не означает равнозначность."
+        }
+      ],
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:0294cf425d2bc994b4c043c9",
+          "translationID": "te-kuremasen-ka-te-itadakemasen-ka:example:0:en",
+          "furigana": "すみません、{写真|しゃしん}を{撮|と}ってくれませんか。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:224290b2bed037f82a792973",
+          "translationID": "te-kuremasen-ka-te-itadakemasen-ka:example:1:en",
+          "furigana": "この{書類|しょるい}の{書|か}き{方|かた}を{教|おし}えていただけませんか。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:7b89e83eb963d95edcd856b6",
+          "translationID": "te-kuremasen-ka-te-itadakemasen-ka:example:2:en",
+          "furigana": "もう{少|すこ}し{大|おお}きい{声|こえ}で{話|はな}していただけませんか。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    },
+    {
+      "id": "naide",
+      "pattern": "〜ないで",
+      "romaji": "naide",
+      "level": "N4",
+      "meaning": "without doing; instead of doing",
+      "formation": "Verb-nai + で",
+      "tags": [
+        "negation",
+        "manner"
+      ],
+      "notes": "〜ずに (N3) means the same but is more formal. Differs from 〜なくて, which gives a reason.",
+      "practiceMetadata": {
+        "categories": [
+          "negation",
+          "manner"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
+      "relations": [
+        {
+          "ruleID": "zu-ni",
+          "kind": "sourceMention",
+          "explanationRU": "Конструкция прямо упомянута в исходном примечании. Связь не означает равнозначность."
+        }
+      ],
+      "exampleReferences": [
+        {
+          "sentenceID": "gs:02e47b818c90f9b0b8c1c232",
+          "translationID": "naide:example:0:en",
+          "furigana": "{今朝|けさ}は{朝|あさ}ご{飯|はん}を{食|た}べないで{学校|がっこう}に{行|い}った。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:942c93e2601a41f57985487a",
+          "translationID": "naide:example:1:en",
+          "furigana": "{傘|かさ}を{持|も}たないで{出|で}かけて、{雨|あめ}にぬれてしまった。",
+          "translationRU": null
+        },
+        {
+          "sentenceID": "gs:c679a9bf81c0c283c8f7b2c1",
+          "translationID": "naide:example:2:en",
+          "furigana": "エレベーターを{使|つか}わないで、{階段|かいだん}で{上|あ}がりましょう。",
+          "translationRU": null
+        }
+      ],
+      "exerciseTemplateIDs": []
+    }
+  ]
+}

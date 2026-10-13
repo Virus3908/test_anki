@@ -1,0 +1,20 @@
+{
+  "commit": "ec0ba4a0ce1611c568b0e4f8a223eb8029249a25",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2026 Stefanus Ndaru Wedhatama",
+  "files": [
+    "tai",
+    "te-hoshii",
+    "you-ni-suru",
+    "wake-de-wa-nai",
+    "zu-ni-wa-okanai-nai-de-wa-okanai"
+  ],
+  "sha256": "ea297c29d6a1d6af7e4fdc497e7333b85455fa92f4413083daf4ffc1ee3e6aca",
+  "excluded": [
+    "JMdict",
+    "KANJIDIC2",
+    "JMnedict",
+    "word examples",
+    "KanjiVG"
+  ]
+}

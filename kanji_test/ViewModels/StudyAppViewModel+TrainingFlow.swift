@@ -30,6 +30,8 @@ extension StudyAppViewModel {
             practice(.kana(deck, deckState.previewKanaCards, guided: false))
         case .ankiDeck(let deck):
             practice(.anki(deck, ankiLibrary.previewCards, guided: false))
+        case .grammarLevel(let level), .grammarRule(let level, _):
+            startGrammar(level)
         default:
             break
         }

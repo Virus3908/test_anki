@@ -88,7 +88,7 @@ struct CustomTrainingView: View, CardContentRendering {
         case .kana:
             guard let card = session.currentKanaCard else { return nil }
             return RecallCardContent(card: card, type: session.currentCardType)
-        case .anki:
+        case .anki, .grammar:
             return nil
         }
     }
@@ -179,7 +179,7 @@ struct CustomTrainingView: View, CardContentRendering {
                     wordFullCardContent(for: card)
                 }
             }
-        case .anki:
+        case .anki, .grammar:
             EmptyView()
         }
     }
@@ -358,7 +358,7 @@ struct CustomTrainingView: View, CardContentRendering {
                     }
                 }
             }
-        case .anki:
+        case .anki, .grammar:
             EmptyView()
         }
     }
@@ -512,7 +512,7 @@ struct CustomTrainingView: View, CardContentRendering {
                 if let card = session.currentWordCard {
                     wordDrawingArea(for: card, panelHeight: panelHeight)
                 }
-            case .anki:
+            case .anki, .grammar:
                 EmptyView()
             }
         }
@@ -694,7 +694,7 @@ struct CustomTrainingView: View, CardContentRendering {
         case .kanji: if let card = session.currentKanjiCard { speech.speak(card.kanji) }
         case .kana: if let card = session.currentKanaCard { speech.speak(card.character) }
         case .words: if let card = session.currentWordCard { speech.speak(card.word) }
-        case .anki: break
+        case .anki, .grammar: break
         }
     }
 }

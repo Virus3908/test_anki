@@ -22,6 +22,7 @@ extension StudyAppViewModel {
             cardIDs = deckState.previewWordCards.filter { selection.contains($0.id) }.map(\.id)
         case .kana:
             cardIDs = deckState.previewKanaCards.filter { selection.contains($0.id) }.map(\.id)
+        case .grammar: return
         case .anki:
             // Anki preview cards are not catalog-registered like built-in decks;
             // register the chosen subset so the session can resolve them.
@@ -52,7 +53,7 @@ extension StudyAppViewModel {
         case .words: return deckState.previewWordCards.map(\.id)
         case .kana: return deckState.previewKanaCards.map(\.id)
         case .anki: return ankiLibrary.previewCards.map(\.id)
-        case nil: return []
+        case .grammar, nil: return []
         }
     }
 }

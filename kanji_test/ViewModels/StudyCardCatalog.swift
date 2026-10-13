@@ -8,6 +8,7 @@ final class StudyCardCatalog {
     private var wordsByID: [String: WordRecord] = [:]
     private var wordIDsByCharacter: [String: [String]] = [:]
     private var kanaByID: [String: KanaStudyCard] = [:]
+    private var grammarByID: [String: GrammarRule] = [:]
     private var ankiByID: [String: AnkiStudyCard] = [:]
 
     private struct WordRecord {
@@ -20,6 +21,14 @@ final class StudyCardCatalog {
 
     func kanji(_ id: String) -> KanjiCard? { kanjiByID[id] }
     func kana(_ id: String) -> KanaStudyCard? { kanaByID[id] }
+    func grammar(_ id: String) -> GrammarRule? { grammarByID[id] }
+
+    @discardableResult
+    func register(_ rules: [GrammarRule]) -> [String] {
+        for rule in rules { grammarByID[rule.id] = rule }
+        return rules.map(\.id)
+    }
+
     func anki(_ id: String) -> AnkiStudyCard? { ankiByID[id] }
 
     @discardableResult
@@ -91,5 +100,6 @@ final class StudyCardCatalog {
         wordIDsByCharacter.removeAll()
         kanaByID.removeAll()
         ankiByID.removeAll()
+        grammarByID.removeAll()
     }
 }
