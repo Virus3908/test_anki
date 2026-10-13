@@ -130,7 +130,7 @@ final class GrammarPracticeTests: XCTestCase {
             fixture(kind: .distinguishMeaning, id: "meaning")]
         let rule = original.withExercises(exercises)
         let model = GrammarPracticeViewModel(rule: rule, seed: "confident", isReview: true, previousRating: .good)
-        XCTAssertEqual(model.count, 5)
+        XCTAssertEqual(model.count, 4)
         for _ in 0..<3 { answer(model, exercise: try XCTUnwrap(model.currentExercise), correct: true); model.next() }
         XCTAssertTrue(model.isComplete); XCTAssertEqual(model.count, 3)
         XCTAssertEqual(model.proposedRating, .good)
@@ -151,6 +151,14 @@ final class GrammarPracticeTests: XCTestCase {
         XCTAssertFalse(assembly.accepts(order: ["no", "yes"]))
         XCTAssertFalse(assembly.accepts(order: ["yes", "yes"]))
     }
+    func testBundledAssemblyAcceptsEquivalentWordOrders() async throws {
+        let rule = try await loadRule("te-hoshii")
+        let exercise = try XCTUnwrap(rule.exercises?.first { $0.kind == .assembleSentence })
+        XCTAssertTrue(exercise.accepts(order: ["0", "1", "2", "3", "4"]))
+        XCTAssertTrue(exercise.accepts(order: ["1", "0", "2", "3", "4"]))
+        XCTAssertFalse(exercise.accepts(order: ["0", "1", "5", "3", "4"]))
+    }
+
     func testSaveGatePreventsDuplicateCompletionAndAllowsFailureRetry() async throws {
         let rule = try await loadRule("tai")
         let model = GrammarPracticeViewModel(rule: rule, seed: "saving")
@@ -161,6 +169,55 @@ final class GrammarPracticeTests: XCTestCase {
         XCTAssertEqual(model.beginSaving(), .good)
         model.finishSaving(success: true)
         XCTAssertNil(model.beginSaving()); XCTAssertNil(model.proposedRating)
+    }
+    func testFormInputAcceptsKanaAndKanjiAndRejectsWrongForm() async throws {
+        let rule = try await loadRule("tai")
+        let exercise = try XCTUnwrap(rule.exercises?.first { $0.id == "tai:form-eat" })
+        XCTAssertTrue(GrammarAnswerValidator.accepts("食べたい", for: exercise))
+        XCTAssertTrue(GrammarAnswerValidator.accepts(" たべたい\n", for: exercise))
+        XCTAssertFalse(GrammarAnswerValidator.accepts("食べるたい", for: exercise))
+        XCTAssertFalse(GrammarAnswerValidator.accepts("食べたいです", for: exercise))
+        XCTAssertFalse(GrammarAnswerValidator.accepts("", for: exercise))
+        let model = GrammarPracticeViewModel(rule: rule.withExercises([exercise] + (rule.exercises ?? []).filter { $0.kind != .formProduction }), seed: "input")
+        XCTAssertEqual(model.currentExercise?.kind, .formProduction)
+        model.textAnswer = "たべたい"; model.checkForm(); model.checkForm()
+        XCTAssertEqual(model.results.count, 1); XCTAssertTrue(model.results[0].isCorrect)
+        model.next(); XCTAssertEqual(model.textAnswer, "")
+    }
+    func testExplicitMetadataAndRepresentativeLessonsPreserveSourceLevels() async throws {
+        let rules = try await GrammarDataLoader.shared.allRules()
+        XCTAssertEqual(rules.filter { $0.practiceMetadata != nil }.count, 526)
+        for rule in rules {
+            let plan = try XCTUnwrap(rule.practiceMetadata)
+            XCTAssertEqual(plan.categories.map(\.rawValue), rule.tags)
+            XCTAssertEqual(plan.sourceExampleCount, rule.examples.count)
+            XCTAssertEqual(Set(plan.availableKinds), Set((rule.exercises ?? []).map(\.kind)))
+            XCTAssertFalse(plan.plannedKinds.isEmpty)
+        }
+        for id in ["tai", "te-hoshii", "you-ni-suru", "wake-de-wa-nai", "zu-ni-wa-okanai-nai-de-wa-okanai"] {
+            let rule = try await loadRule(id)
+            XCTAssertNotNil(rule.teaching); XCTAssertNotNil(rule.supplement)
+            for review in [false, true] {
+                let model = GrammarPracticeViewModel(rule: rule, seed: id, isReview: review)
+                XCTAssertEqual(model.isLessonRead, review)
+                while !model.isComplete {
+                    answer(model, exercise: try XCTUnwrap(model.currentExercise), correct: true); model.next()
+                }
+                XCTAssertEqual(model.proposedRating, .good)
+                XCTAssertLessThanOrEqual(model.count, 8)
+            }
+        }
+        let you = try await loadRule("you-ni-suru"), wake = try await loadRule("wake-de-wa-nai")
+        XCTAssertEqual(you.level, .n4); XCTAssertEqual(wake.level, .n3)
+    }
+    func testDifficultyWeightedRatingAndAssistanceAreDeterministic() {
+        let exercises = [fixture(id: "a", difficulty: 3), fixture(id: "b", difficulty: 1), fixture(id: "c", difficulty: 1)]
+        let results = [GrammarExerciseResult(exerciseID: "a", optionID: "no", isCorrect: false),
+            .init(exerciseID: "b", optionID: "yes", isCorrect: true), .init(exerciseID: "c", optionID: "yes", isCorrect: true)]
+        XCTAssertEqual(GrammarLessonRating.rating(results: results, exercises: exercises), .again)
+        XCTAssertNil(GrammarLessonRating.rating(results: results + [results[0]], exercises: exercises))
+        let helped = exercises.map { GrammarExerciseResult(exerciseID: $0.id, optionID: "yes", isCorrect: true, usedHint: true) }
+        XCTAssertEqual(GrammarLessonRating.rating(results: helped, exercises: exercises), .hard)
     }
     func testEveryRequiredApplicationKindHasOfflineMaterialAcrossAllLevels() async throws {
         let all = try await GrammarDataLoader.shared.allRules()
@@ -185,7 +242,10 @@ final class GrammarPracticeTests: XCTestCase {
         return try XCTUnwrap(value)
     }
     private func answer(_ model: GrammarPracticeViewModel, exercise: GrammarExercise, correct: Bool) {
-        if exercise.kind == .assembleSentence {
+        if exercise.kind == .formProduction {
+            model.textAnswer = correct ? exercise.correctAnswer : "неверный ответ"
+            model.checkForm()
+        } else if exercise.kind == .assembleSentence {
             let order = correct ? exercise.acceptedOrders!.first! : [exercise.options.last!.id]
             for id in order { model.toggleElement(id) }
             model.checkAssembly()

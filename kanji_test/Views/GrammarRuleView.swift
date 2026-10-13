@@ -121,10 +121,25 @@ struct GrammarLessonContent: View {
                     ForEach(localized.typicalErrorsRU, id: \.self) { Text($0) }
                 }
             }
+            if let supplement = rule.supplement {
+                DisclosureGroup("Дополнительный материал Nihongo Mono") {
+                    Text(supplement.summary).font(.callout)
+                    ForEach(supplement.structure, id: \.self) { Text($0).font(.callout) }
+                    ForEach(supplement.pitfalls, id: \.self) { Text($0).font(.callout) }
+                    ForEach(Array(supplement.examples.enumerated()), id: \.offset) { _, example in
+                        Text(example.ja).font(.title3).fixedSize(horizontal: false, vertical: true)
+                        Text(example.en).font(.callout).foregroundStyle(AppPalette.secondaryText)
+                    }
+                }
+            }
             DisclosureGroup("Источник и лицензия") {
                 Link("OpenJLPT · CC BY-SA 4.0", destination: URL(string: "https://github.com/evanclan/OpenJLPT")!)
                 Text("OpenJLPT contributors, Evan Clan. Исходные материалы и адаптации: CC BY-SA 4.0. Добавлены учебные ситуации и русские пояснения.").font(.caption)
                 Link("Условия лицензии", destination: URL(string: "https://creativecommons.org/licenses/by-sa/4.0/")!)
+                if rule.supplement != nil {
+                    Link("Nihongo Mono · MIT", destination: URL(string: "https://github.com/stndaru/nihongo-mono/blob/ec0ba4a0ce1611c568b0e4f8a223eb8029249a25/LICENSE-DATA.md")!)
+                    Text("Оригинальные дополнительные материалы: © 2026 Stefanus Ndaru Wedhatama. MIT. Английский оригинал доступен офлайн.").font(.caption)
+                }
                 Text("Уровни JLPT — неофициальная классификация. Учебные адаптации требуют лингвистического ревью.").font(.caption)
             }
         }

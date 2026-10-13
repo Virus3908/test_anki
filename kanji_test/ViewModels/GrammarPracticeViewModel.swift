@@ -21,6 +21,7 @@ final class GrammarPracticeViewModel {
     private(set) var position = 0
     private(set) var selectedOptionID: String?
     private(set) var selectedElements: [String] = []
+    var textAnswer = ""
     private(set) var isAnswerVisible = false
     private(set) var usedHint = false
     private(set) var results: [GrammarExerciseResult] = []
@@ -31,51 +32,15 @@ final class GrammarPracticeViewModel {
     private var reserve: [GrammarExercise]
     private var remediationCount = 0
     private let previousRating: ReviewRating?
-    static let maximumCount = 8
+    static let maximumCount = GrammarExerciseEngine.maximumCount
 
     init(rule: GrammarRule, seed: String, freePractice: Bool = false, isReview: Bool = false, attempt: Int = 0,
          previousRating: ReviewRating? = nil) {
         self.rule = rule; self.seed = seed; self.attempt = attempt
         isFreePractice = freePractice; self.isReview = isReview; isLessonRead = isReview
         self.previousRating = previousRating
-        var seen = Set<String>()
-        let available = GrammarExerciseSelection.ordered(rule.exercises ?? [], seed: seed).filter {
-            $0.isUsable(for: rule.id) && $0.eligibleForPractice
-                && seen.insert($0.promptRU + "\n" + ($0.japanese ?? "")).inserted
-        }
-        let complexity = min(3, max(1, rule.teaching?.complexity ?? 2))
-        let target = isReview ? min(5, 2 + complexity + (previousRating == .again ? 1 : 0)) : min(6, 3 + complexity)
-        // First encounter scaffolds formation before independent application.
-        // Reviews rotate within comparable difficulty, starting at the learner's level.
-        let ordered = available.enumerated().sorted { a, b in
-            let preferred = isReview ? min(3, 1 + attempt / 2) : 1
-            let da = abs(a.element.difficulty - preferred)
-            let db = abs(b.element.difficulty - preferred)
-            if da != db { return da < db }
-            if !isReview {
-                let pa = Self.stage(a.element.kind), pb = Self.stage(b.element.kind)
-                if pa != pb { return pa < pb }
-            }
-            return a.offset < b.offset
-        }.map(\.element)
-        // Keep more than one skill in the initial lesson, even with easy formation tasks.
-        var initial: [GrammarExercise] = []
-        let independent: [GrammarExerciseKind] = [.understandSentence, .correctError, .distinguishMeaning]
-        let kinds: [GrammarExerciseKind] = isReview
-            ? GrammarExerciseSelection.ordered([.fillBlank, .chooseContext, .transformSentence, .assembleSentence] + independent, seed: seed + "skills")
-            : [.fillBlank, .chooseContext, .transformSentence, .assembleSentence]
-                + GrammarExerciseSelection.ordered(independent, seed: seed + "skills")
-        for kind in kinds {
-            if let exercise = ordered.first(where: { $0.kind == kind }), initial.count < target {
-                initial.append(exercise)
-            }
-        }
-        for exercise in ordered where initial.count < target && !initial.contains(where: { $0.id == exercise.id }) {
-            initial.append(exercise)
-        }
-        exercises = initial.sorted { Self.stage($0.kind) < Self.stage($1.kind) }
-        let selected = Set(initial.map(\.id))
-        reserve = ordered.filter { !selected.contains($0.id) }
+        let plan = GrammarExerciseEngine.plan(rule: rule, seed: seed, isReview: isReview, attempt: attempt, previousRating: previousRating)
+        exercises = plan.exercises; reserve = plan.reserve
         let example = rule.examples.first ?? GrammarExample(ja: "", en: "", furigana: nil, ru: nil)
         recallPrompts = [
             RecallPrompt(id: "\(rule.id):meaning", question: "Объясни смысл в контексте.", cue: rule.pattern, sourceAnswer: rule.displayedMeaning),
@@ -84,16 +49,6 @@ final class GrammarPracticeViewModel {
         ]
     }
 
-    private static func stage(_ kind: GrammarExerciseKind) -> Int {
-        switch kind {
-        case .fillBlank: 0
-        case .chooseContext, .understandSentence: 1
-        case .transformSentence: 2
-        case .assembleSentence: 3
-        case .correctError, .distinguishMeaning: 4
-        default: 5
-        }
-    }
     var isSelfAssessment: Bool { isFreePractice }
     var contentError: String? {
         !isFreePractice && exercises.count < 3 ? "Практика для этого правила ещё готовится. Все объяснения и примеры доступны." : nil
@@ -101,7 +56,7 @@ final class GrammarPracticeViewModel {
     var correctCount: Int { results.filter(\.isCorrect).count }
     var proposedRating: ReviewRating? {
         isComplete && !isSelfAssessment && !isClosed && !isSaved
-            ? GrammarLessonRating.rating(correct: correctCount, total: count, hints: results.filter(\.usedHint).count) : nil
+            ? GrammarLessonRating.rating(results: results, exercises: exercises) : nil
     }
     var weakAspects: [String] {
         var seen = Set<String>()
@@ -148,6 +103,11 @@ final class GrammarPracticeViewModel {
               exercise.kind == .assembleSentence, !selectedElements.isEmpty else { return }
         record(correct: exercise.accepts(order: selectedElements), answer: selectedElements.joined(separator: "|"))
     }
+    func checkForm() {
+        guard !isClosed, !isAnswerVisible, contentError == nil, let exercise = currentExercise,
+              exercise.kind == .formProduction, !textAnswer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        record(correct: GrammarAnswerValidator.accepts(textAnswer, for: exercise), answer: textAnswer)
+    }
     private func record(correct: Bool, answer: String) {
         guard let exercise = currentExercise else { return }
         isAnswerVisible = true
@@ -161,7 +121,7 @@ final class GrammarPracticeViewModel {
         if isReview, previousRating != .again, results.count >= 3,
            results.allSatisfy({ $0.isCorrect && !$0.usedHint }) {
             let answered = Set(results.compactMap { result in exercises.first { $0.id == result.exerciseID }?.kind })
-            let formation = !answered.isDisjoint(with: [.fillBlank, .transformSentence, .correctError])
+            let formation = !answered.isDisjoint(with: [.formProduction, .fillBlank, .transformSentence, .correctError])
             let context = !answered.isDisjoint(with: [.chooseContext, .understandSentence, .distinguishMeaning])
             let application = !answered.isDisjoint(with: [.transformSentence, .assembleSentence])
             if formation && context && application { exercises = Array(exercises.prefix(position + 1)) }
@@ -170,6 +130,6 @@ final class GrammarPracticeViewModel {
     func reveal() { guard !isClosed, isSelfAssessment, !isComplete else { return }; isAnswerVisible = true }
     func next() {
         guard !isClosed, contentError == nil, isAnswerVisible, !isComplete else { return }
-        position += 1; selectedOptionID = nil; selectedElements = []; isAnswerVisible = false; usedHint = false
+        position += 1; selectedOptionID = nil; selectedElements = []; textAnswer = ""; isAnswerVisible = false; usedHint = false
     }
 }

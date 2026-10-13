@@ -8,7 +8,7 @@ import json
 from functools import lru_cache
 
 COMMIT = '0d1d3410bec90bd4098a7c72de820543cb4f707c'
-KIND_NAMES = ('fillBlank', 'transformSentence', 'assembleSentence', 'chooseContext',
+KIND_NAMES = ('formProduction', 'fillBlank', 'transformSentence', 'assembleSentence', 'chooseContext',
               'correctError', 'distinguishMeaning', 'understandSentence')
 
 
@@ -29,5 +29,13 @@ def authored(rule, all_rules):
                                  'exampleIndex': None, 'method': 'explicit-context-authoring-v2',
                                  'status': 'automaticallyChecked'})
         value.pop('slug')
+        value['competency'] = {'formProduction': 'formation', 'fillBlank': 'formation',
+            'transformSentence': 'application', 'assembleSentence': 'application',
+            'chooseContext': 'context', 'correctError': 'correction',
+            'distinguishMeaning': 'contrast', 'understandSentence': 'meaning'}[value['kind']]
+        # Algorithm checking verifies the keyed surface only, not the context or distractors.
+        if value.get('conjugation'):
+            value['provenance']['status'] = 'algorithmicallyChecked'
+            value['provenance']['method'] = 'explicit-verb-class-conjugation-v1; context-needs-linguistic-review'
         result.append(value)
     return result

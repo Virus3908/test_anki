@@ -40,9 +40,12 @@ final class GrammarDataTests: XCTestCase {
             XCTAssertTrue(rule.examples.allSatisfy { $0.ru == nil })
             let practice = GrammarPracticeViewModel(rule: rule, seed: "source-only")
             XCTAssertFalse(practice.isSelfAssessment)
-            XCTAssertEqual(rule.exercises?.count ?? 0, rule.teaching == nil ? 0 : 8)
+            if rule.teaching == nil { XCTAssertEqual(rule.exercises?.count ?? 0, 0) }
+            else { XCTAssertGreaterThanOrEqual(rule.exercises?.count ?? 0, 8) }
             if rule.teaching != nil { XCTAssertGreaterThanOrEqual(Set((rule.exercises ?? []).map(\.kind)).count, 2) }
-            XCTAssertTrue((rule.exercises ?? []).allSatisfy { $0.provenance?.status == .automaticallyChecked && $0.reviewer == nil })
+            XCTAssertTrue((rule.exercises ?? []).allSatisfy { exercise in
+                (exercise.provenance?.status == .automaticallyChecked || exercise.provenance?.status == .algorithmicallyChecked) && exercise.reviewer == nil
+            })
         }
     }
 

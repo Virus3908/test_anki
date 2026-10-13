@@ -48,6 +48,8 @@ nonisolated struct GrammarRule: Identifiable, Codable, Sendable, StudyItem {
     let exercises: [GrammarExercise]?
     let relations: [GrammarRelation]?
     var teaching: GrammarTeaching? = nil
+    var practiceMetadata: GrammarPracticeMetadata? = nil
+    var supplement: GrammarSupplement? = nil
 
     var reviewKey: String { "grammar:\(id)" }
     var categories: [GrammarCategory] { tags.compactMap(GrammarCategory.init(rawValue:)) }
@@ -58,7 +60,7 @@ nonisolated struct GrammarRule: Identifiable, Codable, Sendable, StudyItem {
     func withExercises(_ value: [GrammarExercise]?) -> GrammarRule {
         GrammarRule(id: id, level: level, pattern: pattern, reading: reading, romaji: romaji,
             meaning: meaning, formation: formation, notes: notes, examples: examples, tags: tags,
-            localization: localization, exercises: value, relations: relations, teaching: teaching)
+            localization: localization, exercises: value, relations: relations, teaching: teaching, practiceMetadata: practiceMetadata, supplement: supplement)
     }
 }
 
@@ -80,6 +82,8 @@ extension GrammarRule {
         localization = try values.decodeIfPresent(GrammarLocalization.self, forKey: .localization)
         relations = try values.decodeIfPresent([GrammarRelation].self, forKey: .relations)
         teaching = try values.decodeIfPresent(GrammarTeaching.self, forKey: .teaching)
+        practiceMetadata = try values.decodeIfPresent(GrammarPracticeMetadata.self, forKey: .practiceMetadata)
+        supplement = try values.decodeIfPresent(GrammarSupplement.self, forKey: .supplement)
         let decoded = try? values.decodeIfPresent([GrammarExercise].self, forKey: .exercises)
         if let decoded, decoded.allSatisfy({ $0.isUsable(for: decodedID) }),
            Set(decoded.map(\.id)).count == decoded.count { exercises = decoded }

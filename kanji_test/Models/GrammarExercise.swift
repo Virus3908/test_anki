@@ -1,10 +1,11 @@
 import Foundation
 
 nonisolated enum GrammarExerciseKind: String, Codable, Sendable, CaseIterable {
-    case chooseConstruction, fillBlank, identifyConstruction, chooseCorrectSentence, transformSentence
+    case formProduction, chooseConstruction, fillBlank, identifyConstruction, chooseCorrectSentence, transformSentence
     case assembleSentence, chooseContext, correctError, distinguishMeaning, understandSentence
     var title: String {
         switch self {
+        case .formProduction: "Образование формы"
         case .chooseConstruction: "Выбор конструкции"
         case .fillBlank: "Заполнение пропуска"
         case .identifyConstruction: "Определение конструкции"
@@ -43,9 +44,16 @@ nonisolated struct GrammarExercise: Identifiable, Codable, Sendable {
     var acceptedOrders: [[String]]? = nil
     /// Explicit editorial eligibility, independent of provenance/reviewer status.
     var isScored: Bool? = nil
+    var conjugation: ConjugationTask? = nil
+    var competency: GrammarCompetency? = nil
+
+    struct ConjugationTask: Codable, Sendable {
+        let verb: GrammarConjugationEngine.Verb
+        let form: GrammarConjugationEngine.Form
+    }
 
     struct Provenance: Codable, Sendable {
-        enum Status: String, Codable, Sendable { case draft, automaticallyChecked, linguisticallyReviewed }
+        enum Status: String, Codable, Sendable { case draft, automaticallyChecked, structurallyChecked, algorithmicallyChecked, linguisticallyReviewed }
         let commit: String
         let sourceRuleID: String
         let exampleIndex: Int?
@@ -85,12 +93,19 @@ nonisolated struct GrammarExercise: Identifiable, Codable, Sendable {
             && options.count >= 2 && ids.count == options.count
             && options.allSatisfy { !$0.id.isEmpty && !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
             && Set(options.map { $0.text.trimmingCharacters(in: .whitespacesAndNewlines) }).count == options.count
-            && validAnswers
+            && (1...3).contains(difficulty) && validAnswers && validConjugation
+    }
+
+    var validConjugation: Bool {
+        guard let conjugation else { return kind != .formProduction }
+        guard let answer = GrammarConjugationEngine.conjugate(conjugation.verb, to: conjugation.form) else { return false }
+        let accepted = options.filter { acceptedOptionIDs.contains($0.id) }.map(\.text)
+        return !accepted.isEmpty && accepted.allSatisfy { $0 == answer.text || $0 == answer.reading }
     }
 
     var eligibleForPractice: Bool {
         isScored == true && kind != .chooseConstruction && kind != .identifyConstruction
-            && (provenance?.status == .automaticallyChecked || provenance?.status == .linguisticallyReviewed)
+            && ([Provenance.Status.automaticallyChecked, .structurallyChecked, .algorithmicallyChecked, .linguisticallyReviewed].contains { $0 == provenance?.status })
     }
     func accepts(order: [String]) -> Bool { acceptedOrders?.contains(order) == true }
     var correctAnswer: String {

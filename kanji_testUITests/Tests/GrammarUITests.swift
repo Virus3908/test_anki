@@ -78,6 +78,28 @@ final class GrammarUITests: UITestCase {
         element("grammar.related.katawara").tap()
         XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "〜かたわら")).firstMatch.waitForExistence(timeout: 5))
     }
+    func testIndependentFormInputAndWrongAnswerExplanation() {
+        launch()
+        tap(ID.Start.search, .openSearch, expecting: ID.Search.field)
+        element(ID.Search.field).tap()
+        element(ID.Search.field).typeText("tai")
+        let rule = element("grammar.searchResult.tai")
+        XCTAssertTrue(rule.waitForExistence(timeout: 15)); rule.tap()
+        XCTAssertTrue(element("grammar.lesson.title").waitForExistence(timeout: 5))
+        capture("11-tai-short-explanation")
+        tap("grammar.practice", .startTraining, expecting: "grammar.training.begin")
+        tap("grammar.training.begin", .startTraining, expecting: "grammar.form.answer")
+        capture("12-independent-conjugation")
+        let field = element("grammar.form.answer")
+        field.tap(); field.typeText("wrong")
+        tap("grammar.training.next", .revealCard, expecting: "grammar.training.feedback")
+        XCTAssertTrue(app.staticTexts["Есть ошибка"].exists)
+        capture("13-conjugation-error-explanation")
+        tap("grammar.training.theory", .openDeck, expecting: "grammar.lesson.title")
+        app.buttons["Закрыть"].tap()
+        XCTAssertTrue(element("grammar.training.feedback").waitForExistence(timeout: 5))
+        XCTAssertEqual(element("grammar.form.answer").value as? String, "wrong")
+    }
 
     private func openGrammar() {
         for _ in 0..<5 where !element("start.section.grammar").isHittable {

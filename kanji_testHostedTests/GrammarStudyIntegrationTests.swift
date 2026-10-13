@@ -225,6 +225,50 @@ final class GrammarStudyIntegrationTests: XCTestCase {
         model.invalidateSearch()
         XCTAssertTrue(model.results.isEmpty)
     }
+    func testFiveRepresentativeLessonsCreateOneFSRSReviewAndRestoreWithUndo() async throws {
+        for id in ["tai", "te-hoshii", "you-ni-suru", "wake-de-wa-nai", "zu-ni-wa-okanai-nai-de-wa-okanai"] {
+            let repository = GrammarMemoryReviews()
+            let suite = "GrammarComplete-\(UUID().uuidString)"
+            let defaults = UserDefaults(suiteName: suite)!
+            defer { defaults.removePersistentDomain(forName: suite) }
+            let errors = StorageStatus()
+            let settings = StudyPreferences(defaults: defaults, errors: errors)
+            let catalog = StudyCardCatalog()
+            let session = TrainingSessionViewModel(repository: repository, catalog: catalog, settings: settings, errors: errors)
+            let loaded = try await GrammarDataLoader.shared.rule(id)
+            let rule = try XCTUnwrap(loaded)
+            try await session.loadProgress()
+            let started = await session.start(deck: rule.level.deck, sourceIDs: catalog.register([rule]))
+            XCTAssertTrue(started)
+            let model = session.practice(for: rule)
+            model.isLessonRead = true
+            while !model.isComplete {
+                let exercise = try XCTUnwrap(model.currentExercise)
+                if exercise.kind == .formProduction { model.textAnswer = exercise.correctAnswer; model.checkForm() }
+                else if exercise.kind == .assembleSentence {
+                    for element in try XCTUnwrap(exercise.acceptedOrders?.first) { model.toggleElement(element) }
+                    model.checkAssembly()
+                } else { model.choose(try XCTUnwrap(exercise.acceptedOptionIDs.first)) }
+                XCTAssertTrue(session.reviewStore.reviewLog.isEmpty)
+                model.next()
+            }
+            let rating = try XCTUnwrap(model.beginSaving())
+            await session.submitReview(rating, expectedKey: rule.reviewKey, holdGrammarResult: true)
+            model.finishSaving(success: session.isGrammarResultPending)
+            XCTAssertNil(model.beginSaving())
+            XCTAssertEqual(session.reviewStore.reviewLog.count, 1)
+            XCTAssertEqual(session.reviewStore.record(for: rule.reviewKey)?.schedulerVersion, "fsrs-6")
+            let restarted = TrainingSessionViewModel(repository: repository, catalog: catalog, settings: settings, errors: errors)
+            try await restarted.loadProgress()
+            XCTAssertEqual(restarted.reviewStore.reviewLog.count, 1)
+            let resumed = await restarted.start(deck: rule.level.deck, sourceIDs: catalog.register([rule]))
+            XCTAssertTrue(resumed)
+            XCTAssertTrue(restarted.practice(for: rule).isLessonRead)
+            await session.moveToPreviousCard()
+            XCTAssertNil(session.reviewStore.record(for: rule.reviewKey))
+            XCTAssertTrue(session.reviewStore.reviewLog.isEmpty)
+        }
+    }
 }
 
 private actor GrammarMemoryReviews: ReviewPersisting {

@@ -45,6 +45,23 @@
       ],
       "notes": "Formal; for special, one-off occasions (ceremonies, departures, contracts). Near-synonym of 〜にあたって, which adds a sense of preparing for or facing the event; に際して simply marks the occasion.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "time",
+          "formal"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "ni-atatte",
@@ -85,6 +102,24 @@
       ],
       "notes": "〜に伴い is the more written form. Like 〜につれて it can describe gradual change, but it also covers one-off events that bring about another (e.g. a relocation).",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "change",
+          "simultaneity",
+          "formal"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "ni-tsurete",
@@ -123,7 +158,28 @@
         "condition"
       ],
       "notes": "B is adjusted to match A (ability, budget, season, requests). Compare 〜次第で, which stresses that the outcome is decided entirely by A.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "relation",
+          "condition"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "ni-hanshite",
@@ -155,7 +211,24 @@
         "formal"
       ],
       "notes": "Used with nouns like 予想, 期待, 意思, 規則. With a rule or law as the noun, it means 'in violation of'.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "contrast",
+          "formal"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "ni-motozuite",
@@ -188,6 +261,23 @@
       ],
       "notes": "The basis is a firm standard such as data, law, facts or experience, and B follows it closely. Compare 〜をもとに, used for material from which something new is created.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "relation",
+          "formal"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "o-moto-ni",
@@ -226,7 +316,25 @@
         "formal"
       ],
       "notes": "Stresses the full extent of a long period, a wide area or many items (多岐にわたる). Not used for short or small spans.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "time",
+          "range",
+          "formal"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "ni-sotte",
@@ -258,7 +366,24 @@
         "manner"
       ],
       "notes": "Literal use: along a road, river or coast. Abstract use: following a plan, policy, or someone's wishes.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "relation",
+          "manner"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "ni-kuwaete",
@@ -285,7 +410,24 @@
         "formal"
       ],
       "notes": "Somewhat formal; 〜に加え is the written form. The added item is often marked with も.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "addition",
+          "formal"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "o-megutte",
@@ -317,6 +459,23 @@
       ],
       "notes": "The verb that follows is about debate, conflict or competition (議論する, 対立する, 争う). Unlike 〜について, it isn't used for simply explaining a topic.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "topic",
+          "relation"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "ni-tsuite",
@@ -355,7 +514,24 @@
         "time"
       ],
       "notes": "Largely interchangeable. 〜を通して tends to stress a deliberate process or experience; 〜を通じて is a little more formal and common with media, contacts and periods (一年を通じて).",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "means",
+          "time"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "o-kikkake-ni",
@@ -381,7 +557,24 @@
         "change"
       ],
       "notes": "Marks an event that led to a new start or change. The formal equivalent 〜を契機に is common in writing.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "reason",
+          "change"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "o-nozoite",
@@ -413,7 +606,24 @@
         "formal"
       ],
       "notes": "More formal than 〜以外. 〜を除き is the written form.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "exclusion",
+          "formal"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "ka-no-you-da",
@@ -445,6 +655,23 @@
       ],
       "notes": "More literary than 〜ようだ and clearly signals that the comparison is not literally true. Often paired with まるで. Also 〜かのように / 〜かのような.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "appearance",
+          "written"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "you-da",
@@ -483,6 +710,23 @@
       ],
       "notes": "Only for undesirable outcomes. Despite the ない, the meaning is positive: 'there's a real risk that ...'. Don't confuse with 〜かねる (cannot).",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "possibility",
+          "conjecture"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "kaneru",
@@ -521,7 +765,25 @@
         "formal"
       ],
       "notes": "A soft, formal way to decline, very common in customer service. It expresses reluctance or difficulty for the speaker, not physical inability.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "ability",
+          "politeness",
+          "formal"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "zu-ni-wa-irarenai",
@@ -553,6 +815,23 @@
       ],
       "notes": "する becomes せずにはいられない. 〜ないではいられない is a slightly more conversational equivalent. An inner urge, unlike 〜ざるを得ない (forced by circumstances).",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "emotion",
+          "emphasis"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "zaru-o-enai",
@@ -592,6 +871,27 @@
       ],
       "notes": "Circumstances force an action the speaker doesn't really want to take. する becomes せざるを得ない. More formal than 〜しかない.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "obligation",
+          "formal"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "shika-nai-no-choice",
@@ -624,7 +924,28 @@
         "necessity"
       ],
       "notes": "The situation doesn't allow one to stay in state A, so one feels pushed to act. Casual: 〜ちゃいられない / 〜てらんない.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "negation",
+          "necessity"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "mono-ka",
@@ -656,7 +977,29 @@
         "emotion"
       ],
       "notes": "Strong emotional denial or refusal; not a real question. Conversational form: 〜もんか; polite/feminine: 〜ものですか.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "negation",
+          "emphasis",
+          "emotion"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "mono-no",
@@ -725,7 +1068,8 @@
             "exampleIndex": null,
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
-          }
+          },
+          "competency": "formation"
         },
         {
           "kind": "chooseContext",
@@ -764,7 +1108,8 @@
             "exampleIndex": null,
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
-          }
+          },
+          "competency": "context"
         },
         {
           "kind": "transformSentence",
@@ -803,7 +1148,8 @@
             "exampleIndex": null,
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
-          }
+          },
+          "competency": "application"
         },
         {
           "kind": "assembleSentence",
@@ -857,7 +1203,8 @@
             "exampleIndex": null,
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
-          }
+          },
+          "competency": "application"
         },
         {
           "kind": "correctError",
@@ -896,11 +1243,12 @@
             "exampleIndex": null,
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
-          }
+          },
+          "competency": "correction"
         },
         {
           "kind": "distinguishMeaning",
-          "promptRU": "Вырази неожиданный результат: старался, но проиграл. から сообщает причину, ものの — уступку.",
+          "promptRU": "Вырази неожиданный результат: я старался, но проиграл.",
           "japanese": null,
           "options": [
             {
@@ -935,7 +1283,8 @@
             "exampleIndex": null,
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
-          }
+          },
+          "competency": "contrast"
         },
         {
           "kind": "understandSentence",
@@ -974,7 +1323,8 @@
             "exampleIndex": null,
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
-          }
+          },
+          "competency": "meaning"
         },
         {
           "kind": "fillBlank",
@@ -1013,9 +1363,39 @@
             "exampleIndex": null,
             "method": "explicit-context-authoring-v2",
             "status": "automaticallyChecked"
-          }
+          },
+          "competency": "formation"
         }
       ],
+      "practiceMetadata": {
+        "categories": [
+          "concession",
+          "written"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "assembleSentence",
+          "correctError"
+        ],
+        "availableKinds": [
+          "fillBlank",
+          "chooseContext",
+          "transformSentence",
+          "assembleSentence",
+          "correctError",
+          "distinguishMeaning",
+          "understandSentence"
+        ],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "authoredNeedsReview",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Материал составлен автором и требует лингвистической проверки."
+      },
       "teaching": {
         "meaningRU": "Хотя…, ожидаемый результат не наступил",
         "usageRU": "Признаёшь первый факт, затем сообщаешь результат вопреки ожиданию.",
@@ -1076,6 +1456,27 @@
       ],
       "notes": "For something hard or impossible to do; the main clause is often 〜たい or a challenge. Don't confuse with N1 〜(よ)うものなら ('if one dared to ..., something bad would happen').",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "condition",
+          "wish"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "tai",
@@ -1109,6 +1510,27 @@
       ],
       "notes": "A is something the speaker strongly dislikes; B is the lesser evil or better choice, often with 〜ほうがいい / 〜ほうがましだ.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "comparison",
+          "condition"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "hou-ga-ii",
@@ -1146,7 +1568,24 @@
         "emphasis"
       ],
       "notes": "Expresses the speaker's strong impression of a quality sensed in something. It's an evaluation, not a statement about literal existence.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "emotion",
+          "emphasis"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "koto-ka",
@@ -1178,7 +1617,25 @@
         "emphasis"
       ],
       "notes": "Usually paired with どんなに, どれほど, 何度, etc. Not a real question; it conveys deep feeling. Slightly written or dramatic in tone.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "exclamation",
+          "emotion",
+          "emphasis"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "koto-ni-wa",
@@ -1209,7 +1666,24 @@
         "written"
       ],
       "notes": "An emotion word (驚いた, 残念な, うれしい, 不思議な) states the speaker's feeling before giving the fact. Fairly written.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "emotion",
+          "written"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "koto-dakara",
@@ -1235,7 +1709,24 @@
         "conjecture"
       ],
       "notes": "From what the speaker knows of a person's character, it leads to a guess about their behavior. Usually followed by だろう, きっと or に違いない.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "reason",
+          "conjecture"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "koto-naku",
@@ -1263,6 +1754,28 @@
       ],
       "notes": "A written equivalent of 〜ないで / 〜ずに, often implying that something one might expect to happen did not.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "negation",
+          "manner",
+          "written"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "naide",
@@ -1300,7 +1813,24 @@
         "written"
       ],
       "notes": "Gives the evidence or origin behind a name, judgment or conclusion. Common in explanations of place names and in reports.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "reason",
+          "written"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "nai-koto-ni-wa",
@@ -1326,7 +1856,28 @@
         "negation"
       ],
       "notes": "The main clause is negative (分からない, できない, 始まらない): without A, B can't happen. More emphatic than 〜なければ.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "condition",
+          "negation"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "koto-wa-ga",
@@ -1357,7 +1908,24 @@
         "emphasis"
       ],
       "notes": "The same word is repeated to admit something only partly before adding a reservation. けど replaces が in speech.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "concession",
+          "emphasis"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "ageku",
@@ -1388,7 +1956,24 @@
         "sequence"
       ],
       "notes": "The result is usually negative or disappointing. 〜末(に) is neutral and can end well; あげく stresses frustration. あげくの果てに is an intensified form.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "result",
+          "sequence"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "amari-ni",
@@ -1420,7 +2005,25 @@
         "emotion"
       ],
       "notes": "An extreme degree of a feeling or state leads to an unusual, often unwanted result. Mostly with emotion nouns (緊張, 心配, 驚き, 悲しみ).",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "degree",
+          "result",
+          "emotion"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "ue-ni",
@@ -1451,7 +2054,23 @@
         "addition"
       ],
       "notes": "Adds a second point of the same kind (good + good, bad + bad). に may be dropped in writing. It isn't normally followed by a command or request.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "addition"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "ue-de",
@@ -1483,7 +2102,24 @@
         "standpoint"
       ],
       "notes": "Verb-ta + 上で: do A first, then B on that basis. Verb-dict + 上で: 'in the process of / for the purpose of A'. Business writing often shortens it to ご確認の上.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "sequence",
+          "standpoint"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "ijou-wa",
@@ -1516,6 +2152,27 @@
       ],
       "notes": "From a given situation, draws an obligation, resolve or firm judgment. Near-synonym of 〜からには; 以上は sounds more formal and logical, からには more like personal resolve.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "reason",
+          "obligation"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "kara-ni-wa",
@@ -1549,6 +2206,27 @@
       ],
       "notes": "Expresses resolve: having reached this situation, one should see it through. Often ends with 〜たい, 〜つもりだ, 〜なければならない. Compare 〜以上(は), which is more formal and neutral.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "reason",
+          "intention"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "tai",
@@ -1586,7 +2264,24 @@
         "emphasis"
       ],
       "notes": "Stresses that this reason, and no other, is the real one, often a reason the listener wouldn't expect. Frequently ends with 〜のだ.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "reason",
+          "emphasis"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "kara-shite",
@@ -1617,7 +2312,24 @@
         "emphasis"
       ],
       "notes": "Two uses: 'judging from X' (basis for a guess), and 'even X, let alone the rest', where one example stands for the whole, often critically.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "standpoint",
+          "emphasis"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "kara-suru-to-kara-sureba",
@@ -1643,7 +2355,24 @@
         "conjecture"
       ],
       "notes": "Gives either the evidence for a judgment or the viewpoint of a person. Close to 〜から見ると; unlike 〜からいうと, it can take a person.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "standpoint",
+          "conjecture"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "kara-miru-to-kara-mireba",
@@ -1669,7 +2398,23 @@
         "standpoint"
       ],
       "notes": "Looks at something from a person's position or from given evidence. 〜から見て and 〜から見ても are also common.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "standpoint"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "kara-iu-to-kara-itte",
@@ -1694,7 +2439,23 @@
         "standpoint"
       ],
       "notes": "The noun is a criterion or viewpoint (立場, 経験, 値段), not a person: say 親からすると, not ×親からいうと. 〜からいえば is also used.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "standpoint"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "sai-ni",
@@ -1727,6 +2488,23 @@
       ],
       "notes": "A formal version of 〜とき, common in announcements and instructions. Unlike 〜に際して, it's fine for everyday occasions.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "time",
+          "formal"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "toki",
@@ -1771,7 +2549,25 @@
         "formal"
       ],
       "notes": "Formal, for a planned future action that follows right after A (contacting, starting). Not used when the main clause is in the past. Compare 〜次第で (depending on).",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "time",
+          "sequence",
+          "formal"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "shidai-da-shidai-de",
@@ -1803,7 +2599,28 @@
         "relation"
       ],
       "notes": "The outcome is decided by A. 〜次第では points to one possible outcome among several.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "condition",
+          "relation"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "sue-ni",
@@ -1837,6 +2654,24 @@
       ],
       "notes": "Neutral: the outcome may be good or bad and is often a decision or conclusion. Use 〜あげく when the result is negative or frustrating.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "result",
+          "sequence",
+          "written"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "ageku",
@@ -1875,6 +2710,27 @@
       ],
       "notes": "The main clause says the effort is useless or the result wouldn't matter much. Often with いくら, どんなに, 今さら. Different from 〜たところ (when I did, I found).",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "concession",
+          "condition"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "ta-tokoro",
@@ -1908,6 +2764,23 @@
       ],
       "notes": "Reports what turned out after an action, often a discovery. The result is a past fact beyond the speaker's control. More formal than 〜たら.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "sequence",
+          "result"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "tara",
@@ -1946,6 +2819,23 @@
       ],
       "notes": "Stronger than 〜だけでなく; the second item is often more surprising and marked by も, まで or さえ. Unlike 〜だけでなく, it isn't followed by commands or requests.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "addition",
+          "emphasis"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "dake-de-naku",
@@ -1984,7 +2874,25 @@
         "result"
       ],
       "notes": "The main clause is an unwanted result, often with regret. The set form 〜たいばかりに ('just because one wanted to') explains a strong motive.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "reason",
+          "regret",
+          "result"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "bakari-da",
@@ -2011,6 +2919,23 @@
       ],
       "notes": "Change continuing in one direction, almost always for the worse. 〜一方だ (N3) is similar but can also describe neutral or good trends.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "change",
+          "tendency"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "ippou-da",
@@ -2048,7 +2973,24 @@
         "emphasis"
       ],
       "notes": "A is the obvious case; B is added with も or まで. 〜はもとより is more formal and written than 〜はもちろん.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "addition",
+          "emphasis"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "wa-tomokaku",
@@ -2075,6 +3017,23 @@
       ],
       "notes": "Sets A aside to focus on B, which the speaker sees as more important. Compare 〜はさておき, used more to shelve a topic for now and move on.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "contrast",
+          "topic"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "wa-sateoki",
@@ -2108,6 +3067,23 @@
       ],
       "notes": "Often used to switch to the main point, as in 冗談はさておき or それはさておき. Slightly more formal than 〜はともかく.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "topic",
+          "contrast"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "wa-tomokaku",
@@ -2146,6 +3122,22 @@
       ],
       "notes": "Presents two opposite sides of the same thing. 〜一方で (N3) is broader and can also contrast two different things.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "contrast"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "ippou-de",
@@ -2183,7 +3175,24 @@
         "written"
       ],
       "notes": "Not the 'while doing' ながら: the subject is in state A, yet B is true. Set phrases: 残念ながら, 知りながら, 及ばずながら.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "concession",
+          "written"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "tsutsu-tsutsu-mo",
@@ -2215,7 +3224,25 @@
         "written"
       ],
       "notes": "つつ alone is a written 〜ながら (two actions at once). つつも means 'although', typically with verbs of knowing or thinking (思いつつ, 知りつつ).",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "simultaneity",
+          "concession",
+          "written"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "tsutsu-aru",
@@ -2241,7 +3268,24 @@
         "written"
       ],
       "notes": "Written style for change that is underway toward some result. Used with change verbs (増える, 回復する, 変わる), not with simple ongoing actions like 食べる.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "change",
+          "written"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "ppanashi",
@@ -2273,7 +3317,25 @@
         "casual"
       ],
       "notes": "Either something left undone that should have been dealt with (often a complaint), or a state that goes on without a break. Conversational.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "state",
+          "criticism",
+          "casual"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "nuku",
@@ -2305,7 +3367,24 @@
         "emphasis"
       ],
       "notes": "Stresses finishing something hard despite difficulty, or doing it to the fullest (考え抜く, 生き抜く).",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "completion",
+          "emphasis"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "uru-enai",
@@ -2337,7 +3416,24 @@
         "written"
       ],
       "notes": "Logical possibility, not personal skill (not ×泳ぎ得る for 'can swim'). The positive is read うる or える; other forms use え- (えない, えた).",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "possibility",
+          "written"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "gatai",
@@ -2369,7 +3465,25 @@
         "written"
       ],
       "notes": "Used with verbs of thinking and feeling (信じる, 理解する, 許す, 離れる). Unlike 〜にくい, not for physical difficulty (×この肉は食べがたい).",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "possibility",
+          "emotion",
+          "written"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "you-ga-nai",
@@ -2401,7 +3515,29 @@
         "means"
       ],
       "notes": "There's no method at all, even if one wanted to. 〜ようもない is more emphatic. With suru-nouns: 説明のしようがない.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "possibility",
+          "negation",
+          "means"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "you-de-wa",
@@ -2428,6 +3564,27 @@
       ],
       "notes": "Criticizes an undesirable state and predicts a bad outcome; the main clause is negative (〜ない, 困る, だめだ).",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "condition",
+          "criticism"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "nai",
@@ -2466,6 +3623,23 @@
       ],
       "notes": "For feelings or impressions that arise on their own (気がする, 思われる, 心配だ, 残念だ). More formal and written than 〜てたまらない / 〜てしょうがない.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "emotion",
+          "degree"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "te-tamaranai",
@@ -2499,6 +3673,27 @@
       ],
       "notes": "Stresses that A is the essential condition for the real value or result in B. 〜てはじめて (N3) is more neutral, focusing on timing.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "condition",
+          "emphasis"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "te-hajimete",
@@ -2531,7 +3726,28 @@
         "sequence"
       ],
       "notes": "The main clause is negative or expresses difficulty: B can't happen unless A is done first.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "condition",
+          "sequence"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "te-irai",
@@ -2563,6 +3779,22 @@
       ],
       "notes": "The main clause is a state or habit continuing from that past point up to now, not a single later event. More formal than 〜てから.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "time"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "te-kara",
@@ -2602,7 +3834,25 @@
         "formal"
       ],
       "notes": "Downplays something as small or unimportant. Often with ただ or 単なる.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "limitation",
+          "emphasis",
+          "formal"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "ni-kagiru",
@@ -2635,6 +3885,23 @@
       ],
       "notes": "The speaker's personal conviction that something is the best choice; conversational. For a more general 'it's best to', use 〜に越したことはない.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "advice",
+          "suggestion"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "ni-koshita-koto-wa-nai",
@@ -2669,6 +3936,23 @@
       ],
       "notes": "Widens the scope beyond A; the second part usually has も. Close to 〜だけでなく but a bit more formal.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "range",
+          "addition"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "dake-de-naku",
@@ -2707,7 +3991,24 @@
         "emphasis"
       ],
       "notes": "Two uses: (1) 'just when', complaining that bad luck strikes at the worst time; (2) with はずがない / ない, firm trust that a particular person wouldn't do something.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "limitation",
+          "emphasis"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "ni-kagiri",
@@ -2739,7 +4040,24 @@
         "formal"
       ],
       "notes": "Formal; typical of notices, ads and rules to state who or what a condition applies to.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "limitation",
+          "formal"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "kagiri",
@@ -2772,6 +4090,28 @@
       ],
       "notes": "'As long as' a condition holds, or 'as far as' the limit of knowledge or ability (私の知るかぎり, できるかぎり). Also written 限り. Different from 〜に限り (limited to).",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "condition",
+          "limitation",
+          "range"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "ni-kagiri",
@@ -2804,7 +4144,28 @@
         "negation"
       ],
       "notes": "B holds as long as A doesn't happen. More emphatic and formal than 〜なければ.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "condition",
+          "negation"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "ni-kakete-wa",
@@ -2830,7 +4191,24 @@
         "ability"
       ],
       "notes": "Praises someone's ability in a specific field; typically followed by 誰にも負けない, 一番だ, 自信がある.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "topic",
+          "ability"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "ni-kotaete",
@@ -2862,6 +4240,23 @@
       ],
       "notes": "Used with nouns like 期待, 要望, 声援, 要求. Also written 〜に応えて. Compare 〜に応じて, which means adjusting to a condition.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "relation",
+          "formal"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "ni-oujite",
@@ -2896,7 +4291,25 @@
         "formal"
       ],
       "notes": "Formal; for preparations or events that come before an important occasion. 〜に先立ち is the written form.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "time",
+          "sequence",
+          "formal"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "ni-shiro-ni-seyo",
@@ -2928,6 +4341,23 @@
       ],
       "notes": "Same meaning as 〜にしても (N3) but more formal; にせよ is the most written. The paired form AにしろBにしろ means 'whether A or B'.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "concession",
+          "formal"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "ni-shite-mo",
@@ -2960,6 +4390,22 @@
       ],
       "notes": "Imagines how things feel from another person's position (usually not the speaker's). Unlike 〜にとって, it focuses on that person's feelings or opinion.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "standpoint"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "ni-totte",
@@ -2995,6 +4441,24 @@
       ],
       "notes": "A written, formal equivalent of 〜に違いない (N3). Also seen on forms: 上記の通り相違ありません ('the above is correct').",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "conjecture",
+          "formal",
+          "written"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "ni-chigai-nai",
@@ -3034,6 +4498,23 @@
       ],
       "notes": "States a common-sense preference, often followed by が / けれど and a practical reservation. Compare 〜に限る, which is a more personal choice.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "advice",
+          "suggestion"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "ni-kagiru",
@@ -3066,7 +4547,24 @@
         "written"
       ],
       "notes": "Strongly asserts that this and nothing else is the case. 〜からにほかならない stresses a reason. Formal/written.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "emphasis",
+          "written"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "ni-mo-kakawarazu",
@@ -3093,6 +4591,23 @@
       ],
       "notes": "A formal counterpart of 〜のに, common in news and writing; stresses that the result goes against what A would lead one to expect. Don't confuse with 〜にかかわらず (regardless of).",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "concession",
+          "formal"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "ni-kakawarazu",
@@ -3131,6 +4646,23 @@
       ],
       "notes": "Formal; used when facing an important undertaking, often with a sense of preparation or resolve. 〜に際して is similar but simply marks the occasion. Written form: 〜にあたり.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "time",
+          "formal"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "ni-saishite",
@@ -3169,7 +4701,25 @@
         "written"
       ],
       "notes": "A formal version of で for places, times, fields or situations. Before a noun, the form is 〜における.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "range",
+          "formal",
+          "written"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "ni-kakawarazu",
@@ -3202,6 +4752,24 @@
       ],
       "notes": "Used with nouns implying a range or an opposite pair (年齢, 天候, 有無, 男女). Very close to 〜を問わず. Don't confuse with 〜にもかかわらず (despite).",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "concession",
+          "range",
+          "formal"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "ni-mo-kakawarazu",
@@ -3238,7 +4806,23 @@
         "relation"
       ],
       "notes": "Used for things with serious consequences: 命, 名誉, 信用, 将来. Also written 〜に関わる.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "relation"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "ni-tsuki",
@@ -3270,7 +4854,25 @@
         "formal"
       ],
       "notes": "Two separate uses: 'per' with quantities, and 'because of' on notices and signs (工事中につき). The reason use is very formal.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "reason",
+          "quantity",
+          "formal"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "ni-mukete",
@@ -3302,7 +4904,24 @@
         "relation"
       ],
       "notes": "Marks a goal or event being worked toward, or the audience something is directed at. Different from 〜向け (N3), 'designed for'.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "purpose",
+          "relation"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "no-moto-de-no-moto-ni",
@@ -3334,7 +4953,25 @@
         "formal"
       ],
       "notes": "Under someone's guidance, protection or influence, or under a rule or condition. Often written 〜の下で / 〜の下に.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "relation",
+          "state",
+          "formal"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "nuki-de-nuki-ni",
@@ -3367,6 +5004,23 @@
       ],
       "notes": "Leaves out something normally included. 〜抜きには〜ない / 〜を抜きにしては〜ない means 'can't ... without'.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "exclusion",
+          "manner"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "nai",
@@ -3399,7 +5053,24 @@
         "manner"
       ],
       "notes": "Used with feelings or intentions (愛, 感謝, 願い, 心). Also written 〜を込めて.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "emotion",
+          "manner"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "o-chuushin-ni",
@@ -3431,7 +5102,24 @@
         "relation"
       ],
       "notes": "A is the core or main part of a wider area, group or activity.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "range",
+          "relation"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "o-moto-ni",
@@ -3458,6 +5146,23 @@
       ],
       "notes": "A is the material or hint from which something new is made. 〜に基づいて is used when strictly following a rule or fact as a standard.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "relation",
+          "means"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "ni-motozuite",
@@ -3497,6 +5202,23 @@
       ],
       "notes": "Used with nouns implying a range or an opposite pair (男女, 昼夜, 国内外). Very close to 〜にかかわらず; を問わず is typical of job ads and notices.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "range",
+          "formal"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "ni-kakawarazu",
@@ -3534,7 +5256,24 @@
         "addition"
       ],
       "notes": "Names the most representative member of a group, then refers to the group as a whole. The main clause covers many items, not just A.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "example",
+          "addition"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "o-to-shite",
@@ -3561,6 +5300,23 @@
       ],
       "notes": "Puts A in the role or function of B; common B nouns are 目的, 目標, 中心, 対象, 条件. 〜を〜にして is a more casual variant.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "standpoint",
+          "manner"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "ni-shite",
@@ -3598,7 +5354,24 @@
         "topic"
       ],
       "notes": "With a question word (なぜ, どうして) it introduces an explanation. Without one, it raises a question only to deny the easy assumption (〜かというと、そうではない). Also 〜かといえば.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "question",
+          "topic"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "ka-to-omottara-ka-to-omou-to",
@@ -3631,7 +5404,25 @@
         "surprise"
       ],
       "notes": "B follows A immediately and unexpectedly. It describes what the speaker observes, so it isn't used for the speaker's own actions.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "time",
+          "sequence",
+          "surprise"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "ka-nai-ka-no-uchi-ni",
@@ -3657,7 +5448,24 @@
         "simultaneity"
       ],
       "notes": "The same verb is repeated in positive and negative: it's unclear whether A has even finished before B happens. Describes observed events.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "time",
+          "simultaneity"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "kiri",
@@ -3688,7 +5496,24 @@
         "time"
       ],
       "notes": "Verb-ta + きり: something happened and the expected follow-up never came (often with ない). Noun + きり: 'only' (一度きり, 二人きり). Casual: 〜っきり.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "limitation",
+          "time"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "ge",
@@ -3720,7 +5545,25 @@
         "written"
       ],
       "notes": "Describes a feeling visible in someone's face or manner; conjugates like a na-adjective (〜げな, 〜げに). Rather literary.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "appearance",
+          "emotion",
+          "written"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "kko-nai",
@@ -3748,6 +5591,28 @@
       ],
       "notes": "Casual speech only; often with potential verbs (できっこない, 分かりっこない). A casual equivalent of 〜わけがない.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "possibility",
+          "negation",
+          "casual"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "wake-ga-nai",
@@ -3786,6 +5651,23 @@
       ],
       "notes": "Either the reality is the opposite of A, or not even something lesser than A is possible (AどころかBも〜ない).",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "contrast",
+          "emphasis"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "nai",
@@ -3818,7 +5700,28 @@
         "emphasis"
       ],
       "notes": "The circumstances make A impossible or unthinkable right now. Casual: 〜どころじゃない.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "negation",
+          "emphasis"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "to-wa-kagiranai",
@@ -3846,6 +5749,27 @@
       ],
       "notes": "Denies that something is always true; often with 必ずしも or 〜からといって.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "negation",
+          "possibility"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "kara-to-itte",
@@ -3883,7 +5807,24 @@
         "criticism"
       ],
       "notes": "A firm opinion about what something really is or how things naturally are. Often used to criticize an attitude.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "emphasis",
+          "criticism"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "to-iu-mono-de-wa-nai",
@@ -3910,6 +5851,27 @@
       ],
       "notes": "Rejects an oversimplified belief; often with 〜ばいい or 〜さえ〜ば. 〜というものでもない is a softer variant.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "negation",
+          "criticism"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "sae",
@@ -3948,6 +5910,23 @@
       ],
       "notes": "Corrects or limits what the listener might assume from the first statement. Often followed by たった, ただ or 〜しか〜ない.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "concession",
+          "limitation"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "nai",
@@ -3985,7 +5964,24 @@
         "example"
       ],
       "notes": "Introduces something closely associated with a topic, or picks up a word just mentioned to shift the conversation. 〜といったら is a more emotional variant.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "topic",
+          "example"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "hoka-nai",
@@ -4012,6 +6008,27 @@
       ],
       "notes": "A somewhat formal equivalent of 〜しかない (N3). Variants: 〜ほかはない, 〜よりほかない, 〜ほかしかたがない.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "obligation",
+          "decision"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "shika-nai-no-choice",
@@ -4045,7 +6062,29 @@
         "conjecture"
       ],
       "notes": "Written/formal. First person: firm resolve not to (〜ないつもりだ). Others: negative guess (〜ないだろう). する → するまい / すまい. Often 〜まいと思う / 〜まいと決心する.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "negation",
+          "intention",
+          "conjecture"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "you-de-wa-nai-ka",
@@ -4071,7 +6110,24 @@
         "formal"
       ],
       "notes": "A strong, formal appeal to a group, typical of speeches and editorials. The casual version is 〜(よ)うじゃないか.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "invitation",
+          "formal"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "mo-kamawazu",
@@ -4097,7 +6153,24 @@
         "criticism"
       ],
       "notes": "Doing something without minding what people would normally care about (人目, 周囲, 雨). Often implies disapproval.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "manner",
+          "criticism"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "jou",
@@ -4130,7 +6203,25 @@
         "written"
       ],
       "notes": "Attaches to Sino-Japanese nouns (歴史上, 経験上, 健康上, 表面上). Read じょう, not うえ.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "standpoint",
+          "formal",
+          "written"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "osore-ga-aru",
@@ -4162,6 +6253,23 @@
       ],
       "notes": "For undesirable possibilities; typical of news, weather reports and official warnings. Also written 〜恐れがある. 〜かねない sounds more like the speaker's own judgment.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "possibility",
+          "formal"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "kanenai",
@@ -4199,7 +6307,24 @@
         "conjecture"
       ],
       "notes": "The speaker isn't sure of the cause. Mostly for bad or neutral results; for good results おかげか is also used.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "reason",
+          "conjecture"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "dake-atte-dake-ni",
@@ -4230,7 +6355,24 @@
         "emphasis"
       ],
       "notes": "だけあって praises a result that matches expectations (often with さすが). だけに also means 'all the more because' and can lead to negative outcomes.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "reason",
+          "emphasis"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "dake-no-koto-wa-aru",
@@ -4256,7 +6398,24 @@
         "emphasis"
       ],
       "notes": "Judges a result as fully justified by the effort, price or reputation; often with さすが. Like 〜だけあって, but placed at the end of the sentence.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "reason",
+          "emphasis"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "tatoe-te-mo",
@@ -4289,6 +6448,28 @@
       ],
       "notes": "たとえ signals a hypothetical 'even if' in advance and strengthens it. A more written variant is たとえ〜としても.",
       "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "concession",
+          "condition",
+          "emphasis"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 3,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      },
       "relations": [
         {
           "ruleID": "to-shite-mo",
@@ -4321,7 +6502,24 @@
         "emotion"
       ],
       "notes": "Lists a few examples among many, often suggesting chaos or mixed feelings. Frequently followed by で + 大変だ / 忙しい.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "example",
+          "emotion"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "zu-ni-sumu-naide-sumu",
@@ -4348,7 +6546,28 @@
         "negation"
       ],
       "notes": "Something unpleasant or costly turned out to be unnecessary. する → せずに済む. Compare Noun + で済む, 'be settled with just ...'.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "necessity",
+          "negation"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     },
     {
       "id": "you-ni-yotte-wa",
@@ -4374,7 +6593,28 @@
         "manner"
       ],
       "notes": "Mostly with 考え, 見, 言い, 使い: the result changes with the way A is done. Often offers a positive reinterpretation.",
-      "exercises": []
+      "exercises": [],
+      "practiceMetadata": {
+        "categories": [
+          "condition",
+          "manner"
+        ],
+        "plannedKinds": [
+          "chooseContext",
+          "understandSentence",
+          "distinguishMeaning",
+          "fillBlank",
+          "transformSentence",
+          "correctError",
+          "assembleSentence"
+        ],
+        "availableKinds": [],
+        "algorithmicForms": [],
+        "sourceExampleCount": 2,
+        "status": "plannedNeedsAuthoring",
+        "basis": "explicit OpenJLPT semantic tags; per-ID authoring availability; no pattern matching",
+        "limitationRU": "Практика и краткий русский урок ещё не подготовлены. Метаданные описывают план, а не готовый урок."
+      }
     }
   ]
 }

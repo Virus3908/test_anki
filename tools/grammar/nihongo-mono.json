@@ -1,0 +1,281 @@
+{
+  "tai": {
+    "repository": "https://github.com/stndaru/nihongo-mono",
+    "commit": "ec0ba4a0ce1611c568b0e4f8a223eb8029249a25",
+    "path": "src/data/grammar/n5.json",
+    "license": "MIT",
+    "entry": {
+      "slug": "tai",
+      "title": "たい",
+      "kana": "たい",
+      "romaji": "tai",
+      "meaning": "want to do ~",
+      "jlpt": 5,
+      "summary": "Expresses the speaker's own desire to do something: attach たい to a verb's stem to say \"I want to ~\". The result conjugates like an い-adjective (たい → たくない → たかった). Use it for your own wishes, or in a question to ask what the listener wants to do.",
+      "structure": [
+        "Verb［stem］＋ たい"
+      ],
+      "pitfalls": [
+        "たい describes the first person's desire (or asks \"you\"). To report that a third person wants something, switch to たがる.",
+        "The object can take が or を — 水が飲みたい and 水を飲みたい are both fine, with が feeling a touch stronger on the wanting."
+      ],
+      "examples": [
+        {
+          "ja": "甘いものが食べたいです。",
+          "en": "I want to eat something sweet.",
+          "f": "｜甘[あま]いものが｜食[た]べたいです。"
+        },
+        {
+          "ja": "新しい靴を買いたいです。",
+          "en": "I want to buy new shoes.",
+          "f": "｜新[あたら]しい｜靴[くつ]を｜買[か]いたいです。"
+        }
+      ],
+      "synonyms": [
+        {
+          "slug": "ga-hoshii",
+          "note": "がほしい wants a thing (a noun); たい wants to do an action (a verb)."
+        }
+      ],
+      "antonyms": [],
+      "related": [
+        {
+          "slug": "tagaru",
+          "note": "たがる reports a third person's desire; たい is for your own."
+        },
+        {
+          "slug": "te-hoshii",
+          "note": "てほしい wants someone else to do something; たい is wanting to do it yourself."
+        }
+      ],
+      "sources": [
+        "jlptsensei",
+        "bunpro"
+      ]
+    }
+  },
+  "te-hoshii": {
+    "repository": "https://github.com/stndaru/nihongo-mono",
+    "commit": "ec0ba4a0ce1611c568b0e4f8a223eb8029249a25",
+    "path": "src/data/grammar/n4.json",
+    "license": "MIT",
+    "entry": {
+      "slug": "te-hoshii",
+      "title": "てほしい",
+      "kana": "てほしい",
+      "romaji": "te hoshii",
+      "meaning": "to want someone (else) to do ~",
+      "jlpt": 4,
+      "summary": "てほしい expresses wanting another person to do something. The person you want to act is marked with に, and ほしい inflects like an い-adjective. The negative 'want you NOT to' is 〜ないでほしい.",
+      "structure": [
+        "Noun［person］＋ に ＋ Verb［て form］＋ ほしい",
+        "Verb［ない form］＋ でほしい［negative］"
+      ],
+      "pitfalls": [
+        "The subject differs from 〜たい: 〜たい = I want to do it myself; てほしい = I want another person to do it.",
+        "Mark the person you want to act with に: 君に来てほしい.",
+        "'Want you not to' is 〜ないでほしい (来ないでほしい = I want you not to come)."
+      ],
+      "examples": [
+        {
+          "ja": "明日は早く来てほしいです。",
+          "en": "I want you to come early tomorrow.",
+          "f": "｜明日[あした]は｜早[はや]く｜来[き]てほしいです。"
+        },
+        {
+          "ja": "私のことを忘れないでほしい。",
+          "en": "I don't want you to forget me.",
+          "f": "｜私[わたし]のことを｜忘[わす]れないでほしい。"
+        }
+      ],
+      "synonyms": [],
+      "antonyms": [],
+      "related": [
+        {
+          "slug": "ga-hoshii",
+          "note": "がほしい wants an object; てほしい wants an action from someone."
+        },
+        {
+          "slug": "tai",
+          "note": "〜たい is wanting to do something yourself; てほしい is wanting someone else to do it."
+        },
+        {
+          "slug": "you-ni-te-hoshii",
+          "note": "ように〜てほしい softens the request, often for outcomes not fully in the person's control."
+        }
+      ],
+      "sources": [
+        "jlptsensei",
+        "bunpro"
+      ]
+    }
+  },
+  "you-ni-suru": {
+    "repository": "https://github.com/stndaru/nihongo-mono",
+    "commit": "ec0ba4a0ce1611c568b0e4f8a223eb8029249a25",
+    "path": "src/data/grammar/n4.json",
+    "license": "MIT",
+    "entry": {
+      "slug": "you-ni-suru",
+      "title": "ようにする",
+      "kana": "ようにする",
+      "romaji": "you ni suru",
+      "meaning": "to make sure to; to make an effort to",
+      "jlpt": 4,
+      "summary": "ようにする says you deliberately arrange your behavior so a certain thing happens (or does not). It expresses making an effort or keeping a conscious habit: 毎日運動するようにする = 'make a point of exercising daily'. With ている (ようにしている) it stresses an ongoing habit you keep up.",
+      "structure": [
+        "Verb［dictionary form］＋ ようにする",
+        "Verb［ない form］＋ ようにする"
+      ],
+      "pitfalls": [
+        "ようにする is a conscious effort you make; ようになる is a change that happens on its own. 早起きするようにする (I make myself get up early) vs 早起きするようになった (I've come to get up early).",
+        "For a firm one-time decision, ことにする fits better; ようにする leans toward ongoing effort or habit.",
+        "The ている form ようにしている marks a habit you are keeping up, not a single act."
+      ],
+      "examples": [
+        {
+          "ja": "健康のために、甘い物を食べすぎないようにしています。",
+          "en": "For my health, I try not to eat too many sweets.",
+          "f": "｜健康[けんこう]のために、｜甘[あま]い｜物[もの]を｜食[た]べすぎないようにしています。"
+        },
+        {
+          "ja": "約束の時間には遅れないようにします。",
+          "en": "I'll make sure not to be late for our appointment.",
+          "f": "｜約束[やくそく]の｜時間[じかん]には｜遅[おく]れないようにします。"
+        }
+      ],
+      "synonyms": [],
+      "antonyms": [],
+      "related": [
+        {
+          "slug": "you-ni-naru",
+          "note": "ようになる is the change coming about on its own; ようにする is the effort you make."
+        },
+        {
+          "slug": "koto-ni-suru",
+          "note": "ことにする is a firm decision to do something; ようにする is ongoing effort or habit."
+        },
+        {
+          "slug": "you-ni-so-that",
+          "note": "The same purpose ように, here completed by する into a personal effort."
+        }
+      ],
+      "sources": [
+        "jlptsensei",
+        "bunpro"
+      ]
+    }
+  },
+  "wake-de-wa-nai": {
+    "repository": "https://github.com/stndaru/nihongo-mono",
+    "commit": "ec0ba4a0ce1611c568b0e4f8a223eb8029249a25",
+    "path": "src/data/grammar/n3.json",
+    "license": "MIT",
+    "entry": {
+      "slug": "wake-dewa-nai",
+      "title": "わけではない",
+      "kana": "わけではない",
+      "romaji": "wake dewa nai",
+      "meaning": "it doesn't (necessarily) mean that ~; it's not the case that ~ (partial denial)",
+      "jlpt": 3,
+      "summary": "〜わけではない gently denies a conclusion someone might jump to — 'that doesn't mean...', 'it's not that...'. 嫌いなわけではない = it's not that I dislike it. It denies part, not all, and often heads off a likely misunderstanding. Casual: わけじゃない.",
+      "structure": [
+        "Verb／い-adjective［plain form］＋ わけではない",
+        "な-adjective ＋ な／Noun ＋ という ＋ わけではない"
+      ],
+      "pitfalls": [
+        "It's a soft, partial denial ('not necessarily so'), far weaker than わけがない ('no way that's true') or a flat 〜ない.",
+        "It typically corrects an assumption the listener might otherwise make."
+      ],
+      "examples": [
+        {
+          "ja": "野菜が嫌いなわけではないが、あまり食べない。",
+          "en": "It's not that I dislike vegetables, but I don't eat many.",
+          "f": "｜野菜[やさい]が｜嫌[きら]いなわけではないが、あまり｜食[た]べない。"
+        },
+        {
+          "ja": "高いからといって、必ずおいしいわけではない。",
+          "en": "Just because it's expensive doesn't necessarily mean it's tasty.",
+          "f": "｜高[たか]いからといって、｜必[かなら]ずおいしいわけではない。"
+        }
+      ],
+      "synonyms": [
+        {
+          "slug": "kanarazushimo",
+          "note": "必ずしも〜ない is 'not always/necessarily'; it often teams up with わけではない for the same partial-denial nuance."
+        },
+        {
+          "slug": "to-iu-mono-dewa-nai",
+          "note": "というものではない denies that a general claim always holds; わけではない denies a specific inferred conclusion."
+        }
+      ],
+      "antonyms": [],
+      "related": [
+        {
+          "slug": "wake-ga-nai",
+          "note": "わけがない is a total 'impossible'; わけではない only chips away at part of a conclusion."
+        },
+        {
+          "slug": "wake-da",
+          "note": "わけだ affirms a natural conclusion; わけではない denies one."
+        }
+      ],
+      "sources": [
+        "jlptsensei",
+        "bunpro"
+      ]
+    }
+  },
+  "zu-ni-wa-okanai-nai-de-wa-okanai": {
+    "repository": "https://github.com/stndaru/nihongo-mono",
+    "commit": "ec0ba4a0ce1611c568b0e4f8a223eb8029249a25",
+    "path": "src/data/grammar/n1.json",
+    "license": "MIT",
+    "entry": {
+      "slug": "zu-niwa-okanai",
+      "title": "〜ずにはおかない・〜ないではおかない",
+      "kana": "ずにはおかない・ないではおかない",
+      "romaji": "zu niwa okanai / nai dewa okanai",
+      "meaning": "will inevitably cause; will not rest until",
+      "jlpt": 1,
+      "summary": "〜ずにはおかない declares that a force will not let things end without the verb happening. With causative or emotive verbs, the subject is often a thing whose power inevitably affects people: 聴く人を感動させずにはおかない = it cannot fail to move listeners. With a personal subject it voices fierce determination: 謝らせずにはおかない = I won't rest until I make him apologize. It is emphatic, formal, and written in flavor; する becomes せずにはおかない.",
+      "structure": [
+        "Verb［ない stem］＋ずにはおかない",
+        "Verb［ない form］＋ではおかない"
+      ],
+      "pitfalls": [
+        "Don't confuse it with ずにはいられない, which is the speaker's own uncontrollable urge; ずにはおかない is an external force or resolve that will inevitably bring the action about.",
+        "In the 'inevitable effect' use the verb is typically causative (感動させる, 考えさせる) and the subject is often a work, event, or statement.",
+        "する becomes せずにはおかない."
+      ],
+      "examples": [
+        {
+          "ja": "彼女の歌声は、聴く人を感動させずにはおかない。",
+          "en": "Her singing voice never fails to move those who hear it.",
+          "f": "｜彼女[かのじょ]の｜歌声[うたごえ]は、｜聴[き]く｜人[ひと]を｜感動[かんどう]させずにはおかない。"
+        },
+        {
+          "ja": "今回の不正は、世間の厳しい批判を招かずにはおかないだろう。",
+          "en": "This misconduct is bound to draw harsh public criticism.",
+          "f": "｜今回[こんかい]の｜不正[ふせい]は、｜世間[せけん]の｜厳[きび]しい｜批判[ひはん]を｜招[まね]かずにはおかないだろう。"
+        }
+      ],
+      "synonyms": [],
+      "antonyms": [],
+      "related": [
+        {
+          "slug": "zuni-wa-irarenai",
+          "note": "ずにはいられない is an internal urge you cannot suppress; ずにはおかない is an outcome the force of things will not fail to produce."
+        },
+        {
+          "slug": "zu-niwa-sumanai",
+          "note": "ずには済まない says circumstances oblige you to act; ずにはおかない says the action will inevitably be brought about."
+        }
+      ],
+      "sources": [
+        "jlptsensei",
+        "bunpro"
+      ]
+    }
+  }
+}

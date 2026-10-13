@@ -16,9 +16,13 @@ def check(release=False):
     pin = json.loads((ROOT / 'tools/grammar/snapshot.json').read_text())
     errors, pending, all_rules = [], [], []
     exercise_ids = set()
-    typed_kinds = {'fillBlank', 'transformSentence', 'assembleSentence', 'chooseContext', 'correctError', 'distinguishMeaning', 'understandSentence'}
+    typed_kinds = {'formProduction', 'fillBlank', 'transformSentence', 'assembleSentence', 'chooseContext', 'correctError', 'distinguishMeaning', 'understandSentence'}
     type_counts = {kind: 0 for kind in sorted(typed_kinds)}
     counts = {}
+    registry = json.loads((ROOT / 'tools/grammar/practice-metadata.json').read_text())
+    supplements = json.loads((ROOT / 'tools/grammar/nihongo-mono.json').read_text())
+    supplement_pin = json.loads((ROOT / 'tools/grammar/nihongo-snapshot.json').read_text())
+    assert hashlib.sha256((ROOT / 'tools/grammar/nihongo-mono.json').read_bytes()).hexdigest() == supplement_pin['sha256']
     for level, expected in pin['counts'].items():
         filename = level.lower() + '.json'
         source_path = ROOT / 'tools/grammar/upstream' / filename
@@ -48,6 +52,18 @@ def check(release=False):
                         assert nonempty(example['ja']) and nonempty(example['en'])
                 else:
                     assert rule.get(key) == value, f'Lost source {key}: {rule["id"]}'
+            plan = rule['practiceMetadata']
+            assert plan == registry[rule['id']]
+            assert plan['categories'] == original['tags']
+            assert plan['sourceExampleCount'] == len(original['examples'])
+            assert plan['plannedKinds'] and set(plan['plannedKinds']) <= typed_kinds
+            assert set(plan['availableKinds']) == {e['kind'] for e in rule.get('exercises', [])}
+            if rule['id'] in supplements:
+                supplemental = rule['supplement']
+                assert supplemental['commit'] == supplement_pin['commit']
+                assert supplemental['license'] == 'MIT'
+                assert supplemental['summary'] == supplements[rule['id']]['entry']['summary']
+                assert supplemental['examples'] == [{k: e[k] for k in ('ja', 'en')} for e in supplements[rule['id']]['entry']['examples']]
             localization = rule.get('localization')
             missing = []
             if localization:
@@ -89,12 +105,19 @@ def check(release=False):
                 else:
                     assert accepted and accepted < ids, f'Invalid answer key: {eid}'
                 assert exercise.get('isScored') is True
+                assert exercise.get('competency') in ('formation', 'application', 'context', 'meaning', 'contrast', 'correction')
+                if exercise['kind'] == 'formProduction':
+                    assert exercise.get('conjugation')
+                    assert exercise['provenance']['status'] == 'algorithmicallyChecked'
+                for option in options:
+                    if option['id'] in accepted and len(option['text']) >= 6:
+                        assert option['text'] not in exercise['promptRU'], f'Answer leaked in prompt: {eid}'
                 assert nonempty(exercise.get('aspect')) and nonempty(exercise.get('hintRU'))
                 assert 1 <= exercise['difficulty'] <= 3
                 assert isinstance(exercise['difficulty'], int)
                 provenance = exercise['provenance']
                 assert provenance['commit'] == pin['commit'] and provenance['sourceRuleID'] == rule['id']
-                assert provenance['status'] in ('automaticallyChecked', 'linguisticallyReviewed')
+                assert provenance['status'] in ('automaticallyChecked', 'structurallyChecked', 'algorithmicallyChecked', 'linguisticallyReviewed')
                 assert nonempty(provenance['method'])
                 if provenance['status'] == 'linguisticallyReviewed':
                     assert nonempty(exercise.get('reviewer')), 'Linguistic review requires an actual reviewer'
@@ -115,6 +138,7 @@ def check(release=False):
             if missing:
                 pending.append({'id': rule['id'], 'level': level, 'missing': missing})
         all_rules.extend(rules)
+    assert set(registry) == {r['id'] for r in all_rules}
     assert len(all_rules) == 526 and len({r['id'] for r in all_rules}) == 526
     ids = {rule['id'] for rule in all_rules}
     for rule in all_rules:
@@ -122,7 +146,7 @@ def check(release=False):
         assert len({link['ruleID'] for link in links}) == len(links)
         assert all(link['ruleID'] in ids and link['ruleID'] != rule['id'] for link in links)
         assert all(nonempty(link.get('explanationRU')) for link in links)
-    for name in ('OpenJLPT-LICENSE.txt', 'OpenJLPT-NOTICE.txt', 'Grammar-NOTICE.txt'):
+    for name in ('OpenJLPT-LICENSE.txt', 'OpenJLPT-NOTICE.txt', 'Grammar-NOTICE.txt', 'NihongoMono-LICENSE.txt', 'NihongoMono-LICENSE-DATA.txt'):
         assert nonempty((DATA / name).read_text())
     assert 'CC-BY-SA-4.0' in (DATA / 'Grammar-NOTICE.txt').read_text() or 'CC BY-SA 4.0' in (DATA / 'Grammar-NOTICE.txt').read_text()
     if release and pending:

@@ -90,7 +90,7 @@ struct StartView: View, StudyViewStyling {
         case .kanji: return "Колоды кандзи с порядком черт и интервальным повторением."
         case .words: return "Слова из локального JMdict, сгруппированные в common-наборы."
         case .kana: return "Хирагана и катакана с просмотром карточек и тренировкой письма."
-        case .grammar: return "Все 526 правил JLPT N5–N1: уроки, упражнения и интервальные повторения."
+        case .grammar: return "Грамматика JLPT N5–N1."
         case .anki: return "Импортируй колоды Anki с полями, картинками и звуком."
         }
     }

@@ -16,7 +16,6 @@ struct GrammarLevelMenu: View {
                 let all = GrammarStatistics(rules: model.rules, progress: reviewStore)
                 Text("На повторении: \(all.review) / \(all.total)")
                     .accessibilityIdentifier("grammar.total")
-                GrammarContentStatus()
                 ForEach(GrammarLevel.allCases) { level in
                     let stats = GrammarStatistics(rules: model.rules.filter { $0.level == level }, progress: reviewStore)
                     Button { onOpen(.grammarLevel(level)) } label: {
@@ -32,14 +31,6 @@ struct GrammarLevelMenu: View {
             }
         }
         .task { await model.load() }
-    }
-}
-
-struct GrammarContentStatus: View {
-    var body: some View {
-        Text("Выбери правило или продолжи обучение.")
-            .font(.callout).foregroundStyle(AppPalette.secondaryText)
-            .accessibilityIdentifier("grammar.contentStatus")
     }
 }
 
@@ -132,12 +123,12 @@ struct GrammarLevelView: View, StudyViewStyling {
         let plan = TrainingSessionEngine.plan(sourceIDs: rules.map(\.id), mode: .grammar,
             deckID: level.deck.id, progress: progress, options: options)
         return VStack(alignment: .leading, spacing: 8) {
-            Text("На повторении: \(stats.review) / \(stats.total)").font(.headline)
-            ProgressView(value: Double(stats.review), total: Double(max(1, stats.total)))
-            Text("Новые: \(stats.new) · Обучение: \(stats.learning) · Переучивание: \(stats.relearning)")
-            Text("Готовы к повторению: \(stats.due) · Исключены: \(stats.excluded)")
-            Text("Сегодня: \(plan.todayIDs.count) · Новые: \(plan.newCount) · Скрыты лимитом: \(plan.hiddenReviews)")
-            DisclosureGroup("Расписание") {
+            Text("К повторению: \(stats.due)").font(.headline)
+            Text("Новые правила: \(stats.new)").foregroundStyle(AppPalette.secondaryText)
+            DisclosureGroup("Прогресс и расписание") {
+                Text("Изучаются: \(stats.learning + stats.relearning) · На повторении: \(stats.review)")
+                Text("Сегодня: \(plan.todayIDs.count) · Новые: \(plan.newCount)")
+                Text("Скрыты лимитом: \(plan.hiddenReviews) · Исключены: \(stats.excluded)")
                 ForEach(progress.scheduleBuckets(forReviewKeys: Set(rules.map(\.reviewKey)))) { bucket in
                     Text("\(bucket.title): \(bucket.count)")
                 }

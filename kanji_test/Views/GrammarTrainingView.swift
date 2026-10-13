@@ -46,6 +46,7 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
     let translationState: TranslationViewModel
     @State private var practice: GrammarPracticeViewModel
     @State private var isLessonPresented = false
+    @FocusState private var isFormFocused: Bool
     @State private var operation: Task<Void, Never>?
 
     init(rule: GrammarRule, session: TrainingSessionViewModel, settings: StudyPreferences, translationState: TranslationViewModel) {
@@ -89,10 +90,13 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
                     }.disabled(session.isPreparingCard || practice.isSaving)
                 } else if practice.contentError == nil {
                     let assembling = practice.currentExercise?.kind == .assembleSentence && !practice.isAnswerVisible
-                    primaryActionButton(title: assembling ? "Проверить" : "Продолжить", systemImage: "arrow.right",
+                    let forming = practice.currentExercise?.kind == .formProduction && !practice.isAnswerVisible
+                    primaryActionButton(title: assembling || forming ? "Проверить" : "Продолжить", systemImage: "arrow.right",
                         accessibilityIdentifier: "grammar.training.next") {
-                        if assembling { practice.checkAssembly() } else { practice.next() }
-                    }.disabled(assembling ? practice.selectedElements.isEmpty : !practice.isAnswerVisible)
+                        if assembling { practice.checkAssembly() }
+                        else if forming { practice.checkForm() }
+                        else { practice.next() }
+                    }.disabled(assembling ? practice.selectedElements.isEmpty : forming ? practice.textAnswer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty : !practice.isAnswerVisible)
                 }
                 GlassIconButton(systemImage: "book", accessibilityLabel: "Посмотреть правило",
                     accessibilityIdentifier: "grammar.training.theory") {
@@ -112,6 +116,7 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
             await saveResult()
         }
         .onDisappear { operation?.cancel() }
+        .onChange(of: practice.isAnswerVisible) { if practice.isAnswerVisible { isFormFocused = false } }
     }
 
     private func saveResult() async {
@@ -125,13 +130,28 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
             Text("Задание \(practice.position + 1) из \(practice.count)").font(.subheadline)
                 .foregroundStyle(AppPalette.secondaryText)
             ProgressView(value: Double(practice.position), total: Double(practice.count))
+            if exercise.kind == .distinguishMeaning, let contrasts = rule.teaching?.contrastsRU {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Сравни значения").font(.headline)
+                    ForEach(contrasts, id: \.self) { Text($0).font(.callout).fixedSize(horizontal: false, vertical: true) }
+                }.padding(16).appSurfaceCard()
+            }
             Text(exercise.promptRU).font(.title3.weight(.medium)).fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier("grammar.training.prompt").accessibilityValue(exercise.id)
             if let japanese = exercise.japanese {
                 Text(japanese).font(.title2).fixedSize(horizontal: false, vertical: true)
                     .textSelection(.enabled).accessibilityIdentifier("grammar.training.japanese")
             }
-            if exercise.kind == .assembleSentence {
+            if exercise.kind == .formProduction {
+                @Bindable var model = practice
+                TextField("Напиши форму по-японски", text: $model.textAnswer)
+                    .font(.title2).padding(16).appSurfaceCard()
+                    .focused($isFormFocused)
+                    .autocorrectionDisabled().textInputAutocapitalization(.never)
+                    .submitLabel(.done).onSubmit { practice.checkForm() }
+                    .disabled(practice.isAnswerVisible)
+                    .accessibilityIdentifier("grammar.form.answer")
+            } else if exercise.kind == .assembleSentence {
                 assembly(exercise)
             } else {
                 ForEach(practice.options) { option in optionButton(option, exercise: exercise) }

@@ -25,6 +25,8 @@ def generate():
     examples = 0
     imported = []
     lessons = materials()
+    practice_metadata = json.loads((SOURCE.parent / 'practice-metadata.json').read_text())
+    supplements = json.loads((SOURCE.parent / 'nihongo-mono.json').read_text())
     all_rules = [rule for level in COUNTS
                  for rule in json.loads((SOURCE / (level.lower() + '.json')).read_text())]
     patterns = {}
@@ -63,6 +65,13 @@ def generate():
                     relations.append({'ruleID': ids[0], 'kind': 'sourceMention',
                         'explanationRU': 'Конструкция прямо упомянута в исходном примечании. Связь не означает равнозначность.'})
             rule["exercises"] = authored(rule, all_rules)
+            rule['practiceMetadata'] = practice_metadata[rule['id']]
+            if rule['id'] in supplements:
+                material = supplements[rule['id']]
+                entry = material['entry']
+                rule['supplement'] = {k: material[k] for k in ('repository', 'commit', 'path', 'license')}
+                rule['supplement'].update({k: entry[k] for k in ('summary', 'structure', 'pitfalls')})
+                rule['supplement']['examples'] = [{k: e[k] for k in ('ja', 'en')} for e in entry['examples']]
             if rule['id'] in lessons:
                 rule['teaching'] = lessons[rule['id']]['teaching']
             if relations:
@@ -103,6 +112,11 @@ def generate():
         'totalRules': len(seen), 'totalExamples': examples,
         'localizedRules': sum('localization' in r for r in imported),
         'sourceAlignedExercises': sum(len(r.get('exercises', [])) for r in imported),
+        'classifiedRules': len(practice_metadata),
+        'rulesByPracticeKind': {kind: sum(any(e['kind'] == kind for e in r.get('exercises', [])) for r in imported) for kind in KIND_NAMES},
+        'rulesWithAuthoredContext': sum(any(e['kind'] == 'chooseContext' for e in r.get('exercises', [])) for r in imported),
+        'linguisticallyReviewedRules': 0,
+        'supplementedRules': len(supplements),
         'exercisesByKind': {kind: sum(e['kind'] == kind for r in imported for e in r.get('exercises', []))
             for kind in KIND_NAMES},
         'exercisesByLevel': {level: sum(len(r.get('exercises', [])) for r in imported if r['level'] == level) for level in COUNTS},
