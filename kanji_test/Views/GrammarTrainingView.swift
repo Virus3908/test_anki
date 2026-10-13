@@ -33,7 +33,7 @@ struct GrammarTrainingView: View, StudyViewStyling {
                 CenteredLoadingIndicator(title: "Обновляю очередь")
             }
         }
-        .padding(.horizontal, 12).padding(.top, 8)
+        .padding(.horizontal, 16).padding(.top, 8)
         .foregroundStyle(AppPalette.text).background(AppPalette.background.ignoresSafeArea())
         .toolbar(.hidden, for: .navigationBar)
         .onDisappear { operation?.cancel() }
@@ -80,7 +80,7 @@ private struct GrammarPracticeCard: View, StudyViewStyling {
                     } else if let exercise = practice.currentExercise {
                         question(exercise)
                     }
-                }.padding(.horizontal, 8).padding(.bottom, 24)
+                }.padding(.bottom, 24)
             }
             .mask { BottomScrollMask() }
             .onChange(of: practice.isLessonRead) { proxy.scrollTo("grammar.practice.top", anchor: .top) }
@@ -336,7 +336,7 @@ private struct GrammarMixedResultView: View, StudyViewStyling {
                     ForEach(mixed.weakRules) { Text($0.pattern) }
                 }
                 if mixed.hasUnsavedResults { Text("Есть несохранённые результаты. Повтори сохранение.") }
-            }.padding(16).appSurfaceCard().padding(.vertical, 12)
+            }.padding(.vertical, 12).appSurfaceCard().padding(.vertical, 12)
         }.safeAreaInset(edge: .bottom) {
             BottomActionBar {
                 primaryActionButton(title: mixed.hasUnsavedResults ? "Сохранить результаты" : "Готово", systemImage: "checkmark",

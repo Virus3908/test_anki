@@ -36,7 +36,6 @@ struct GrammarLevelMenu: View {
 
 struct GrammarLevelView: View, StudyViewStyling {
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     let level: GrammarLevel
     let appModel: StudyAppViewModel
     @State private var model = GrammarLibraryViewModel()
@@ -92,36 +91,52 @@ struct GrammarLevelView: View, StudyViewStyling {
                         ForEach(categories) { Text($0.title).tag(Optional($0)) }
                     }
                     .pickerStyle(.menu)
-                    LazyVGrid(columns: ruleColumns, alignment: .center, spacing: 10) {
+                    LazyVStack(alignment: .leading, spacing: 10) {
                         ForEach(model.results) { rule in
                             NavigationLink(value: StudyRoute.grammarRule(level, rule.id)) {
-                                VStack(alignment: .leading, spacing: 8) {
+                                VStack(alignment: .leading, spacing: 4) {
                                     Text(rule.pattern)
-                                        .font(.system(size: 25, weight: .regular, design: .serif))
-                                        .multilineTextAlignment(.center)
-                                        .frame(maxWidth: .infinity, minHeight: 48)
+                                        .font(.system(.title2, design: .serif))
+                                        .frame(maxWidth: .infinity, minHeight: 30, alignment: .leading)
                                         .fixedSize(horizontal: false, vertical: true)
-                                    Text(appModel.translationState.displayedGrammarText(rule.displayedMeaning, rule: rule, language: appModel.settings.options(for: level.deck.id).meaningLanguage)).font(.callout)
-                                        .foregroundStyle(AppPalette.secondaryText)
-                                        .fixedSize(horizontal: false, vertical: true)
-                                    Rectangle().fill(AppPalette.border.opacity(0.55)).frame(height: 1)
-                                    Text(GrammarStatistics.status(rule, progress: appModel.trainingSession.reviewStore))
-                                        .font(.caption.weight(.medium)).foregroundStyle(AppPalette.secondaryText)
-                                        .lineLimit(2)
+                                    HStack(alignment: .top, spacing: 10) {
+                                        let meaning = appModel.translationState.displayedGrammarText(
+                                            rule.displayedMeaning,
+                                            rule: rule,
+                                            language: appModel.settings.options(for: level.deck.id).meaningLanguage
+                                        )
+                                        Text(meaning)
+                                            .font(.callout)
+                                            .foregroundStyle(AppPalette.secondaryText)
+                                            .lineLimit(2)
+                                            .frame(maxWidth: .infinity, minHeight: 36, alignment: .topLeading)
+                                            .fixedSize(horizontal: false, vertical: true)
+                                            .accessibilityLabel(meaning)
+
+                                        Text(GrammarStatistics.status(rule, progress: appModel.trainingSession.reviewStore))
+                                            .font(.caption.weight(.medium))
+                                            .foregroundStyle(AppPalette.secondaryText)
+                                            .multilineTextAlignment(.trailing)
+                                            .fixedSize(horizontal: false, vertical: true)
+                                            .frame(maxWidth: 112, minHeight: 36, alignment: .topTrailing)
+                                    }
                                 }
-                                .frame(maxWidth: .infinity, minHeight: 150, alignment: .topLeading)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(12)
                                 .appSurfaceCard(borderOpacity: 0.55)
                                 .cardMasteryChrome(CardMastery(record: appModel.trainingSession.reviewStore.record(for: rule.reviewKey),
                                     isExcluded: appModel.trainingSession.reviewStore.isExcluded(rule.reviewKey),
                                     now: appModel.trainingSession.reviewStore.studyDate()))
                             }
+                            .frame(maxWidth: .infinity)
                             .buttonStyle(.plain).accessibilityIdentifier("grammar.rule.\(rule.id)")
                         }
                     }
                 }
             }
-            .padding(16).foregroundStyle(AppPalette.text)
+            .padding(.horizontal, 4)
+            .padding(.vertical, 16)
+            .foregroundStyle(AppPalette.text)
         }
         }
         .padding(.horizontal, 12).padding(.top, 8)
@@ -145,11 +160,6 @@ struct GrammarLevelView: View, StudyViewStyling {
             guard !Task.isCancelled else { return }
             await model.search(query, level: level, category: category)
         }
-    }
-
-    private var ruleColumns: [GridItem] {
-        let minimum: CGFloat = dynamicTypeSize.isAccessibilitySize ? 230 : 154
-        return [GridItem(.adaptive(minimum: minimum, maximum: 300), spacing: 10)]
     }
 
     private var statistics: some View {

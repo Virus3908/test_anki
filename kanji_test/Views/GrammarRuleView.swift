@@ -42,7 +42,8 @@ struct GrammarRuleView: View, StudyViewStyling {
                     Text("Правило не найдено.")
                 }
             }
-            .padding(16)
+            .padding(.horizontal, 4)
+            .padding(.vertical, 16)
         }
         }
         .padding(.horizontal, 12).padding(.top, 8)
